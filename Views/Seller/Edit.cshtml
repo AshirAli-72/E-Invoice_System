@@ -1,0 +1,46 @@
+@model E_Invoice_system.Models.Sellers
+
+<div class="card" style="max-width: 100%; margin: 0 auto;">
+    <div class="card-header">
+        <div class="card-title">Edit Seller Profile #@Model.id</div>
+    </div>
+    
+    <form asp-action="Edit" method="post" style="padding: 1rem;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="id" />
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Business Name</label>
+            <input asp-for="name" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none;" placeholder="e.g. SATA Technologies" required />
+            <span asp-validation-for="name" style="color: #ef4444; font-size: 0.75rem;"></span>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Contact Number</label>
+            <input asp-for="contact" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none;" placeholder="e.g. +1 234 567 890" />
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Email Address</label>
+            <input asp-for="email" type="email" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none;" placeholder="e.g. info@satatech.com" />
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Business Address</label>
+            <textarea asp-for="address" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; resize: vertical;" rows="3" placeholder="Enter physical business address"></textarea>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Status</label>
+            <select asp-for="status" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; background: white;">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn-primary" style="flex: 1; justify-content: center;">Update Profile</button>
+            <a asp-action="Index" class="btn-primary" style="flex: 1; justify-content: center; background: #fff; color: var(--text); border: 1px solid var(--border);">Cancel</a>
+        </div>
+    </form>
+</div>

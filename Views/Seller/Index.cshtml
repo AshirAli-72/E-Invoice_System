@@ -1,0 +1,64 @@
+@model IEnumerable<E_Invoice_system.Models.Sellers>
+
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem;">
+        <div>
+            <div class="card-title">Seller Profiles</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Manage your business entities</p>
+        </div>
+        <a asp-action="Create" class="btn-primary" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="ph-plus"></i> Add Seller
+        </a>
+    </div>
+    
+    <div style="padding: 1rem 2rem;">
+        @foreach (var item in Model)
+        {
+            <div style="background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: #dc2626;"></div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #000;">@item.name</h2>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: @(item.status == "Active" ? "#10b981" : "#6b7280"); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem;">
+                            <div style="width: 8px; height: 8px; background: @(item.status == "Active" ? "#10b981" : "#6b7280"); border-radius: 50%;"></div>
+                            @item.status Profile
+                        </div>
+                    </div>
+                    <span style="background: white; border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">#@item.id</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Contact Information</label>
+                        <p style="font-weight: 600; margin-bottom: 0.25rem;"><i class="ph-phone" style="margin-right: 0.5rem;"></i> @item.contact</p>
+                        <p style="font-weight: 600;"><i class="ph-envelope" style="margin-right: 0.5rem;"></i> @item.email</p>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Business Address</label>
+                        <p style="font-weight: 600; line-height: 1.5;"><i class="ph-map-pin" style="margin-right: 0.5rem;"></i> @item.address</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 1rem;">
+                    <a asp-action="Edit" asp-route-id="@item.id" class="btn-primary" style="background: #f3f4f6; color: var(--text); border: 1px solid var(--border); text-decoration: none;">
+                        <i class="ph-pencil"></i> Edit Profile
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('Are you sure you want to delete this seller?');" style="display: inline;">
+                        <button type="submit" class="btn-primary" style="background: #fff; color: #dc2626; border: 1px solid #fecaca;">
+                            <i class="ph-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div style="padding: 4rem; text-align: center; color: var(--text-muted);">
+                <i class="ph-storefront" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p>No seller profiles found in the database.</p>
+                <a asp-action="Create" class="btn-primary" style="display: inline-block; margin-top: 1rem; text-decoration: none;">Create Your First Profile</a>
+            </div>
+        }
+    </div>
+</div>

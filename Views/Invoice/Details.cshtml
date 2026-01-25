@@ -1,0 +1,216 @@
+@using System.Text.Json
+
+
+@{
+    var subtotal = Model.price;
+    var discount = Model.discount;
+    var totalAmount = Model.total_price;
+    var isMultiItem = false;
+    List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
+
+    try 
+    {
+        if (!string.IsNullOrEmpty(Model.prod_name_service) && Model.prod_name_service.Trim().StartsWith("["))
+        {
+            var jsonElements = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(Model.prod_name_service);
+            if (jsonElements != null)
+            {
+                isMultiItem = true;
+                foreach(var item in jsonElements)
+                {
+                    var newItem = new Dictionary<string, object>();
+                    foreach(var kvp in item)
+                    {
+                        if (kvp.Value.ValueKind == JsonValueKind.Number)
+                            newItem[kvp.Key] = kvp.Value.GetDecimal();
+                        else if (kvp.Value.ValueKind == JsonValueKind.String)
+                            newItem[kvp.Key] = kvp.Value.GetString();
+                        else
+                            newItem[kvp.Key] = kvp.Value.ToString();
+                    }
+                    items.Add(newItem);
+                }
+                
+                // Recalculate subtotal from items if needed, but we rely on stored total_price
+                // If subtotal (Model.price) is 0 (because we only set total_price in Create), we might want to sum it up here for display
+                if (subtotal == 0 && items.Any())
+                {
+                    subtotal = items.Sum(i => (decimal)i["price"] * (decimal)i["qty"]);
+                }
+            }
+        }
+    }
+    catch
+    {
+        // Fallback to single item
+        isMultiItem = false;
+    }
+}
+
+<div class="no-print" style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: flex-end;">
+    <button onclick="printInvoice('@Url.Action("Print", new { id = Model.id })')" class="btn-primary" style="background: #10b981;">
+        <i class="ph-printer"></i> Print Invoice
+    </button>
+    <a asp-action="Index" class="btn-primary" style="background: #fff; color: var(--text); border: 1px solid var(--border);">
+        <i class="ph-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<!-- Hidden Iframe for Printing -->
+<iframe id="printFrame" style="display:none; width:0; height:0;"></iframe>
+
+<script>
+    function printInvoice(url) {
+        var frame = document.getElementById('printFrame');
+        if (frame) {
+            frame.src = url;
+        }
+    }
+</script>
+
+<div class="invoice-container" id="printableInvoice" style="background: white; padding: 3rem; color: #1f2937; font-family: 'Inter', sans-serif; min-height: 297mm; max-width: 800px; margin: 0 auto; border: 1px solid #e5e7eb;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div style="background: #dc2626; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 900; font-size: 1.25rem;">S</div>
+                <h1 style="font-size: 1.5rem; margin: 0; font-weight: 800; letter-spacing: -0.02em;">SATA Technologies</h1>
+            </div>
+            <div style="font-size: 0.9rem; color: #374151;">
+                <p style="margin: 0 0 0.25rem 0;"><strong>Invoice Number:</strong> @(Model.invoice_no ?? Model.id.ToString())</p>
+                <p style="margin: 0 0 0.25rem 0;"><strong>Date:</strong> @Model.date.ToString("dd/MM/yyyy")</p>
+                <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <strong>Status:</strong>
+                    <span style="background: @(Model.status == "Paid" ? "#dcfce7" : "#fee2e2"); color: @(Model.status == "Paid" ? "#15803d" : "#b91c1c"); padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; border: 1px solid @(Model.status == "Paid" ? "#bbf7d0" : "#fecaca");">
+                        @Model.status
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div style="background: #dc2626; color: white; padding: 1rem 3rem; font-size: 2.5rem; font-weight: 900; letter-spacing: 0.1em; border-radius: 4px;">
+            INVOICE
+        </div>
+    </div>
+
+    <div style="height: 2px; background: #e5e7eb; margin-bottom: 2rem;"></div>
+
+    <!-- Bill From / To -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; font-size: 0.9rem;">
+        <div>
+            <p style="font-weight: 700; margin-bottom: 0.5rem; color: #111827;">Bill from:</p>
+            <p style="margin: 0 0 0.25rem 0;">SATA Technologies</p>
+            <p style="margin: 0 0 0.25rem 0;">@Model.seller_address</p>
+            <p style="margin: 0;">@Model.seller_contact</p>
+        </div>
+        <div>
+            <p style="font-weight: 700; margin-bottom: 0.5rem; color: #111827;">Bill to:</p>
+            <p style="margin: 0 0 0.25rem 0;">@Model.buyer_name</p>
+            <p style="margin: 0 0 0.25rem 0;">@Model.buyer_address</p>
+            <p style="margin: 0;">@Model.buyer_contact</p>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 3rem;">
+        <thead>
+            <tr style="border-top: 2px solid #374151; border-bottom: 2px solid #374151;">
+                <th style="padding: 0.75rem 0.5rem; text-align: left; font-weight: 700; text-transform: capitalize;">Item</th>
+                <th style="padding: 0.75rem 0.5rem; text-align: center; font-weight: 700; text-transform: capitalize;">Qty/Unit</th>
+                <th style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 700; text-transform: capitalize;">Price</th>
+                <th style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 700; text-transform: capitalize;">Discount</th>
+                <th style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 700; text-transform: capitalize;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (isMultiItem)
+            {
+                foreach(var item in items)
+                {
+                    <tr>
+                        <td style="padding: 1rem 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                            <p style="font-weight: 700; margin: 0;">@item["name"]</p>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; text-align: center; border-bottom: 1px solid #e5e7eb;">
+                            <p style="margin: 0; font-weight: 600;">@item["qty"] @(item.ContainsKey("unit") ? item["unit"] : "")</p>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                            <p style="margin: 0; font-weight: 600;">$@(((decimal)item["price"]).ToString("F2"))</p>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb; color: #dc2626;">
+                            <p style="margin: 0; font-weight: 600;">-$@(((decimal)item["discount"]).ToString("F2"))</p>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb; font-weight: 700;">
+                            $@(((decimal)item["total"]).ToString("F2"))
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td style="padding: 1.5rem 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                        <p style="font-weight: 700; margin: 0 0 0.25rem 0;">@Model.prod_name_service</p>
+                    </td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: center; border-bottom: 1px solid #e5e7eb;">
+                        <p style="margin: 0; font-weight: 600;">@Model.qty_unit_type</p>
+                    </td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb;">
+                        <p style="margin: 0; font-weight: 600;">$@Model.price.ToString("F2")</p>
+                    </td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb; color: #dc2626;">
+                         <p style="margin: 0; font-weight: 600;">-$@Model.discount.ToString("F2")</p>
+                    </td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb; vertical-align: middle; font-weight: 700;">
+                        $@((Model.price - Model.discount).ToString("F2"))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Bottom Section -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="width: 50%;">
+            <p style="font-weight: 700; margin-bottom: 0.5rem;">Terms & Conditions:</p>
+            <p style="font-size: 0.8rem; color: #6b7280; line-height: 1.5;">Payment is due within 30 days. Please make checks payable to SATA Technologies. Thank you for your business!</p>
+        </div>
+        <div style="width: 35%;">
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                <span style="color: #4b5563;">Subtotal:</span>
+                <span style="font-weight: 600;">$@subtotal.ToString("F2")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                <span style="color: #4b5563;">Discount:</span>
+                <span style="font-weight: 600; color: #dc2626;">-$@discount.ToString("F2")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; margin-bottom: 1rem;">
+                <span style="color: #4b5563;">Method:</span>
+                <span style="font-weight: 600;">@Model.payment</span>
+            </div>
+            <div style="background: #dc2626; color: white; display: flex; justify-content: space-between; padding: 1rem; border-radius: 4px; font-weight: 800; font-size: 1.25rem;">
+                <span>Total</span>
+                <span>$@totalAmount.ToString("F2")</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    @@media print {
+        .no-print { display: none !important; }
+        body { background: white !important; padding: 0 !important; margin: 0 !important; }
+        .invoice-container { 
+            box-shadow: none !important; 
+            padding: 3rem !important; 
+            margin: 0 auto !important;
+            border-radius: 0 !important;
+            min-height: 297mm !important;
+            border: 1px solid #e5e7eb !important;
+            max-width: 800px !important;
+            width: 100% !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>

@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - E-Invoice System</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">S</div>
+                <div class="logo-text">SATA Invoice</div>
+                <button id="sidebarClose" class="mobile-only" style="margin-left: auto; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">
+                    <i class="ph-x"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a asp-controller="Home" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="ph-house nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a asp-controller="Buyer" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Buyer" ? "active" : "")">
+                    <i class="ph-users nav-icon"></i>
+                    <span>Buyers</span>
+                </a>
+                
+                <a asp-controller="Product" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")">
+                    <i class="ph-package nav-icon"></i>
+                    <span>Products</span>
+                </a>
+                
+                <a asp-controller="Sale" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Sale" ? "active" : "")">
+                    <i class="ph-shopping-cart nav-icon"></i>
+                    <span>Sale</span>
+                </a>
+                
+                <a asp-controller="Invoice" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoice" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="ph-file-text nav-icon"></i>
+                    <span>Invoices</span>
+                </a>
+
+                <a asp-controller="Invoice" asp-action="Create" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoice" && ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "")">
+                    <i class="ph-file-plus nav-icon"></i>
+                    <span>Create Invoice</span>
+                </a>
+
+                <a asp-controller="Seller" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seller" ? "active" : "")">
+                    <i class="ph-storefront nav-icon"></i>
+                    <span>Seller Profile</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer" style="padding: 1.5rem; border-top: 1px solid var(--border);">
+                <a asp-controller="Account" asp-action="Logout" class="nav-item">
+                    <i class="ph-sign-out nav-icon"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebarToggle" class="mobile-only" style="background: white; border: 1px solid var(--border); padding: 0.5rem; border-radius: 8px; font-size: 1.25rem; cursor: pointer; display: none;">
+                        <i class="ph-list"></i>
+                    </button>
+                </div>
+            </header>
+
+            @RenderBody()
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const mainContent = document.querySelector('.main-content');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.add('open');
+            });
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

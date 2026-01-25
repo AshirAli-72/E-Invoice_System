@@ -1,0 +1,241 @@
+@model E_Invoice_system.Models.Sale
+@{
+    var buyers = ViewBag.Buyers as List<E_Invoice_system.Models.buyers>;
+}
+
+<div class="card" style="max-width: 1200px; margin: 2rem auto; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: none; border-radius: 12px; background: white;">
+    <div class="card-header" style="background: var(--text); padding: 1.5rem 2rem; border-radius: 12px 12px 0 0;">
+        <div class="card-title" style="color: white; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="ph-receipt" style="font-size: 1.5rem; color: var(--primary);"></i>
+            Create New Sale Transaction
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" id="saleForm" style="padding: 2rem;">
+        @Html.AntiForgeryToken()
+
+        <!-- Top Section: Buyer & General Info -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">Buyer Name</label>
+                <select name="buyer_name" class="form-control" required style="width: 100%; padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                    <option value="">-- Select --</option>
+                    @if (buyers != null)
+                    {
+                        foreach (var b in buyers)
+                        {
+                            <option value="@b.name">@b.name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">Payment Method</label>
+                <select name="payment_method" class="form-control" required style="width: 100%; padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 0.95rem; outline: none;">
+                    <option value="Cash">Cash Sale</option>
+                    <option value="Card">Card Payment</option>
+                    <option value="Online">Online Transfer</option>
+                    <option value="Credit">Credit</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">Status</label>
+                <select name="status" class="form-control" required style="width: 100%; padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 0.95rem; outline: none;">
+                    <option value="Paid">Paid</option>
+                    <option value="Pendig">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                   
+                </select>
+            </div>
+        </div>
+
+        <!-- Middle Section: Product Entry Row -->
+        <div style="background: #f8fafc; border-radius: 10px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr auto; gap: 1rem; align-items: flex-end;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Product / Service</label>
+                    <select id="prodSelect" style="width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid var(--border); background: white; outline: none;">
+                        <option value="">-- Select Product --</option>
+                        @foreach (var p in ViewBag.Products as List<E_Invoice_system.Models.ProductService>)
+                        {
+                            <option value="@p.id" data-name="@p.prod_name_service" data-price="@p.price" data-discount="@p.discount" data-expiry="@(p.expiry_date?.ToString("yyyy-MM-dd"))">@p.prod_name_service</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Qty/Unit</label>
+                    <input type="text" id="rowQty" placeholder="1" style="width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid var(--border); outline: none;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Price ($)</label>
+                    <input type="number" id="rowPrice" step="0.01" style="width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid var(--border); outline: none;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Disc ($)</label>
+                    <input type="number" id="rowDisc" step="0.01" style="width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid var(--border); outline: none;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Expiry Date</label>
+                    <input type="date" id="rowExp" style="width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid var(--border); outline: none;" />
+                </div>
+                <button type="button" onclick="addToSale()" style="background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s;">
+                    <i class="ph-plus-bold"></i> Add
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Items List -->
+        <div style="overflow-x: auto; margin-bottom: 2.5rem;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
+                <thead style="background: #f1f5f9;">
+                    <tr>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Product Name</th>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Qty</th>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Unit Price</th>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Discount</th>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Expiry</th>
+                        <th style="padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total</th>
+                        <th style="padding: 1rem; text-align: center; width: 60px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="saleItemsBody" style="background: white;">
+                    <!-- Added items will appear here -->
+                </tbody>
+            </table>
+            <div id="emptyState" style="padding: 3rem; text-align: center; border: 1px dashed var(--border); border-top: none; border-radius: 0 0 10px 10px; color: var(--text-muted);">
+                <i class="ph-shopping-cart" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; opacity: 0.3;"></i>
+                No items added to the sale yet.
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase;">Description / Internal Notes</label>
+                <textarea name="description" rows="4" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--border); outline: none; resize: vertical;" placeholder="Type any remarks about this transaction..."></textarea>
+            </div>
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Grand Total Amount</span>
+                <span id="grandTotal" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">$0.00</span>
+                <span style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Includes all line discounts</span>
+            </div>
+        </div>
+
+        <!-- Hidden input container for the collection -->
+        <div id="hiddenInputsContainer"></div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 3rem; justify-content: flex-end;">
+            <button type="submit" class="btn-primary" style="padding: 1rem 3rem; font-size: 1rem; background: var(--text);">
+                <i class="ph-floppy-disk-bold"></i> Save Sale
+            </button>
+            <a asp-action="Index" class="btn-primary" style="background: white; color: var(--text); border: 1px solid var(--border); padding: 1rem 2rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    let saleItems = [];
+
+    document.getElementById('prodSelect').addEventListener('change', function() {
+        const opt = this.options[this.selectedIndex];
+        if (opt.value) {
+            document.getElementById('rowPrice').value = opt.dataset.price;
+            document.getElementById('rowDisc').value = opt.dataset.discount;
+            document.getElementById('rowExp').value = opt.dataset.expiry || "";
+            document.getElementById('rowQty').value = "1";
+        }
+    });
+
+    function addToSale() {
+        const select = document.getElementById('prodSelect');
+        const opt = select.options[select.selectedIndex];
+        
+        if (!opt.value) {
+            alert("Please select a product first!");
+            return;
+        }
+
+        const item = {
+            prod_name_service: opt.dataset.name,
+            qty_unit_type: document.getElementById('rowQty').value || "1",
+            price: parseFloat(document.getElementById('rowPrice').value) || 0,
+            discount: parseFloat(document.getElementById('rowDisc').value) || 0,
+            expiry_date: document.getElementById('rowExp').value || null
+        };
+
+        // Parse quantity for total calculation
+        const qtyNum = parseFloat(item.qty_unit_type.split(' ')[0]) || 0;
+        item.total_price = (item.price * qtyNum) - item.discount;
+
+        saleItems.push(item);
+        renderSaleItems();
+        
+        // Reset row inputs
+        select.value = "";
+        document.getElementById('rowQty').value = "";
+        document.getElementById('rowPrice').value = "";
+        document.getElementById('rowDisc').value = "";
+        document.getElementById('rowExp').value = "";
+    }
+
+    function removeItem(index) {
+        saleItems.splice(index, 1);
+        renderSaleItems();
+    }
+
+    function renderSaleItems() {
+        const body = document.getElementById('saleItemsBody');
+        const empty = document.getElementById('emptyState');
+        const hiddenContainer = document.getElementById('hiddenInputsContainer');
+        const grandTotalSpan = document.getElementById('grandTotal');
+        
+        body.innerHTML = "";
+        hiddenContainer.innerHTML = "";
+        
+        if (saleItems.length === 0) {
+            empty.style.display = "block";
+            grandTotalSpan.innerText = "$0.00";
+            return;
+        }
+        
+        empty.style.display = "none";
+        let grandTotal = 0;
+
+        saleItems.forEach((item, index) => {
+            grandTotal += item.total_price;
+            
+            // Render Table Row
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 1rem; font-weight: 600;">${item.prod_name_service}</td>
+                <td style="padding: 1rem;">${item.qty_unit_type}</td>
+                <td style="padding: 1rem; color: var(--text-muted);">$${item.price.toFixed(2)}</td>
+                <td style="padding: 1rem; color: #ef4444;">-$${item.discount.toFixed(2)}</td>
+                <td style="padding: 1rem; font-size: 0.85rem; color: var(--text-muted);">${item.expiry_date || 'N/A'}</td>
+                <td style="padding: 1rem; font-weight: 700; color: var(--primary);">$${item.total_price.toFixed(2)}</td>
+                <td style="padding: 1rem; text-align: center;">
+                    <button type="button" onclick="removeItem(${index})" style="background: #fee2e2; color: #ef4444; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ph-trash-bold"></i>
+                    </button>
+                </td>
+            `;
+            body.appendChild(tr);
+
+            // Create Hidden Inputs for Model Binding
+            const prefix = `items[${index}]`;
+            hiddenContainer.innerHTML += `
+                <input type="hidden" name="${prefix}.prod_name_service" value="${item.prod_name_service}" />
+                <input type="hidden" name="${prefix}.qty_unit_type" value="${item.qty_unit_type}" />
+                <input type="hidden" name="${prefix}.price" value="${item.price}" />
+                <input type="hidden" name="${prefix}.discount" value="${item.discount}" />
+                <input type="hidden" name="${prefix}.expiry_date" value="${item.expiry_date}" />
+                <input type="hidden" name="${prefix}.total_price" value="${item.total_price}" />
+            `;
+        });
+
+        grandTotalSpan.innerText = "$" + grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+</script>
+
+
+
+

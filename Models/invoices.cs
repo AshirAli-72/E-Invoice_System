@@ -1,0 +1,60 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace E_Invoice_system.Models
+{
+    [Table("invoices")]
+    public class invoices
+    {
+        [Key]
+        [Column("id")]
+        public int id { get; set; }
+
+        [Column("invoice_no")]
+        public string? invoice_no { get; set; }
+
+        [Column("date")]
+        public DateTime date { get; set; }
+
+        [Column("seller_name")]
+        public string? seller_name { get; set; }
+
+        [Column("seller_contact")]
+        public string? seller_contact { get; set; }
+
+        [Column("seller_address")]
+        public string? seller_address { get; set; }
+
+        [Column("buyer_name")]
+        public string? buyer_name { get; set; }
+
+        [Column("buyer_address")]
+        public string? buyer_address { get; set; }
+
+        [Column("buyer_contact")]
+        public string? buyer_contact { get; set; }
+        [Column("prod_name/service")]
+        public string? prod_name_service { get; set; }
+
+        [Column("qty/unit_type")]
+        public string? qty_unit_type { get; set; }
+
+        [Column("price")]
+        public decimal price { get; set; }
+
+        [Column("discount")]
+        public decimal discount { get; set; }
+
+        [Column("total_price")]
+        public decimal total_price { get; set; }
+
+
+        [Column("payment")]
+        public string? payment { get; set; }
+
+        [Column("status")]
+        public string? status { get; set; }
+
+
+    }
+}
