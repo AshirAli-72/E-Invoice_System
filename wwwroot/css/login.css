@@ -7,9 +7,14 @@
 /* Main Wrapper - Centered on page */
 body {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    overflow-y: auto;
-    background: linear-gradient(135deg, #ff4757 0%, #ff6b81 50%, #c44569 100%);
+    height: 100vh;
+    overflow: hidden;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /* Light E-Invoice themed background image */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,23 +24,29 @@ body {
 .login-wrapper {
     display: flex;
     width: 100%;
-    max-width: 1000px;
-    min-height: 700px;
-    background: white;
-    border-radius: 20px;
+    max-width: 1100px;
+    min-height: 600px;
+    background: rgba(255, 255, 255, 0.92);
+    /* Semi-transparent background */
+    backdrop-filter: blur(10px);
+    /* Glass effect */
+    border-radius: 4px;
     overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
 /* Left Panel with Background */
 .left-panel {
-    flex: 1.1;
-    background: linear-gradient(rgba(255, 71, 87, 0.8), rgba(196, 69, 105, 0.8)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    flex: 1;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
     position: relative;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding-bottom: 3rem;
+    padding-bottom: 0;
     overflow: hidden;
 }
 
@@ -59,10 +70,10 @@ body {
 }
 
 .overlay-content h2 {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     font-weight: 400;
     line-height: 1.6;
-    font-style: italic;
+    letter-spacing: 0.5px;
 }
 
 /* Right Panel */
@@ -72,7 +83,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 3rem;
 }
 
 /* Login Card - Simplified as it's now part of the right-panel layout */
@@ -112,6 +123,25 @@ body {
 }
 
 /* Form Styles */
+/* External Footer */
+.login-footer-external {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    text-align: center;
+    color: black;
+    font-size: 0.75rem;
+    font-weight: 400;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.login-footer-external p {
+    margin: 0;
+}
+
 .login-form {
     margin-bottom: 1.5rem;
 }
@@ -188,7 +218,7 @@ body {
 }
 
 .btn-login:hover {
-    background: #ff6b81;
+    background: #f83a3d;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
 }

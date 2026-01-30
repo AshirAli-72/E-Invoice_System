@@ -1,13 +1,13 @@
 :root {
     --primary: #ff4757;
-    --primary-hover: #ff6b81;
-    --bg-light: #f8f9fa;
+    --primary-hover: #ee3141;
+    --bg-light: #fcfcfc;
     --sidebar-bg: #ffffff;
-    --text: #2d3436;
-    --text-muted: #636e72;
-    --border: #edf2f7;
+    --text: #1a1c1e;
+    --text-muted: #5f6368;
+    --border: rgba(0, 0, 0, 0.06);
     --white: #ffffff;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
     --sidebar-width: 260px;
 }
 
@@ -44,24 +44,7 @@ body {
     gap: 0.75rem;
 }
 
-.logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--primary);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 800;
-}
-
-.logo-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text);
-}
-
+/* Sidebar Navigation Area */
 .sidebar-nav {
     flex: 1;
     padding: 0 1rem;
@@ -124,19 +107,102 @@ body {
     font-size: 0.875rem;
 }
 
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-shrink: 0;
-}
-
-.user-avatar {
+.user-avatar-initial {
     width: 40px;
     height: 40px;
-    background: var(--border);
+    background: var(--primary);
+    color: white;
     border-radius: 50%;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(255, 71, 87, 0.2);
+}
+
+.user-avatar-initial:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.user-profile {
+    position: relative;
+    margin-left: auto;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    display: none;
+    z-index: 1100;
+    animation: fadeInScale 0.2s ease;
+}
+
+.profile-dropdown.show {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 0.75rem;
+}
+
+.user-email {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.5rem 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background: #fff5f6;
+    color: var(--primary);
+}
+
+.dropdown-item i {
+    font-size: 1.1rem;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* Dashboard Grid */

@@ -19,9 +19,8 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-icon">S</div>
-                <div class="logo-text">SATA Invoice</div>
+            <div class="sidebar-header" style="justify-content: center; padding: 2.5rem 1.5rem;">
+                <img src="/images/sata-logo.png" alt="SATA" style="max-width: 160px; height: auto;" />
                 <button id="sidebarClose" class="mobile-only" style="margin-left: auto; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">
                     <i class="ph-x"></i>
                 </button>
@@ -63,22 +62,35 @@
                     <span>Seller Profile</span>
                 </a>
             </nav>
-            
-            <div class="sidebar-footer" style="padding: 1.5rem; border-top: 1px solid var(--border);">
-                <a asp-controller="Account" asp-action="Logout" class="nav-item">
-                    <i class="ph-sign-out nav-icon"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button id="sidebarToggle" class="mobile-only" style="background: white; border: 1px solid var(--border); padding: 0.5rem; border-radius: 8px; font-size: 1.25rem; cursor: pointer; display: none;">
+                    <button id="sidebarToggle" class="mobile-only" style="background: white; border: 1px solid var(--border); padding: 0.5rem; border-radius: 8px; font-size: 1.25rem; cursor: pointer;">
                         <i class="ph-list"></i>
                     </button>
+                </div>
+
+                <div class="user-profile">
+                    @{
+                        var userEmail = Context.Session.GetString("UserEmail") ?? "User";
+                        var initial = userEmail.Substring(0, 1).ToUpper();
+                    }
+                    <div class="user-avatar-initial" id="profileDropdownToggle">
+                        @initial
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <p class="user-email">@userEmail</p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a asp-controller="Account" asp-action="Logout" class="dropdown-item">
+                            <i class="ph-sign-out"></i>
+                            Logout
+                        </a>
+                    </div>
                 </div>
             </header>
 
@@ -93,6 +105,25 @@
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const mainContent = document.querySelector('.main-content');
+        
+        // Profile Dropdown
+        const profileToggle = document.getElementById('profileDropdownToggle');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                profileDropdown.classList.remove('show');
+            });
+
+            profileDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
 
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
