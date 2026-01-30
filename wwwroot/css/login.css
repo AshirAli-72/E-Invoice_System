@@ -65,6 +65,7 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
+    margin-top:80%;
     color: white;
     padding: 2rem;
 }

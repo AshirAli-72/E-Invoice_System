@@ -41,6 +41,7 @@ namespace E_Invoice_system.Controllers
                 // TEMP session (simple auth)
                 HttpContext.Session.SetString("UserEmail", user.email);
 
+                TempData["Success"] = "Welcome back! Login successful.";
                 return RedirectToAction("Index", "Home");
             }
 

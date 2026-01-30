@@ -1,4 +1,4 @@
-@model IEnumerable<E_Invoice_system.Models.ProductService>
+    @model IEnumerable<E_Invoice_system.Models.ProductService>
 
 <div class="card">
     <div class="card-header" style="justify-content: space-between; align-items: center;">
@@ -29,7 +29,7 @@
                         <td style="padding: 1rem 0.5rem; font-weight: 500;">@item.prod_name_service</td>
                         <td style="padding: 1rem 0.5rem;">@item.qty_unit_type</td>
                         <td style="padding: 1rem 0.5rem; font-weight: 700;">$@item.price.ToString("F2")</td>
-                        <td style="padding: 1rem 0.5rem; color: #ef4444;">-@item.discount.ToString("F2")</td>
+                        <td style="padding: 1rem 0.5rem; color: #ef4444;">@item.discount.ToString("F2")</td>
                         <td style="padding: 1rem 0.5rem;">
                             <span style="background: @(item.status == "Available" ? "#ecfdf5" : "#fef2f2"); color: @(item.status == "Available" ? "#10b981" : "#ef4444"); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
                                 @(item.status ?? "N/A")

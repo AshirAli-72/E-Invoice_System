@@ -1,129 +1,148 @@
 @model E_Invoice_system.Models.Sale
 
-<div class="card" style="max-width: 900px; margin: 2rem auto; padding: 2rem;">
+<div class="dashboard-panel">
+    <div class="page-header">
+        <h1 class="page-title-large">
+            Edit Sale Transaction
+        </h1>
+        <a asp-action="Index" class="btn-secondary">
+            <i class="ph-arrow-left"></i> Back to List
+        </a>
+    </div>
 
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="id" />
-        <input type="hidden" asp-for="date" />
+    <div class="form-wrapper">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="id" />
+            <input type="hidden" asp-for="date" />
 
-        <!-- Header -->
-        <div style="margin-bottom: 1.5rem;">
-            <h2 class="card-title" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.4rem;">
-                <i class="ph-receipt" style="color: var(--primary); font-size: 1.6rem;"></i> Edit Sale
-            </h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Update details for this sale transaction below.</p>
-        </div>
-
-        <!-- Buyer & Payment Info -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div>
-                <input asp-for="buyer_name" class="form-control" placeholder="Buyer Name"
-                       style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border);" />
-                <span asp-validation-for="buyer_name" class="text-danger" style="font-size: 0.7rem;"></span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <select asp-for="payment_method" class="form-control"
-                        style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border); background: var(--white);">
-                    <option value="">Payment Method</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Card">Card</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Mobile Payment">Mobile Payment</option>
-                </select>
-                <span asp-validation-for="payment_method" class="text-danger" style="font-size: 0.7rem;"></span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <select asp-for="status" class="form-control"
-                        style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border); background: var(--white);">
-                    <option value="">Status</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-                <span asp-validation-for="status" class="text-danger" style="font-size: 0.7rem;"></span>
-            </div>
-        </div>
-
-        <!-- Product Info -->
-        <div style="background: var(--bg-light); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
-            <h3 style="font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
-                <i class="ph-package" style="color: var(--primary);"></i> Product Information
-            </h3>
-
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                <div>
-                    <select id="productSelect" class="form-control"
-                            style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border); background: var(--white); width: 100%;">
-                        <option value="">Select a product...</option>
-                        @foreach (var p in ViewBag.Products)
-                        {
-                            <option value="@p.prod_name_service"
-                                    data-price="@p.price"
-                                    data-discount="@p.discount"
-                                    selected="@(p.prod_name_service == Model.prod_name_service ? "selected" : null)">
-                                @p.prod_name_service - $@p.price
-                            </option>
-                        }
-                    </select>
-                    <input type="hidden" asp-for="prod_name_service" id="prod_name_service" />
+            <!-- Section 1: Sale Info -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-receipt" style="color: var(--primary);"></i>
+                        Sale Details
+                    </h3>
                 </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="buyer_name" class="form-label">Buyer Name</label>
+                        <input asp-for="buyer_name" class="form-control" placeholder="Buyer Name" />
+                        <span asp-validation-for="buyer_name" class="text-danger"></span>
+                    </div>
 
-                <div>
-                    <input asp-for="qty_unit_type" id="quantityInput" class="form-control"
-                           style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border);" placeholder="Qty / Unit" />
+                    <div class="form-group">
+                        <label asp-for="payment_method" class="form-label">Payment Method</label>
+                        <select asp-for="payment_method" class="form-control">
+                            <option value="">Payment Method</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Mobile Payment">Mobile Payment</option>
+                        </select>
+                        <span asp-validation-for="payment_method" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="status" class="form-label">Status</label>
+                        <select asp-for="status" class="form-control">
+                            <option value="">Status</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <span asp-validation-for="status" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
-                <div>
-                    <input asp-for="price" id="priceInput" type="number" step="0.01" class="form-control"
-                           style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border);" placeholder="Unit Price" />
+            <!-- Section 2: Product Info -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-package" style="color: var(--primary);"></i>
+                        Product Information
+                    </h3>
                 </div>
-                <div>
-                    <input asp-for="discount" id="discountInput" type="number" step="0.01" class="form-control"
-                           style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border);" placeholder="Discount" />
-                </div>
-                <div>
-                    <input asp-for="expiry_date" type="date" class="form-control"
-                           style="padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border);" />
+
+                <div style="background: var(--bg-light); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div class="form-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Product</label>
+                            <select id="productSelect" class="form-control">
+                                <option value="">Select a product...</option>
+                                @foreach (var p in ViewBag.Products)
+                                {
+                                    <option value="@p.prod_name_service"
+                                            data-price="@p.price"
+                                            data-discount="@p.discount"
+                                            selected="@(p.prod_name_service == Model.prod_name_service ? "selected" : null)">
+                                        @p.prod_name_service - $@p.price
+                                    </option>
+                                }
+                            </select>
+                            <input type="hidden" asp-for="prod_name_service" id="prod_name_service" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="qty_unit_type" class="form-label">Qty / Unit</label>
+                            <input asp-for="qty_unit_type" id="quantityInput" class="form-control" placeholder="Qty / Unit" />
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                        <div class="form-group">
+                            <label asp-for="price" class="form-label">Unit Price ($)</label>
+                            <input asp-for="price" id="priceInput" type="number" step="0.01" class="form-control" placeholder="Unit Price" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="discount" class="form-label">Discount ($)</label>
+                            <input asp-for="discount" id="discountInput" type="number" step="0.01" class="form-control" placeholder="Discount" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="expiry_date" class="form-label">Expiry Date</label>
+                            <input asp-for="expiry_date" type="date" class="form-control" />
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Total Display -->
-        <div style="background: var(--text); color: var(--white); border-radius: 14px; padding: 1.4rem 1.6rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <div style="font-size: 0.85rem; opacity: 0.75;">Total Sale Amount</div>
-                <div style="font-size: 0.7rem; opacity: 0.6;">(Price × Qty) - Discount</div>
+            <!-- Section 3: Summary -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-calculator" style="color: var(--primary);"></i>
+                        Summary
+                    </h3>
+                </div>
+                
+                <div style="background: var(--text); color: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Total Sale Amount</div>
+                        <div style="font-size: 0.75rem; opacity: 0.6;">(Price × Qty) - Discount</div>
+                    </div>
+                    <div id="totalDisplay" style="font-size: 2rem; font-weight: 700; color: #4ade80;">
+                        $@Model.total_price.ToString("N2")
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="description" class="form-label">Internal Notes</label>
+                    <textarea asp-for="description" class="form-control" rows="3" placeholder="Note..."></textarea>
+                </div>
             </div>
-            <div id="totalDisplay" style="font-size: 1.8rem; font-weight: 800; color: var(--primary-hover);">
-                $@Model.total_price.ToString("N2")
+
+            <div class="form-actions-sticky">
+                <a asp-action="Index" class="btn-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="ph-floppy-disk"></i>
+                    Update Sale
+                </button>
             </div>
-        </div>
-
-        <!-- Notes Box -->
-        <div style="margin-bottom: 1.5rem;">
-            <textarea asp-for="description" class="form-control"
-                      style="padding: 0.8rem; border-radius: 14px; border: 1px solid var(--border); background: var(--white); width: 100%; min-height: 80px;"
-                      placeholder="Note..."></textarea>
-        </div>
-
-        <!-- Buttons -->
-        <div style="display: flex; gap: 1rem;">
-            <button type="submit" class="btn-primary" style="flex: 1; justify-content: center; padding: 0.9rem;">
-                <i class="ph-floppy-disk"></i> Update Sale
-            </button>
-            <a asp-action="Index" class="btn-primary" style="flex: 0.5; justify-content: center; background: var(--white); color: var(--text); border: 1px solid var(--border);">
-                Cancel
-            </a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

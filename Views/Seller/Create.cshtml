@@ -1,47 +1,77 @@
 @model E_Invoice_system.Models.Sellers
 
-<div class="card" style="max-width: 1200px; margin: 2rem auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: none; border-radius: 12px;">
-    <div class="card-header">
-        <div class="card-title">Add New Seller Profile</div>
+<div class="dashboard-panel">
+    <div class="page-header">
+        <h1 class="page-title-large">
+            Add New Seller
+        </h1>
+        <a asp-action="Index" class="btn-secondary">
+            <i class="ph-arrow-left"></i> Back to List
+        </a>
     </div>
-    
-    <form asp-action="Create" method="post" style="padding: 2rem;">
-        @Html.AntiForgeryToken()
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
-            <div>
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem;">Business Name</label>
-                <input asp-for="name" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-family: inherit; box-sizing: border-box;" placeholder="e.g. SATA Technologies" required />
-                <span asp-validation-for="name" style="color: #ef4444; font-size: 0.75rem;"></span>
-            </div>
-            <div>
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem;">Contact Number</label>
-                <input asp-for="contact" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-family: inherit; box-sizing: border-box;" placeholder="e.g. +1 234 567 890" />
-            </div>
-        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
-            <div>
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem;">Email Address</label>
-                <input asp-for="email" type="email" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-family: inherit; box-sizing: border-box;" placeholder="e.g. info@satatech.com" />
-            </div>
-            <div>
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem;">Status</label>
-                <select asp-for="status" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-family: inherit; background: white; box-sizing: border-box; display: block;">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-        </div>
+    <div class="form-wrapper">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
 
-        <div style="margin-bottom: 2rem;">
-            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem;">Business Address</label>
-            <textarea asp-for="address" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-family: inherit; resize: vertical; box-sizing: border-box;" rows="3" placeholder="Enter physical business address"></textarea>
-        </div>
+            <!-- Section 1: Basic Information -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-info" style="color: var(--primary);"></i>
+                        Basic Information
+                    </h3>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="name" class="form-label">Business Name</label>
+                        <input asp-for="name" class="form-control" placeholder="e.g. SATA Technologies" required />
+                        <span asp-validation-for="name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="contact" class="form-label">Contact Number</label>
+                        <input asp-for="contact" class="form-control" placeholder="e.g. +1 234 567 890" />
+                        <span asp-validation-for="contact" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="email" class="form-label">Email Address</label>
+                        <input asp-for="email" type="email" class="form-control" placeholder="e.g. info@satatech.com" />
+                        <span asp-validation-for="email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="status" class="form-label">Status</label>
+                        <select asp-for="status" class="form-control">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
-            <button type="submit" class="btn-primary" style="padding: 0.8rem 2rem; font-weight: 600;">Save Profile</button>
-            <a asp-action="Index" class="btn-primary" style="background: #fff; color: var(--text); border: 1px solid var(--border); padding: 0.8rem 2rem; font-weight: 600;">Cancel</a>
-        </div>
-    </form>
+            <!-- Section 2: Address -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-map-pin" style="color: var(--primary);"></i>
+                        Location Details
+                    </h3>
+                </div>
+                <div class="form-group">
+                    <label asp-for="address" class="form-label">Business Address</label>
+                    <textarea asp-for="address" class="form-control" rows="3" placeholder="Enter physical business address"></textarea>
+                    <span asp-validation-for="address" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions-sticky">
+                <a asp-action="Index" class="btn-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="ph-check"></i>
+                    Save Seller
+                </button>
+            </div>
+        </form>
+    </div>
 </div>

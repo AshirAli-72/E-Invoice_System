@@ -36,6 +36,7 @@ namespace E_Invoice_system.Controllers
             {
                 _context.sellers.Add(seller);
                 _context.SaveChanges();
+                TempData["Success"] = "Seller profile created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);
@@ -58,6 +59,7 @@ namespace E_Invoice_system.Controllers
             {
                 _context.sellers.Update(seller);
                 _context.SaveChanges();
+                TempData["Success"] = "Seller profile updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);

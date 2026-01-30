@@ -56,6 +56,7 @@ namespace E_Invoice_system.Controllers
                 product.date = DateTime.Now;
                 _context.products_services.Add(product);
                 _context.SaveChanges();
+                TempData["Success"] = "Product/Service created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -97,6 +98,7 @@ namespace E_Invoice_system.Controllers
             {
                 _context.products_services.Update(product);
                 _context.SaveChanges();
+                TempData["Success"] = "Product/Service updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);

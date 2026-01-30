@@ -36,6 +36,7 @@ namespace E_Invoice_system.Controllers
             {
                 _context.buyers.Add(buyer);
                 _context.SaveChanges();
+                TempData["Success"] = "Buyer created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(buyer);
@@ -58,6 +59,7 @@ namespace E_Invoice_system.Controllers
             {
                 _context.buyers.Update(buyer);
                 _context.SaveChanges();
+                TempData["Success"] = "Buyer updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(buyer);

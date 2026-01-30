@@ -57,6 +57,7 @@ namespace E_Invoice_system.Controllers
 
                 _context.invoices.Add(invoice);
                 _context.SaveChanges();
+                TempData["Success"] = "Invoice generated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
