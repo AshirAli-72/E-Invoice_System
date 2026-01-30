@@ -115,19 +115,18 @@
                     </h3>
                 </div>
                 
-                <div style="background: var(--text); color: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">Total Sale Amount</div>
-                        <div style="font-size: 0.75rem; opacity: 0.6;">(Price × Qty) - Discount</div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span style="font-size: 1.1rem; font-weight: 600; color: var(--text);">Total Amount:</span>
+                        <div id="totalDisplay" style="font-size: 2rem; font-weight: 800; color: var(--primary);">
+                            $@Model.total_price.ToString("N2")
+                        </div>
                     </div>
-                    <div id="totalDisplay" style="font-size: 2rem; font-weight: 700; color: #4ade80;">
-                        $@Model.total_price.ToString("N2")
-                    </div>
-                </div>
 
-                <div class="form-group">
-                    <label asp-for="description" class="form-label">Internal Notes</label>
-                    <textarea asp-for="description" class="form-control" rows="3" placeholder="Note..."></textarea>
+                    <div class="form-group">
+                        <label asp-for="description" class="form-label">Internal Notes (Optional)</label>
+                        <textarea asp-for="description" class="form-control" rows="3" placeholder="Note..." data-val="false"></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -163,14 +162,28 @@
 
         productSelect.addEventListener('change', function() {
             const selected = this.options[this.selectedIndex];
+            // ID for expiry assumed to be default asp-for generated ID 'expiry_date'
+            const expiryInput = document.getElementById('expiry_date'); 
+            
             if (selected.value) {
                 prodNameHidden.value = selected.value;
                 priceInput.value = selected.dataset.price || 0;
                 discountInput.value = selected.dataset.discount || 0;
+                
+                // Set fields to read-only
+                priceInput.readOnly = true;
+                discountInput.readOnly = true;
+                if(expiryInput) expiryInput.readOnly = true;
+                
             } else {
                 prodNameHidden.value = "";
                 priceInput.value = 0;
                 discountInput.value = 0;
+                
+                // Allow editing if cleared (optional behavior)
+                priceInput.readOnly = false;
+                discountInput.readOnly = false;
+                if(expiryInput) expiryInput.readOnly = false;
             }
             calculateTotal();
         });

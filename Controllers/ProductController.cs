@@ -53,6 +53,9 @@ namespace E_Invoice_system.Controllers
 
             if (ModelState.IsValid)
             {
+                // Ensure description is null if empty
+                if (string.IsNullOrWhiteSpace(product.description)) product.description = null;
+
                 product.date = DateTime.Now;
                 _context.products_services.Add(product);
                 _context.SaveChanges();
@@ -96,6 +99,9 @@ namespace E_Invoice_system.Controllers
 
             if (ModelState.IsValid)
             {
+                // Ensure description is null if empty
+                if (string.IsNullOrWhiteSpace(product.description)) product.description = null;
+
                 _context.products_services.Update(product);
                 _context.SaveChanges();
                 TempData["Success"] = "Product/Service updated successfully!";

@@ -116,7 +116,7 @@ namespace E_Invoice_system.Controllers
                     s.total_price,
                     s.status,
                     date = s.date.ToString("yyyy-MM-dd"),
-                    expiryDate = s.expiry_date.ToString("yyyy-MM-dd")
+                    expiryDate = s.expiry_date.HasValue ? s.expiry_date.Value.ToString("yyyy-MM-dd") : null
                 })
                 .ToList();
 

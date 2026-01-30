@@ -27,7 +27,7 @@ namespace E_Invoice_system.Models
         [Column("discount")]
         public decimal discount { get; set; }
         [Column("expiry_date")]
-        public DateTime expiry_date { get; set; }
+        public DateTime? expiry_date { get; set; }
 
         [Column("total_price")]
         public decimal total_price { get; set; }

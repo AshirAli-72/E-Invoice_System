@@ -37,8 +37,11 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string buyer_name, string status, string payment_method, string description, List<Sale> items)
+        public IActionResult Create(string buyer_name, string status, string payment_method, string? description, List<Sale> items)
         {
+            // Remove description from validation as it is optional
+            ModelState.Remove("description");
+
             if (items == null || !items.Any())
             {
                 ModelState.AddModelError("", "At least one product/service must be added.");
@@ -46,6 +49,9 @@ namespace E_Invoice_system.Controllers
 
             if (ModelState.IsValid)
             {
+                // Ensure description is null if empty
+                if (string.IsNullOrWhiteSpace(description)) description = null;
+
                 DateTime now = DateTime.Now;
                 foreach (var item in items)
                 {
@@ -66,9 +72,10 @@ namespace E_Invoice_system.Controllers
                     // Calculate total
                     item.total_price = (item.price * qty) - item.discount;
 
-                    _context.sales.Add(item);
                 }
+                _context.sales.AddRange(items);
                 _context.SaveChanges();
+                TempData["Success"] = "Sale created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -106,8 +113,12 @@ namespace E_Invoice_system.Controllers
 
             if (ModelState.IsValid)
             {
+                // Ensure description is null if empty
+                if (string.IsNullOrWhiteSpace(sale.description)) sale.description = null;
+
                 _context.sales.Update(sale);
                 _context.SaveChanges();
+                TempData["Success"] = "Sale updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
