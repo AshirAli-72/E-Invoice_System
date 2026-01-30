@@ -43,7 +43,7 @@ namespace E_Invoice_system.Controllers
             // Recent invoices
             var recentInvoices = _context.invoices
                 .OrderByDescending(i => i.date)
-                .Take(5)
+                .Take(4)
                 .ToList();
 
             return View(recentInvoices);
