@@ -23,9 +23,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [HttpPost]
-        
-        public IActionResult Login(string email, string password)
+        public IActionResult Login(string email, string password, bool rememberMe)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
