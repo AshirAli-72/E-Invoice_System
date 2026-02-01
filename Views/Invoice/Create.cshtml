@@ -4,21 +4,29 @@
     var sellers = ViewBag.Sellers as List<E_Invoice_system.Models.Sellers>;
 }
 
-<div class="form-card">
-    <div class="form-header">
-        <h2 class="form-title">
+<div class="dashboard-panel">
+    <div class="page-header">
+        <h1 class="page-title-large">
             <i class="ph-file-plus" style="color: var(--primary);"></i>
             Generate New Invoice
-        </h2>
+        </h1>
+        <a asp-action="Index" class="btn-secondary">
+            <i class="ph-arrow-left"></i> Back to List
+        </a>
     </div>
     
-    <div class="form-body">
+    <div class="form-wrapper">
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
-            <div style="margin-bottom: 2rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <label class="form-label" style="color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; display: block; margin-bottom: 1rem;">Seller Information (Self)</label>
-                
+            <!-- Section 1: Seller Information -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-buildings" style="color: var(--primary);"></i>
+                        Seller Information (Self)
+                    </h3>
+                </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Company Name</label>
@@ -48,10 +56,15 @@
                 </div>
             </div>
 
-            <div class="form-grid">
-            <div style="margin-bottom: 2rem;">
-                <label class="form-label" style="color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; display: block; margin-bottom: 1rem;">Buyer Information</label>
-                
+
+            <!-- Section 2: Buyer Information -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-user" style="color: var(--primary);"></i>
+                        Buyer Information
+                    </h3>
+                </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Select Buyer</label>
@@ -78,102 +91,105 @@
                 </div>
             </div>
 
-            <!-- Sales Selection Section -->
-            <div id="salesListContainer" style="display: none; background: #fffbff; border: 1px solid #fbcfe8; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <h4 style="margin: 0; font-size: 0.9rem; color: #9d174d; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="ph-shopping-cart" style="font-size: 1.1rem;"></i> 
-                        Check Previous Sales for this Buyer
-                    </h4>
-                    <button type="button" onclick="addSelectedSales()" class="btn-primary" style="background: #9d174d; border: none; padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-                        Add Selected
-                    </button>
+            <!-- Section 3: Line Items & Totals -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3 class="form-section-title">
+                        <i class="ph-list-bullets" style="color: var(--primary);"></i>
+                        Invoice Line Items
+                    </h3>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+
+                <!-- Sales Selection Section -->
+                <div id="salesListContainer" style="display: none; background: #fffbff; border: 1px dotted var(--primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h4 style="margin: 0; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="ph-shopping-cart-simple" style="font-size: 1.25rem;"></i> 
+                            Check Previous Sales for this Buyer
+                        </h4>
+                        <button type="button" onclick="addSelectedSales()" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                            Add Selected Items
+                        </button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                            <thead>
+                                <tr style="text-align: left; border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                                    <th style="padding: 0.75rem 0.5rem; width: 40px;"></th>
+                                    <th style="padding: 0.75rem 0.5rem;">Date</th>
+                                    <th style="padding: 0.75rem 0.5rem;">Product / Service</th>
+                                    <th style="padding: 0.75rem 0.5rem; width: 80px;">Qty</th>
+                                    <th style="padding: 0.75rem 0.5rem; width: 100px;">Price</th>
+                                    <th style="padding: 0.75rem 0.5rem; width: 100px;">Discount</th>
+                                    <th style="padding: 0.75rem 0.5rem;">Expiry</th>
+                                    <th style="padding: 0.75rem 0.5rem; width: 100px;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesListBody">
+                                <!-- Sales will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div style="overflow-x: auto; margin-bottom: 1.5rem;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
                         <thead>
-                            <tr style="text-align: left; border-bottom: 1px solid #fbcfe8;">
-                                <th style="padding: 0.4rem; width: 40px;"></th>
-                                <th style="padding: 0.4rem; width: 100px; white-space: nowrap;">Date</th>
-                                <th style="padding: 0.4rem;">Product / Service</th>
-                                <th style="padding: 0.4rem; width: 80px;">Qty/Unit</th>
-                                <th style="padding: 0.4rem; width: 80px;">Price</th>
-                                <th style="padding: 0.4rem; width: 80px;">Discount</th>
-                                <th style="padding: 0.4rem; width: 100px; white-space: nowrap;">Expiry Date</th>
-                                <th style="padding: 0.4rem; width: 80px;">Status</th>
-                                <th style="padding: 0.4rem; width: 90px;">Total</th>
+                            <tr style="background: #f8fafc; text-align: left;">
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 35%;">Product/Service</th>
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 15%;">Qty/Unit</th>
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 16%;">Expiry</th>
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 11%;">Price</th>
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 11%;">Discount</th>
+                                <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 11%;">Total</th>
+                                <th style="padding: 1rem; width: 80px;"></th>
                             </tr>
                         </thead>
-                        <tbody id="salesListBody">
-                            <!-- Sales will be loaded here -->
+                        <tbody id="itemsTableBody">
+                            <!-- Items added from sales will be listed here -->
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1rem 0;" />
-            
-            <!-- Items Table -->
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                    <thead>
-                        <tr style="background: #f8fafc; text-align: left;">
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 35%;">Product/Service</th>
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 15%;">Qty/Unit_type</th>
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 16%; white-space: nowrap;">Expiry Date</th>
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 11%;">Price</th>
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 11%;">Discount</th>
-                            <th style="padding: 0.5rem; font-size: 0.85rem; font-weight: 600; width: 11%;">Total</th>
-                            <th style="padding: 0.5rem; width: 60px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="itemsTableBody">
-                        <!-- Items added from sales will be listed here -->
-                    </tbody>
-                </table>
-            </div>
+                <!-- Hidden Fields for Storage -->
+                <input type="hidden" asp-for="prod_name_service" id="prodNameServiceHidden" />
+                <input type="hidden" asp-for="qty_unit_type" id="qtyUnitTypeHidden" />
+                <input type="hidden" asp-for="total_price" id="totalPriceInput" />
+                <input type="hidden" asp-for="price" id="priceInputHidden" />
+                <input type="hidden" asp-for="discount" id="totalDiscountInput" />
 
-            <!-- Hidden Fields for Storage -->
-            <input type="hidden" asp-for="prod_name_service" id="prodNameServiceHidden" />
-            <input type="hidden" asp-for="qty_unit_type" id="qtyUnitTypeHidden" />
-            <input type="hidden" asp-for="total_price" id="totalPriceInput" />
-            <input type="hidden" asp-for="price" id="priceInputHidden" />
-            <!-- We use discount column to store total discount of the invoice -->
-            <input type="hidden" asp-for="discount" id="totalDiscountInput" />
-
-
-            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1rem 0;" />
-
-            <div style="margin-bottom: 2rem;">
-                <label class="form-label" style="color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; display: block; margin-bottom: 1rem;">Payment & Status</label>
-                
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
-                    <div class="form-group">
-                        <label class="form-label">Invoice Status</label>
-                        <select asp-for="status" class="form-control">
-                            <option value="Pending">Pending</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Payment Method</label>
-                        <select asp-for="payment" class="form-control">
-                            <option value="Cash">Cash</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="Online">Online</option>
-                            <option value="Credit">Credit</option>
-                        </select>
+                <!-- Section 4: Finalize & Payment -->
+                <div style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
+                        <div class="form-group">
+                            <label class="form-label">Invoice Status</label>
+                            <select asp-for="status" class="form-control">
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Method</label>
+                            <select asp-for="payment" class="form-control">
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Online">Online</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-actions">
+            <div class="form-actions-sticky">
                 <a asp-action="Index" class="btn-secondary">
                     Cancel
                 </a>
                 <button type="submit" class="btn-primary">
-                    Create Invoice
+                    <i class="ph-check-circle"></i>
+                    Generate Invoice
                 </button>
             </div>
         </form>
