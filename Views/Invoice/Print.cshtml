@@ -133,12 +133,6 @@
             align-items: flex-start;
         }
 
-        .logo-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .logo-box {
             background: white;
             padding: 10px;
@@ -153,27 +147,21 @@
             display: block;
         }
 
-        .invoice-title-section {
-            text-align: right;
-        }
-
         .invoice-label {
-            font-size: 56px;
+            font-size: 40px;
             font-weight: 900;
             color: #BC1823;
             text-transform: uppercase;
             line-height: 1;
-            margin-bottom: 5px;
         }
 
         .invoice-no {
             font-size: 16px;
             font-weight: 700;
             color: #1C2120;
-            letter-spacing: 1px;
+            text-align: right;
         }
 
-        /* Billing Details Layout */
         .details-section {
             padding: 0 60px 40px 60px;
             display: flex;
@@ -182,9 +170,7 @@
             z-index: 10;
         }
 
-        .billing-box {
-            width: 45%;
-        }
+        .billing-box { width: 45%; }
 
         .section-label {
             background: #BC1823;
@@ -195,7 +181,13 @@
             display: inline-block;
             margin-bottom: 15px;
             text-transform: uppercase;
-            border-radius: 2px;
+        }
+
+        .billing-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1C2120;
+            margin-bottom: 5px;
         }
 
         .billing-details {
@@ -204,27 +196,12 @@
             line-height: 1.6;
         }
 
-        .billing-name {
-            font-size: 18px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        /* Status & Payment Bar */
         .info-bar {
             padding: 0 60px 30px 60px;
             display: flex;
             gap: 40px;
             position: relative;
             z-index: 10;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
         }
 
         .info-label {
@@ -243,12 +220,10 @@
         .status-badge {
             padding: 2px 10px;
             border-radius: 4px;
-            background: #111827;
             color: white;
             font-size: 12px;
         }
 
-        /* Table Styles */
         .items-section {
             padding: 0 60px;
             flex-grow: 1;
@@ -259,31 +234,12 @@
             border-collapse: collapse;
         }
 
-        thead tr {
-            background: #BC1823;
-            color: white;
-        }
-
-        th {
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 14px;
-            color: #374151;
-        }
-
+        thead tr { background: #BC1823; color: white; }
+        th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #4b5563; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
-        /* Summary & Signature Section */
         .bottom-section {
             padding: 40px 60px;
             display: flex;
@@ -293,17 +249,8 @@
             z-index: 10;
         }
 
-        .summary-box {
-            width: 35%;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 14px;
-        }
-
+        .summary-box { width: 45%; }
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
         .summary-total {
             background: #BC1823;
             color: white;
@@ -313,14 +260,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
             font-weight: 800;
             font-size: 18px;
             box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
-        }
-
-        .signature-box {
-            text-align: center;
-            width: 200px;
         }
 
         .signature-line {
@@ -332,7 +275,8 @@
             text-transform: uppercase;
         }
 
-        /* Bottom Geometric Patterns */
+        .signature-box { text-align: center; width: 200px; }
+
         .bottom-pattern {
             position: relative;
             height: 150px;
@@ -380,8 +324,6 @@
             color: white;
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
             z-index: 10;
         }
 
@@ -412,6 +354,8 @@
         }
 
         @@media print {
+            .btn-print { display: none !important; }
+            
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -453,14 +397,6 @@
 
             .items-section {
                 padding-bottom: 160px !important;
-            }
-
-            .btn-print {
-                display: none !important;
-            }
-
-            .top-pattern, .bottom-pattern {
-                display: block !important;
             }
         }
     </style>
