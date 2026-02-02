@@ -42,7 +42,7 @@
 }
 
 <div class="no-print" style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: flex-end; padding: 0 20px;">
-    <button onclick="window.print()" class="btn-primary" style="background: #ff0000; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+    <button onclick="window.print()" class="btn-primary" style="background: #BC1823; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 800; display: flex; align-items: center; gap: 8px;">
         <i class="ph-printer-bold"></i> PRINT INVOICE
     </button>
     <a asp-action="Index" class="btn-primary" style="background: #111827; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 700;">
@@ -95,7 +95,7 @@
         <div class="info-bar">
             <div class="info-item">
                 <div class="info-label">Status</div>
-                <div class="info-value"><span class="status-badge" style="background: @(Model.status == "Paid" ? "#10b981" : "#ff0000")">@(Model.status ?? "PENDING")</span></div>
+                <div class="info-value"><span class="status-badge" style="background: @(Model.status == "Paid" ? "#10b981" : "#BC1823")">@(Model.status ?? "PENDING")</span></div>
             </div>
             <div class="info-item">
                 <div class="info-label">Payment Method</div>
@@ -220,7 +220,7 @@
         left: 0;
         width: 180px;
         height: 180px;
-        background: #ff0000;
+        background: #BC1823;
         clip-path: polygon(0 0, 100% 0, 0 100%);
         z-index: 2;
     }
@@ -231,7 +231,7 @@
         left: 80px;
         width: 150px;
         height: 150px;
-        background: #111827;
+        background: #1C2120;
         clip-path: polygon(0 0, 100% 0, 40% 100%);
         z-index: 1;
         opacity: 0.9;
@@ -243,7 +243,7 @@
         left: 200px;
         width: 200px;
         height: 100px;
-        background: #111827;
+        background: #1C2120;
         clip-path: polygon(0 0, 100% 0, 60% 100%);
         z-index: 0;
         opacity: 0.8;
@@ -274,7 +274,7 @@
     .invoice-label {
         font-size: 56px;
         font-weight: 900;
-        color: #ff0000;
+        color: #BC1823;
         text-transform: uppercase;
         line-height: 1;
     }
@@ -282,7 +282,7 @@
     .invoice-no {
         font-size: 16px;
         font-weight: 700;
-        color: #111827;
+        color: #1C2120;
         text-align: right;
     }
 
@@ -295,7 +295,7 @@
     }
 
     .section-label {
-        background: #ff0000;
+        background: #BC1823;
         color: white;
         padding: 4px 15px;
         font-size: 12px;
@@ -308,7 +308,7 @@
     .billing-name {
         font-size: 18px;
         font-weight: 800;
-        color: #111827;
+        color: #1C2120;
         margin-bottom: 5px;
     }
 
@@ -356,9 +356,9 @@
         border-collapse: collapse;
     }
 
-    thead tr { background: #ff0000; color: white; }
-    th { padding: 12px 15px; text-align: left; font-size: 12px; font-weight: 800; text-transform: uppercase; }
-    td { padding: 15px; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #111827; }
+    thead tr { background: #BC1823; color: white; }
+    th { padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 15px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
@@ -374,15 +374,17 @@
     .summary-box { width: 35%; }
     .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
     .summary-total {
-        background: #ff0000;
+        background: #BC1823;
         color: white;
-        padding: 15px;
-        border-radius: 4px;
-        margin-top: 10px;
+        padding: 25px 30px;
+        border-radius: 8px;
+        margin-top: 20px;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         font-weight: 900;
-        font-size: 20px;
+        font-size: 28px;
+        box-shadow: 0 10px 20px rgba(188, 24, 35, 0.15);
     }
 
     .signature-line {
@@ -407,7 +409,7 @@
         left: 150px;
         width: 400px;
         height: 120px;
-        background: #ff0000;
+        background: #BC1823;
         clip-path: polygon(20% 0, 100% 100%, 0 100%);
         z-index: 2;
     }
@@ -418,7 +420,7 @@
         left: 0;
         width: 300px;
         height: 150px;
-        background: #111827;
+        background: #1C2120;
         clip-path: polygon(0 0, 60% 100%, 0 100%);
         z-index: 1;
     }
@@ -429,7 +431,7 @@
         right: 0;
         width: 350px;
         height: 80px;
-        background: #111827;
+        background: #1C2120;
         clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
         z-index: 1;
     }

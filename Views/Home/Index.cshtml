@@ -1,4 +1,4 @@
-﻿@model IEnumerable<E_Invoice_system.Models.invoices>
+@model IEnumerable<E_Invoice_system.Models.invoices>
 @{
     ViewData["Title"] = "Dashboard";
 }
@@ -45,7 +45,7 @@
     <div class="card">
         <div class="card-header">
             <div class="card-title">Recent Invoices</div>
-            <a asp-controller="Invoice" asp-action="Index" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View All</a>
+            <a asp-controller="Invoice" asp-action="Index" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: #BC1823; border: none; color: white;">View All</a>
         </div>
         
         <table style="width: 100%; border-collapse: collapse;">
@@ -169,8 +169,8 @@
         
         // gradient for the line chart fill
         var gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.2)');
-        gradient.addColorStop(1, 'rgba(255, 0, 0, 0.0)');
+        gradient.addColorStop(0, 'rgba(188, 24, 35, 0.2)');
+        gradient.addColorStop(1, 'rgba(188, 24, 35, 0.0)');
 
         new Chart(trendCtx, {
             type: 'line',
@@ -180,10 +180,10 @@
                     label: 'Invoices Issued',
                     data: [12, 19, 3, 5, 2, 8],
                     backgroundColor: gradient,
-                    borderColor: '#ff0000',
+                    borderColor: '#bc1823',
                     borderWidth: 2,
                     pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#ff0000',
+                    pointBorderColor: '#bc1823',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
