@@ -1,10 +1,11 @@
 :root {
-    --primary: #E53935;
-    --primary-hover: #D32F2F;
+    --primary: #BC1823;
+    --primary-hover: #9c141d;
+    --secondary: #1C2120;
     --bg-light: #ffffff;
     --sidebar-bg: #ffffff;
-    --text: #4b5563;
-    --text-muted: #9ca3af;
+    --text: #1C2120;
+    --text-muted: #64748b;
     --border: rgba(0, 0, 0, 0.04);
     --white: #ffffff;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.02);

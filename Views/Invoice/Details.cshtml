@@ -84,9 +84,8 @@
             <div class="billing-box" style="text-align: right;">
                 <div class="section-label">Invoice From:</div>
                 <div class="billing-details">
-                    <div class="billing-name">SATA TECHNOLOGIES</div>
+                    <div class="billing-name">@Model.seller_name</div>
                     <div>@Model.seller_address</div>
-                    <div>Phone: @Model.seller_contact</div>
                     <div style="font-weight: 800; color: #111827; margin-top: 5px;">Date: @Model.date.ToString("dd MMM yyyy")</div>
                 </div>
             </div>
@@ -158,7 +157,7 @@
                 </div>
                 <div class="summary-row">
                     <span style="font-weight: 700; color: #6b7280;">Discount</span>
-                    <span style="font-weight: 800; color: #ff0000;">-$@discount.ToString("N2")</span>
+                    <span style="font-weight: 800; color: #BC1823;">-$@discount.ToString("N2")</span>
                 </div>
                 <div class="summary-total">
                     <span>Grand Total</span>
@@ -220,7 +219,7 @@
         left: 0;
         width: 180px;
         height: 180px;
-        background: #E53935;
+        background: #BC1823;
         clip-path: polygon(0 0, 100% 0, 0 100%);
         z-index: 2;
     }
@@ -357,8 +356,8 @@
     }
 
     thead tr { background: #BC1823; color: white; }
-    th { padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 15px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
+    th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #4b5563; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
@@ -376,15 +375,15 @@
     .summary-total {
         background: #BC1823;
         color: white;
-        padding: 25px 30px;
-        border-radius: 8px;
-        margin-top: 20px;
+        padding: 12px 24px;
+        border-radius: 20px;
+        margin-top: 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-weight: 900;
-        font-size: 28px;
-        box-shadow: 0 10px 20px rgba(188, 24, 35, 0.15);
+        font-weight: 800;
+        font-size: 18px;
+        box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
     }
 
     .signature-line {
@@ -409,7 +408,7 @@
         left: 150px;
         width: 400px;
         height: 120px;
-        background: #E53935;
+        background: #BC1823;
         clip-path: polygon(20% 0, 100% 100%, 0 100%);
         z-index: 2;
     }
@@ -446,8 +445,13 @@
         z-index: 10;
     }
 
+    @@page {
+        size: A4;
+        margin: 0;
+    }
+
     @@media print {
-        #invoiceViewWrapper { padding: 0; margin: 0; background: white !important; height: 100vh; border: none; }
+        #invoiceViewWrapper { padding: 0; margin: 0; background: white !important; height: 100vh; border: none; overflow: hidden; }
         .no-print, .sidebar, .top-bar, .toast-container { display: none !important; }
         
         * {
@@ -463,6 +467,7 @@
             height: 297mm;
             width: 210mm;
             background: white !important;
+            overflow: hidden;
         }
 
         #printableInvoice, #printableInvoice * { 
@@ -474,7 +479,7 @@
             left: 0 !important; 
             top: 0 !important; 
             width: 210mm !important; 
-            height: 297mm !important;
+            height: 296mm !important;
             margin: 0 !important; 
             padding: 0 !important;
             box-shadow: none !important;
@@ -484,8 +489,8 @@
             display: flex !important;
             flex-direction: column !important;
             overflow: hidden !important;
-            /* Scale to fit one page */
-            transform: scale(0.98);
+            /* Scale slightly if needed to ensure one page and no scrollbars */
+            transform: scale(0.97);
             transform-origin: top center;
         }
 

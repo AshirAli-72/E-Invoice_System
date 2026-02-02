@@ -307,15 +307,15 @@
         .summary-total {
             background: #BC1823;
             color: white;
-            padding: 25px 30px;
-            border-radius: 8px;
-            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 20px;
+            margin-top: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 900;
-            font-size: 28px;
-            box-shadow: 0 10px 20px rgba(188, 24, 35, 0.15);
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
         }
 
         .signature-box {
@@ -430,15 +430,14 @@
             .invoice-container {
                 box-shadow: none !important;
                 width: 210mm !important;
-                height: 297mm !important;
+                height: 296mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 position: absolute;
                 top: 0;
                 left: 0;
-                overflow: hidden;
-                /* Shrink slightly to ensure one page fit if content is long */
-                transform: scale(0.98);
+                overflow: hidden !important;
+                transform: scale(0.97);
                 transform-origin: top center;
             }
 
@@ -489,9 +488,8 @@
             <div class="billing-box" style="text-align: right;">
                 <div class="section-label">Invoice From:</div>
                 <div class="billing-details">
-                    <div class="billing-name">SATA TECHNOLOGIES</div>
+                    <div class="billing-name">@Model.seller_name</div>
                     <div>@Model.seller_address</div>
-                    <div>Phone: @Model.seller_contact</div>
                     <div style="font-weight: 800; color: #111827; margin-top: 5px;">Date: @Model.date.ToString("dd MMM yyyy")</div>
                 </div>
             </div>
@@ -563,7 +561,7 @@
                 </div>
                 <div class="summary-row">
                     <span style="font-weight: 700; color: #6b7280;">Discount</span>
-                    <span style="font-weight: 800; color: #ff0000;">-$@discount.ToString("N2")</span>
+                    <span style="font-weight: 800; color: #BC1823;">-$@discount.ToString("N2")</span>
                 </div>
                 <div class="summary-total">
                     <span>Grand Total</span>

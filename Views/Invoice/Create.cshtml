@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- Sales Selection Section -->
-                <div id="salesListContainer" style="display: none; background: #fffbff; border: 1px dotted var(--primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                <div id="salesListContainer" style="display: none; background: #fffbff; border: 1px dotted #BC1823; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h4 style="margin: 0; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
                             <i class="ph-shopping-cart-simple" style="font-size: 1.25rem;"></i> 
@@ -232,7 +232,7 @@
                     body.innerHTML = '';
                     data.sales.forEach((sale, index) => {
                         const tr = document.createElement('tr');
-                        tr.style.borderBottom = '1px solid #fecaca';
+                        tr.style.borderBottom = '1px solid #ffcccc';
                         tr.innerHTML = `
                             <td style="padding: 0.4rem; text-align: center;">
                                 <input type="checkbox" class="sale-checkbox" data-index="${index}" style="width: 14px; height: 14px;">
