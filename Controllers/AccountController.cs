@@ -31,19 +31,27 @@ namespace E_Invoice_system.Controllers
                 return View();
             }
 
-            var user = _context.users
-                .FirstOrDefault(u => u.email == email && u.password == password);
-
-            if (user != null)
+            try
             {
-                // TEMP session (simple auth)
-                HttpContext.Session.SetString("UserEmail", user.email);
+                var user = _context.users
+                    .FirstOrDefault(u => u.email == email && u.password == password);
 
-                TempData["Success"] = "Welcome back! Login successful.";
-                return RedirectToAction("Index", "Home");
+                if (user != null)
+                {
+                    // TEMP session (simple auth)
+                    HttpContext.Session.SetString("UserEmail", user.email);
+
+                    TempData["Success"] = "Welcome back! Login successful.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("", "Invalid email or password.");
             }
-
-            ModelState.AddModelError("", "Invalid email or password.");
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Session expired. Please try again.");
+            }
+            
             return View(); // 🔥 Redirect nahi, View return karo
         }
 
