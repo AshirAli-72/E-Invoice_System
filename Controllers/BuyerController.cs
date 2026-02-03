@@ -57,6 +57,24 @@ namespace E_Invoice_system.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existingBuyer = _context.buyers.AsNoTracking().FirstOrDefault(b => b.id == buyer.id);
+                if (existingBuyer != null && existingBuyer.name != buyer.name)
+                {
+                    // Update invoices
+                    var invoices = _context.invoices.Where(i => i.buyer_name == existingBuyer.name).ToList();
+                    foreach (var inv in invoices)
+                    {
+                        inv.buyer_name = buyer.name;
+                    }
+
+                    // Update sales
+                    var sales = _context.sales.Where(s => s.buyer_name == existingBuyer.name).ToList();
+                    foreach (var sale in sales)
+                    {
+                        sale.buyer_name = buyer.name;
+                    }
+                }
+
                 _context.buyers.Update(buyer);
                 _context.SaveChanges();
                 TempData["Success"] = "Buyer updated successfully!";

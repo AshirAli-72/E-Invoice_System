@@ -57,6 +57,17 @@ namespace E_Invoice_system.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existingSeller = _context.sellers.AsNoTracking().FirstOrDefault(s => s.id == seller.id);
+                if (existingSeller != null && existingSeller.name != seller.name)
+                {
+                    // Update invoices
+                    var invoices = _context.invoices.Where(i => i.seller_name == existingSeller.name).ToList();
+                    foreach (var inv in invoices)
+                    {
+                        inv.seller_name = seller.name;
+                    }
+                }
+
                 _context.sellers.Update(seller);
                 _context.SaveChanges();
                 TempData["Success"] = "Seller profile updated successfully!";
