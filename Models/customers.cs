@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace E_Invoice_system.Models
 {
-    [Table("buyers")]
-    public class buyers
+    [Table("customers")]
+    public class customers
     {
         [Key]
         [Column("id")]

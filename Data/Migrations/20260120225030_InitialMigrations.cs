@@ -12,7 +12,7 @@ namespace E_Invoice_system.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "buyers",
+                name: "customers",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -25,7 +25,7 @@ namespace E_Invoice_system.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_buyers", x => x.id);
+                    table.PrimaryKey("PK_customers", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -39,9 +39,9 @@ namespace E_Invoice_system.Migrations
                     seller_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     seller_contact = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     seller_address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    buyer_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    buyer_address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    buyer_contact = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    customer_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    customer_address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    customer_contact = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     prod_name_service = table.Column<string>(name: "prod_name/service", type: "nvarchar(max)", nullable: true),
                     qty_unit_type = table.Column<string>(name: "qty/unit_type", type: "nvarchar(max)", nullable: true),
                     price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -100,7 +100,7 @@ namespace E_Invoice_system.Migrations
                {
                    id = table.Column<int>(type: "int", nullable: false)
                        .Annotation("SqlServer:Identity", "1, 1"),
-                   buyer_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                   customer_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                    date = table.Column<DateTime>(type: "datetime2", nullable: false),
                    prod_name_service = table.Column<string>(name: "prod_name/service", type: "nvarchar(max)", nullable: true),
                    qty_unit_type = table.Column<string>(name: "qty/unit_type", type: "nvarchar(max)", nullable: true),
@@ -137,7 +137,7 @@ namespace E_Invoice_system.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "buyers");
+                name: "customers");
 
             migrationBuilder.DropTable(
                name: "sale_details");

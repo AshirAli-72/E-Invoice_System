@@ -1,9 +1,9 @@
-@model E_Invoice_system.Models.buyers
+@model E_Invoice_system.Models.customers
 
 <div class="dashboard-panel">
     <div class="page-header">
         <h1 class="page-title-large">
-            Add New Buyer
+            Add New Customer
         </h1>
         <a asp-action="Index" class="btn-secondary">
             <i class="ph-arrow-left"></i> Back to List
@@ -18,14 +18,14 @@
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-users" style="color: var(--primary);"></i>
-                        Buyer Details
+                        <i class="ph-users form-icon-primary"></i>
+                        Customer Details
                     </h3>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label asp-for="name" class="form-label">Full Name</label>
-                        <input asp-for="name" class="form-control" placeholder="Enter buyer's full name" required />
+                        <input asp-for="name" class="form-control" placeholder="Enter customer's full name" required />
                         <span asp-validation-for="name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -52,7 +52,7 @@
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-map-pin" style="color: var(--primary);"></i>
+                        <i class="ph-map-pin form-icon-primary"></i>
                         Address Information
                     </h3>
                 </div>
@@ -69,7 +69,7 @@
                 </a>
                 <button type="submit" class="btn-primary">
                     <i class="ph-check"></i>
-                    Save Buyer
+                    Save Customer
                 </button>
             </div>
         </form>

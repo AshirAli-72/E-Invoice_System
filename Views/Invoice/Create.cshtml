@@ -1,13 +1,13 @@
 @model E_Invoice_system.Models.invoices
 @{
-    var buyers = ViewBag.Buyers as List<E_Invoice_system.Models.buyers>;
+    var customers = ViewBag.Customers as List<E_Invoice_system.Models.customers>;
     var sellers = ViewBag.Sellers as List<E_Invoice_system.Models.Sellers>;
 }
 
 <div class="dashboard-panel">
     <div class="page-header">
         <h1 class="page-title-large">
-            <i class="ph-file-plus" style="color: var(--primary);"></i>
+            <i class="ph-file-plus form-icon-primary"></i>
             Generate New Invoice
         </h1>
         <a asp-action="Index" class="btn-secondary">
@@ -23,7 +23,7 @@
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-buildings" style="color: var(--primary);"></i>
+                        <i class="ph-buildings form-icon-primary"></i>
                         Seller Information (Self)
                     </h3>
                 </div>
@@ -57,22 +57,22 @@
             </div>
 
 
-            <!-- Section 2: Buyer Information -->
+            <!-- Section 2: Customer Information -->
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-user" style="color: var(--primary);"></i>
-                        Buyer Information
+                        <i class="ph-user form-icon-primary"></i>
+                        Customer Information
                     </h3>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label class="form-label">Select Buyer</label>
-                        <select asp-for="buyer_name" class="form-control" required id="buyerSelect">
-                            <option value="">-- Choose Buyer --</option>
-                            @foreach (var b in buyers)
+                        <label class="form-label">Select Customer</label>
+                        <select asp-for="customer_name" class="form-control" required id="customerSelect">
+                            <option value="">-- Choose Customer --</option>
+                            @foreach (var c in customers)
                             {
-                                <option value="@b.name" data-address="@b.address" data-contact="@b.contact">@b.name</option>
+                                <option value="@c.name" data-address="@c.address" data-contact="@c.contact">@c.name</option>
                             }
                         </select>
                     </div>
@@ -81,12 +81,12 @@
                         <input asp-for="invoice_no" class="form-control" placeholder="INV-0001 (Auto)" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Buyer Contact</label>
-                        <input asp-for="buyer_contact" id="buyerContact" class="form-control" placeholder="Buyer Contact" />
+                        <label class="form-label">Customer Contact</label>
+                        <input asp-for="customer_contact" id="customerContact" class="form-control" placeholder="Customer Contact" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Buyer Address</label>
-                        <input asp-for="buyer_address" id="buyerAddress" class="form-control" placeholder="Buyer Address" />
+                        <label class="form-label">Customer Address</label>
+                        <input asp-for="customer_address" id="customerAddress" class="form-control" placeholder="Customer Address" />
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-list-bullets" style="color: var(--primary);"></i>
+                        <i class="ph-list-bullets form-icon-primary"></i>
                         Invoice Line Items
                     </h3>
                 </div>
@@ -105,13 +105,13 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h4 style="margin: 0; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
                             <i class="ph-shopping-cart-simple" style="font-size: 1.25rem;"></i> 
-                            Check Previous Sales for this Buyer
+                            Check Previous Sales for this Customer
                         </h4>
                         <button type="button" onclick="addSelectedSales()" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
                             Add Selected Items
                         </button>
                     </div>
-                    <div style="overflow-x: auto;">
+                    <div class="table-responsive">
                         <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
                             <thead>
                                 <tr style="text-align: left; border-bottom: 1px solid var(--border); color: var(--text-muted);">
@@ -198,7 +198,7 @@
 
 <script>
     let invoiceItems = [];
-    let currentBuyerSales = [];
+    let currentCustomerSales = [];
     const products = @Html.Raw(Json.Serialize(ViewBag.Products));
 
     document.getElementById('sellerSelect').addEventListener('change', function() {
@@ -207,28 +207,28 @@
         document.getElementById('sellerAddressTop').value = option.getAttribute('data-address') || '';
     });
 
-    document.getElementById('buyerSelect').addEventListener('change', function() {
-        const buyerName = this.value;
+    document.getElementById('customerSelect').addEventListener('change', function() {
+        const customerName = this.value;
         const container = document.getElementById('salesListContainer');
         const body = document.getElementById('salesListBody');
         
-        if (!buyerName) {
+        if (!customerName) {
             container.style.display = 'none';
-            document.getElementById('buyerContact').value = '';
-            document.getElementById('buyerAddress').value = '';
+            document.getElementById('customerContact').value = '';
+            document.getElementById('customerAddress').value = '';
             return;
         }
 
         const option = this.options[this.selectedIndex];
-        document.getElementById('buyerContact').value = option.getAttribute('data-contact') || '';
-        document.getElementById('buyerAddress').value = option.getAttribute('data-address') || '';
+        document.getElementById('customerContact').value = option.getAttribute('data-contact') || '';
+        document.getElementById('customerAddress').value = option.getAttribute('data-address') || '';
 
 
-        fetch(`/Invoice/GetSalesByBuyer?buyerName=${encodeURIComponent(buyerName)}`)
+        fetch(`/Invoice/GetSalesByCustomer?customerName=${encodeURIComponent(customerName)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.sales.length > 0) {
-                    currentBuyerSales = data.sales;
+                    currentCustomerSales = data.sales;
                     body.innerHTML = '';
                     data.sales.forEach((sale, index) => {
                         const tr = document.createElement('tr');
@@ -261,7 +261,7 @@
         const checkboxes = document.querySelectorAll('.sale-checkbox:checked');
         checkboxes.forEach(cb => {
             const index = cb.dataset.index;
-            const sale = currentBuyerSales[index];
+            const sale = currentCustomerSales[index];
             
             const item = {
                 id: 0, // Not a specific product ID if it's from a sale record

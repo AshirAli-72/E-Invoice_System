@@ -10,8 +10,8 @@ namespace E_Invoice_system.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("buyer_name")]
-        public string? buyer_name { get; set; }
+        [Column("customer_name")]
+        public string? customer_name { get; set; }
         [Column("date")]
         public DateTime date { get; set; }
    

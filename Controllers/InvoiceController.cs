@@ -28,7 +28,7 @@ namespace E_Invoice_system.Controllers
         public IActionResult Create()
         {
             ViewData["Title"] = "Create Invoice";
-            ViewBag.Buyers = _context.buyers.Where(b => b.status == "Active").ToList();
+            ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
             ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
             ViewBag.Sellers = _context.sellers.ToList();
             return View();
@@ -50,12 +50,12 @@ namespace E_Invoice_system.Controllers
                     invoice.invoice_no = "INV-" + DateTime.Now.ToString("yyyyMMdd") + "-" + (_context.invoices.Count() + 1).ToString("D3");
                 }
 
-                var buyer = _context.buyers.FirstOrDefault(b => b.name == invoice.buyer_name);
+                var customer = _context.customers.FirstOrDefault(c => c.name == invoice.customer_name);
 
-                if (buyer != null)
+                if (customer != null)
                 {
-                    invoice.buyer_address = buyer.address;
-                    invoice.buyer_contact = buyer.contact;
+                    invoice.customer_address = customer.address;
+                    invoice.customer_contact = customer.contact;
                 }
 
                 _context.invoices.Add(invoice);
@@ -64,7 +64,7 @@ namespace E_Invoice_system.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Buyers = _context.buyers.Where(b => b.status == "Active").ToList();
+            ViewBag.Customers = _context.customers.Where(b => b.status == "Active").ToList();
             ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
             ViewBag.Sellers = _context.sellers.ToList();
             return View(invoice);
@@ -75,12 +75,12 @@ namespace E_Invoice_system.Controllers
             var invoice = _context.invoices.FirstOrDefault(i => i.id == id);
             if (invoice == null) return NotFound();
 
-            // Fetch latest buyer info
-            var buyer = _context.buyers.FirstOrDefault(b => b.name == invoice.buyer_name);
-            if (buyer != null)
+            // Fetch latest customer info
+            var customer = _context.customers.FirstOrDefault(c => c.name == invoice.customer_name);
+            if (customer != null)
             {
-                invoice.buyer_address = buyer.address;
-                invoice.buyer_contact = buyer.contact;
+                invoice.customer_address = customer.address;
+                invoice.customer_contact = customer.contact;
             }
 
             // Fetch latest seller info
@@ -107,12 +107,12 @@ namespace E_Invoice_system.Controllers
             var invoice = _context.invoices.FirstOrDefault(i => i.id == id);
             if (invoice == null) return NotFound();
 
-            // Fetch latest buyer info
-            var buyer = _context.buyers.FirstOrDefault(b => b.name == invoice.buyer_name);
-            if (buyer != null)
+            // Fetch latest customer info
+            var customer = _context.customers.FirstOrDefault(c => c.name == invoice.customer_name);
+            if (customer != null)
             {
-                invoice.buyer_address = buyer.address;
-                invoice.buyer_contact = buyer.contact;
+                invoice.customer_address = customer.address;
+                invoice.customer_contact = customer.contact;
             }
 
             // Fetch latest seller info
@@ -146,13 +146,13 @@ namespace E_Invoice_system.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetSalesByBuyer(string buyerName)
+        public JsonResult GetSalesByCustomer(string customerName)
         {
-            if (string.IsNullOrEmpty(buyerName))
-                return Json(new { success = false, message = "Buyer name is required." });
+            if (string.IsNullOrEmpty(customerName))
+                return Json(new { success = false, message = "Customer name is required." });
 
             var sales = _context.sales
-                .Where(s => s.buyer_name == buyerName)
+                .Where(s => s.customer_name == customerName)
                 .OrderByDescending(s => s.date)
                 .Select(s => new
                 {

@@ -325,3 +325,8 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.sourcelink.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-timfbiolvn-timfbiolvn.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-ezqwx4tk5h-ezqwx4tk5h.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-puekgj3qo1-puekgj3qo1.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\dfpdpy54t7-{0}-8xhe4h775t-8xhe4h775t.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\e5ers0z3f0-{0}-b558t20bat-b558t20bat.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\rg1vk5gd84-{0}-u5owk5v596-u5owk5v596.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-owk7dp5oxu-owk7dp5oxu.gz

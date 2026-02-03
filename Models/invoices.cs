@@ -25,14 +25,14 @@ namespace E_Invoice_system.Models
         [Column("seller_address")]
         public string? seller_address { get; set; }
 
-        [Column("buyer_name")]
-        public string? buyer_name { get; set; }
+        [Column("customer_name")]
+        public string? customer_name { get; set; }
 
-        [Column("buyer_address")]
-        public string? buyer_address { get; set; }
+        [Column("customer_address")]
+        public string? customer_address { get; set; }
 
-        [Column("buyer_contact")]
-        public string? buyer_contact { get; set; }
+        [Column("customer_contact")]
+        public string? customer_contact { get; set; }
         [Column("prod_name/service")]
         public string? prod_name_service { get; set; }
 

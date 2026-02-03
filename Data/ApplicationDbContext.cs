@@ -11,7 +11,7 @@ namespace E_Invoice_system.Data
         }
 
         public DbSet<Sellers> sellers { get; set; }
-        public DbSet<buyers> buyers { get; set; }
+        public DbSet<customers> customers { get; set; }
         public DbSet<ProductService> products_services { get; set; }
         public DbSet<users> users { get; set; }
         public DbSet<invoices> invoices { get; set; }

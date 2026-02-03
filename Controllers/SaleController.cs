@@ -28,7 +28,7 @@ namespace E_Invoice_system.Controllers
         public IActionResult Create()
         {
             ViewData["Title"] = "New Sale";
-            ViewBag.Buyers = _context.buyers.Where(b => b.status == "Active").ToList();
+            ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
             ViewBag.Products = _context.products_services
                 .Where(p => p.status == "Available")
                 .ToList();
@@ -37,7 +37,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string buyer_name, string status, string payment_method, string? description, List<Sale> items)
+        public IActionResult Create(string customer_name, string status, string payment_method, string? description, List<Sale> items)
         {
             // Remove description from validation as it is optional
             ModelState.Remove("description");
@@ -55,7 +55,7 @@ namespace E_Invoice_system.Controllers
                 DateTime now = DateTime.Now;
                 foreach (var item in items)
                 {
-                    item.buyer_name = buyer_name;
+                    item.customer_name = customer_name;
                     item.status = status;
                     item.payment_method = payment_method;
                     item.description = description;

@@ -13,7 +13,7 @@
             <thead>
                 <tr style="text-align: left; border-bottom: 2px solid var(--border);">
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; width: 180px;">Invoice #</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Buyer</th>
+                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Customer</th>
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; width: 140px;">Date</th>
 @using System.Text.Json
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; width: 25%;">Product/Service</th>
@@ -27,7 +27,7 @@
                 {
                     <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
                         <td style="padding: 1rem 0.5rem; font-weight: 600;">#@(item.invoice_no ?? item.id.ToString())</td>
-                        <td style="padding: 1rem 0.5rem;">@item.buyer_name</td>
+                        <td style="padding: 1rem 0.5rem;">@item.customer_name</td>
                         <td style="padding: 1rem 0.5rem;">@item.date.ToString("MMM dd, yyyy")</td>
                         <td style="padding: 1rem 0.5rem;">
                             @{

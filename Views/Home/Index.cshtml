@@ -18,8 +18,8 @@
             <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;"><i class="ph-users"></i></div>
             
         </div>
-        <div class="stat-label">Total Buyers</div>
-        <div class="stat-value">@ViewBag.TotalBuyers</div>
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value">@ViewBag.TotalCustomers</div>
     </div>
 
     <div class="stat-card">
@@ -52,7 +52,7 @@
             <thead>
                 <tr style="text-align: left; border-bottom: 2px solid var(--border);">
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Invoice ID</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Buyer</th>
+                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Customer</th>
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Date</th>
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Amount</th>
                     <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Status</th>
@@ -63,7 +63,7 @@
                 {
                     <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 1rem 0.5rem; font-weight: 600;">#@(inv.invoice_no ?? inv.id.ToString())</td>
-                        <td style="padding: 1rem 0.5rem;">@inv.buyer_name</td>
+                        <td style="padding: 1rem 0.5rem;">@inv.customer_name</td>
                         <td style="padding: 1rem 0.5rem;">@inv.date.ToString("MMM dd, yyyy")</td>
                         <td style="padding: 1rem 0.5rem; font-weight: 700;">$@(inv.total_price.ToString("N2"))</td>
 
@@ -95,8 +95,8 @@
             <a asp-controller="Invoice" asp-action="Create" class="btn-primary" style="justify-content: center;">
                 <i class="ph-file-plus"></i> New Invoice
             </a>
-            <a asp-controller="Buyer" asp-action="Create" class="btn-primary" style="justify-content: center; background: #fff; color: var(--text); border: 1px solid var(--border);">
-                <i class="ph-user-plus"></i> Add New Buyer
+            <a asp-controller="Customer" asp-action="Create" class="btn-primary" style="justify-content: center; background: #fff; color: var(--text); border: 1px solid var(--border);">
+                <i class="ph-user-plus"></i> Add New Customer
             </a>
             <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
                 <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 0.5rem;">System Health</div>

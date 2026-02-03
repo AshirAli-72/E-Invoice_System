@@ -14,14 +14,19 @@
     <script src="https://unpkg.com/phosphor-icons"></script>
     
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/app-base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/invoice.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sale.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product.css" asp-append-version="true" />
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header" style="justify-content: center; padding: 2.5rem 1.5rem;">
-                <img src="/images/sata-logo.png" alt="SATA" style="max-width: 160px; height: auto;" />
-                <button id="sidebarClose" class="mobile-only" style="margin-left: auto; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">
+            <div class="sidebar-header sidebar-logo-container">
+                <img src="/images/sata-logo.png" alt="SATA" class="sidebar-logo" />
+                <button id="sidebarClose" class="mobile-only mobile-close-btn">
                     <i class="ph-x"></i>
                 </button>
             </div>
@@ -32,9 +37,9 @@
                     <span>Dashboard</span>
                 </a>
                 
-                <a asp-controller="Buyer" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Buyer" ? "active" : "")">
+                <a asp-controller="Customer" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Customer" ? "active" : "")">
                     <i class="ph-users nav-icon"></i>
-                    <span>Buyers</span>
+                    <span>Customers</span>
                 </a>
                 
                 <a asp-controller="Product" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")">
@@ -67,8 +72,8 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button id="sidebarToggle" class="mobile-only" style="background: white; border: 1px solid var(--border); padding: 0.5rem; border-radius: 8px; font-size: 1.25rem; cursor: pointer;">
+                <div class="top-bar-left">
+                    <button id="sidebarToggle" class="mobile-only mobile-toggle-btn">
                         <i class="ph-list"></i>
                     </button>
                 </div>
@@ -76,7 +81,7 @@
                 <div class="user-profile">
                     @{
                         var userEmail = Context.Session.GetString("UserEmail") ?? "User";
-                        var initial = userEmail.Substring(0, 1).ToUpper();
+                        var initial = userEmail.Length > 0 ? userEmail.Substring(0, 1).ToUpper() : "U";
                     }
                     <div class="user-avatar-initial" id="profileDropdownToggle">
                         @initial

@@ -34,20 +34,20 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Views/Buyer/Add.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV5ZXJcQWRkLmNzaHRtbA==
+[D:/netcore/E-Invoice_system/Views/Customer/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcQWRkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Views/Buyer/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV5ZXJcQ3JlYXRlLmNzaHRtbA==
+[D:/netcore/E-Invoice_system/Views/Customer/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Views/Buyer/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV5ZXJcRWRpdC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/Views/Customer/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Views/Buyer/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV5ZXJcSW5kZXguY3NodG1s
+[D:/netcore/E-Invoice_system/Views/Customer/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Views/Home/Index.cshtml]

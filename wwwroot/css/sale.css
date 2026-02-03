@@ -1,0 +1,9 @@
+/* Sale-specific styles */
+.sale-item-row {
+    border-bottom: 1px dashed var(--border);
+}
+
+.sale-total-highlight {
+    color: var(--primary);
+    font-weight: 800;
+}

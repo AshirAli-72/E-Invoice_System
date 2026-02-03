@@ -125,7 +125,7 @@ namespace E_Invoice_system.Migrations
                     b.ToTable("sellers");
                 });
 
-            modelBuilder.Entity("E_Invoice_system.Models.buyers", b =>
+            modelBuilder.Entity("E_Invoice_system.Models.customers", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -156,7 +156,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("buyers");
+                    b.ToTable("customers");
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.invoices", b =>
@@ -168,17 +168,17 @@ namespace E_Invoice_system.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("buyer_address")
+                    b.Property<string>("customer_address")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("buyer_address");
+                        .HasColumnName("customer_address");
 
-                    b.Property<string>("buyer_contact")
+                    b.Property<string>("customer_contact")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("buyer_contact");
+                        .HasColumnName("customer_contact");
 
-                    b.Property<string>("buyer_name")
+                    b.Property<string>("customer_name")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("buyer_name");
+                        .HasColumnName("customer_name");
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2")
@@ -268,9 +268,9 @@ namespace E_Invoice_system.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("buyer_name")
+                    b.Property<string>("customer_name")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("buyer_name");
+                        .HasColumnName("customer_name");
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2")

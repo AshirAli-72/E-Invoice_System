@@ -22,7 +22,7 @@ namespace E_Invoice_system.Controllers
         {
             // COUNTS
             ViewBag.TotalInvoices = _context.invoices.Count();
-            ViewBag.TotalBuyers = _context.buyers.Count();
+            ViewBag.TotalCustomers = _context.customers.Count();
             ViewBag.TotalProducts = _context.products_services.Count();
 
             // ✅ TOTAL SALES AMOUNT
