@@ -1,7 +1,7 @@
 @model IEnumerable<E_Invoice_system.Models.customers>
 
-<div class="card">
-    <div class="card-header card-header-flex">
+<div class="card card-no-padding">
+    <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem;">
         <div class="card-title">Manage Customers</div>
         <a asp-action="Create" class="btn-primary">
             <i class="ph-user-plus"></i> Add New Customer
@@ -12,34 +12,34 @@
         <table class="styled-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="padding-left: 1.5rem;">ID</th>
                     <th>Name</th>
                     <th>Contact</th>
                     <th>Email</th>
                     <th>Status</th>
-                    <th style="text-align: right;">Actions</th>
+                    <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
-                        <td class="font-bold">#@item.id</td>
+                    <tr>
+                        <td class="font-bold" style="padding-left: 1.5rem;">#@item.id</td>
                         <td class="font-medium">@item.name</td>
                         <td>@item.contact</td>
-                        <td class="text-muted">@item.email</td>
+                        <td class="text-muted font-sm">@item.email</td>
                         <td>
                             <span class="status-badge @(item.status == "Active" ? "status-active" : "status-inactive")">
                                 @(item.status ?? "Inactive")
                             </span>
                         </td>
-                        <td style="text-align: right;">
-                            <div class="actions-container">
-                                <a asp-action="Edit" asp-route-id="@item.id" class="btn-primary btn-icon btn-edit">
+                        <td class="text-right" style="padding-right: 1.5rem;">
+                            <div class="actions-container actions-right">
+                                <a asp-action="Edit" asp-route-id="@item.id" class="btn-icon-sm btn-edit" title="Edit">
                                     <i class="ph-pencil"></i>
                                 </a>
                                 <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('Are you sure you want to delete this customer?')">
-                                    <button type="submit" class="btn-primary btn-icon btn-delete">
+                                    <button type="submit" class="btn-icon-sm btn-delete" title="Delete">
                                         <i class="ph-trash"></i>
                                     </button>
                                 </form>
@@ -52,7 +52,7 @@
                     <tr>
                         <td colspan="6" class="empty-state">
                             <i class="ph-users empty-state-icon"></i>
-                            No customers found. Click "Add New Customer" to get started.
+                            <p>No customers found. Click "Add New Customer" to get started.</p>
                         </td>
                     </tr>
                 }
@@ -60,3 +60,4 @@
         </table>
     </div>
 </div>
+
