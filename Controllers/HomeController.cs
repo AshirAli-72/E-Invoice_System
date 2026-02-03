@@ -46,6 +46,19 @@ namespace E_Invoice_system.Controllers
                 .Take(4)
                 .ToList();
 
+            // ✅ TREND CHART DATA (Last 7 Days)
+            var trendLabels = new List<string>();
+            var trendData = new List<int>();
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = DateTime.Today.AddDays(-i);
+                trendLabels.Add(date.ToString("MMM dd"));
+                var count = _context.invoices.Count(inv => inv.date.Date == date);
+                trendData.Add(count);
+            }
+            ViewBag.TrendLabels = trendLabels.ToArray();
+            ViewBag.TrendData = trendData.ToArray();
+
             return View(recentInvoices);
         }
 

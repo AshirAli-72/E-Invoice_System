@@ -175,10 +175,10 @@
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TrendLabels)),
                 datasets: [{
                     label: 'Invoices Issued',
-                    data: [12, 19, 3, 5, 2, 8],
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TrendData)),
                     backgroundColor: gradient,
                     borderColor: '#BC1823',
                     borderWidth: 2,
