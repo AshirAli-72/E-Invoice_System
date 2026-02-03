@@ -317,10 +317,10 @@
             position: absolute;
             bottom: 0;
             right: -1px; /* Close right gap */
-            width: 251px;
-            height: 100px;
+            width: 350px;
+            height: 80px;
             background: #1C2120;
-            clip-path: polygon(40% 0, 100% 0, 100% 100%, 0 100%);
+            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
             z-index: 1;
         }
 
@@ -418,7 +418,9 @@
             .shape-black-bottom-2 {
                 right: -2px !important;
                 bottom: -2px !important;
-                width: 252px !important;
+                width: 352px !important; /* Matches 350px + 2px overshoot */
+                height: 80px !important;
+                clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%) !important;
             }
 
             .footer-branding {
