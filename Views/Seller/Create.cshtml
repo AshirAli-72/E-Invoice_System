@@ -10,56 +10,44 @@
         </a>
     </div>
 
-    <div class="form-wrapper">
+    <div class="form-wrapper form-layout-simple">
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
-            <!-- Section 1: Basic Information -->
+            <!-- Combined Information -->
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
                         <i class="ph-info" style="color: var(--primary);"></i>
-                        Basic Information
+                        Seller Information
                     </h3>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label asp-for="name" class="form-label">Business Name</label>
-                        <input asp-for="name" class="form-control" placeholder="e.g. SATA Technologies" required />
-                        <span asp-validation-for="name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="contact" class="form-label">Contact Number</label>
-                        <input asp-for="contact" class="form-control" placeholder="e.g. +1 234 567 890" />
-                        <span asp-validation-for="contact" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="email" class="form-label">Email Address</label>
-                        <input asp-for="email" type="email" class="form-control" placeholder="e.g. info@satatech.com" />
-                        <span asp-validation-for="email" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="status" class="form-label">Status</label>
-                        <select asp-for="status" class="form-control">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label asp-for="name" class="form-label">Business Name</label>
+                    <input asp-for="name" class="form-control" placeholder="e.g. SATA Technologies" required />
+                    <span asp-validation-for="name" class="text-danger"></span>
                 </div>
-            </div>
-
-            <!-- Section 2: Address -->
-            <div class="form-section">
-                <div class="form-section-header">
-                    <h3 class="form-section-title">
-                        <i class="ph-map-pin" style="color: var(--primary);"></i>
-                        Location Details
-                    </h3>
+                <div class="form-group">
+                    <label asp-for="contact" class="form-label">Contact Number</label>
+                    <input asp-for="contact" class="form-control" placeholder="e.g. +1 234 567 890" />
+                    <span asp-validation-for="contact" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="email" class="form-label">Email Address</label>
+                    <input asp-for="email" type="email" class="form-control" placeholder="e.g. info@satatech.com" />
+                    <span asp-validation-for="email" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="address" class="form-label">Business Address</label>
                     <textarea asp-for="address" class="form-control" rows="3" placeholder="Enter physical business address"></textarea>
                     <span asp-validation-for="address" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="status" class="form-label">Status</label>
+                    <select asp-for="status" class="form-control">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
                 </div>
             </div>
 
