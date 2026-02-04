@@ -2,12 +2,13 @@
 .pos-container {
     display: flex;
     gap: 24px;
-    height: calc(100vh - 85px);
-    /* Adjusted for layout */
+    height: auto;
+    min-height: calc(100vh - 85px);
     margin-top: -10px;
     font-family: 'Inter', sans-serif;
-    overflow: hidden;
-    /* Prevent body scroll */
+    overflow: visible;
+    /* Allow page scroll */
+    padding-bottom: 20px;
 }
 
 /* Left Section Catalog */
@@ -19,6 +20,10 @@
     border-radius: 16px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
+    height: 85vh;
+    /* Default height */
+    min-height: 600px;
+    /* Force minimum height */
 }
 
 .catalog-header {
@@ -137,13 +142,29 @@
     width: 380px;
     background: white;
     border-radius: 16px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    height: 85vh;
+    /* Default height */
+    min-height: 600px;
+    /* Force minimum height, causes page scroll if screen is small */
+}
+
+/* Right Section Cart */
+.cart-section {
+    width: 380px;
+    background: white;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    height: 100%;
-    /* Ensure it fills parent */
+    height: 85vh;
+    /* Default height */
+    min-height: 600px;
+    /* Force minimum height */
 }
 
 .cart-header-pos {

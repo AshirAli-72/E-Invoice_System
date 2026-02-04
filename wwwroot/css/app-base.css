@@ -116,12 +116,16 @@
     display: inline-block;
 }
 
-.status-active, .status-available, .status-paid {
+.status-active,
+.status-available,
+.status-paid {
     background: #ecfdf5;
     color: #10b981;
 }
 
-.status-inactive, .status-out-of-stock, .status-cancelled {
+.status-inactive,
+.status-out-of-stock,
+.status-cancelled {
     background: #fef2f2;
     color: #ef4444;
 }
@@ -229,6 +233,18 @@
     margin: 0 auto;
 }
 
+.form-layout-left-wide {
+    max-width: 900px;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.form-layout-full-left {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: auto;
+}
+
 /* Updated Form Controls for Web Style */
 .form-control {
     width: 100%;
@@ -297,7 +313,7 @@
 .form-actions-sticky {
     position: sticky;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
     padding: 1rem 0;
     margin-top: 2rem;
@@ -305,7 +321,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    z-index: 10;
+    z-index: 100;
 }
 
 /* Sidebar & Top Bar Fixes */

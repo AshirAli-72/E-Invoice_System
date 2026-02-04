@@ -15,90 +15,75 @@
         </a>
     </div>
     
-    <div class="form-wrapper form-layout-complex">
+    <div class="form-wrapper form-layout-left-wide">
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
-
-            <!-- Section 1: Seller Information -->
+            
             <div class="form-section">
                 <div class="form-section-header">
                     <h3 class="form-section-title">
-                        <i class="ph-buildings form-icon-primary"></i>
-                        Seller Information (Self)
+                        <i class="ph-file-plus form-icon-primary"></i>
+                        Invoice Details
                     </h3>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Company Name</label>
-                        <select asp-for="seller_name" class="form-control" id="sellerSelect" required>
-                            <option value="">-- Select Seller --</option>
-                            @if (sellers != null)
+
+                <!-- Seller Info -->
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <select asp-for="seller_name" class="form-control" id="sellerSelect" required>
+                        <option value="">-- Select Seller --</option>
+                        @if (sellers != null)
+                        {
+                            foreach (var s in sellers)
                             {
-                                foreach (var s in sellers)
-                                {
-                                    <option value="@s.name" data-address="@s.address" data-contact="@s.contact">@s.name</option>
-                                }
+                                <option value="@s.name" data-address="@s.address" data-contact="@s.contact">@s.name</option>
                             }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Invoice Date</label>
-                        <input asp-for="date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Seller Contact</label>
-                        <input asp-for="seller_contact" id="sellerContactTop" class="form-control" placeholder="Contact number" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Seller Address</label>
-                        <input asp-for="seller_address" id="sellerAddressTop" class="form-control" placeholder="Office address" />
-                    </div>
+                        }
+                    </select>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Date</label>
+                    <input asp-for="date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seller Contact</label>
+                    <input asp-for="seller_contact" id="sellerContactTop" class="form-control" placeholder="Contact number" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seller Address</label>
+                    <input asp-for="seller_address" id="sellerAddressTop" class="form-control" placeholder="Office address" />
+                </div>
+                
+                <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
 
+                <!-- Customer Info -->
+                <div class="form-group">
+                    <label class="form-label">Select Customer</label>
+                    <select asp-for="customer_name" class="form-control" required id="customerSelect">
+                        <option value="">-- Choose Customer --</option>
+                        @foreach (var c in customers)
+                        {
+                            <option value="@c.name" data-address="@c.address" data-contact="@c.contact">@c.name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Number</label>
+                    <input asp-for="invoice_no" class="form-control" placeholder="INV-0001 (Auto)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Customer Contact</label>
+                    <input asp-for="customer_contact" id="customerContact" class="form-control" placeholder="Customer Contact" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Customer Address</label>
+                    <input asp-for="customer_address" id="customerAddress" class="form-control" placeholder="Customer Address" />
+                </div>
 
-            <!-- Section 2: Customer Information -->
-            <div class="form-section">
-                <div class="form-section-header">
-                    <h3 class="form-section-title">
-                        <i class="ph-user form-icon-primary"></i>
-                        Customer Information
-                    </h3>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Select Customer</label>
-                        <select asp-for="customer_name" class="form-control" required id="customerSelect">
-                            <option value="">-- Choose Customer --</option>
-                            @foreach (var c in customers)
-                            {
-                                <option value="@c.name" data-address="@c.address" data-contact="@c.contact">@c.name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Invoice Number</label>
-                        <input asp-for="invoice_no" class="form-control" placeholder="INV-0001 (Auto)" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Customer Contact</label>
-                        <input asp-for="customer_contact" id="customerContact" class="form-control" placeholder="Customer Contact" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Customer Address</label>
-                        <input asp-for="customer_address" id="customerAddress" class="form-control" placeholder="Customer Address" />
-                    </div>
-                </div>
-            </div>
+                <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
 
-            <!-- Section 3: Line Items & Totals -->
-            <div class="form-section">
-                <div class="form-section-header">
-                    <h3 class="form-section-title">
-                        <i class="ph-list-bullets form-icon-primary"></i>
-                        Invoice Line Items
-                    </h3>
-                </div>
+                <!-- Line Items Header (Optional visual separator) -->
+                <h4 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Line Items & Payment</h4>
 
                 <!-- Sales Selection Section -->
                 <div id="salesListContainer" style="display: none; background: #fffbff; border: 1px dotted #BC1823; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
@@ -116,12 +101,13 @@
                             <thead>
                                 <tr style="text-align: left; border-bottom: 1px solid var(--border); color: var(--text-muted);">
                                     <th style="padding: 0.75rem 0.5rem; width: 40px;"></th>
-                                    <th style="padding: 0.75rem 0.5rem;">Date</th>
-                                    <th style="padding: 0.75rem 0.5rem;">Product / Service</th>
+                                    <th style="padding: 0.75rem 0.5rem; white-space: nowrap;">Date</th>
+                                    <th style="padding: 0.75rem 0.5rem; white-space: nowrap;">Product / Service</th>
                                     <th style="padding: 0.75rem 0.5rem; width: 80px;">Qty</th>
                                     <th style="padding: 0.75rem 0.5rem; width: 100px;">Price</th>
                                     <th style="padding: 0.75rem 0.5rem; width: 100px;">Discount</th>
-                                    <th style="padding: 0.75rem 0.5rem;">Expiry</th>
+                                    <th style="padding: 0.75rem 0.5rem; white-space: nowrap;">Expiry</th>
+                                    <th style="padding: 0.75rem 0.5rem; width: 80px;">Status</th>
                                     <th style="padding: 0.75rem 0.5rem; width: 100px;">Total</th>
                                 </tr>
                             </thead>
@@ -133,8 +119,8 @@
                 </div>
 
                 <!-- Items Table -->
-                <div style="overflow-x: auto; margin-bottom: 1.5rem;">
-                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+                <div style="overflow-x: auto; max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
                         <thead>
                             <tr style="background: #f8fafc; text-align: left;">
                                 <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); width: 35%;">Product/Service</th>
@@ -159,27 +145,22 @@
                 <input type="hidden" asp-for="price" id="priceInputHidden" />
                 <input type="hidden" asp-for="discount" id="totalDiscountInput" />
 
-                <!-- Section 4: Finalize & Payment -->
-                <div style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
-                        <div class="form-group">
-                            <label class="form-label">Invoice Status</label>
-                            <select asp-for="status" class="form-control">
-                                <option value="Pending">Pending</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Payment Method</label>
-                            <select asp-for="payment" class="form-control">
-                                <option value="Cash">Cash</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                                <option value="Online">Online</option>
-                                <option value="Credit">Credit</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Status</label>
+                    <select asp-for="status" class="form-control">
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select asp-for="payment" class="form-control">
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Online">Online</option>
+                        <option value="Credit">Credit</option>
+                    </select>
                 </div>
             </div>
 

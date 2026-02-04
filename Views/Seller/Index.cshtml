@@ -1,65 +1,63 @@
 @model IEnumerable<E_Invoice_system.Models.Sellers>
 
-<div class="card" style="max-width: 900px; margin: 0 auto;">
-    <div class="card-header card-header-flex" style="padding: 1.5rem 2rem;">
-        <div>
-            <div class="card-title">Seller Profiles</div>
-            <p class="text-muted font-sm">Manage your business entities</p>
-        </div>
+<div class="card card-no-padding">
+    <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+        <div class="card-title">Manage Sellers</div>
         <a asp-action="Create" class="btn-primary">
-            <i class="ph-plus"></i> Add Seller
+            <i class="ph-storefront"></i> Add New Seller
         </a>
     </div>
     
-    <div style="padding: 1rem 2rem;">
-        @foreach (var item in Model)
-        {
-            <div style="background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--primary);"></div>
-                
-                <div class="card-header-flex" style="margin-bottom: 1.5rem;">
-                    <div>
-                        <h2 style="font-size: 1.5rem; margin: 0 0 0.5rem 0; color: var(--text);">@item.name</h2>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; color: @(item.status == "Active" ? "#10b981" : "#6b7280"); font-size: 0.85rem; font-weight: 600;">
-                            <div style="width: 8px; height: 8px; background: @(item.status == "Active" ? "#10b981" : "#6b7280"); border-radius: 50%;"></div>
-                            @item.status Profile
-                        </div>
-                    </div>
-                    <span class="btn-icon-sm" style="background: white;">#@item.id</span>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div>
-                        <label class="font-xs text-muted" style="display: block; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Contact Information</label>
-                        <p class="font-medium" style="margin-bottom: 0.25rem;"><i class="ph-phone" style="margin-right: 0.5rem;"></i> @item.contact</p>
-                        <p class="font-medium"><i class="ph-envelope" style="margin-right: 0.5rem;"></i> @item.email</p>
-                    </div>
-                    <div>
-                        <label class="font-xs text-muted" style="display: block; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Business Address</label>
-                        <p class="font-medium" style="line-height: 1.5;"><i class="ph-map-pin" style="margin-right: 0.5rem;"></i> @item.address</p>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 1rem;">
-                    <a asp-action="Edit" asp-route-id="@item.id" class="btn-icon-sm btn-edit" style="padding: 0.6rem 1.2rem;">
-                        <i class="ph-pencil"></i> Edit Profile
-                    </a>
-                    <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('Are you sure you want to delete this seller?');" style="display: inline;">
-                        <button type="submit" class="btn-icon-sm btn-delete" style="padding: 0.6rem 1.2rem;">
-                            <i class="ph-trash"></i> Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-        }
-        @if (!Model.Any())
-        {
-            <div class="empty-state">
-                <i class="ph-storefront empty-state-icon"></i>
-                <p>No seller profiles found in the database.</p>
-                <a asp-action="Create" class="btn-primary" style="margin-top: 1rem;">Create Your First Profile</a>
-            </div>
-        }
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th style="padding-left: 1.5rem;">ID</th>
+                    <th>Company Name</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="font-bold" style="padding-left: 1.5rem;">#@item.id</td>
+                        <td class="font-medium">@item.name</td>
+                        <td>@item.contact</td>
+                        <td class="text-muted font-sm">@item.email</td>
+                        <td>
+                            <span class="status-badge @(item.status == "Active" ? "status-active" : "status-inactive")">
+                                @(item.status ?? "Inactive")
+                            </span>
+                        </td>
+                        <td class="text-right" style="padding-right: 1.5rem;">
+                            <div class="actions-container actions-right">
+                                <a asp-action="Edit" asp-route-id="@item.id" class="btn-icon-sm btn-edit" title="Edit">
+                                    <i class="ph-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('Are you sure you want to delete this seller?');">
+                                    <button type="submit" class="btn-icon-sm btn-delete" title="Delete">
+                                        <i class="ph-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="ph-storefront empty-state-icon"></i>
+                            <p>No seller profiles found. Click "Add New Seller" to get started.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 

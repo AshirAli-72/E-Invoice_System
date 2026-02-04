@@ -42,7 +42,7 @@
 
     <!-- Right: Sale Form & Cart -->
     <div class="cart-section">
-        <form asp-action="Create" method="post" id="saleForm">
+        <form asp-action="Create" method="post" id="saleForm" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
             @Html.AntiForgeryToken()
             <input type="hidden" name="payment_method" id="hiddenPaymentMethod" value="Cash" />
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
