@@ -277,8 +277,8 @@
 
 .footer-branding {
     position: absolute !important;
-    bottom: 8px !important;
-    right: 15px !important;
+    bottom: 10px !important;
+    right: 2px !important;
     color: white !important;
     font-size: 8px !important;
     font-weight: 800 !important;
@@ -370,17 +370,15 @@
 
     .footer-branding {
         position: absolute !important;
-        bottom: 8px !important;
-        right: 15px !important;
-        font-size: 8px !important;
-        display: block !important;
-        z-index: 10000 !important;
+        bottom: 10px !important;
+        right: 2px !important;
         color: white !important;
-        white-space: nowrap !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        text-transform: uppercase !important;
+        font-size: 8px !important;
+        font-weight: 800 !important;
         letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        z-index: 99 !important;
+        display: block !important;
         text-align: right !important;
     }
 
