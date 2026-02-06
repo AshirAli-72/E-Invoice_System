@@ -278,7 +278,7 @@
             tr.innerHTML = `
                 <td style="padding: 0.5rem;">${item.name}</td>
                 <td style="padding: 0.5rem;">${item.qty} ${item.unit || ''}</td>
-                <td style="padding: 0.5rem; white-space: nowrap; color: var(--text-muted);">${item.expiry || ''}</td>
+                <td style="padding: 0.5rem; white-space: nowrap; color: var(--text-muted);">${item.expiryDate || ''}</td>
                 <td style="padding: 0.5rem;">$${item.price.toFixed(2)}</td>
                 <td style="padding: 0.5rem;">$${item.discount.toFixed(2)}</td>
                 <td style="padding: 0.5rem; font-weight: bold;">$${item.total.toFixed(2)}</td>

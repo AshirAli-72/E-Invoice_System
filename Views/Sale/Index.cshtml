@@ -1,16 +1,16 @@
 @model IEnumerable<E_Invoice_system.Models.Sale>
 
-<div class="page-header">
-    <div>
-        <h2 class="page-title-large">Sales Transactions</h2>
-        <p class="text-muted">Manage and track your business sales</p>
-    </div>
-    <a asp-action="Create" class="btn-primary">
-        <i class="ph-plus-circle"></i> New Sale
-    </a>
-</div>
-
 <div class="card card-no-padding">
+    <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+        <div class="card-title">
+            Sales Transactions
+            <p class="text-muted font-sm font-normal" style="margin-top: 0.25rem;">Manage and track your business sales</p>
+        </div>
+        <a asp-action="Create" class="btn-primary">
+            <i class="ph-plus-circle"></i> New Sale
+        </a>
+    </div>
+    
     <div class="table-responsive">
         <table class="styled-table" style="min-width: 1000px;">
             <thead>
