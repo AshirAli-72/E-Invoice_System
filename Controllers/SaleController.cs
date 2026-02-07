@@ -37,7 +37,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string customer_name, string status, string payment_method, string? description, string transaction_type, List<Sale> items)
+        public IActionResult Create(string customer_name, string status, string payment_method, string? description, List<Sale> items)
         {
             // Remove description from validation as it is optional
             ModelState.Remove("description");
@@ -57,7 +57,6 @@ namespace E_Invoice_system.Controllers
                 {
                     item.customer_name = customer_name;
                     item.status = status;
-                    item.transaction_type = transaction_type;
                     item.payment_method = payment_method;
                     item.description = description;
                     item.date = now;
@@ -82,14 +81,7 @@ namespace E_Invoice_system.Controllers
                         {
                             string unit = prodQtyParts.Length > 1 ? " " + string.Join(" ", prodQtyParts.Skip(1)) : "";
                             
-                            if (transaction_type == "Return")
-                            {
-                                currentQty += qty;
-                            }
-                            else // Sale
-                            {
-                                currentQty -= qty;
-                            }
+                            currentQty -= qty;
 
                             product.qty_unit_type = $"{currentQty}{unit}";
                             _context.products_services.Update(product);
@@ -98,7 +90,7 @@ namespace E_Invoice_system.Controllers
                 }
                 _context.sales.AddRange(items);
                 _context.SaveChanges();
-                TempData["Success"] = transaction_type == "Return" ? "Return processed successfully!" : "Sale created successfully!";
+                TempData["Success"] = "Sale created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 

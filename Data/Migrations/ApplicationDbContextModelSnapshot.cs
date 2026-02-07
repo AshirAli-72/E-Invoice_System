@@ -125,9 +125,7 @@ namespace E_Invoice_system.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_price");
 
-                    b.Property<string>("transaction_type")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("transaction_type");
+
 
                     b.HasKey("id");
 
