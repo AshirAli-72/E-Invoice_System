@@ -11,18 +11,29 @@
             <h2 class="catalog-title">
                 <i class="ph-package"></i> Product Catalog
             </h2>
-            <div class="search-wrapper">
                 <i class="ph-magnifying-glass"></i>
-                <input type="text" id="prodSearch" placeholder="Search products or services..." oninput="filterProducts()" />
+                <input type="text" id="prodSearch" placeholder="Search products..." oninput="filterProducts()" />
             </div>
-        </div>
+            
+            <!-- Search Mode & Transaction Mode -->
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Search By:</span>
+                    <label style="font-size: 0.85rem; cursor: pointer;">
+                        <input type="radio" name="searchMode" value="name" checked onchange="filterProducts()"> Name
+                    </label>
+                    <label style="font-size: 0.85rem; cursor: pointer;">
+                        <input type="radio" name="searchMode" value="barcode" onchange="filterProducts()"> Barcode
+                    </label>
+                </div>
+            </div>
 
         <div class="product-grid" id="productGrid">
             @if (products != null)
             {
                 foreach (var p in products)
                 {
-                    <div class="product-card" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))')">
+                    <div class="product-card" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))')">
                         <div class="product-icon-box">
                             <i class="ph-cube"></i>
                         </div>
@@ -52,6 +63,17 @@
                 <button type="button" class="btn-clear-pos" onclick="clearSaleItems()">
                     <i class="ph-trash"></i>
                 </button>
+            </div>
+            
+            <!-- Transaction Mode -->
+            <div style="padding: 0 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Mode:</span>
+                <label style="font-size: 0.85rem; cursor: pointer; color: #059669; font-weight: 500;">
+                    <input type="radio" name="transMode" value="sale" checked> Sale
+                </label>
+                <label style="font-size: 0.85rem; cursor: pointer; color: #dc2626; font-weight: 500;">
+                    <input type="radio" name="transMode" value="return"> Return
+                </label>
             </div>
 
             <div class="cart-meta-pos">
@@ -214,46 +236,88 @@
 
     function filterProducts() {
         const term = document.getElementById('prodSearch').value.toLowerCase();
+        const mode = document.querySelector('input[name="searchMode"]:checked').value;
         const cards = document.querySelectorAll('.product-card');
+        
         cards.forEach(card => {
-            const name = card.querySelector('.prod-card-name').innerText.toLowerCase();
-            card.style.display = name.includes(term) ? '' : 'none';
+            let match = false;
+            if (mode === 'name') {
+                const name = card.dataset.name; // Use data attribute
+                match = name.includes(term);
+            } else {
+                const barcode = card.dataset.barcode; // Use data attribute
+                match = barcode.includes(term);
+                
+                // If exact match on barcode, maybe auto-add? (Optional enhancement)
+            }
+            card.style.display = match ? '' : 'none';
         });
     }
 
     function addToSaleFromCard(id, name, price, discount, expiry) {
-        // Check if item already in sale (simplified matching by name for now)
+        // Check transaction mode
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+        const qtyToAdd = isReturn ? -1 : 1;
+
+        // Check if item already in sale
         const existing = saleItems.find(i => i.prod_name_service === name);
         if (existing) {
-            existing.qty++;
+            // Logic: if return mode, adding means decreasing existing quantity (more negative)
+            // But we simplify: just add qtyToAdd. 
+            // If existing is 1 and we add -1, it becomes 0 (remove?). 
+            // Or if existing is -1 and we add -1, it becomes -2.
+            
+            existing.qty += qtyToAdd;
+            
+            // If qty becomes 0, remove item?
+            if (existing.qty === 0) {
+                const idx = saleItems.indexOf(existing);
+                if (idx > -1) removeItem(idx);
+                return;
+            }
+            
             existing.total_price = (existing.price * existing.qty) - (existing.discount * existing.qty);
         } else {
             saleItems.push({
                 prod_name_service: name,
-                qty: 1,
+                qty: qtyToAdd,
                 price: price,
                 discount: discount,
                 expiry_date: expiry || null,
-                total_price: price - discount
+                total_price: (price * qtyToAdd) - (discount * qtyToAdd)
             });
         }
         renderSaleItems();
     }
 
     function decreaseQty(index) {
-        if (saleItems[index].qty > 1) {
-            saleItems[index].qty--;
-            saleItems[index].total_price = (saleItems[index].price * saleItems[index].qty) - (saleItems[index].discount * saleItems[index].qty);
-            renderSaleItems();
-        } else {
+        const item = saleItems[index];
+        // If qty positive, decrease towards 0. If negative (return), decrease means more negative? No, usually "decrease quantity" button means "less items".
+        // But here visuals are tricky. 
+        // Let's assume buttons mean: (+) adds 1 (or -1 if return mode?? No, buttons are per item row).
+        // Let's make buttons always +/- 1 magnitude?
+        // Simpler: (-) subtracts 1 from qty. (+) adds 1 to qty.
+        // If qty is -1 (Return), (-) makes it -2 (More items returned). (+) makes it 0 (Less items returned).
+        
+        item.qty--;
+        if (item.qty === 0) {
             removeItem(index);
+        } else {
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            renderSaleItems();
         }
     }
 
     function increaseQty(index) {
-        saleItems[index].qty++;
-        saleItems[index].total_price = (saleItems[index].price * saleItems[index].qty) - (saleItems[index].discount * saleItems[index].qty);
-        renderSaleItems();
+        const item = saleItems[index];
+        item.qty++;
+        if (item.qty === 0) {
+            removeItem(index);
+        } else {
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            renderSaleItems();
+        }
     }
 
     function removeItem(index) {

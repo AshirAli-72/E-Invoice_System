@@ -286,8 +286,8 @@
                 <td style="padding: 0.5rem;">${item.qty} ${item.unit || ''}</td>
                 <td style="padding: 0.5rem;">
                     <input type="date" value="${item.expiryDate ? item.expiryDate.split('T')[0] : ''}" 
-                           onchange="updateItemExpiry(${index}, this.value)"
-                           style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.2rem; font-size: 0.8rem; color: #334155; width: 100%;">
+                           readonly
+                           style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.2rem; font-size: 0.8rem; color: #334155; width: 100%; background-color: #f8fafc;">
                 </td>
                 <td style="padding: 0.5rem;">$${item.price.toFixed(2)}</td>
                 <td style="padding: 0.5rem;">$${item.discount.toFixed(2)}</td>

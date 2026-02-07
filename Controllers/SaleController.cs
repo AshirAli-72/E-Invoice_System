@@ -72,7 +72,7 @@ namespace E_Invoice_system.Controllers
                     // Calculate total
                     item.total_price = (item.price * qty) - item.discount;
 
-                    // Update Inventory
+                        // Update Inventory
                     var product = _context.products_services.FirstOrDefault(p => p.prod_name_service == item.prod_name_service);
                     if (product != null && !string.IsNullOrEmpty(product.qty_unit_type))
                     {
@@ -81,8 +81,27 @@ namespace E_Invoice_system.Controllers
                         {
                             string unit = prodQtyParts.Length > 1 ? " " + string.Join(" ", prodQtyParts.Skip(1)) : "";
                             
-                            currentQty -= qty;
+                            // Check for Stock Limit if selling (qty > 0)
+                            if (qty > 0 && currentQty < qty)
+                            {
+                                ModelState.AddModelError("", $"Insufficient stock for {item.prod_name_service}. Available: {currentQty}, Requested: {qty}");
+                                // Since we are inside loop but want to stop everything?
+                                // Ef Core tracks changes, so adding error will prevent save if we check ModelState.IsValid again?
+                                // No, IsValid is checked at start.
+                                // We must throw or return view. 
+                                // Proper way: add model error and return view.
+                                // But items are already processed partially? No, SaveChanges is at end.
+                                
+                                // Reload lists
+                                ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
+                                ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
+                                return View(items); // Passing items back might break view if it expects null or different model. The view expects nothing (it builds from ViewBag/JS).
+                                // Actually, Create View (GET) returns View(). POST returns Redirect.
+                                // If error, we return View().
+                            }
 
+                            currentQty -= qty; // If qty is negative (return), this adds to stock.
+                            
                             product.qty_unit_type = $"{currentQty}{unit}";
                             _context.products_services.Update(product);
                         }
@@ -100,46 +119,7 @@ namespace E_Invoice_system.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            var sale = _context.sales.Find(id);
-            if (sale == null) return NotFound();
 
-            ViewData["Title"] = "Edit Sale";
-            ViewBag.Products = _context.products_services.ToList();
-            return View(sale);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Sale sale)
-        {
-            // Parse numeric quantity from string
-            decimal qty = 0;
-            if (!string.IsNullOrEmpty(sale.qty_unit_type))
-            {
-                var qtyPart = sale.qty_unit_type.Split(' ')[0];
-                decimal.TryParse(qtyPart, out qty);
-            }
-
-            // Recalculate total
-            sale.total_price = (sale.price * qty) - sale.discount;
-
-            if (ModelState.IsValid)
-            {
-                // Ensure description is null if empty
-                if (string.IsNullOrWhiteSpace(sale.description)) sale.description = null;
-
-                _context.sales.Update(sale);
-                _context.SaveChanges();
-                TempData["Success"] = "Sale updated successfully!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.Products = _context.products_services.ToList();
-            return View(sale);
-        }
 
         [HttpPost]
         public IActionResult Delete(int id)
