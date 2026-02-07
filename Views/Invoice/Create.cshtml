@@ -269,6 +269,12 @@
         updateTotals();
     }
 
+    function updateItemExpiry(index, newDate) {
+        invoiceItems[index].expiryDate = newDate;
+        // Update hidden field
+        document.getElementById('prodNameServiceHidden').value = JSON.stringify(invoiceItems);
+    }
+
     function renderItems() {
         const tbody = document.getElementById('itemsTableBody');
         tbody.innerHTML = '';
@@ -278,7 +284,11 @@
             tr.innerHTML = `
                 <td style="padding: 0.5rem;">${item.name}</td>
                 <td style="padding: 0.5rem;">${item.qty} ${item.unit || ''}</td>
-                <td style="padding: 0.5rem; white-space: nowrap; color: var(--text-muted);">${item.expiryDate || ''}</td>
+                <td style="padding: 0.5rem;">
+                    <input type="date" value="${item.expiryDate ? item.expiryDate.split('T')[0] : ''}" 
+                           onchange="updateItemExpiry(${index}, this.value)"
+                           style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.2rem; font-size: 0.8rem; color: #334155; width: 100%;">
+                </td>
                 <td style="padding: 0.5rem;">$${item.price.toFixed(2)}</td>
                 <td style="padding: 0.5rem;">$${item.discount.toFixed(2)}</td>
                 <td style="padding: 0.5rem; font-weight: bold;">$${item.total.toFixed(2)}</td>
