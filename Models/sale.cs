@@ -39,6 +39,9 @@ namespace E_Invoice_system.Models
         [Column("status")]
         public string? status { get; set; }
 
+        [Column("transaction_type")]
+        public string? transaction_type { get; set; }
+
 
 
     }

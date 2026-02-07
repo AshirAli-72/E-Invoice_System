@@ -322,7 +322,6 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.csproj.AssemblyRe
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoic.08753401.Up2Date
 D:\netcore\E-Invoice_system\bin\Debug\net10.0\NuGet.Config
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.sourcelink.json
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-timfbiolvn-timfbiolvn.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-ezqwx4tk5h-ezqwx4tk5h.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\dfpdpy54t7-{0}-8xhe4h775t-8xhe4h775t.gz

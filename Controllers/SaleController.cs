@@ -37,7 +37,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string customer_name, string status, string payment_method, string? description, List<Sale> items)
+        public IActionResult Create(string customer_name, string status, string payment_method, string? description, string transaction_type, List<Sale> items)
         {
             // Remove description from validation as it is optional
             ModelState.Remove("description");
@@ -57,6 +57,7 @@ namespace E_Invoice_system.Controllers
                 {
                     item.customer_name = customer_name;
                     item.status = status;
+                    item.transaction_type = transaction_type;
                     item.payment_method = payment_method;
                     item.description = description;
                     item.date = now;
@@ -72,10 +73,32 @@ namespace E_Invoice_system.Controllers
                     // Calculate total
                     item.total_price = (item.price * qty) - item.discount;
 
+                    // Update Inventory
+                    var product = _context.products_services.FirstOrDefault(p => p.prod_name_service == item.prod_name_service);
+                    if (product != null && !string.IsNullOrEmpty(product.qty_unit_type))
+                    {
+                        var prodQtyParts = product.qty_unit_type.Split(' ');
+                        if (decimal.TryParse(prodQtyParts[0], out decimal currentQty))
+                        {
+                            string unit = prodQtyParts.Length > 1 ? " " + string.Join(" ", prodQtyParts.Skip(1)) : "";
+                            
+                            if (transaction_type == "Return")
+                            {
+                                currentQty += qty;
+                            }
+                            else // Sale
+                            {
+                                currentQty -= qty;
+                            }
+
+                            product.qty_unit_type = $"{currentQty}{unit}";
+                            _context.products_services.Update(product);
+                        }
+                    }
                 }
                 _context.sales.AddRange(items);
                 _context.SaveChanges();
-                TempData["Success"] = "Sale created successfully!";
+                TempData["Success"] = transaction_type == "Return" ? "Return processed successfully!" : "Sale created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
