@@ -15,16 +15,20 @@
                 <input type="text" id="prodSearch" placeholder="Search products..." oninput="filterProducts()" />
             </div>
             
-            <!-- Search Mode & Transaction Mode -->
-            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Search Mode Toggle -->
+            <div style="margin-top: 1rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Search By:</span>
-                    <label style="font-size: 0.85rem; cursor: pointer;">
-                        <input type="radio" name="searchMode" value="name" checked onchange="filterProducts()"> Name
-                    </label>
-                    <label style="font-size: 0.85rem; cursor: pointer;">
-                        <input type="radio" name="searchMode" value="barcode" onchange="filterProducts()"> Barcode
-                    </label>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #475569; letter-spacing: 0.02em;">SEARCH BY</span>
+                    <div class="toggle-group">
+                        <div class="toggle-option">
+                            <input type="radio" id="searchName" name="searchMode" value="name" checked onchange="filterProducts()">
+                            <label for="searchName">Name</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="radio" id="searchBarcode" name="searchMode" value="barcode" onchange="filterProducts()">
+                            <label for="searchBarcode">Barcode</label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -66,14 +70,19 @@
             </div>
             
             <!-- Transaction Mode -->
+            <!-- Transaction Mode Toggle -->
             <div style="padding: 0 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
-                <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Mode:</span>
-                <label style="font-size: 0.85rem; cursor: pointer; color: #059669; font-weight: 500;">
-                    <input type="radio" name="transMode" value="sale" checked> Sale
-                </label>
-                <label style="font-size: 0.85rem; cursor: pointer; color: #dc2626; font-weight: 500;">
-                    <input type="radio" name="transMode" value="return"> Return
-                </label>
+                <span style="font-size: 0.85rem; font-weight: 700; color: #475569; letter-spacing: 0.02em;">MODE</span>
+                <div class="toggle-group">
+                    <div class="toggle-option toggle-mode-sale">
+                        <input type="radio" id="modeSale" name="transMode" value="sale" checked>
+                        <label for="modeSale">Sale</label>
+                    </div>
+                    <div class="toggle-option toggle-mode-return">
+                        <input type="radio" id="modeReturn" name="transMode" value="return">
+                        <label for="modeReturn">Return</label>
+                    </div>
+                </div>
             </div>
 
             <div class="cart-meta-pos">
