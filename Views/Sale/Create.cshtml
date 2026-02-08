@@ -420,9 +420,17 @@
         });
 
         currentTotal = grandTotal;
-        subtotalSpan.innerText = "$" + totalSub.toLocaleString(undefined, { minimumFractionDigits: 2 });
-        discountSpan.innerText = "-$" + totalDisc.toLocaleString(undefined, { minimumFractionDigits: 2 });
-        grandTotalSpan.innerText = "$" + grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        
+        // Format with proper sign for negative values
+        const formatCurrency = (value) => {
+            const absValue = Math.abs(value);
+            const formatted = absValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            return value < 0 ? `-$${formatted}` : `$${formatted}`;
+        };
+        
+        subtotalSpan.innerText = formatCurrency(totalSub);
+        discountSpan.innerText = totalDisc >= 0 ? `-$${totalDisc.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : `$${Math.abs(totalDisc).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        grandTotalSpan.innerText = formatCurrency(grandTotal);
     }
 
     // Modal & Payment Logic
@@ -432,8 +440,15 @@
             return;
         }
         
+        
         // Update modal totals
-        const formattedTotal = "$" + currentTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        const formatCurrency = (value) => {
+            const absValue = Math.abs(value);
+            const formatted = absValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            return value < 0 ? `-$${formatted}` : `$${formatted}`;
+        };
+        
+        const formattedTotal = formatCurrency(currentTotal);
         document.getElementById('modalTotalAmount').innerText = formattedTotal;
         document.getElementById('modalAmountDue').innerText = formattedTotal;
         
