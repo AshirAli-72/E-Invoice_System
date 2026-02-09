@@ -125,13 +125,14 @@
     width: 100%;
 }
 
-.mode-toggle-v2 .toggle-pill {
-    background: var(--surface);
+.mode-toggle-v2 .toggle-pill,
+.search-toggle-v2 .toggle-pill {
+    background: #ffffff;
     border: 1px solid var(--border);
-    padding: 5px;
-    border-radius: 14px;
+    padding: 4px;
+    border-radius: 12px;
     display: flex;
-    gap: 4px;
+    gap: 2px;
     box-shadow: var(--shadow-luxury);
 }
 
@@ -548,8 +549,21 @@
 
 /* Well Designed Payment Modal */
 .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(28, 33, 32, 0.4);
     backdrop-filter: blur(12px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.show {
+    display: flex;
 }
 
 .payment-card {
