@@ -152,7 +152,7 @@ namespace E_Invoice_system.Controllers
                 return Json(new { success = false, message = "Customer name is required." });
 
             var sales = _context.sales
-                .Where(s => s.customer_name == customerName)
+                .Where(s => s.customer_name == customerName && (s.qty_unit_type == null || !s.qty_unit_type.Trim().StartsWith("-")))
                 .OrderByDescending(s => s.date)
                 .Select(s => new
                 {

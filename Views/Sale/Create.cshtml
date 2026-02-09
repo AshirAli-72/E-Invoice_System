@@ -47,7 +47,13 @@
             {
                 foreach (var p in products)
                 {
-                    <div class="product-card" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")')">
+                    decimal stockValue = 0;
+                    if (!string.IsNullOrEmpty(p.qty_unit_type))
+                    {
+                        var parts = p.qty_unit_type.Trim().Split(' ');
+                        decimal.TryParse(parts[0], out stockValue);
+                    }
+                    <div class="product-card" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" data-stock="@stockValue" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
                         <div class="product-icon-box">
                             <i class="ph-cube"></i>
                         </div>
@@ -148,6 +154,11 @@
                     <span>Total Discount</span>
                     <span id="discountDisplay" style="color: #ef4444;">-$0.00</span>
                 </div>
+
+                <div id="stockAlert" style="display: none; margin: 10px 0; padding: 12px; border-radius: 8px; background: #fff1f2; border: 1px solid #fda4af; color: #be123c; font-size: 0.85rem; font-weight: 700; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <i class="ph-warning-circle" style="font-size: 1rem; vertical-align: middle;"></i> <span id="stockAlertMsg" style="vertical-align: middle;"></span>
+                </div>
+
                 <div class="total-box-pos">
                     <span class="total-label">GRAND TOTAL</span>
                     <span class="total-value" id="grandTotal">$0.00</span>
@@ -289,7 +300,20 @@
         });
     }
 
-    function addToSaleFromCard(id, name, price, discount, expiry, barcode) {
+    function showStockAlert(msg) {
+        const alert = document.getElementById('stockAlert');
+        const alertMsg = document.getElementById('stockAlertMsg');
+        alertMsg.innerText = msg;
+        alert.style.display = 'block';
+        
+        // Hide after 3 seconds
+        if (window.stockTimeout) clearTimeout(window.stockTimeout);
+        window.stockTimeout = setTimeout(() => {
+            alert.style.display = 'none';
+        }, 3000);
+    }
+
+    function addToSaleFromCard(id, name, price, discount, expiry, barcode, maxStock) {
         // Check transaction mode
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
@@ -298,11 +322,12 @@
         // Check if item already in sale
         const existing = saleItems.find(i => i.prod_name_service === name);
         if (existing) {
-            // Logic: if return mode, adding means decreasing existing quantity (more negative)
-            // But we simplify: just add qtyToAdd. 
-            // If existing is 1 and we add -1, it becomes 0 (remove?). 
-            // Or if existing is -1 and we add -1, it becomes -2.
-            
+            // Check stock if selling
+            if (!isReturn && (existing.qty + qtyToAdd) > maxStock) {
+                showStockAlert(`Cannot add more. Only ${maxStock} available in stock.`);
+                return;
+            }
+
             existing.qty += qtyToAdd;
             
             // If qty becomes 0, remove item?
@@ -314,6 +339,12 @@
             
             existing.total_price = (existing.price * existing.qty) - (existing.discount * existing.qty);
         } else {
+            // Check stock if selling
+            if (!isReturn && qtyToAdd > maxStock) {
+                showStockAlert(`Insufficient stock! ${maxStock} available.`);
+                return;
+            }
+
             saleItems.push({
                 prod_name_service: name,
                 barcode: barcode || null,
@@ -321,6 +352,7 @@
                 price: price,
                 discount: discount,
                 expiry_date: expiry || null,
+                maxStock: maxStock,
                 total_price: (price * qtyToAdd) - (discount * qtyToAdd)
             });
         }
@@ -347,6 +379,14 @@
 
     function increaseQty(index) {
         const item = saleItems[index];
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        
+        // Stock check: if not return and positive qty (selling)
+        if (mode !== 'return' && item.qty >= item.maxStock) {
+            showStockAlert(`Only ${item.maxStock} available.`);
+            return;
+        }
+
         item.qty++;
         if (item.qty === 0) {
             removeItem(index);
