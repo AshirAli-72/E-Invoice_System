@@ -1,41 +1,50 @@
 ﻿@model E_Invoice_system.Models.Sale
 @{
+    Layout = "_SaleLayout";
     var customers = ViewBag.Customers as List<E_Invoice_system.Models.customers>;
     var products = ViewBag.Products as List<E_Invoice_system.Models.ProductService>;
 }
 
-<div class="pos-container">
-    <!-- Left: Product Catalog -->
-    <div class="catalog-section">
-        <div class="catalog-header">
-            <div class="catalog-title">
-                <i><i class="ph-shopping-bag"></i></i>
-                Product Catalog
-            </div>
+<div class="pos-container-v2">
+    <!-- Left: Slim Category Sidebar -->
+    <aside class="category-sidebar">
+        <div class="category-item active" onclick="filterByCategory('all')">
+            <i class="ph-grid-four"></i>
+            <span>All</span>
+        </div>
+        <div class="category-item" onclick="filterByCategory('products')">
+            <i class="ph-package"></i>
+            <span>Items</span>
+        </div>
+        <div class="category-item" onclick="filterByCategory('services')">
+            <i class="ph-sparkle"></i>
+            <span>Service</span>
+        </div>
+        <div class="category-item" onclick="filterByCategory('fav')">
+            <i class="ph-star"></i>
+            <span>Saved</span>
+        </div>
+    </aside>
 
-            <div class="search-container">
-                <div class="search-wrapper">
-                    <i class="ph-magnifying-glass"></i>
-                    <input type="text" id="prodSearch" placeholder="Search products..." oninput="filterProducts()" />
-                </div>
-                
-                <div class="modern-toggle">
-                    <input type="radio" id="searchName" name="searchMode" value="name" checked onchange="updateSearchPlaceholder(); filterProducts();">
-                    <label for="searchName">By Name</label>
-                    <input type="radio" id="searchBarcode" name="searchMode" value="barcode" onchange="updateSearchPlaceholder(); filterProducts();">
-                    <label for="searchBarcode">Barcode</label>
+    <!-- Center: Product Discovery -->
+    <div class="product-canvas">
+        <div class="canvas-header">
+            <div class="search-bar-v2">
+                <i class="ph-magnifying-glass"></i>
+                <input type="text" id="prodSearch" placeholder="Search products or scan barcode..." oninput="filterProducts()" />
+            </div>
+            
+            <div class="mode-toggle-v2">
+                <div class="toggle-pill">
+                    <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
+                    <label for="modeSale">Sale</label>
+                    <input type="radio" id="modeReturn" name="transMode" value="return" onchange="handleModeChange()">
+                    <label for="modeReturn">Return</label>
                 </div>
             </div>
-
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger" style="margin-top: 16px; padding: 12px 20px; border-radius: 12px; background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; font-size: 0.85rem; font-weight: 600;">
-                    @Html.ValidationSummary(false, "")
-                </div>
-            }
         </div>
 
-        <div class="product-grid" id="productGrid">
+        <div class="product-grid-v2" id="productGrid">
             @if (products != null)
             {
                 foreach (var p in products)
@@ -46,88 +55,99 @@
                         var parts = p.qty_unit_type.Trim().Split(' ');
                         decimal.TryParse(parts[0], out stockValue);
                     }
-                    <div class="product-card" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" data-stock="@stockValue" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
-                        <div class="product-icon-box">
-                            <i class="ph-cube"></i>
+                    <div class="product-card-v2" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" data-stock="@stockValue" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
+                        <div class="card-status-pill @(stockValue <= 0 ? "out" : "in")">
+                            @(stockValue <= 0 ? "Out of Stock" : $"{stockValue} Available")
                         </div>
-                        <h4 class="prod-card-name">@p.prod_name_service</h4>
-                        <p class="prod-card-price">$@p.price.ToString("N2")</p>
-                        @if (p.discount > 0)
-                        {
-                            <span style="font-size: 0.7rem; color: var(--success); font-weight: 700; background: var(--success-bg); padding: 4px 8px; border-radius: 8px; margin-top: 8px;">-$@p.discount.ToString("N2")</span>
-                        }
+                        <div class="card-icon">
+                            <i class="ph-cube-transparent"></i>
+                        </div>
+                        <div class="card-info">
+                            <h4 class="card-name">@p.prod_name_service</h4>
+                            <div class="card-price-row">
+                                <span class="price-tag">$@p.price.ToString("N2")</span>
+                                @if (p.discount > 0)
+                                {
+                                    <span class="discount-pill">-$@p.discount.ToString("N2")</span>
+                                }
+                            </div>
+                        </div>
                     </div>
                 }
             }
         </div>
     </div>
 
-    <!-- Right: Order Summary -->
-    <div class="cart-section">
-        <form asp-action="Create" method="post" id="saleForm" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+    <!-- Right: Checkout Center -->
+    <div class="checkout-center">
+        <form asp-action="Create" method="post" id="saleForm" class="checkout-form">
             @Html.AntiForgeryToken()
             <input type="hidden" name="payment_method" id="hiddenPaymentMethod" value="Cash" />
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
             
-            <div class="cart-header">
-                <h3>Order Summary</h3>
-                <button type="button" class="btn-clear" onclick="clearSaleItems()">Clear All</button>
-            </div>
-            
-            <div class="cart-meta">
-                <div class="form-label-mini">Transaction Mode</div>
-                <div class="modern-toggle" style="margin-bottom: 24px;">
-                    <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
-                    <label for="modeSale" style="flex: 1; text-align: center;">Standard Sale</label>
-                    <input type="radio" id="modeReturn" name="transMode" value="return" onchange="handleModeChange()">
-                    <label for="modeReturn" style="flex: 1; text-align: center;">Return Item</label>
+            <div class="checkout-header">
+                <div>
+                    <h3>Current Order</h3>
+                    <p id="itemCountDisplay">0 items selected</p>
                 </div>
+                <button type="button" class="btn-clear-v2" onclick="clearSaleItems()">
+                    <i class="ph-trash"></i>
+                </button>
+            </div>
 
-                <div class="form-label-mini">Customer</div>
-                <select name="customer_name" class="modern-select" required>
-                    <option value="">-- Select Customer --</option>
-                    @if (customers != null)
-                    {
-                        foreach (var c in customers)
+            <div class="customer-selector-v2">
+                <label>Customer</label>
+                <div class="select-wrapper-v2">
+                    <i class="ph-user-circle"></i>
+                    <select name="customer_name" required>
+                        <option value="">Select Customer</option>
+                        @if (customers != null)
                         {
-                            <option value="@c.name">@c.name</option>
+                            foreach (var c in customers)
+                            {
+                                <option value="@c.name">@c.name</option>
+                            }
                         }
-                    }
-                </select>
+                    </select>
+                </div>
             </div>
 
-            <div class="cart-items" id="saleItemsBody">
-                <!-- Items populated by JS as checkout-item divs -->
+            <div class="checkout-items-v2" id="saleItemsBody">
+                <!-- Items populated by JS -->
             </div>
 
-            <div id="emptyCartState" style="padding: 40px; text-align: center; color: var(--text-muted);">
-                <i class="ph-shopping-cart" style="font-size: 3rem; opacity: 0.2; display: block; margin-bottom: 16px;"></i>
-                <p style="font-weight: 500;">No items in your order.</p>
+            <div id="emptyStateV2" class="empty-state-v2">
+                <div class="empty-glow"></div>
+                <i class="ph-shopping-cart-simple"></i>
+                <p>Bag is empty</p>
             </div>
 
-            <div class="cart-footer">
-                <div class="summary-line-pos">
-                    <span>Subtotal</span>
-                    <span id="subtotalDisplay">$0.00</span>
-                </div>
-                <div class="summary-line-pos">
-                    <span>Discount</span>
-                    <span id="discountDisplay" style="color: var(--primary);">-$0.00</span>
-                </div>
+            <div class="checkout-footer-v2">
+                <div class="price-summary-v2">
+                    <div class="summary-line">
+                        <span>Items Total</span>
+                        <span id="subtotalDisplay">$0.00</span>
+                    </div>
+                    <div class="summary-line highlight">
+                        <span>Discounts</span>
+                        <span id="discountDisplay">-$0.00</span>
+                    </div>
+                    
+                    <div id="stockAlert" class="alert-v2" style="display: none;">
+                        <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
+                    </div>
 
-                <div id="stockAlert" style="display: none; margin: 16px 0; padding: 12px; border-radius: 12px; background: #fff1f2; border: 1px solid #fda4af; color: #be123c; font-size: 0.85rem; font-weight: 700; text-align: center;">
-                    <i class="ph-warning-circle"></i> <span id="stockAlertMsg"></span>
-                </div>
-
-                <div class="summary-row total">
-                    <span>Grand Total</span>
-                    <span id="grandTotal">$0.00</span>
+                    <div class="grand-total-row">
+                        <div class="total-label">Grand Total</div>
+                        <div class="total-value" id="grandTotal">$0.00</div>
+                    </div>
                 </div>
 
                 <div id="hiddenInputsContainer"></div>
 
-                <button type="button" class="btn-payment" onclick="openPaymentModal()">
-                    Proceed to Payment <i class="ph-arrow-right"></i>
+                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
+                    Complete Payment
+                    <i class="ph-arrow-right"></i>
                 </button>
             </div>
         </form>
@@ -213,33 +233,30 @@
     let saleItems = [];
     let currentTotal = 0;
 
-    function updateSearchPlaceholder() {
-        const mode = document.querySelector('input[name="searchMode"]:checked').value;
-        const input = document.getElementById('prodSearch');
-        input.placeholder = mode === 'name' ? "Search by name..." : "Search by barcode...";
-    }
-
-    function handleModeChange() {
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
+    function filterByCategory(cat) {
+        document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
         
-        saleItems.forEach(item => {
-            const absQty = Math.abs(item.qty);
-            item.qty = isReturn ? -absQty : absQty;
-            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+        // Add filtering logic here if needed based on product types
+        // For now, it stays as a placeholder or can be simple name matching
+        const cards = document.querySelectorAll('.product-card-v2');
+        cards.forEach(card => {
+            if (cat === 'all') card.style.display = '';
+            else if (cat === 'fav') {
+                // Example: filter cards with a specific data attribute
+                card.style.display = card.dataset.stock > 10 ? '' : 'none';
+            }
         });
-        
-        renderSaleItems();
     }
 
     function filterProducts() {
         const term = document.getElementById('prodSearch').value.toLowerCase();
-        const mode = document.querySelector('input[name="searchMode"]:checked').value;
-        const cards = document.querySelectorAll('.product-card');
+        const cards = document.querySelectorAll('.product-card-v2');
         
         cards.forEach(card => {
-            const val = mode === 'name' ? card.dataset.name : card.dataset.barcode;
-            card.style.display = val.includes(term) ? '' : 'none';
+            const name = card.dataset.name;
+            const barcode = card.dataset.barcode;
+            card.style.display = (name.includes(term) || barcode.includes(term)) ? '' : 'none';
         });
     }
 
@@ -308,7 +325,7 @@
     }
 
     function clearSaleItems() {
-        if (saleItems.length > 0 && confirm("Clear current order summary?")) {
+        if (saleItems.length > 0 && confirm("Clear current order?")) {
             saleItems = [];
             renderSaleItems();
         }
@@ -316,17 +333,20 @@
 
     function renderSaleItems() {
         const body = document.getElementById('saleItemsBody');
-        const empty = document.getElementById('emptyCartState');
+        const empty = document.getElementById('emptyStateV2');
         const hiddenContainer = document.getElementById('hiddenInputsContainer');
         const subtotalSpan = document.getElementById('subtotalDisplay');
         const discountSpan = document.getElementById('discountDisplay');
         const grandTotalSpan = document.getElementById('grandTotal');
+        const countDisplay = document.getElementById('itemCountDisplay');
 
         body.innerHTML = "";
         hiddenContainer.innerHTML = "";
 
+        countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
+
         if (saleItems.length === 0) {
-            empty.style.display = "block";
+            empty.style.display = "flex";
             subtotalSpan.innerText = "$0.00";
             discountSpan.innerText = "-$0.00";
             grandTotalSpan.innerText = "$0.00";
@@ -349,19 +369,19 @@
             grandTotal += lineTotal;
 
             const div = document.createElement('div');
-            div.className = "checkout-item";
+            div.className = "item-v2";
             div.innerHTML = `
-                <div class="item-main">
-                    <div class="item-title">${item.prod_name_service}</div>
-                    <div class="item-sub">$${item.price.toFixed(2)} / unit</div>
+                <div class="item-v2-main">
+                    <div class="title">${item.prod_name_service}</div>
+                    <div class="meta">$${item.price.toFixed(2)} / unit</div>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <div class="item-qty-wrap">
-                        <button type="button" class="qty-btn-mini" onclick="decreaseQty(${index})">-</button>
-                        <span style="font-weight: 700; min-width: 24px; text-align: center; font-size: 0.85rem;">${item.qty}</span>
-                        <button type="button" class="qty-btn-mini" onclick="increaseQty(${index})">+</button>
+                <div class="item-v2-controls">
+                    <div class="qty-pill-v2">
+                        <button type="button" onclick="decreaseQty(${index})">-</button>
+                        <span>${item.qty}</span>
+                        <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
-                    <div class="item-price">$${lineTotal.toFixed(2)}</div>
+                    <div class="item-v2-price">$${lineTotal.toFixed(2)}</div>
                 </div>
             `;
             body.appendChild(div);
@@ -392,17 +412,23 @@
         setTimeout(() => el.style.display = 'none', 3000);
     }
 
-    // Modern Modal Flow
+    function handleModeChange() {
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+        saleItems.forEach(item => {
+            const absQty = Math.abs(item.qty);
+            item.qty = isReturn ? -absQty : absQty;
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+        });
+        renderSaleItems();
+    }
+
     function openPaymentModal() {
         if (saleItems.length === 0) return alert("Cart is empty.");
-        
         const format = (v) => (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
         document.getElementById('webModalTotal').innerText = format(currentTotal);
-        
-        // Reset inputs
         document.getElementById('webTendered').value = "";
         calculateWebChange();
-        
         document.getElementById('paymentModal').classList.add('show');
     }
 
@@ -413,7 +439,6 @@
     function setWebPaymentMethod(method) {
         document.getElementById('hiddenPaymentMethod').value = method;
         document.getElementById('hiddenStatus').value = (method === 'Credit') ? 'Pending' : 'Paid';
-        
         document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
         event.currentTarget.classList.add('active');
     }
@@ -421,7 +446,6 @@
     function calculateWebChange() {
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
         const change = tendered - currentTotal;
-        
         const format = (v) => (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
         document.getElementById('webModalTendered').innerText = format(tendered);
         document.getElementById('webModalChange').innerText = format(change);
@@ -440,15 +464,7 @@
 
     function submitSaleForm() {
         const cust = document.querySelector('select[name="customer_name"]').value;
-        if (!cust) return alert("Please select a customer first.");
-        
-        const method = document.getElementById('hiddenPaymentMethod').value;
-        const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        
-        if (method === 'Cash' && currentTotal > 0 && tendered < currentTotal) {
-            if (!confirm("Partial payment? Remaining balance will be recorded as credit.")) return;
-        }
-        
+        if (!cust) return alert("Please select a customer.");
         document.getElementById('saleForm').submit();
     }
 </script>
