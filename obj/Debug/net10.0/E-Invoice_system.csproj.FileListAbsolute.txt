@@ -323,10 +323,10 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoic.08753401.Up2Date
 D:\netcore\E-Invoice_system\bin\Debug\net10.0\NuGet.Config
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.sourcelink.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-timfbiolvn-timfbiolvn.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-ezqwx4tk5h-ezqwx4tk5h.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\dfpdpy54t7-{0}-8xhe4h775t-8xhe4h775t.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\rg1vk5gd84-{0}-u5owk5v596-u5owk5v596.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-6z2o5xvfvp-6z2o5xvfvp.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\e5ers0z3f0-{0}-dxdlc4de0t-dxdlc4de0t.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-85x7uqdx3o-85x7uqdx3o.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-rduprelv31-rduprelv31.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-cwy752kvk7-cwy752kvk7.gz

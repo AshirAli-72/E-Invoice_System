@@ -40,6 +40,13 @@
             height: 100vh;
         }
 
+        @@media (max-width: 1024px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+        }
+
         .sale-layout-wrapper {
             display: flex;
             flex-direction: column;
@@ -190,6 +197,14 @@
             overflow: hidden;
         }
 
+        @@media (max-width: 1024px) {
+            .sale-main-viewport, .sale-layout-wrapper {
+                overflow: visible;
+                height: auto;
+                flex: none;
+            }
+        }
+
         #toast-container {
             position: fixed;
             top: 24px;
@@ -213,8 +228,15 @@
             transform: translateY(-100px);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .toast.show { transform: translateY(60px); }
-        .toast-icon { color: var(--primary); font-size: 1.25rem; }
+
+        .toast.show {
+            transform: translateY(60px);
+        }
+
+        .toast-icon {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
     </style>
 </head>
 <body>

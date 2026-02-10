@@ -21,7 +21,7 @@
 
 .pos-container-v2 {
     display: grid;
-    grid-template-columns: 80px 1fr 380px;
+    grid-template-columns: 80px 1fr 480px;
     height: calc(100vh - 64px);
     background: var(--bg-app);
     overflow: hidden;
@@ -784,7 +784,7 @@
 
 @media (max-width: 1200px) {
     .pos-container-v2 {
-        grid-template-columns: 80px 1fr 340px;
+        grid-template-columns: 80px 1fr 420px;
     }
 }
 
@@ -833,11 +833,12 @@
         border-left: none;
         border-top: 1px solid var(--border);
         height: auto;
-        max-height: 800px;
+        max-height: none;
     }
 
     .checkout-items-v2 {
-        max-height: 400px;
+        max-height: none;
+        overflow-y: visible;
     }
 
     .payment-card {
