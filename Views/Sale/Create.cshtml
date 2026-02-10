@@ -14,11 +14,11 @@
         </div>
         <div class="category-item" onclick="filterByCategory('products')">
             <i class="ph-package"></i>
-            <span>Items</span>
+            <span>Products</span>
         </div>
         <div class="category-item" onclick="filterByCategory('services')">
             <i class="ph-sparkle"></i>
-            <span>Service</span>
+            <span>Services</span>
         </div>
         <div class="category-item" onclick="filterByCategory('fav')">
             <i class="ph-star"></i>
@@ -50,17 +50,45 @@
                 foreach (var p in products)
                 {
                     decimal stockValue = 0;
+                    string unitLabel = "";
+                    bool isService = false;
+
                     if (!string.IsNullOrEmpty(p.qty_unit_type))
                     {
-                        var parts = p.qty_unit_type.Trim().Split(' ');
-                        decimal.TryParse(parts[0], out stockValue);
+                        var match = System.Text.RegularExpressions.Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
+                        if (match.Success)
+                        {
+                            decimal.TryParse(match.Groups[1].Value, out stockValue);
+                            unitLabel = match.Groups[2].Value.Trim();
+                            if (!string.IsNullOrEmpty(unitLabel))
+                            {
+                                isService = true;
+                            }
+                        }
+                        else
+                        {
+                            // Fallback if regex fails (shouldn't happen with this pattern)
+                            isService = true;
+                            unitLabel = p.qty_unit_type;
+                        }
                     }
-                    <div class="product-card-v2" data-name="@p.prod_name_service.ToLower()" data-barcode="@(p.barcode?.ToLower() ?? "")" data-stock="@stockValue" onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
-                        <div class="card-status-pill @(stockValue <= 0 ? "out" : "in")">
-                            @(stockValue <= 0 ? "Out of Stock" : $"{stockValue} Available")
+
+                    <div class="product-card-v2" 
+                         data-name="@p.prod_name_service.ToLower()" 
+                         data-barcode="@(p.barcode?.ToLower() ?? "")" 
+                         data-stock="@stockValue" 
+                         data-type="@(isService ? "service" : "product")"
+                         onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
+                        
+                        <div class="card-status-pill @(stockValue <= 0 && !isService ? "out" : "in")">
+                            @if (isService) {
+                                <span><i class="ph-sparkle"></i> @unitLabel Service</span>
+                            } else {
+                                @(stockValue <= 0 ? "Out of Stock" : $"{stockValue} Available")
+                            }
                         </div>
                         <div class="card-icon">
-                            <i class="ph-cube-transparent"></i>
+                            <i class="@(isService ? "ph-wrench" : "ph-cube-transparent")"></i>
                         </div>
                         <div class="card-info">
                             <h4 class="card-name">@p.prod_name_service</h4>
@@ -259,6 +287,12 @@
         const cards = document.querySelectorAll('.product-card-v2');
         cards.forEach(card => {
             if (cat === 'all') card.style.display = '';
+            else if (cat === 'products') {
+                card.style.display = card.dataset.type === 'product' ? '' : 'none';
+            }
+            else if (cat === 'services') {
+                card.style.display = card.dataset.type === 'service' ? '' : 'none';
+            }
             else if (cat === 'fav') {
                 card.style.display = card.dataset.stock > 10 ? '' : 'none';
             }

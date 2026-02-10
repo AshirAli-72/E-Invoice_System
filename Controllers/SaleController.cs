@@ -65,8 +65,11 @@ namespace E_Invoice_system.Controllers
                     decimal qty = 0;
                     if (!string.IsNullOrEmpty(item.qty_unit_type))
                     {
-                        var qtyPart = item.qty_unit_type.Trim().Split(' ')[0];
-                        decimal.TryParse(qtyPart, out qty);
+                        var match = System.Text.RegularExpressions.Regex.Match(item.qty_unit_type.Trim(), @"^([0-9.-]+)");
+                        if (match.Success)
+                        {
+                            decimal.TryParse(match.Groups[1].Value, out qty);
+                        }
                     }
 
                     // Calculate total
@@ -76,26 +79,21 @@ namespace E_Invoice_system.Controllers
                     var product = _context.products_services.FirstOrDefault(p => p.prod_name_service == item.prod_name_service);
                     if (product != null && !string.IsNullOrEmpty(product.qty_unit_type))
                     {
-                        var prodQtyParts = product.qty_unit_type.Split(' ');
-                        if (decimal.TryParse(prodQtyParts[0], out decimal currentQty))
+                        var prodMatch = System.Text.RegularExpressions.Regex.Match(product.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
+                        if (prodMatch.Success && decimal.TryParse(prodMatch.Groups[1].Value, out decimal currentQty))
                         {
-                            string unit = prodQtyParts.Length > 1 ? " " + string.Join(" ", prodQtyParts.Skip(1)) : "";
+                            string unit = prodMatch.Groups[2].Value;
+                            if (!string.IsNullOrEmpty(unit)) unit = " " + unit;
                             
                             // Check for Stock Limit if selling (qty > 0)
                             if (qty > 0 && currentQty < qty)
                             {
                                 ModelState.AddModelError("", $"Insufficient stock for {item.prod_name_service}. Available: {currentQty}, Requested: {qty}");
-                                // Since we are inside loop but want to stop everything?
-                                // Ef Core tracks changes, so adding error will prevent save if we check ModelState.IsValid again?
-                                // No, IsValid is checked at start.
-                                // We must throw or return view. 
-                                // Proper way: add model error and return view.
-                                // But items are already processed partially? No, SaveChanges is at end.
                                 
                                 // Reload lists
                                 ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
                                 ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
-                                return View(); // View expects Model of type Sale, not List<Sale>
+                                return View();
                             }
 
                             currentQty -= qty; // If qty is negative (return), this adds to stock.
