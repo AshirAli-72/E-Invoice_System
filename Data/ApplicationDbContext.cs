@@ -65,11 +65,7 @@ namespace E_Invoice_system.Data
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<ReturnDetail>()
-                .Property(r => r.ReturnQty)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<ReturnDetail>()
-                .Property(r => r.RefundAmount)
+                .Property(r => r.Amount)
                 .HasColumnType("decimal(18,2)");
         }
     }

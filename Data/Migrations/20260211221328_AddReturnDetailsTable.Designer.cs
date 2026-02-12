@@ -88,29 +88,41 @@ namespace E_Invoice_system.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("barcode");
+
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("customer_name");
 
-                    b.Property<int>("OriginalSaleId")
-                        .HasColumnType("int")
-                        .HasColumnName("original_sale_id");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("product_name");
-
-                    b.Property<decimal>("RefundAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("refund_amount");
-
-                    b.Property<DateTime>("ReturnDate")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
-                        .HasColumnName("return_date");
+                        .HasColumnName("date");
 
-                    b.Property<decimal>("ReturnQty")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("return_qty");
+                    b.Property<string>("Method")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("method");
+
+                    b.Property<string>("ProdNameService")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("prod_name/service");
+
+                    b.Property<string>("QtyUnitType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("qty/unit_type");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("int")
+                        .HasColumnName("sale_id");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
 
                     b.HasKey("Id");
 

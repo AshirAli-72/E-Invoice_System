@@ -73,7 +73,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("products_services");
+                    b.ToTable("products_services", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.ReturnDetail", b =>
@@ -85,33 +85,45 @@ namespace E_Invoice_system.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("barcode");
+
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("customer_name");
 
-                    b.Property<int>("OriginalSaleId")
-                        .HasColumnType("int")
-                        .HasColumnName("original_sale_id");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("product_name");
-
-                    b.Property<decimal>("RefundAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("refund_amount");
-
-                    b.Property<DateTime>("ReturnDate")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
-                        .HasColumnName("return_date");
+                        .HasColumnName("date");
 
-                    b.Property<decimal>("ReturnQty")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("return_qty");
+                    b.Property<string>("Method")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("method");
+
+                    b.Property<string>("ProdNameService")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("prod_name/service");
+
+                    b.Property<string>("QtyUnitType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("qty/unit_type");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("int")
+                        .HasColumnName("sale_id");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
 
                     b.HasKey("Id");
 
-                    b.ToTable("return_details");
+                    b.ToTable("return_details", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.Sale", b =>
@@ -173,7 +185,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("sale_details");
+                    b.ToTable("sale_details", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.Sellers", b =>
@@ -207,7 +219,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("sellers");
+                    b.ToTable("sellers", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.customers", b =>
@@ -241,7 +253,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("customers");
+                    b.ToTable("customers", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.invoices", b =>
@@ -315,7 +327,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("invoices");
+                    b.ToTable("invoices", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.users", b =>
@@ -341,7 +353,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

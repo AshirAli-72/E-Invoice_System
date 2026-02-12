@@ -23,7 +23,7 @@ namespace E_Invoice_system.Controllers
                 .ToList();
             
             var returns = _context.returns
-                .OrderByDescending(r => r.ReturnDate)
+                .OrderByDescending(r => r.Date)
                 .ToList();
             
             ViewBag.Returns = returns;

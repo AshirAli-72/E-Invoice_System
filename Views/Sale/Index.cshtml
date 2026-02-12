@@ -101,12 +101,12 @@
         <table class="styled-table" style="min-width: 1000px;">
             <thead>
                 <tr>
-                    <th style="padding-left: 1.5rem;">Date</th>
-                    <th>Product / Service</th>
+                    <th style="padding-left: 1.5rem;">Sale ID</th>
                     <th>Customer Name</th>
+                    <th>Date</th>
+                    <th>Product / Service</th>
                     <th>QTY/Unit Type</th>
-                    <th>Price</th>
-                    <th>Total</th>
+                    <th>Amount</th>
                     <th class="text-center">Method</th>
                     <th class="text-center">Status</th>
                     <th class="text-center" style="padding-right: 1.5rem;">Actions</th>
@@ -119,23 +119,26 @@
                     {
                         <tr>
                             <td style="padding-left: 1.5rem;">
-                                <div class="font-bold font-sm">@ret.ReturnDate.ToString("MMM dd, yyyy")</div>
-                                <div class="text-muted font-xs">@ret.ReturnDate.ToString("hh:mm tt")</div>
-                            </td>
-                            <td>
-                                <div class="font-bold">@ret.ProductName</div>
+                                <div class="font-bold font-sm">#@ret.SaleId</div>
                             </td>
                             <td class="text-muted">@ret.CustomerName</td>
-                            <td class="text-danger font-bold">@ret.ReturnQty.ToString("G29")</td>
-                            <td class="text-muted">$@((ret.ReturnQty != 0 ? ret.RefundAmount / ret.ReturnQty : 0).ToString("N2"))</td>
                             <td>
-                                <div class="font-bold text-danger" style="font-size: 1rem;">$@ret.RefundAmount.ToString("N2")</div>
+                                <div class="font-bold font-sm">@ret.Date.ToString("MMM dd, yyyy")</div>
+                                <div class="text-muted font-xs">@ret.Date.ToString("hh:mm tt")</div>
+                            </td>
+                            <td>
+                                <div class="font-bold">@ret.ProdNameService</div>
+                                <div class="text-muted font-xs">@ret.Barcode</div>
+                            </td>
+                            <td class="text-danger font-bold">@ret.QtyUnitType</td>
+                            <td>
+                                <div class="font-bold text-danger" style="font-size: 1rem;">$@ret.Amount.ToString("N2")</div>
                             </td>
                             <td class="text-center">
-                                <span class="font-medium font-sm">Refund</span>
+                                <span class="font-medium font-sm">@ret.Method</span>
                             </td>
                             <td class="text-center">
-                                <span class="status-badge" style="background: #fff1f2; color: #9f1239;">Returned</span>
+                                <span class="status-badge" style="background: #fff1f2; color: #9f1239;">@ret.Status</span>
                             </td>
                             <td style="padding-right: 1.5rem;">
                                 <div class="actions-container actions-center">
