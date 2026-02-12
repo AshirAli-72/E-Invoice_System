@@ -151,9 +151,20 @@ namespace E_Invoice_system.Controllers
             if (string.IsNullOrEmpty(customerName))
                 return Json(new { success = false, message = "Customer name is required." });
 
-            var sales = _context.sales
-                .Where(s => s.customer_name == customerName && (s.qty_unit_type == null || !s.qty_unit_type.Trim().StartsWith("-")))
+            var salesAll = _context.sales
+                .Where(s => s.customer_name == customerName)
                 .OrderByDescending(s => s.date)
+                .ToList();
+
+            var sales = salesAll
+                .Where(s => {
+                    var match = System.Text.RegularExpressions.Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
+                    if (match.Success && decimal.TryParse(match.Groups[1].Value, out decimal q))
+                    {
+                        return q > 0;
+                    }
+                    return false; // Filter out if 0 or negative
+                })
                 .Select(s => new
                 {
                     s.id,
