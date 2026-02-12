@@ -136,7 +136,7 @@
                 <label>Customer</label>
                 <div class="select-wrapper-v2">
                     <i class="ph-user-circle"></i>
-                    <select name="customer_name" required>
+                    <select name="customer_name" required onchange="handleCustomerChange()">
                         <option value="">Select Customer</option>
                         @if (customers != null)
                         {
@@ -316,11 +316,36 @@
         });
     }
 
-    function addToSaleFromCard(id, name, price, discount, expiry, barcode, maxStock) {
+    async function validateReturnEligibility(customerName, productName) {
+        if (!customerName || !productName) return true;
+        try {
+            const response = await fetch(`/Sale/CheckPurchaseHistory?customerName=${encodeURIComponent(customerName)}&productName=${encodeURIComponent(productName)}`);
+            const data = await response.json();
+            return data.hasPurchased;
+        } catch (error) {
+            console.error("Validation error:", error);
+            return true; // Default to allow if check fails? Or block? Let's block if we want to be safe.
+        }
+    }
+
+    async function addToSaleFromCard(id, name, price, discount, expiry, barcode, maxStock) {
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
-        const qtyToAdd = isReturn ? -1 : 1;
+        const customerName = document.querySelector('select[name="customer_name"]').value;
 
+        if (isReturn) {
+            if (!customerName) {
+                showStockAlert("Please select a customer first to validate return eligibility.");
+                return;
+            }
+            const isEligible = await validateReturnEligibility(customerName, name);
+            if (!isEligible) {
+                showStockAlert(`Customer ${customerName} has no purchase history for ${name}. Return denied.`);
+                return;
+            }
+        }
+
+        const qtyToAdd = isReturn ? -1 : 1;
         const existing = saleItems.find(i => i.prod_name_service === name);
         if (existing) {
             if (!isReturn && (existing.qty + qtyToAdd) > maxStock) {
@@ -363,16 +388,52 @@
         }
     }
 
-    function increaseQty(index) {
+    async function increaseQty(index) {
         const item = saleItems[index];
         const mode = document.querySelector('input[name="transMode"]:checked').value;
-        if (mode !== 'return' && item.qty >= item.maxStock) {
-            showStockAlert(`Max stock reached (${item.maxStock}).`);
-            return;
+        const isReturn = mode === 'return';
+
+        if (isReturn) {
+             // For returns, "increasing" means making it more negative (e.g. returning more)
+             // But in the UI, qty is negative. So increasing qty (e.g. from -1 to -2) is subtraction.
+             // Wait, the UI controls are +/-. 
+             // If qty is -1, clicking + should probably make it -2 if we follow "more items to return".
+             // Actually, usually + means "more", regardless of sign.
+             // Let's stick to the current logic: item.qty++ adds 1.
+             // So if qty is -2, clicking + makes it -1. This is safe.
+             // If qty is -1, clicking + makes it 0 -> removed.
+             // Clicking - makes it more negative.
+             item.qty++; 
+        } else {
+            if (item.qty >= item.maxStock) {
+                showStockAlert(`Max stock reached (${item.maxStock}).`);
+                return;
+            }
+            item.qty++;
         }
-        item.qty++;
+        
         item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         renderSaleItems();
+    }
+
+    // New function to handle manual qty decrease which for returns means "more items"
+    async function decreaseQtyBtn(index) {
+        const item = saleItems[index];
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+
+        if (isReturn) {
+            item.qty--; // e.g. -1 to -2
+        } else {
+            item.qty--; // e.g. 2 to 1
+        }
+
+        if (item.qty === 0) {
+            removeItem(index);
+        } else {
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            renderSaleItems();
+        }
     }
 
     function removeItem(index) {
@@ -433,8 +494,8 @@
                 </div>
                 <div class="item-v2-controls">
                     <div class="qty-pill-v2">
-                        <button type="button" onclick="decreaseQty(${index})">-</button>
-                        <span>${item.qty}</span>
+                        <button type="button" onclick="decreaseQtyBtn(${index})">-</button>
+                        <span>${Math.abs(item.qty)}</span>
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
                     <div class="item-v2-price">$${lineTotal.toFixed(2)}</div>
@@ -465,18 +526,54 @@
         const el = document.getElementById('stockAlert');
         document.getElementById('stockAlertMsg').innerText = msg;
         el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 3000);
+        setTimeout(() => el.style.display = 'none', 4000);
     }
 
-    function handleModeChange() {
+    async function handleModeChange() {
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
+        const customerName = document.querySelector('select[name="customer_name"]').value;
+
+        if (isReturn && saleItems.length > 0) {
+            if (!customerName) {
+                showStockAlert("Please select a customer to validate return eligibility for the current items.");
+                // Toggle back to sale? Or just alert?
+                // Let's just alert and block validation.
+            } else {
+                // Check all items
+                for (let i = saleItems.length - 1; i >= 0; i--) {
+                    const isEligible = await validateReturnEligibility(customerName, saleItems[i].prod_name_service);
+                    if (!isEligible) {
+                        showStockAlert(`${saleItems[i].prod_name_service} removed from return list (no purchase history).`);
+                        saleItems.splice(i, 1);
+                    }
+                }
+            }
+        }
+
         saleItems.forEach(item => {
             const absQty = Math.abs(item.qty);
             item.qty = isReturn ? -absQty : absQty;
             item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         });
         renderSaleItems();
+    }
+
+    async function handleCustomerChange() {
+        const customerName = document.querySelector('select[name="customer_name"]').value;
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+
+        if (isReturn && saleItems.length > 0 && customerName) {
+            for (let i = saleItems.length - 1; i >= 0; i--) {
+                const isEligible = await validateReturnEligibility(customerName, saleItems[i].prod_name_service);
+                if (!isEligible) {
+                    showStockAlert(`${saleItems[i].prod_name_service} removed: ${customerName} never purchased this.`);
+                    saleItems.splice(i, 1);
+                }
+            }
+            renderSaleItems();
+        }
     }
 
     function openPaymentModal() {

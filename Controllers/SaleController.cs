@@ -122,14 +122,14 @@ namespace E_Invoice_system.Controllers
                             returnsToInsert.Add(new ReturnDetail
                             {
                                 SaleId = originalSale.id,
+                                Date = now,
                                 CustomerName = customer_name,
                                 ProdNameService = item.prod_name_service,
                                 Barcode = item.barcode,
                                 QtyUnitType = $"{Math.Abs(qty)} {unit}".Trim(),
                                 Amount = Math.Abs(item.total_price),
-                                Date = now,
-                                Method = "Refund",
-                                Status = "Returned"
+                                Method = payment_method,
+                                Status = "Return"
                             });
                         }
                         else
@@ -230,9 +230,24 @@ namespace E_Invoice_system.Controllers
                 price = product.price,
                 discount = product.discount,
                 tax = product.tax,
+                qty_unit_type = product.qty_unit_type,
+                barcode = product.barcode,
                 name = product.prod_name_service
             });
         }
+
+        [HttpGet]
+        public JsonResult CheckPurchaseHistory(string customerName, string productName)
+        {
+            if (string.IsNullOrEmpty(customerName) || string.IsNullOrEmpty(productName))
+            {
+                return Json(new { hasPurchased = false });
+            }
+
+            var hasPurchased = _context.sales.Any(s => s.customer_name == customerName && s.prod_name_service == productName);
+            return Json(new { hasPurchased = hasPurchased });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteReturn(int id)
