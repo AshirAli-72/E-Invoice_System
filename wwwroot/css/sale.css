@@ -14,10 +14,10 @@
     --text-dim: #94a3b8;
     --success: #10b981;
     --danger: #ef4444;
-    --radius-xl: 32px;
-    --radius-lg: 20px;
-    --shadow-luxury: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
-    --glass-bg: rgba(255, 255, 255, 0.8);
+    --radius-xl: 20px;
+    --radius-lg: 12px;
+    --shadow-luxury: 0 4px 12px rgba(0, 0, 0, 0.03);
+    --glass-bg: rgba(255, 255, 255, 0.95);
 }
 
 .pos-container-v2 {
@@ -51,7 +51,7 @@
     justify-content: center;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.2s ease;
     gap: 4px;
     position: relative;
 }
@@ -71,7 +71,6 @@
 .category-item:hover {
     color: var(--primary);
     background: rgba(188, 24, 35, 0.05);
-    transform: scale(1.05);
 }
 
 .category-item.active {
@@ -96,7 +95,7 @@
     flex-direction: column;
     padding: 24px 32px;
     overflow: hidden;
-    background: radial-gradient(circle at top left, rgba(188, 24, 35, 0.02), transparent 40%);
+    background: var(--bg-app);
 }
 
 .canvas-header {
@@ -118,13 +117,12 @@
     padding: 0 24px;
     gap: 16px;
     box-shadow: var(--shadow-luxury);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
 }
 
 .search-bar-v2:focus-within {
     border-color: var(--primary);
-    box-shadow: 0 0 0 5px var(--primary-glow);
-    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .search-bar-v2 i {
@@ -200,7 +198,7 @@
     padding: 24px;
     position: relative;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -221,9 +219,8 @@
 }
 
 .product-card-v2:hover {
-    transform: translateY(-8px);
     border-color: var(--primary-glow);
-    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .product-card-v2:hover::before {
@@ -340,7 +337,6 @@
 .btn-back-list:hover {
     background: var(--primary);
     color: white;
-    transform: translateX(-4px);
 }
 
 .checkout-header p {
@@ -366,7 +362,6 @@
 .btn-clear-v2:hover {
     background: var(--danger);
     color: white;
-    transform: rotate(15deg) scale(1.1);
 }
 
 .customer-selector-v2 {
@@ -434,15 +429,12 @@
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+    transition: all 0.2s ease;
 }
 
 .item-v2:hover {
     border-color: var(--primary-glow);
     background: #fffafa;
-    transform: scale(1.02);
-    box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.05);
 }
 
 .item-v2-main .title {
@@ -588,13 +580,12 @@
     justify-content: center;
     gap: 12px;
     transition: all 0.3s;
-    box-shadow: 0 8px 16px var(--primary-glow);
+    box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .btn-pay-v2:hover {
-    transform: translateY(-2px);
     background: var(--primary-hover);
-    box-shadow: 0 12px 24px var(--primary-glow);
+    box-shadow: 0 6px 16px var(--primary-glow);
 }
 
 .btn-pay-v2:active {
@@ -636,12 +627,10 @@
 @keyframes fadeInModal {
     from {
         opacity: 0;
-        backdrop-filter: blur(0px);
     }
 
     to {
         opacity: 1;
-        backdrop-filter: blur(12px);
     }
 }
 
@@ -656,17 +645,17 @@
     box-shadow: 0 50px 120px -30px rgba(0, 0, 0, 0.3);
     display: flex;
     transform: scale(1);
-    animation: slideUpModal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: slideUpModal 0.2s ease-out;
 }
 
 @keyframes slideUpModal {
     from {
-        transform: translateY(40px) scale(0.95);
+        transform: translateY(10px);
         opacity: 0;
     }
 
     to {
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
         opacity: 1;
     }
 }
@@ -718,7 +707,7 @@
     justify-content: center;
     gap: 12px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
 }
 
 .method-tab i {
@@ -789,7 +778,6 @@
     border-color: var(--primary);
     color: var(--primary);
     background: #fffafa;
-    transform: translateY(-1px);
 }
 
 .summary-box-web {
@@ -846,11 +834,11 @@
     gap: 12px;
     cursor: pointer;
     border: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
 }
 
 .btn-confirm-web:active {
-    transform: translateY(0) scale(0.98);
+    opacity: 0.9;
 }
 
 /* Custom Scrollbar */
@@ -885,8 +873,7 @@
 
 .reveal-up {
     opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease-out forwards;
+    animation: fadeIn 0.4s ease-out forwards;
 }
 
 @keyframes fadeIn {
