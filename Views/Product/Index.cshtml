@@ -13,6 +13,7 @@
             <thead>
                 <tr>
                     <th style="padding-left: 1.5rem; width: 60px;">ID</th>
+                    <th style="width: 80px;">Image</th>
                     <th>Item/Service Name</th>
                     <th>Barcode</th>
                     <th style="width: 140px;">QTY / UNIT</th>
@@ -27,6 +28,18 @@
                 {
                     <tr>
                         <td class="font-bold" style="padding-left: 1.5rem;">#@item.id</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.image_path))
+                            {
+                                <img src="@item.image_path" alt="Product" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" />
+                            }
+                            else
+                            {
+                                <div style="width: 50px; height: 50px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                                    <i class="ph-image" style="font-size: 1.5rem;"></i>
+                                </div>
+                            }
+                        </td>
                         <td class="font-medium">@item.prod_name_service</td>
                         <td>@(item.barcode ?? "-")</td>
                         <td>@System.Text.RegularExpressions.Regex.Replace(item.qty_unit_type ?? "", @"[^0-9.-]", "")</td>
@@ -54,7 +67,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="8" class="empty-state">
+                        <td colspan="9" class="empty-state">
                             <i class="ph-package empty-state-icon"></i>
                             <p>No products found. Click "Add New Item" to get started.</p>
                         </td>

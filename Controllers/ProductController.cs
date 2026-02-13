@@ -2,16 +2,21 @@ using Microsoft.AspNetCore.Mvc;
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace E_Invoice_system.Controllers
 {
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         public IActionResult Index()
@@ -30,8 +35,21 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ProductService product)
+        public async Task<IActionResult> Create(ProductService product, IFormFile? imageFile)
         {
+            // Handle Image Upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                string path = Path.Combine(wwwRootPath, "savepic", fileName);
+
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+                product.image_path = "/savepic/" + fileName;
+            }
             // Auto-generate barcode if empty
             if (string.IsNullOrWhiteSpace(product.barcode))
             {
@@ -112,8 +130,31 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(ProductService product)
+        public async Task<IActionResult> Edit(ProductService product, IFormFile? imageFile)
         {
+            // Handle Image Upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                string path = Path.Combine(wwwRootPath, "savepic", fileName);
+
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(product.image_path))
+                {
+                    var oldPath = Path.Combine(wwwRootPath, product.image_path.TrimStart('/'));
+                    if (System.IO.File.Exists(oldPath))
+                    {
+                        System.IO.File.Delete(oldPath);
+                    }
+                }
+
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+                product.image_path = "/savepic/" + fileName;
+            }
             // Auto-generate barcode if empty on edit
             if (string.IsNullOrWhiteSpace(product.barcode))
             {
