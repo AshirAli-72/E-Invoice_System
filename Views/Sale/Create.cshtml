@@ -5,25 +5,29 @@
     var products = ViewBag.Products as List<E_Invoice_system.Models.ProductService>;
 }
 
-<div class="pos-container-v2">
-    <!-- Center: Product Discovery -->
-    <div class="product-canvas">
-        <div class="canvas-header">
-            <div class="category-tabs-v2">
-                <div class="tab-item active" onclick="filterByCategory('all')">All</div>
-                <div class="tab-item" onclick="filterByCategory('products')">Products</div>
-                <div class="tab-item" onclick="filterByCategory('services')">Services</div>
-                <div class="tab-item" onclick="filterByCategory('fav')">Saved</div>
+<div class="saas-pos-container">
+    <!-- Main Discovery Section -->
+    <div class="discovery-canvas">
+        <!-- Integrated Dashboard Toolbar -->
+        <header class="saas-toolbar">
+            <div class="toolbar-branding">
+                <div class="terminal-id">
+                    <span class="badge-pro">PRO</span>
+                    <h1>Terminal 01</h1>
+                </div>
+                <div class="session-meta">
+                    <span id="terminalClock" class="clock-tabular">00:00:00</span>
+                    <span class="divider"></span>
+                    <span class="date-label">@DateTime.Now.ToString("ddd, MMM dd")</span>
+                </div>
             </div>
 
-            <div class="canvas-header-bottom">
-                <div class="search-bar-v2">
+            <div class="toolbar-search">
+                <div class="search-unified">
                     <i class="ph-magnifying-glass"></i>
-                    <input type="text" id="prodSearch" placeholder="Search products or scan barcode..." oninput="filterProducts()" autocomplete="off" />
-                </div>
-                
-                <div class="search-toggle-v2">
-                    <div class="toggle-pill">
+                    <input type="text" id="prodSearch" placeholder="Search item or scan barcode..." oninput="filterProducts()" autocomplete="off" />
+                    <div class="search-divider"></div>
+                    <div class="search-opts">
                         <input type="radio" id="searchName" name="searchMode" value="name" checked onchange="handleSearchModeChange()">
                         <label for="searchName">Name</label>
                         <input type="radio" id="searchBarcode" name="searchMode" value="barcode" onchange="handleSearchModeChange()">
@@ -31,9 +35,30 @@
                     </div>
                 </div>
             </div>
+
+            <div class="toolbar-actions">
+                <a href="@Url.Action("Index", "Sale")" class="btn-dashboard-back">
+                    <i class="ph-squares-four"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Quick Filter Hub -->
+        <div class="filter-hub">
+            <div class="filter-group">
+                <span class="filter-caption">DISCOVERY</span>
+                <div class="filter-pills">
+                    <div class="pill-item active" onclick="filterByCategory('all')">All Items</div>
+                    <div class="pill-item" onclick="filterByCategory('products')">Products</div>
+                    <div class="pill-item" onclick="filterByCategory('services')">Services</div>
+                    <div class="pill-item" onclick="filterByCategory('fav')">Regulars</div>
+                </div>
+            </div>
         </div>
 
-        <div class="product-grid-v2" id="productGrid">
+        <!-- Scrollable Discovery Grid -->
+        <div class="discovery-grid-wrapper" id="productGrid">
             @if (products != null)
             {
                 foreach (var p in products)
@@ -54,47 +79,42 @@
                                 isService = true;
                             }
                         }
-                        else
-                        {
-                            // Fallback if regex fails (shouldn't happen with this pattern)
-                            isService = true;
-                            unitLabel = p.qty_unit_type;
-                        }
                     }
 
-                    <div class="product-card-v2" 
+                    <div class="pro-product-card" 
+                         data-category="@(isService ? "service" : "product")" 
                          data-name="@p.prod_name_service.ToLower()" 
-                         data-barcode="@(p.barcode?.ToLower() ?? "")" 
-                         data-stock="@stockValue" 
-                         data-type="@(isService ? "service" : "product")"
+                         data-barcode="@(p.barcode?.ToLower() ?? "")"
                          onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue)">
                         
-                        <div class="card-status-pill @(stockValue <= 0 && !isService ? "out" : "in")">
-                            @if (isService) {
-                                <span><i class="ph-sparkle"></i> @unitLabel Service</span>
-                            } else {
-                                @(stockValue <= 0 ? "Out of Stock" : $"{stockValue} Available")
-                            }
-                        </div>
-                        <div class="card-image">
+                        <div class="card-visual">
                             @if (!string.IsNullOrEmpty(p.image))
                             {
                                 <img src="/product-images/@p.image" alt="Product" />
                             }
                             else
                             {
-                                <div class="image-placeholder">
+                                <div class="visual-placeholder">
                                     <i class="@(isService ? "ph-wrench" : "ph-cube-transparent")"></i>
                                 </div>
                             }
+                            <span class="stock-pill @(stockValue <= 0 && !isService ? "out" : "in")">
+                                @if (isService) {
+                                    <span><i class="ph-sparkle"></i> @unitLabel Service</span>
+                                } else {
+                                    @(stockValue <= 0 ? "Out of Stock" : $"{stockValue} Available")
+                                }
+                            </span>
                         </div>
+                        
                         <div class="card-info">
-                            <h4 class="card-name">@p.prod_name_service</h4>
-                            <div class="card-price-row">
-                                <span class="price-tag">$@p.price.ToString("N2")</span>
+                            <h3 class="item-name">@p.prod_name_service</h3>
+                            <div class="item-price-row">
+                                <span class="currency">$</span>
+                                <span class="price-val">@p.price.ToString("N2")</span>
                                 @if (p.discount > 0)
                                 {
-                                    <span class="discount-pill">-$@p.discount.ToString("N2")</span>
+                                    <span class="discount-badge">-@p.discount.ToString("N0")%</span>
                                 }
                             </div>
                         </div>
@@ -104,37 +124,31 @@
         </div>
     </div>
 
-    <!-- Right: Checkout Center -->
-    <div class="checkout-center">
-        <form asp-action="Create" method="post" id="saleForm" class="checkout-form">
+    <!-- Professional Order Sidebar -->
+    <aside class="order-sidebar">
+        <form asp-action="Create" method="post" id="saleForm" class="sidebar-form">
             @Html.AntiForgeryToken()
             <input type="hidden" name="payment_method" id="hiddenPaymentMethod" value="Cash" />
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
             
-            <div class="checkout-header">
-                <div style="flex: 1;">
-                    <h3 style="margin: 0;">Current Order</h3>
-                    <p id="itemCountDisplay" style="margin: 0;">0 items selected</p>
+            <div class="cart-header">
+                <div class="cart-title">
+                    <h2>Current Order</h2>
+                    <span class="badge-items" id="itemCountDisplay">0 items</span>
                 </div>
-                <div class="mode-toggle-v2 compact">
-                    <div class="toggle-pill">
-                        <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
-                        <label for="modeSale">Sale</label>
-                        <input type="radio" id="modeReturn" name="transMode" value="return" onchange="handleModeChange()">
-                        <label for="modeReturn">Return</label>
-                    </div>
+                <div class="mode-toggle-saas">
+                    <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
+                    <label for="modeSale">Sale</label>
+                    <input type="radio" id="modeReturn" name="transMode" value="return" onchange="handleModeChange()">
+                    <label for="modeReturn">Return</label>
                 </div>
-                <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order">
-                    <i class="ph-trash"></i>
-                </button>
             </div>
 
-            <div class="customer-selector-v2">
-                <label>Customer</label>
-                <div class="select-wrapper-v2">
+            <div class="customer-entry">
+                <div class="input-integrated">
                     <i class="ph-user-circle"></i>
-                    <select name="customer_name" required onchange="handleCustomerChange()">
-                        <option value="">Select Customer</option>
+                    <select name="customer_name" required onchange="handleCustomerChange()" class="select-ghost">
+                        <option value="">Walk-in Customer</option>
                         @if (customers != null)
                         {
                             foreach (var c in customers)
@@ -146,46 +160,45 @@
                 </div>
             </div>
 
-            <div class="checkout-items-v2" id="saleItemsBody">
+            <div class="order-list-canvas" id="saleItemsBody">
                 <!-- Items populated by JS -->
             </div>
 
-            <div id="emptyStateV2" class="empty-state-v2">
-                <div class="empty-glow"></div>
-                <i class="ph-shopping-cart-simple"></i>
-                <p>Bag is empty</p>
+            <div id="emptyStateV2" class="empty-canvas">
+                <i class="ph-shopping-bag-open"></i>
+                <p>Cart is currently empty</p>
             </div>
 
-            <div class="checkout-footer-v2">
-                <div class="price-summary-v2" style="margin-bottom: 24px;">
-                    <div class="summary-line">
-                        <span>Items Total</span>
+            <div class="cart-footer">
+                <div class="summary-block">
+                    <div class="line">
+                        <span>Subtotal</span>
                         <span id="subtotalDisplay">$0.00</span>
                     </div>
-                    <div class="summary-line highlight">
+                    <div class="line highlight">
                         <span>Discounts</span>
                         <span id="discountDisplay">-$0.00</span>
                     </div>
-                    
-                    <div id="stockAlert" class="alert-v2" style="display: none; margin-top: 12px;">
-                        <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
-                    </div>
 
-                    <div class="grand-total-row" style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; margin-bottom: 24px;">
-                        <div class="total-label">Grand Total</div>
-                        <div class="total-value" id="grandTotal">$0.00</div>
+                    <div id="stockAlert" class="alert-soft" style="display: none;">
+                        <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
                     </div>
                 </div>
 
-                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
-                    Payment
-                    <i class="ph-arrow-right"></i>
+                <div class="grand-total-block">
+                    <div class="total-label">Grand Total</div>
+                    <div class="total-value" id="grandTotal">$0.00</div>
+                </div>
+
+                <button type="button" class="btn-checkout-pro" onclick="openPaymentModal()">
+                    Complete Payment
+                    <i class="ph-check-circle"></i>
                 </button>
-                
-                <div id="hiddenInputsContainer"></div>
             </div>
+            
+            <div id="hiddenInputsContainer"></div>
         </form>
-    </div>
+    </aside>
 </div>
 
 <!-- Modern Web Payment Modal -->
@@ -265,6 +278,16 @@
 </div>
 
 <script>
+    function updateClock() {
+        const now = new Date();
+        const clockEl = document.getElementById('terminalClock');
+        if (clockEl) {
+            clockEl.innerText = now.toLocaleTimeString([], { hour12: false });
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     let saleItems = [];
     let currentTotal = 0;
     let searchMode = 'name'; // Default search mode
@@ -279,27 +302,28 @@
     }
 
     function filterByCategory(cat) {
-        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.pill-item').forEach(el => el.classList.remove('active'));
         event.currentTarget.classList.add('active');
         
-        const cards = document.querySelectorAll('.product-card-v2');
+        const cards = document.querySelectorAll('.pro-product-card');
         cards.forEach(card => {
             if (cat === 'all') card.style.display = '';
             else if (cat === 'products') {
-                card.style.display = card.dataset.type === 'product' ? '' : 'none';
+                card.style.display = card.dataset.category === 'product' ? '' : 'none';
             }
             else if (cat === 'services') {
-                card.style.display = card.dataset.type === 'service' ? '' : 'none';
+                card.style.display = card.dataset.category === 'service' ? '' : 'none';
             }
             else if (cat === 'fav') {
-                card.style.display = card.dataset.stock > 10 ? '' : 'none';
+                // Example logic for "Regulars" - could be based on a flag, but here we'll use stock or something
+                card.style.display = card.dataset.category === 'product' ? '' : 'none';
             }
         });
     }
 
     function filterProducts() {
         const query = document.getElementById('prodSearch').value.toLowerCase();
-        const cards = document.querySelectorAll('.product-card-v2');
+        const cards = document.querySelectorAll('.pro-product-card');
 
         cards.forEach(card => {
             const name = card.dataset.name;
@@ -473,7 +497,7 @@
         body.innerHTML = "";
         hiddenContainer.innerHTML = "";
 
-        countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
+        countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''}`;
 
         if (saleItems.length === 0) {
             empty.style.display = "flex";
@@ -499,19 +523,19 @@
             grandTotal += lineTotal;
 
             const div = document.createElement('div');
-            div.className = "item-v2";
+            div.className = "cart-item";
             div.innerHTML = `
-                <div class="item-v2-main">
+                <div class="cart-item-info">
                     <div class="title">${item.prod_name_service}</div>
-                    <div class="meta">$${item.price.toFixed(2)} / unit</div>
+                    <div class="price-unit">$${item.price.toFixed(2)} / unit</div>
                 </div>
-                <div class="item-v2-controls">
-                    <div class="qty-pill-v2">
+                <div class="cart-item-actions">
+                    <div class="qty-control-pro">
                         <button type="button" onclick="decreaseQtyBtn(${index})">-</button>
-                        <span>${Math.abs(item.qty)}</span>
+                        <span class="qty-val">${Math.abs(item.qty)}</span>
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
-                    <div class="item-v2-price">$${lineTotal.toFixed(2)}</div>
+                    <div class="cart-item-total">$${lineTotal.toFixed(2)}</div>
                 </div>
             `;
             body.appendChild(div);
