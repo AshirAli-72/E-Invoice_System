@@ -157,12 +157,7 @@
             </div>
 
             <div class="checkout-footer-v2">
-                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
-                    Payment
-                    <i class="ph-arrow-right"></i>
-                </button>
-
-                <div class="price-summary-v2" style="margin-top: 24px; margin-bottom: 0;">
+                <div class="price-summary-v2" style="margin-bottom: 24px;">
                     <div class="summary-line">
                         <span>Items Total</span>
                         <span id="subtotalDisplay">$0.00</span>
@@ -176,11 +171,16 @@
                         <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
                     </div>
 
-                    <div class="grand-total-row" style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px;">
+                    <div class="grand-total-row" style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; margin-bottom: 24px;">
                         <div class="total-label">Grand Total</div>
                         <div class="total-value" id="grandTotal">$0.00</div>
                     </div>
                 </div>
+
+                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
+                    Payment
+                    <i class="ph-arrow-right"></i>
+                </button>
                 
                 <div id="hiddenInputsContainer"></div>
             </div>
