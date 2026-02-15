@@ -11,15 +11,15 @@
         <div class="canvas-header">
             <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h1>
+                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h3>
                 </div>
 
-                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
+                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: flex-start;">
                     <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
                     <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
                 
-                <div class="mode-toggle-v2 compact" style="margin: 0; height:50px;">
+                <div class="mode-toggle-v2 compact" style="margin: 0; height:30px;">
                     <div class="toggle-pill" style="height: 100%; display: flex; align-items: center;">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
                         <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">Name</label>
@@ -89,11 +89,17 @@
                     }
 
                     <div class="product-card-v2" 
-                         data-name="@p.prod_name_service.ToLower()" 
+                         data-id="@p.id"
+                         data-name="@p.prod_name_service" 
+                         data-search-name="@p.prod_name_service.ToLower()"
                          data-barcode="@(p.barcode?.ToLower() ?? "")" 
+                         data-price="@p.price"
+                         data-discount="@p.discount"
+                         data-expiry="@(p.expiry_date?.ToString("yyyy-MM-dd") ?? "")"
                          data-stock="@stockValue" 
                          data-type="@(isService ? "service" : "product")"
-                         onclick="addToSaleFromCard(@p.id, '@p.prod_name_service', @p.price, @p.discount, '@(p.expiry_date?.ToString("yyyy-MM-dd"))', '@(p.barcode ?? "")', @stockValue, '@p.image')">
+                         data-image="@(p.image ?? "")"
+                         onclick="addToSaleFromCard(this)">
                         
                         <div class="card-image">
                             @if (!string.IsNullOrEmpty(p.image))
@@ -133,7 +139,10 @@
             
             <div class="checkout-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="margin: 0; font-size: 1.25rem;">Order Detail</h3>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.25rem;">Order Detail</h3>
+                        <div id="itemCountDisplay" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">0 items selected</div>
+                    </div>
                     
                     <div style="display: flex; gap: 8px; align-items: center;">
                          <div class="mode-toggle-v2 compact">
@@ -183,6 +192,10 @@
                     <div class="summary-line">
                         <span>Subtotal</span>
                         <span id="subtotalDisplay">$0.00</span>
+                    </div>
+                    <div class="summary-line" style="color: var(--success);">
+                        <span>Discount</span>
+                        <span id="discountDisplay">-$0.00</span>
                     </div>
                     <div class="summary-line">
                         <span>Tax</span>
@@ -364,7 +377,7 @@
         }
 
         // Add to cart as service (no stock limit)
-        addToSaleFromCard(0, name, price, 0, null, null, 999999, null);
+        addItemToSale(0, name, price, 0, null, null, 999999, null);
         closeCustomItemModal();
     }
 
@@ -401,8 +414,8 @@
         const cards = document.querySelectorAll('.product-card-v2');
 
         cards.forEach(card => {
-            const name = card.dataset.name;
-            const barcode = card.dataset.barcode;
+            const name = card.dataset.searchName || "";
+            const barcode = card.dataset.barcode || "";
             
             if (searchMode === 'name') {
                 card.style.display = name.includes(query) ? '' : 'none';
@@ -424,7 +437,20 @@
         }
     }
 
-    async function addToSaleFromCard(id, name, price, discount, expiry, barcode, maxStock, image) {
+    function addToSaleFromCard(card) {
+        const id = card.dataset.id;
+        const name = card.dataset.name;
+        const price = parseFloat(card.dataset.price);
+        const discount = parseFloat(card.dataset.discount);
+        const expiry = card.dataset.expiry || null;
+        const barcode = card.dataset.barcode || null;
+        const maxStock = parseFloat(card.dataset.stock);
+        const image = card.dataset.image || null;
+
+        addItemToSale(id, name, price, discount, expiry, barcode, maxStock, image);
+    }
+
+    async function addItemToSale(id, name, price, discount, expiry, barcode, maxStock, image) {
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
         const customerName = document.querySelector('select[name="customer_name"]').value;
