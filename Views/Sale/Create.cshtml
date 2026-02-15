@@ -11,10 +11,10 @@
         <div class="canvas-header">
             <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h3>
+                    <h3 style="margin: 0; display:inline; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h3>
                 </div>
 
-                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: flex-start;">
+                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items:center;">
                     <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
                     <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
@@ -195,11 +195,7 @@
                     </div>
                     <div class="summary-line" style="color: var(--success);">
                         <span>Discount</span>
-                        <span id="discountDisplay">-$0.00</span>
-                    </div>
-                    <div class="summary-line">
-                        <span>Tax</span>
-                        <span id="taxDisplay">$0.00</span>
+                        <span id="discountDisplay">$0.00</span>
                     </div>
 
                     
