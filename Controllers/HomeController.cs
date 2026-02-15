@@ -27,16 +27,8 @@ namespace E_Invoice_system.Controllers
 
             // ✅ TOTAL SALES AMOUNT (Filtered: excluding 0 quantity / fully returned)
             decimal totalSales = _context.sales
-                .AsEnumerable()
-                .Where(s => {
-                    var match = System.Text.RegularExpressions.Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
-                    if (match.Success && decimal.TryParse(match.Groups[1].Value, out decimal q))
-                    {
-                        return q > 0;
-                    }
-                    return true;
-                })
-                .Sum(s => s.total_price);
+                .Where(s => s.total_price > 0)
+                .Sum(s => (decimal?)s.total_price) ?? 0;
 
             ViewBag.totalSales = Math.Max(0, totalSales);
 

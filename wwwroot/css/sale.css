@@ -237,6 +237,13 @@
     border-left: 1px solid #f1f5f9;
 }
 
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
 .checkout-header {
     padding: 32px 24px;
     border-bottom: 1px solid #f1f5f9;
@@ -267,8 +274,8 @@
     padding: 32px;
     background: #ffffff;
     border-top: 1px solid #f1f5f9;
-    margin-top: auto;
-    /* Push to bottom */
+    margin-top: auto !important;
+    /* Force bottom alignment */
 }
 
 .price-summary-v2 {
@@ -558,54 +565,7 @@
     font-size: 0.9rem;
 }
 
-.checkout-footer-v2 {
-    padding: 32px;
-    background: #f8fafc;
-    border-top: 1px solid var(--border);
-}
-
-.price-summary-v2 {
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-muted);
-}
-
-.summary-line.highlight {
-    color: var(--danger);
-}
-
-.grand-total-row {
-    margin-top: 12px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.total-label {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.total-value {
-    font-size: 2.25rem;
-    font-weight: 900;
-    letter-spacing: -0.05em;
-    color: var(--primary);
-}
+/* Cleaned up redundant blocks */
 
 .btn-pay-v2 {
     width: 100%;

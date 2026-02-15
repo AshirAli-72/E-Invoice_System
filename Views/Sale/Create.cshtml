@@ -14,18 +14,32 @@
                     <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h1>
                 </div>
 
-                <div class="search-bar-v2" style="flex: 1; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
+                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
                     <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
-                    <input type="text" id="prodSearch" placeholder="Search by name..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
+                    <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
                 
-                <div class="mode-toggle-v2 compact" style="margin: 0;">
-                    <div class="toggle-pill">
-                        <input type="radio" id="searchName" name="searchMode" value="name" checked onchange="handleSearchModeChange()">
-                        <label for="searchName">Name</label>
-                        <input type="radio" id="searchBarcode" name="searchMode" value="barcode" onchange="handleSearchModeChange()">
-                        <label for="searchBarcode">Barcode</label>
+                <div class="mode-toggle-v2 compact" style="margin: 0; height:50px;">
+                    <div class="toggle-pill" style="height: 100%; display: flex; align-items: center;">
+                        <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
+                        <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">Name</label>
+                        <input type="radio" id="searchBarcode" name="searchMode" value="barcode" checked onchange="handleSearchModeChange()">
+                        <label for="searchBarcode" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">Barcode</label>
                     </div>
+                </div>
+
+                <!-- Quick Actions Toolbar -->
+                <div style="margin-left: auto; display: flex; gap: 8px;">
+                    <button type="button" class="btn-clear-v2" onclick="reloadPage()" title="Refresh" style="width: 60px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ph-arrows-clockwise" style="font-size: 1.2rem;"></i>
+                    </button>
+                    <button type="button" class="btn-clear-v2" onclick="toggleFullScreen()" title="Full Screen" style="width: 60px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ph-corners-out" style="font-size: 1.2rem;"></i>
+                    </button>
+                    <!-- Back Button moved here -->
+                    <a href="/Home/Index" class="btn-clear-v2" title="Back to Dashboard" style="display: flex; align-items: center; justify-content: center; width: 60px; height: 50px; background: #f1f5f9; border-radius: 12px; color: var(--text-main); text-decoration: none;">
+                        <i class="ph-arrow-left" style="font-size: 1.2rem;"></i>
+                    </a>
                 </div>
             </div>
 
@@ -171,7 +185,7 @@
                         <span id="subtotalDisplay">$0.00</span>
                     </div>
                     <div class="summary-line">
-                        <span>Tax (8.25%)</span>
+                        <span>Tax</span>
                         <span id="taxDisplay">$0.00</span>
                     </div>
 
@@ -274,10 +288,85 @@
     </div>
 </div>
 
+<!-- Custom Item Modal -->
+<div class="modal-overlay" id="customItemModal">
+    <div class="payment-card" style="max-width: 500px; width: 90%; align-items: stretch; flex-direction: column;">
+        <div style="padding: 32px;">
+            <h2 style="margin: 0 0 24px 0; color: var(--text-main); font-size: 1.5rem;">Add Custom Item</h2>
+            
+            <div class="web-input-group">
+                <label>Item Name / Description</label>
+                <input type="text" id="customName" class="web-input" placeholder="e.g. Delivery Charge">
+            </div>
+
+            <div class="web-input-group">
+                <label>Price</label>
+                <input type="number" id="customPrice" class="web-input" placeholder="0.00" step="0.01">
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-top: 32px;">
+                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closeCustomItemModal()">Cancel</button>
+                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="addCustomItem()">
+                    Add to Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     let saleItems = [];
     let currentTotal = 0;
-    let searchMode = 'name'; // Default search mode
+    let searchMode = 'barcode'; // Default search mode
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    function reloadPage() {
+        if (saleItems.length > 0) {
+            if (confirm("Cart contains items. Reload and lose changes?")) {
+                window.location.reload();
+            }
+        } else {
+            window.location.reload();
+        }
+    }
+
+    function openCustomItemModal() {
+        document.getElementById('customName').value = '';
+        document.getElementById('customPrice').value = '';
+        document.getElementById('customItemModal').classList.add('show');
+        document.getElementById('customName').focus();
+    }
+
+    function closeCustomItemModal() {
+        document.getElementById('customItemModal').classList.remove('show');
+    }
+
+    function addCustomItem() {
+        const name = document.getElementById('customName').value.trim();
+        const price = parseFloat(document.getElementById('customPrice').value);
+
+        if (!name) {
+            alert("Please enter item name");
+            return;
+        }
+        if (isNaN(price) || price < 0) {
+            alert("Please enter a valid price");
+            return;
+        }
+
+        // Add to cart as service (no stock limit)
+        addToSaleFromCard(0, name, price, 0, null, null, 999999, null);
+        closeCustomItemModal();
+    }
 
     function handleSearchModeChange() {
         searchMode = document.querySelector('input[name="searchMode"]:checked').value;
