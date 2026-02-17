@@ -291,19 +291,19 @@
                 </div>
 
                 <div class="top-bar-right">
-                    <div class="user-profile" onclick="toggleProfileDropdown()">
+                    <div class="user-profile">
                         @{
                             var userEmail = Context.Session.GetString("UserEmail") ?? "User";
                             var initial = userEmail.Length > 0 ? userEmail.Substring(0, 1).ToUpper() : "U";
                         }
-                        <div class="user-avatar-initial">
+                        <div class="user-avatar-initial" id="profileDropdownToggle">
                             @initial
                         </div>
 
                         <div class="profile-dropdown" id="profileDropdown">
                             <div class="dropdown-email">@userEmail</div>
                             <div class="dropdown-divider"></div>
-                            <form asp-controller="Home" asp-action="Logout" method="post">
+                            <form asp-controller="Account" asp-action="Logout" method="post">
                                 <button type="submit" class="btn-logout">
                                     <i class="ph-sign-out"></i>
                                     Logout
@@ -365,16 +365,22 @@
         const successMessage = '@TempData["Success"]';
         if (successMessage) showToast('Success', successMessage);
 
-        function toggleProfileDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('show');
-            
-            // Close dropdown if clicked outside
-            document.addEventListener('click', function closeDropdown(e) {
-                if (!e.target.closest('.user-profile')) {
-                    dropdown.classList.remove('show');
-                    document.removeEventListener('click', closeDropdown);
-                }
+        // Profile Dropdown (matching dashboard implementation)
+        const profileToggle = document.getElementById('profileDropdownToggle');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                profileDropdown.classList.remove('show');
+            });
+
+            profileDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
             });
         }
     </script>

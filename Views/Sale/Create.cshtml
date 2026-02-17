@@ -10,32 +10,32 @@
     <div class="product-canvas">
         <div class="canvas-header">
             <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
-                <h3 style="margin: 0; display:inline; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Sales Transaction</h3>
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main); line-height: 50px; white-space: nowrap;">Sales Transaction</h3>
 
-                <div class="search-bar-v2" style="width: 800px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items:center;">
+                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
                     <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
                     <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
                 
-                <div class="mode-toggle-v2 compact" style="margin: 0; height:40px;">
+                <div class="mode-toggle-v2 compact" style="margin: 0; height: 50px;">
                     <div class="toggle-pill" style="height: 100%; display: flex; align-items: center;">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
-                        <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">Name</label>
+                        <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Name</label>
                         <input type="radio" id="searchBarcode" name="searchMode" value="barcode" checked onchange="handleSearchModeChange()">
-                        <label for="searchBarcode" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">Barcode</label>
+                        <label for="searchBarcode" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Barcode</label>
                     </div>
                 </div>
 
                 <!-- Quick Actions Toolbar -->
-                <div style="margin-left: auto; display: flex; gap: 8px;">
-                    <button type="button" class="btn-clear-v2" onclick="reloadPage()" title="Refresh" style="width: 60px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <div style="margin-left: auto; display: flex; gap: 12px;">
+                    <button type="button" class="btn-clear-v2" onclick="reloadPage()" title="Refresh" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <i class="ph-arrows-clockwise" style="font-size: 1.2rem;"></i>
                     </button>
-                    <button type="button" class="btn-clear-v2" onclick="toggleFullScreen()" title="Full Screen" style="width: 60px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="btn-clear-v2" onclick="toggleFullScreen()" title="Full Screen" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <i class="ph-corners-out" style="font-size: 1.2rem;"></i>
                     </button>
                     <!-- Back Button moved here -->
-                    <a href="/Home/Index" class="btn-clear-v2" title="Back to Dashboard" style="display: flex; align-items: center; justify-content: center; width: 60px; height: 50px; background: #f1f5f9; border-radius: 12px; color: var(--text-main); text-decoration: none;">
+                    <a href="/Home/Index" class="btn-clear-v2" title="Back to Dashboard" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: #f1f5f9; border-radius: 12px; color: var(--text-main); text-decoration: none;">
                         <i class="ph-arrow-left" style="font-size: 1.2rem;"></i>
                     </a>
                 </div>
@@ -565,33 +565,21 @@
         });
     }
 
-    function decreaseQty(index) {
-        saleItems[index].qty--;
-        if (saleItems[index].qty === 0) {
-            removeItem(index);
-        } else {
-            const item = saleItems[index];
-            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-            renderSaleItems();
-        }
-    }
 
     async function increaseQty(index) {
         const item = saleItems[index];
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
+        const customerName = document.querySelector('select[name="customer_name"]').value;
 
         if (isReturn) {
-             // For returns, "increasing" means making it more negative (e.g. returning more)
-             // But in the UI, qty is negative. So increasing qty (e.g. from -1 to -2) is subtraction.
-             // Wait, the UI controls are +/-. 
-             // If qty is -1, clicking + should probably make it -2 if we follow "more items to return".
-             // Actually, usually + means "more", regardless of sign.
-             // Let's stick to the current logic: item.qty++ adds 1.
-             // So if qty is -2, clicking + makes it -1. This is safe.
-             // If qty is -1, clicking + makes it 0 -> removed.
-             // Clicking - makes it more negative.
-             item.qty++; 
+            // For returns, clicking "+" means returning more items
+            const validation = await validateReturnEligibility(customerName, item.prod_name_service);
+            if (Math.abs(item.qty - 1) > validation.purchasedQty) {
+                showStockAlert(`Max returnable reached (${validation.purchasedQty} purchased).`);
+                return;
+            }
+            item.qty--; // e.g., -1 to -2
         } else {
             if (item.qty >= item.maxStock) {
                 showStockAlert(`Max stock reached (${item.maxStock}).`);
@@ -609,17 +597,12 @@
         const item = saleItems[index];
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
-        const customerName = document.querySelector('select[name="customer_name"]').value;
 
         if (isReturn) {
-            const validation = await validateReturnEligibility(customerName, item.prod_name_service);
-            if (Math.abs(item.qty - 1) > validation.purchasedQty) {
-                showStockAlert(`Max returnable reached (${validation.purchasedQty} purchased).`);
-                return;
-            }
-            item.qty--; // e.g. -1 to -2
+            // For returns, clicking "-" means returning fewer items
+            item.qty++; // e.g., -2 to -1
         } else {
-            item.qty--; // e.g. 2 to 1
+            item.qty--; // e.g., 2 to 1
         }
 
         if (item.qty === 0) {
