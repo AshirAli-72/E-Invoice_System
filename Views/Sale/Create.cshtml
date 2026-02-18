@@ -172,10 +172,10 @@
                         }
                     </select>
                 </div>
-                <button type="button" onclick="triggerCustomerModalV2(event)" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem;">
+                <a href="/Customer/Create" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">
                     <i class="ph-plus" style="font-size: 1.1rem;"></i>
                     <span>Add Customer</span>
-                </button>
+                </a>
             </div>
 
             <div class="checkout-items-v2" id="saleItemsBody">
@@ -198,11 +198,6 @@
                         <span>Discount</span>
                         <span id="discountDisplay">$0.00</span>
                     </div>
-                    <div class="summary-line">
-                        <span>Tax (8.25%)</span>
-                        <span id="taxDisplay">$0.00</span>
-                    </div>
-
                     
                     <div id="stockAlert" class="alert-v2" style="display: none;">
                         <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
