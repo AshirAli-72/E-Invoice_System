@@ -11,7 +11,7 @@
 
 .pos-container-v2 {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 500px;
     height: calc(100vh - 60px);
     background: #ffffff;
     overflow: hidden;
@@ -229,7 +229,7 @@
 
 /* 5. Order Detail Sidebar (Pic 2 Match) */
 .checkout-center {
-    width: 400px;
+    width: 500px;
     background: #ffffff;
     display: flex;
     flex-direction: column;

@@ -158,11 +158,10 @@
                 </div>
             </div>
 
-            <div class="customer-selector-v2">
-                <!-- Removed Label as requested -->
-                <div class="select-wrapper-v2">
+            <div class="customer-selector-v2" style="display: flex; gap: 8px; align-items: center; margin-bottom: 20px;">
+                <div class="select-wrapper-v2" style="flex: 1;">
                     <i class="ph-user-circle"></i>
-                    <select name="customer_name" required onchange="handleCustomerChange()">
+                    <select name="customer_name" id="customerSelect" required onchange="handleCustomerChange()">
                         <option value="">Select Customer</option>
                         @if (customers != null)
                         {
@@ -173,6 +172,10 @@
                         }
                     </select>
                 </div>
+                <button type="button" onclick="openCustomerModal()" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem;">
+                    <i class="ph-plus" style="font-size: 1.1rem;"></i>
+                    <span>Add Customer</span>
+                </button>
             </div>
 
             <div class="checkout-items-v2" id="saleItemsBody">
@@ -194,6 +197,10 @@
                     <div class="summary-line" style="color: var(--success);">
                         <span>Discount</span>
                         <span id="discountDisplay">$0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Tax (8.25%)</span>
+                        <span id="taxDisplay">$0.00</span>
                     </div>
 
                     
@@ -315,6 +322,37 @@
                 <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closeCustomItemModal()">Cancel</button>
                 <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="addCustomItem()">
                     Add to Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="customerModal">
+    <div class="payment-card" style="max-width: 500px; width: 90%; align-items: stretch; flex-direction: column;">
+        <div style="padding: 32px;">
+            <h2 style="margin: 0 0 24px 0; color: var(--text-main); font-size: 1.5rem;">Add New Customer</h2>
+            
+            <div class="web-input-group">
+                <label>Full Name</label>
+                <input type="text" id="newCustName" class="web-input" placeholder="Enter name">
+            </div>
+
+            <div class="web-input-group">
+                <label>Contact</label>
+                <input type="text" id="newCustContact" class="web-input" placeholder="Enter contact">
+            </div>
+
+            <div class="web-input-group">
+                <label>Email</label>
+                <input type="email" id="newCustEmail" class="web-input" placeholder="Enter email">
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-top: 32px;">
+                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closeCustomerModal()">Cancel</button>
+                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="saveCustomerAjax()">
+                    Save Customer
                 </button>
             </div>
         </div>
@@ -670,12 +708,12 @@
                 </div>
                 <div class="item-v2-info">
                     <div class="title">${item.prod_name_service}</div>
-                    <div class="price-sub">$${item.price.toFixed(2)}</div>
+                    <div class="price-sub">${format(lineTotal)}</div>
                 </div>
                 <div class="item-v2-controls">
                     <div class="qty-stepper">
                         <button type="button" onclick="decreaseQtyBtn(${index})">-</button>
-                        <span>${Math.abs(item.qty)}</span>
+                        <span>${item.qty < 0 ? '-' : ''}${Math.abs(item.qty)}</span>
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
                 </div>
@@ -835,5 +873,54 @@
         const cust = document.querySelector('select[name="customer_name"]').value;
         if (!cust) return alert("Please select a customer.");
         document.getElementById('saleForm').submit();
+    }
+
+    function openCustomerModal() {
+        document.getElementById('newCustName').value = '';
+        document.getElementById('newCustContact').value = '';
+        document.getElementById('newCustEmail').value = '';
+        document.getElementById('customerModal').classList.add('show');
+        document.getElementById('newCustName').focus();
+    }
+
+    function closeCustomerModal() {
+        document.getElementById('customerModal').classList.remove('show');
+    }
+
+    async function saveCustomerAjax() {
+        const name = document.getElementById('newCustName').value.trim();
+        const contact = document.getElementById('newCustContact').value.trim();
+        const email = document.getElementById('newCustEmail').value.trim();
+
+        if (!name) return alert("Customer name is required.");
+
+        try {
+            const response = await fetch('/Customer/CreateAjax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ name, contact, email })
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Add to dropdown
+                const select = document.getElementById('customerSelect');
+                const opt = document.createElement('option');
+                opt.value = data.name;
+                opt.text = data.name;
+                opt.selected = true;
+                select.add(opt);
+                
+                closeCustomerModal();
+                handleCustomerChange();
+            } else {
+                alert("Error saving customer: " + (data.message || "Unknown error"));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("An error occurred while saving the customer.");
+        }
     }
 </script>

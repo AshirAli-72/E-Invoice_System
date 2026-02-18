@@ -43,6 +43,20 @@ namespace E_Invoice_system.Controllers
             return View(customer);
         }
 
+        [HttpPost]
+        public IActionResult CreateAjax([FromBody] customers customer)
+        {
+            if (ModelState.IsValid)
+            {
+                customer.status = "Active"; // Default for AJAX creation
+                _context.customers.Add(customer);
+                _context.SaveChanges();
+                return Json(new { success = true, name = customer.name });
+            }
+            return Json(new { success = false, message = "Invalid data" });
+        }
+
+
         [HttpGet]
         public IActionResult Edit(int id)
         {
