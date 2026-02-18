@@ -334,38 +334,12 @@
         <div style="padding: 32px;">
             <h2 style="margin: 0 0 24px 0; color: var(--text-main); font-size: 1.5rem;">Add New Customer</h2>
             
-            <div class="web-input-group">
-                <label>Full Name</label>
-                <input type="text" id="newCustName" class="web-input" placeholder="Enter name">
-            </div>
-
-            <div class="web-input-group">
-                <label>Contact</label>
-                <input type="text" id="newCustContact" class="web-input" placeholder="Enter contact">
-            </div>
-
-            <div class="web-input-group">
-                <label>Email</label>
-                <input type="email" id="newCustEmail" class="web-input" placeholder="Enter email">
-            </div>
-
-            <div class="web-input-group">
-                <label>Address</label>
-                <textarea id="newCustAddress" class="web-input" rows="2" placeholder="Enter address"></textarea>
-            </div>
-
-            <div class="web-input-group">
-                <label>Status</label>
-                <select id="newCustStatus" class="web-input">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
+            @await Html.PartialAsync("~/Views/Customer/_CustomerFormPartial.cshtml", new E_Invoice_system.Models.customers())
 
             <div style="display: flex; gap: 16px; margin-top: 32px;">
-                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closeCustomerModal()">Cancel</button>
-                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="saveCustomerAjax()">
-                    Save Customer
+                <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeCustomerModal()">Cancel</button>
+                <button type="button" class="btn-primary" style="flex: 2;" onclick="saveCustomerAjax()">
+                    <i class="ph-check"></i> Save Customer
                 </button>
             </div>
         </div>
