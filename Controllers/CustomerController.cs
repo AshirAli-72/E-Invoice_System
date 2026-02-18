@@ -48,7 +48,10 @@ namespace E_Invoice_system.Controllers
         {
             if (ModelState.IsValid)
             {
-                customer.status = "Active"; // Default for AJAX creation
+                if (string.IsNullOrEmpty(customer.status))
+                {
+                    customer.status = "Active"; // Default for AJAX creation if not provided
+                }
                 _context.customers.Add(customer);
                 _context.SaveChanges();
                 return Json(new { success = true, name = customer.name });
