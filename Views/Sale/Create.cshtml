@@ -172,7 +172,7 @@
                         }
                     </select>
                 </div>
-                <button type="button" onclick="openCustomerModal()" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem;">
+                <button type="button" onclick="triggerCustomerModalV2(event)" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem;">
                     <i class="ph-plus" style="font-size: 1.1rem;"></i>
                     <span>Add Customer</span>
                 </button>
@@ -413,7 +413,8 @@
         document.getElementById('customItemModal').classList.remove('show');
     }
 
-    function openCustomerModal() {
+    function triggerCustomerModalV2(e) {
+        if (e) e.preventDefault();
         document.getElementById('newCustName').value = '';
         document.getElementById('newCustContact').value = '';
         document.getElementById('newCustEmail').value = '';
