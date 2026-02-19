@@ -143,18 +143,6 @@
             font-size: 0.85rem;
         }
 
-        @@media (max-width: 768px) {
-            .top-bar-center {
-                display: none;
-            }
-            .welcome-msg {
-                display: none;
-            }
-            .top-bar {
-                padding: 0 16px;
-            }
-        }
-
         .user-profile {
             display: flex;
             align-items: center;
@@ -248,15 +236,13 @@
 
         @@media (max-width: 1024px) {
             .sale-layout-container {
-                display: block;
-                overflow-y: auto;
+                grid-template-columns: 1fr;
             }
             .sidebar {
                 display: none;
             }
-            .sale-content-body {
-                height: auto;
-                min-height: calc(100vh - 60px);
+            .sale-main-wrapper {
+                grid-column: 1;
             }
         }
 

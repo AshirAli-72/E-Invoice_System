@@ -9,20 +9,20 @@
     <!-- Center: Product Discovery -->
     <div class="product-canvas">
         <div class="canvas-header">
-            <div class="search-container-v2">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
                 <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main); line-height: 50px; white-space: nowrap;">Sales Transaction</h3>
 
-                <div class="search-bar-v2">
-                    <i class="ph-magnifying-glass"></i>
-                    <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()">
+                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
+                    <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
+                    <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
                 
-                <div class="mode-toggle-v2 compact">
-                    <div class="toggle-pill">
+                <div class="mode-toggle-v2 compact" style="margin: 0; height: 50px;">
+                    <div class="toggle-pill" style="height: 100%; display: flex; align-items: center;">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
-                        <label for="searchName">Name</label>
+                        <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Name</label>
                         <input type="radio" id="searchBarcode" name="searchMode" value="barcode" checked onchange="handleSearchModeChange()">
-                        <label for="searchBarcode">Barcode</label>
+                        <label for="searchBarcode" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Barcode</label>
                     </div>
                 </div>
 
@@ -158,7 +158,7 @@
                 </div>
             </div>
 
-            <div class="customer-selector-v2">
+            <div class="customer-selector-v2" style="display: flex; gap: 8px; align-items: center; margin-bottom: 20px;">
                 <div class="select-wrapper-v2" style="flex: 1;">
                     <i class="ph-user-circle"></i>
                     <select name="customer_name" id="customerSelect" required onchange="handleCustomerChange()">
@@ -172,8 +172,8 @@
                         }
                     </select>
                 </div>
-                <a href="/Customer/Create" title="Add New Customer" class="btn-add-customer">
-                    <i class="ph-plus"></i>
+                <a href="/Customer/Create" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">
+                    <i class="ph-plus" style="font-size: 1.1rem;"></i>
                     <span>Add Customer</span>
                 </a>
             </div>
