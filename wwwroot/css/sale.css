@@ -289,9 +289,9 @@
 
 .product-grid-v2 {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 24px;
-    padding: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 16px;
 }
 
 @media (max-width: 1200px) {
@@ -349,7 +349,7 @@
 }
 
 .card-info {
-    padding: 24px;
+    padding: 16px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -361,8 +361,8 @@
     }
 
     .card-name {
-        font-size: 0.9rem !important;
-        margin-bottom: 8px !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 4px !important;
     }
 
     .price-tag {
@@ -407,12 +407,16 @@
 /* 5. Order Detail Sidebar (Pic 2 Match) */
 .checkout-center {
     width: 100%;
-    max-width: 500px;
+    max-width: 450px;
+    /* Reduced slightly to match compact feel */
     background: #ffffff;
     display: flex;
     flex-direction: column;
     height: 100%;
     border-left: 1px solid #f1f5f9;
+    position: relative;
+    overflow: hidden;
+    /* Ensure only items scroll */
 }
 
 .customer-selector-v2 {
@@ -423,33 +427,36 @@
 }
 
 .btn-add-customer {
-    padding: 0 15px;
-    height: 50px;
+    padding: 0 12px;
+    height: 40px;
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     transition: all 0.2s;
-    gap: 8px;
+    gap: 6px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-decoration: none;
 }
 
 @media (max-width: 1024px) {
     .customer-selector-v2 {
-        flex-wrap: wrap;
-        padding: 0 24px;
+        flex-wrap: nowrap;
+        /* Keep on one line if possible, or stack properly */
+        padding: 0 20px;
+        gap: 8px;
     }
 
     .btn-add-customer {
-        flex: 1;
-        min-width: 140px;
+        flex: 0 0 auto;
+        /* Don't grow too much on mobile if we want side-by-side */
+        min-width: unset;
     }
 }
 
@@ -638,12 +645,14 @@
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    height: 50px;
+    height: 40px;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 12px;
+    padding: 0 12px;
+    gap: 8px;
     transition: all 0.2s;
+    flex: 1;
+    /* Allow it to fill space */
 }
 
 .select-wrapper-v2:focus-within {
@@ -796,7 +805,19 @@
     font-size: 0.9rem;
 }
 
-/* Cleaned up redundant blocks */
+/* Ensure customer selector stays on one line on desktop and fills area */
+.customer-selector-v2 {
+    padding: 0 24px;
+    width: 100%;
+}
+
+.customer-selector-v2 .select-wrapper-v2 {
+    flex: 1;
+}
+
+.customer-selector-v2 .btn-add-customer {
+    flex-shrink: 0;
+}
 
 .btn-pay-v2 {
     width: 100%;
@@ -1194,50 +1215,59 @@
     .pos-container-v2 {
         display: flex;
         flex-direction: column;
-        height: auto;
-        min-height: calc(100vh - 60px);
-        overflow-y: visible;
+        height: calc(100vh - 60px);
+        /* Fixed height to allow independent scroll */
+        overflow: hidden;
     }
 
     .product-canvas {
-        padding: 16px;
         flex: 1;
-        overflow: visible;
+        /* Grow to fill available space */
+        padding: 12px;
+        overflow-y: auto;
         border-right: none;
+        background: #ffffff;
     }
 
     .checkout-center {
         width: 100%;
         max-width: 100%;
+        height: 50%;
+        /* Take half the screen on mobile, adjustable */
+        min-height: 300px;
         border-left: none;
-        border-top: 1px solid var(--border);
-        height: auto;
-        max-height: none;
+        border-top: 2px solid var(--primary-glow);
         display: flex;
         flex-direction: column;
-        background: #f8fafc;
+        background: #ffffff;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+        overflow: hidden;
+        /* Ensure only items scroll */
     }
 
     .checkout-form {
-        height: auto;
+        flex: 1;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
 
     .checkout-items-v2 {
-        flex: none;
-        max-height: 500px;
+        flex: 1;
         overflow-y: auto;
         background: #ffffff;
     }
 
     .checkout-footer-v2 {
-        position: sticky;
+        position: relative;
+        /* No longer sticky since container is fixed */
         bottom: 0;
         z-index: 100;
         background: #ffffff;
-        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
-        border-top: 2px solid var(--primary-glow);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        border-top: 1px solid var(--border);
+        padding: 16px 20px;
     }
 }
 
