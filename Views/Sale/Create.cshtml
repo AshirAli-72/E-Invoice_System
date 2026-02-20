@@ -9,10 +9,10 @@
     <!-- Center: Product Discovery -->
     <div class="product-canvas">
         <div class="canvas-header">
-            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
-                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main); line-height: 50px; white-space: nowrap;">Sales Transaction</h3>
+            <div class="canvas-header-top">
+                <h3 class="canvas-title">Sales Transaction</h3>
 
-                <div class="search-bar-v2" style="width: 900px; height: 50px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
+                <div class="search-bar-v2">
                     <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
                     <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
                 </div>
@@ -27,7 +27,7 @@
                 </div>
 
                 <!-- Quick Actions Toolbar -->
-                <div style="margin-left: auto; display: flex; gap: 12px;">
+                <div class="quick-actions-v2">
                     <button type="button" class="btn-clear-v2" onclick="reloadPage()" title="Refresh" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <i class="ph-arrows-clockwise" style="font-size: 1.2rem;"></i>
                     </button>

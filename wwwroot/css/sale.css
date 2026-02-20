@@ -58,23 +58,48 @@
 
 /* 4. Search Bar Hub */
 .canvas-header {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.canvas-header-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.canvas-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 50px;
+    white-space: nowrap;
+}
+
+.quick-actions-v2 {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
 }
 
 .search-bar-v2 {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    height: 48px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    height: 50px;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 12px;
-    transition: border-color 0.2s;
+    flex: 1;
+    min-width: 300px;
+    transition: all 0.2s;
 }
 
 .search-bar-v2:focus-within {
     border-color: var(--primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .search-bar-v2 i {
@@ -90,6 +115,7 @@
     font-weight: 600;
     outline: none;
     color: var(--text-main);
+    padding: 12px;
 }
 
 .mode-toggle-v2 .toggle-pill,
@@ -895,21 +921,41 @@
     }
 }
 
+@media (max-width: 1100px) {
+    .canvas-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-bar-v2 {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .quick-actions-v2 {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
 @media (max-width: 1024px) {
     .pos-container-v2 {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
         height: auto;
-        min-height: calc(100vh - 64px);
+        min-height: calc(100vh - 60px);
         overflow-y: auto;
     }
 
     .product-canvas {
         padding: 20px;
         overflow: visible;
+        border-right: none;
     }
 
     .checkout-center {
+        width: 100%;
         border-left: none;
         border-top: 1px solid var(--border);
         height: auto;
@@ -917,40 +963,20 @@
     }
 
     .checkout-items-v2 {
-        max-height: none;
-        overflow-y: visible;
+        max-height: 400px;
+        /* Limit height on small screens but keep it visible */
+        overflow-y: auto;
     }
 }
 
 @media (max-width: 768px) {
-    .canvas-header {
-        flex-direction: column;
-        align-items: stretch;
+    .canvas-header-top {
         gap: 16px;
     }
 
-    .search-bar-v2 {
-        height: 48px;
-    }
-
     .product-grid-v2 {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 12px;
-    }
-
-    .product-card-v2 {
-        padding: 12px;
-        gap: 8px;
-    }
-
-    .card-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-    }
-
-    .price-tag {
-        font-size: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
     }
 
     .checkout-header,
@@ -959,42 +985,40 @@
         padding: 20px;
     }
 
-    .checkout-items-v2 {
-        padding: 0 20px;
+    .payment-card {
+        flex-direction: column;
+        max-height: 95vh;
+        overflow-y: auto;
+        border-radius: 24px;
     }
 
-    .total-value {
-        font-size: 1.75rem;
+    .payment-left,
+    .payment-right {
+        padding: 24px;
+        flex: none;
+        width: 100%;
     }
 
-    .method-tabs {
-        grid-template-columns: 1fr;
-    }
-
-    .payment-title {
-        font-size: 1.5rem;
+    .payment-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
     }
 }
 
 @media (max-width: 480px) {
-    .sale-top-nav {
-        padding: 0 12px;
+    .canvas-title {
+        font-size: 1.1rem;
+        line-height: 40px;
     }
 
-    .nav-brand span {
-        display: none;
+    .product-grid-v2 {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
     }
 
-    .btn-back-list {
-        padding: 6px 8px;
-    }
-
-    .btn-back-list span {
-        display: none;
-    }
-
-    .checkout-footer-v2 {
-        padding: 16px;
+    .customer-selector-v2 {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .btn-pay-v2 {
@@ -1003,7 +1027,7 @@
     }
 
     .summary-box-web {
-        padding: 20px;
+        padding: 16px;
     }
 
     .summary-web-line.grand span:last-child {
