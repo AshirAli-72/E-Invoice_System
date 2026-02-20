@@ -13,16 +13,16 @@
                 <h3 class="canvas-title">Sales Transaction</h3>
 
                 <div class="search-bar-v2">
-                    <i class="ph-magnifying-glass" style="margin-left: 16px; color: var(--text-muted);"></i>
-                    <input type="text" id="prodSearch" placeholder="Scan or enter barcode..." oninput="filterProducts()" style="padding: 12px; background: transparent; border: none; outline: none; width: 100%; font-weight: 600; font-size: 0.95rem;">
+                    <i class="ph-magnifying-glass search-icon"></i>
+                    <input type="text" id="prodSearch" class="search-input" placeholder="Scan or enter barcode..." oninput="filterProducts()">
                 </div>
                 
-                <div class="mode-toggle-v2 compact" style="margin: 0; height: 30px;">
-                    <div class="toggle-pill" style="height: 100%; display: flex; align-items: center;">
+                <div class="mode-toggle-v2 compact">
+                    <div class="toggle-pill">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
-                        <label for="searchName" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Name</label>
+                        <label for="searchName">Name</label>
                         <input type="radio" id="searchBarcode" name="searchMode" value="barcode" checked onchange="handleSearchModeChange()">
-                        <label for="searchBarcode" style="height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 16px;">Barcode</label>
+                        <label for="searchBarcode">Barcode</label>
                     </div>
                 </div>
 
@@ -40,10 +40,10 @@
                 </div>
             </div>
 
-            <div class="category-tabs-v2" style="margin-bottom: 32px;">
+            <div class="category-tabs-v2">
                 <div class="tab-item active" onclick="filterByCategory('all', this)">All</div>
                 <div class="tab-item" onclick="filterByCategory('Foods', this)">Products</div>
-                <div class="tab-item" onclick="filterByCategory('Beverages', this  )"> Services</div>
+                <div class="tab-item" onclick="filterByCategory('Beverages', this)">Services</div>
             </div>
         </div>
 
@@ -135,13 +135,13 @@
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
             
             <div class="checkout-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="checkout-header-main">
                     <div>
-                        <h3 style="margin: 0; font-size: 1.25rem;">Order Detail</h3>
-                        <div id="itemCountDisplay" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">0 items selected</div>
+                        <h3 class="order-detail-title">Order Detail</h3>
+                        <div id="itemCountDisplay" class="item-count-badge">0 items selected</div>
                     </div>
                     
-                    <div style="display: flex; gap: 8px; align-items: center;">
+                    <div class="checkout-header-actions">
                          <div class="mode-toggle-v2 compact">
                             <div class="toggle-pill">
                                 <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
@@ -150,8 +150,8 @@
                                 <label for="modeReturn">Return</label>
                             </div>
                         </div>
-                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order" style="background: #fee2e2; color: #ef4444; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <i class="ph-trash" style="font-size: 1rem;"></i>
+                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order">
+                            <i class="ph-trash"></i>
                         </button>
                     </div>
                 </div>
