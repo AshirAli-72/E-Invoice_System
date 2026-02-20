@@ -127,6 +127,24 @@
             z-index: 1100;
         }
 
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .top-bar-logo {
+            height: 32px;
+            width: auto;
+            transition: height 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-logo {
+                height: 24px;
+            }
+        }
+
         .welcome-msg {
             font-weight: 800;
             font-size: 1.1rem;
@@ -350,8 +368,8 @@
         <div class="sale-main-wrapper">
             <header class="top-bar">
 
-                <div class="top-bar-left" style="display: flex; align-items: center; gap: 16px;">
-                    <img src="/images/sata-logo.png" alt="SATA" style="height: 32px; width: auto;" />
+                <div class="top-bar-left">
+                    <img src="/images/sata-logo.png" alt="SATA" class="top-bar-logo" />
                     <span class="welcome-msg">Welcome back!</span>
                 </div>
 
