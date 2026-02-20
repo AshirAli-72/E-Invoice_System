@@ -17,6 +17,15 @@
     overflow: hidden;
 }
 
+@media (max-width: 1024px) {
+    .pos-container-v2 {
+        display: block;
+        /* Remove grid to allow natural stacking and scrolling */
+        height: auto;
+        overflow: visible;
+    }
+}
+
 /* 2. Main Discovery Area */
 .product-canvas {
     display: flex;
@@ -25,6 +34,15 @@
     overflow-y: auto;
     background: #ffffff;
     border-right: 1px solid #f1f5f9;
+}
+
+@media (max-width: 1024px) {
+    .product-canvas {
+        padding: 16px;
+        overflow: visible;
+        border-right: none;
+        height: auto;
+    }
 }
 
 
@@ -61,12 +79,27 @@
     margin-bottom: 24px;
 }
 
+@media (max-width: 768px) {
+    .canvas-header {
+        margin-bottom: 16px;
+    }
+}
+
 .canvas-header-top {
     display: flex;
     gap: 12px;
     align-items: center;
     margin-bottom: 24px;
     flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .canvas-header-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
 }
 
 .canvas-title {
@@ -246,6 +279,18 @@
     flex-direction: column;
     height: 100%;
     border-left: 1px solid #f1f5f9;
+}
+
+@media (max-width: 1024px) {
+    .checkout-center {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #f1f5f9;
+        height: 600px;
+        /* Fixed height unit for mobile checkout scrolling */
+        max-height: 80vh;
+        margin-top: 20px;
+    }
 }
 
 .checkout-form {
