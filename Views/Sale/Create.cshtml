@@ -158,8 +158,8 @@
                 </div>
             </div>
 
-            <div class="customer-selector-v2" style="display: flex; gap: 8px; align-items: center; margin-bottom: 20px;">
-                <div class="select-wrapper-v2" style="flex: 1;">
+            <div class="customer-selector-v2">
+                <div class="select-wrapper-v2">
                     <i class="ph-user-circle"></i>
                     <select name="customer_name" id="customerSelect" required onchange="handleCustomerChange()">
                         <option value="">Select Customer</option>
@@ -172,8 +172,8 @@
                         }
                     </select>
                 </div>
-                <a href="/Customer/Create" title="Add New Customer" style="padding: 0 15px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; gap: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">
-                    <i class="ph-plus" style="font-size: 1.1rem;"></i>
+                <a href="/Customer/Create" title="Add New Customer" class="btn-add-customer">
+                    <i class="ph-plus"></i>
                     <span>Add Customer</span>
                 </a>
             </div>
@@ -197,6 +197,10 @@
                     <div class="summary-line" style="color: var(--success);">
                         <span>Discount</span>
                         <span id="discountDisplay">$0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Tax (8.25%)</span>
+                        <span id="taxDisplay">$0.00</span>
                     </div>
                     
                     <div id="stockAlert" class="alert-v2" style="display: none;">
