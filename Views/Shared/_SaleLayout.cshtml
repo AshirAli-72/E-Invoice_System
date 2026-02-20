@@ -41,27 +41,12 @@
             height: 100vh;
         }
 
-        @media (max-width: 1024px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-            }
-        }
-
         .sale-layout-container {
             display: flex;
             height: 100vh;
             width: 100vw;
             background: #f4f7fa;
             overflow: hidden;
-        }
-
-        @media (max-width: 1024px) {
-            .sale-layout-container {
-                height: auto;
-                overflow: visible;
-                display: block; /* Stack vertically if needed */
-            }
         }
 
 
@@ -127,13 +112,6 @@
             background: #f4f7fa;
         }
 
-        @media (max-width: 1024px) {
-            .sale-main-wrapper {
-                overflow: visible;
-                height: auto;
-            }
-        }
-
 
         /* Top Bar - Sleeker match to SupaPOS */
         .top-bar {
@@ -147,16 +125,6 @@
             flex-shrink: 0;
             position: relative;
             z-index: 1100;
-        }
-
-        @media (max-width: 768px) {
-            .top-bar {
-                height: auto;
-                padding: 12px 16px;
-                flex-direction: column;
-                gap: 12px;
-                align-items: stretch;
-            }
         }
 
         .welcome-msg {
@@ -181,24 +149,6 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-        }
-
-        @media (max-width: 768px) {
-            .top-bar-center {
-                position: static;
-                transform: none;
-                text-align: center;
-                order: 3;
-            }
-            .top-bar-left {
-                order: 1;
-            }
-            .top-bar-right {
-                order: 2;
-                position: absolute;
-                top: 12px;
-                right: 16px;
-            }
         }
 
         .user-profile {
@@ -292,22 +242,76 @@
             overflow: hidden;
         }
 
-        @media (max-width: 1024px) {
-            .sale-content-body {
-                overflow: visible;
-                height: auto;
-            }
-        }
-
+        /* CONSOLIDATED MOBILE OVERRIDES */
         @@media (max-width: 1024px) {
-            .sale-layout-container {
-                grid-template-columns: 1fr;
+            body {
+                overflow-y: auto !important;
+                height: auto !important;
             }
+
+            .sale-layout-container {
+                display: block;
+                height: auto;
+                overflow: visible;
+                width: 100%;
+            }
+
             .sidebar {
                 display: none;
             }
+
             .sale-main-wrapper {
-                grid-column: 1;
+                height: auto;
+                overflow: visible;
+                display: block;
+            }
+
+            .top-bar {
+                height: auto;
+                min-height: 60px;
+                padding: 12px 20px;
+                flex-wrap: wrap;
+                gap: 12px;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .top-bar-left {
+                width: auto;
+                order: 1;
+            }
+
+            .top-bar-right {
+                width: auto;
+                order: 2;
+            }
+
+            .top-bar-center {
+                position: relative;
+                left: 0;
+                transform: none;
+                width: 100%;
+                order: 3;
+                text-align: left;
+                padding: 8px 0;
+                border-top: 1px solid var(--border);
+            }
+
+            .sale-content-body {
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .top-bar {
+                padding: 10px 16px;
+            }
+            .welcome-msg {
+                display: none; /* Hide on very small screens to save space */
+            }
+            .top-bar-left {
+                gap: 8px !important;
             }
         }
 
