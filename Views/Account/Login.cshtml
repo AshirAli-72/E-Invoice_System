@@ -65,6 +65,19 @@
             // Auto-focus email field for faster typing
             document.getElementById('email').focus();
 
+            // Loading state on form submission
+            const loginForm = document.querySelector('.login-form');
+            const loginBtn = document.querySelector('.btn-login');
+
+            if (loginForm && loginBtn) {
+                loginForm.addEventListener('submit', function () {
+                    loginBtn.disabled = true;
+                    loginBtn.innerText = 'Logging in...';
+                    loginBtn.style.opacity = '0.7';
+                    loginBtn.style.cursor = 'not-allowed';
+                });
+            }
+
             const texts = [
                 '"E-Invoice System - SATA"',
                 '"Fast & Secure Invoicing"',

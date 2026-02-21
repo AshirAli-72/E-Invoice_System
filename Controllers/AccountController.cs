@@ -2,6 +2,7 @@
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_Invoice_system.Controllers
 {
@@ -23,7 +24,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
@@ -33,8 +34,8 @@ namespace E_Invoice_system.Controllers
 
             try
             {
-                var user = _context.users
-                    .FirstOrDefault(u => u.email == email && u.password == password);
+                var user = await _context.users
+                    .FirstOrDefaultAsync(u => u.email == email && u.password == password);
 
                 if (user != null)
                 {
@@ -49,10 +50,10 @@ namespace E_Invoice_system.Controllers
             }
             catch (Exception)
             {
-                ModelState.AddModelError("", "Session expired. Please try again.");
+                ModelState.AddModelError("", "An error occurred. Please try again.");
             }
             
-            return View(); // 🔥 Redirect nahi, View return karo
+            return View();
         }
 
         public IActionResult Logout()
