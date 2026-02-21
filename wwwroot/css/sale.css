@@ -212,8 +212,21 @@
     display: flex;
     align-items: center;
     flex: 1;
-    min-width: 300px;
+    min-width: unset;
+    width: 100%;
     transition: all 0.2s;
+}
+
+@media (max-width: 480px) {
+    .search-bar-v2 {
+        height: 44px;
+        min-width: unset;
+    }
+
+    .search-bar-v2 input {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
 }
 
 .search-bar-v2:focus-within {
@@ -292,6 +305,7 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
     padding: 16px;
+    width: 100%;
 }
 
 @media (max-width: 1200px) {
@@ -453,8 +467,30 @@
 
     .btn-add-customer {
         flex: 0 0 auto;
-        /* Don't grow too much on mobile if we want side-by-side */
         min-width: unset;
+    }
+}
+
+@media (max-width: 480px) {
+    .customer-selector-v2 {
+        padding: 0 16px;
+        margin-bottom: 16px;
+        gap: 6px;
+    }
+
+    .btn-add-customer {
+        padding: 0 10px;
+        height: 40px;
+    }
+
+    .btn-add-customer span {
+        display: none;
+        /* Hide text on mobile to save space */
+    }
+
+    .btn-add-customer i {
+        font-size: 1.1rem;
+        margin: 0;
     }
 }
 
@@ -469,6 +505,7 @@
         margin-top: 20px;
         display: block;
         /* Avoid flex constraints if they cause issues */
+        overflow-x: hidden;
     }
 }
 
@@ -567,8 +604,29 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        padding: 16px 20px;
-        margin-top: 24px !important;
+        padding: 12px 16px;
+        margin-top: 16px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-footer-v2 {
+        padding: 12px 12px;
+    }
+
+    .grand-total-row {
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+
+    .total-value {
+        font-size: 1.25rem;
+    }
+
+    .btn-pay-v2 {
+        height: 54px;
+        margin-top: 16px;
+        font-size: 1.1rem;
     }
 }
 
@@ -805,8 +863,12 @@
 
 /* Ensure customer selector stays on one line on desktop and fills area */
 .customer-selector-v2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 0 24px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .customer-selector-v2 .select-wrapper-v2 {
@@ -1211,18 +1273,18 @@
 
 @media (max-width: 1024px) {
     .pos-container-v2 {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 60px);
-        /* Fixed height to allow independent scroll */
-        overflow: hidden;
+        display: block;
+        /* Use block on mobile for natural flow */
+        height: auto;
+        overflow: visible;
     }
 
     .product-canvas {
         flex: 1;
         /* Grow to fill available space */
         padding: 12px;
-        overflow-y: auto;
+        overflow-y: visible;
+        /* Disable internal scroll on mobile */
         border-right: none;
         background: #ffffff;
     }
@@ -1230,8 +1292,8 @@
     .checkout-center {
         width: 100%;
         max-width: 100%;
-        height: 50%;
-        /* Take half the screen on mobile, adjustable */
+        height: auto;
+        /* Flow naturally on mobile */
         min-height: 300px;
         border-left: none;
         border-top: 2px solid var(--primary-glow);
@@ -1240,8 +1302,7 @@
         background: #ffffff;
         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
         z-index: 10;
-        overflow: hidden;
-        /* Ensure only items scroll */
+        overflow: visible;
     }
 
     .checkout-form {
