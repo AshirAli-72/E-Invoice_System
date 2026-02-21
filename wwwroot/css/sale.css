@@ -289,16 +289,16 @@
 
 .product-grid-v2 {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
     padding: 16px;
 }
 
 @media (max-width: 1200px) {
     .product-grid-v2 {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 20px;
-        padding: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+        padding: 12px;
     }
 }
 
@@ -407,8 +407,7 @@
 /* 5. Order Detail Sidebar (Pic 2 Match) */
 .checkout-center {
     width: 100%;
-    max-width: 450px;
-    /* Reduced slightly to match compact feel */
+    max-width: 500px;
     background: #ffffff;
     display: flex;
     flex-direction: column;
@@ -416,7 +415,6 @@
     border-left: 1px solid #f1f5f9;
     position: relative;
     overflow: hidden;
-    /* Ensure only items scroll */
 }
 
 .customer-selector-v2 {

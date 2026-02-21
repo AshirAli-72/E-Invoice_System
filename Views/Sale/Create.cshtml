@@ -608,6 +608,7 @@
 
         if (saleItems.length === 0) {
             empty.style.display = "flex";
+            body.style.display = "none";
             subtotalSpan.innerText = "$0.00";
             discountSpan.innerText = "-$0.00";
             document.getElementById('taxDisplay').innerText = "$0.00";
@@ -616,6 +617,7 @@
             return;
         }
         empty.style.display = "none";
+        body.style.display = "flex";
 
         let totalSub = 0, totalDisc = 0, totalBase = 0;
 
