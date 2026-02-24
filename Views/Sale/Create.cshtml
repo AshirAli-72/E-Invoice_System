@@ -116,7 +116,7 @@
                                 <span class="price-tag">$@p.price.ToString("N2")</span>
                                 @if (p.discount > 0)
                                 {
-                                    <span class="discount-pill">-$@p.discount.ToString("N2")</span>
+                                    <span class="discount-pill">$@p.discount.ToString("N2")</span>
                                 }
                             </div>
                         </div>
@@ -606,7 +606,7 @@
             empty.style.display = "flex";
             body.style.display = "none";
             subtotalSpan.innerText = "$0.00";
-            discountSpan.innerText = "-$0.00";
+            discountSpan.innerText = "$0.00";
             document.getElementById('taxDisplay').innerText = "$0.00";
             grandTotalSpan.innerText = "$0.00";
             currentTotal = 0;
@@ -664,7 +664,7 @@
         currentTotal = finalTotal;
 
         subtotalSpan.innerText = format(totalSub);
-        discountSpan.innerText = "-" + format(totalDisc);
+        discountSpan.innerText = "" + format(totalDisc);
         document.getElementById('taxDisplay').innerText = format(taxAmount);
         grandTotalSpan.innerText = format(finalTotal);
     }
