@@ -197,6 +197,11 @@
                         <span>Discount </span>
                         <span id="discountDisplay">$0.00</span>
                     </div>
+
+                    <div class="summary-line">
+                        <span>Tax (8.25%)</span>
+                        <span id="taxDisplay">$0.00</span>
+                    </div>
                     
                     <div id="stockAlert" class="alert-v2" style="display: none;">
                         <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
@@ -252,6 +257,8 @@
                     <div class="quick-pill" onclick="addWebAmount(20)">+ $20</div>
                     <div class="quick-pill" onclick="addWebAmount(50)">+ $50</div>
                     <div class="quick-pill" onclick="addWebAmount(100)">+ $100</div>
+                    <div class="quick-pill" onclick="addWebAmount(500)">+ $500</div>
+                    <div class="quick-pill" onclick="addWebAmount(1000)">+ $1000</div>
                     <div class="quick-pill" onclick="matchWebAmount()">Match Total</div>
                 </div>
             </div>
