@@ -606,6 +606,7 @@
         hiddenContainer.innerHTML = "";
         countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
 
+        if (saleItems.length === 0) {
             empty.style.display = "flex";
             body.style.display = "none";
             subtotalSpan.innerText = "$0.00";
@@ -613,6 +614,7 @@
             grandTotalSpan.innerText = "$0.00";
             currentTotal = 0;
             return;
+        }
         empty.style.display = "none";
         body.style.display = "flex";
 
