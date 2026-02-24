@@ -198,10 +198,7 @@
                         <span id="discountDisplay">$0.00</span>
                     </div>
 
-                    <div class="summary-line">
-                        <span>Tax (8.25%)</span>
-                        <span id="taxDisplay">$0.00</span>
-                    </div>
+                
                     
                     <div id="stockAlert" class="alert-v2" style="display: none;">
                         <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
@@ -609,16 +606,13 @@
         hiddenContainer.innerHTML = "";
         countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
 
-        if (saleItems.length === 0) {
             empty.style.display = "flex";
             body.style.display = "none";
             subtotalSpan.innerText = "$0.00";
             discountSpan.innerText = "$0.00";
-            document.getElementById('taxDisplay').innerText = "$0.00";
             grandTotalSpan.innerText = "$0.00";
             currentTotal = 0;
             return;
-        }
         empty.style.display = "none";
         body.style.display = "flex";
 
@@ -666,13 +660,11 @@
             `;
         });
 
-        const taxAmount = totalBase * 0.0825;
-        const finalTotal = totalBase + taxAmount;
+        const finalTotal = totalBase;
         currentTotal = finalTotal;
 
         subtotalSpan.innerText = format(totalSub);
         discountSpan.innerText = "" + format(totalDisc);
-        document.getElementById('taxDisplay').innerText = format(taxAmount);
         grandTotalSpan.innerText = format(finalTotal);
     }
 
