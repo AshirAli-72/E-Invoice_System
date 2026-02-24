@@ -822,6 +822,26 @@
     function submitSaleForm() {
         const cust = document.getElementById('customerSelect').value;
         if (!cust) return alert("Please select a customer.");
+
+        const method = document.getElementById('hiddenPaymentMethod').value;
+        const tenderedInput = document.getElementById('webTendered').value;
+        const tendered = parseFloat(tenderedInput);
+
+        // Check if amount is entered
+        if (tenderedInput === "" || isNaN(tendered)) {
+            return alert("Please enter the amount tendered.");
+        }
+
+        // Prevent zero or negative
+        if (tendered <= 0) {
+            return alert("Amount tendered must be greater than zero.");
+        }
+
+        // For non-credit, must cover total
+        if (method !== 'Credit' && tendered < currentTotal) {
+            return alert("Amount tendered is less than the grand total.");
+        }
+
         document.getElementById('saleForm').submit();
     }
 </script>
