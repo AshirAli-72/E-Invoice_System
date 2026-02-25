@@ -9,45 +9,93 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <style>
-    /* Select2 Custom Styling to match the premium UI */
-    .select2-container--default .select2-selection--single {
-        background-color: transparent;
-        border: none;
-        height: 100%;
+    /* Custom Searchable Dropdown Styling */
+    .customer-search-container {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customer-search-input-wrapper {
+        position: relative;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        height: 44px;
         display: flex;
         align-items: center;
+        padding: 0 12px;
+        gap: 8px;
+        transition: all 0.2s;
     }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: var(--text-main);
-        font-weight: 500;
-        padding-left: 0;
+
+    .customer-search-input-wrapper:focus-within {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px var(--primary-glow);
     }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
+
+    .customer-search-input-wrapper i {
+        color: var(--text-muted);
+        font-size: 1.25rem;
+    }
+
+    .customer-search-input {
+        background: transparent;
+        border: none;
+        width: 100%;
         height: 100%;
-        right: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        outline: none;
     }
-    .select2-dropdown {
+
+    .customer-dropdown-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
         border: 1px solid var(--border);
         border-radius: 12px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        overflow: hidden;
         margin-top: 4px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
     }
-    .select2-search--dropdown .select2-search__field {
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 12px;
+
+    .customer-dropdown-results.show {
+        display: block;
     }
-    .select2-results__option {
-        padding: 10px 16px;
-        font-size: 0.95rem;
+
+    .customer-result-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 1px solid #f8fafc;
     }
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: var(--primary);
+
+    .customer-result-item:last-child {
+        border-bottom: none;
     }
-    .select-wrapper-v2 .select2-container {
-        width: 100% !important;
-        flex: 1;
+
+    .customer-result-item:hover, .customer-result-item.highlighted {
+        background-color: var(--primary-glow);
+        color: var(--primary);
+    }
+
+    .customer-result-item .cust-name {
+        font-weight: 600;
+        display: block;
+    }
+
+    .customer-result-item .cust-details {
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
 </style>
 
@@ -204,18 +252,15 @@
             </div>
 
             <div class="customer-selector-v2">
-                <div class="select-wrapper-v2">
-                    <i class="ph-user-circle"></i>
-                    <select name="customer_name" id="customerSelect" required onchange="handleCustomerChange()">
-                        <option value="">Select Customer</option>
-                        @if (customers != null)
-                        {
-                            foreach (var c in customers)
-                            {
-                                <option value="@c.name">@c.name</option>
-                            }
-                        }
-                    </select>
+                <div class="customer-search-container">
+                    <div class="customer-search-input-wrapper">
+                        <i class="ph-user-circle"></i>
+                        <input type="text" id="customerSearchInput" class="customer-search-input" placeholder="Search Customer..." autocomplete="off" />
+                        <input type="hidden" name="customer_name" id="customerSelect" required />
+                    </div>
+                    <div id="customerResults" class="customer-dropdown-results shadow-luxury">
+                        <!-- Results will be populated by JS -->
+                    </div>
                 </div>
                 <button type="button" onclick="triggerCustomerModalV2(event)" title="Add New Customer" class="btn-add-customer">
                     <i class="ph-plus"></i>
@@ -520,12 +565,10 @@
             });
             const data = await response.json();
             if (data.success) {
-                const select = $('#customerSelect');
-                const newOption = new Option(data.name, data.name, true, true);
-                select.append(newOption).trigger('change');
+                // Update new searchable dropdown
+                selectCustomer(data.name);
                 
                 closeCustomerModal();
-                handleCustomerChange();
             } else {
                 alert("Error saving customer: " + (data.message || "Unknown error"));
             }
@@ -887,13 +930,99 @@
         document.getElementById('saleForm').submit();
     }
 
-    // Initialize Select2
-    $(document).ready(function() {
-        $('#customerSelect').select2({
-            placeholder: "Select Customer",
-            allowClear: true,
-            width: 'resolve'
+    // Custom Searchable Dropdown Logic
+    const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact_no, email = c.email })));
+    let highlightedIndex = -1;
+
+    const searchInput = document.getElementById('customerSearchInput');
+    const resultsContainer = document.getElementById('customerResults');
+    const hiddenInput = document.getElementById('customerSelect');
+
+    searchInput.addEventListener('focus', () => {
+        filterCustomerResults();
+    });
+
+    searchInput.addEventListener('input', () => {
+        filterCustomerResults();
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+        const items = resultsContainer.querySelectorAll('.customer-result-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+            updateHighlight(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            highlightedIndex = Math.max(highlightedIndex - 1, 0);
+            updateHighlight(items);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (highlightedIndex >= 0 && items[highlightedIndex]) {
+                items[highlightedIndex].click();
+            }
+        } else if (e.key === 'Escape') {
+            hideResults();
+        }
+    });
+
+    function filterCustomerResults() {
+        const query = searchInput.value.toLowerCase();
+        resultsContainer.innerHTML = "";
+        const filtered = allCustomers.filter(c => 
+            c.name.toLowerCase().includes(query) || 
+            (c.contact && c.contact.includes(query))
+        );
+
+        if (filtered.length === 0) {
+            resultsContainer.innerHTML = `<div class="customer-result-item" style="cursor: default; color: var(--text-muted);">No customers found</div>`;
+        } else {
+            filtered.forEach((c, idx) => {
+                const div = document.createElement('div');
+                div.className = "customer-result-item";
+                div.innerHTML = `
+                    <span class="cust-name">${c.name}</span>
+                    ${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}
+                `;
+                div.onclick = () => selectCustomer(c.name);
+                resultsContainer.appendChild(div);
+            });
+        }
+        resultsContainer.classList.add('show');
+        highlightedIndex = -1;
+    }
+
+    function updateHighlight(items) {
+        items.forEach((item, idx) => {
+            if (idx === highlightedIndex) {
+                item.classList.add('highlighted');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('highlighted');
+            }
         });
+    }
+
+    function selectCustomer(name) {
+        searchInput.value = name;
+        hiddenInput.value = name;
+        hideResults();
+        handleCustomerChange();
+    }
+
+    function hideResults() {
+        resultsContainer.classList.remove('show');
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            hideResults();
+        }
+    });
+
+    $(document).ready(function() {
+        // Any other initializations
     });
 </script>
 
