@@ -66,6 +66,12 @@
         overflow-y: auto;
         z-index: 1000;
         display: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .customer-dropdown-results::-webkit-scrollbar {
+        display: none;
     }
 
     .customer-dropdown-results.show {
@@ -814,22 +820,45 @@
         const isReturn = mode === 'return';
         const customerName = document.getElementById('customerSelect').value;
 
-        if (isReturn && customerName) {
+        if (isReturn) {
+            if (!customerName) {
+                showStockAlert("Please select a customer first.");
+                saleItems = [];
+                renderSaleItems();
+                return;
+            }
+
             try {
                 const res = await fetch(`/Sale/CheckAnyPurchaseHistory?customerName=${encodeURIComponent(customerName)}`);
                 const data = await res.json();
                 if (!data.hasAnyHistory) {
                     showStockAlert("Customer has no active purchases.");
                     saleItems = [];
+                    renderSaleItems();
+                    return;
                 }
-            } catch (e) { console.error(e); }
-        }
 
-        saleItems.forEach(item => {
-            const absQty = Math.abs(item.qty);
-            item.qty = isReturn ? -absQty : absQty;
-            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-        });
+                // Filter items that customer has actually purchased
+                const filteredItems = [];
+                for (const item of saleItems) {
+                    const validation = await validateReturnEligibility(customerName, item.prod_name_service);
+                    if (validation.eligible) {
+                        const absQty = Math.abs(item.qty);
+                        item.qty = -Math.min(absQty, validation.purchasedQty);
+                        item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+                        filteredItems.push(item);
+                    }
+                }
+                saleItems = filteredItems;
+            } catch (e) { console.error(e); }
+        } else {
+            // Converting back to Sale mode
+            saleItems.forEach(item => {
+                const absQty = Math.abs(item.qty);
+                item.qty = absQty;
+                item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            });
+        }
         renderSaleItems();
     }
 
@@ -849,13 +878,18 @@
                 }
             } catch (e) { console.error(e); }
 
-            for (let i = saleItems.length - 1; i >= 0; i--) {
-                const validation = await validateReturnEligibility(customerName, saleItems[i].prod_name_service);
-                if (!validation.eligible) saleItems.splice(i, 1);
-                else if (Math.abs(saleItems[i].qty) > validation.purchasedQty) {
-                    saleItems[i].qty = -validation.purchasedQty;
+            // Filter items that customer has actually purchased
+            const filteredItems = [];
+            for (const item of saleItems) {
+                const validation = await validateReturnEligibility(customerName, item.prod_name_service);
+                if (validation.eligible) {
+                    const absQty = Math.abs(item.qty);
+                    item.qty = -Math.min(absQty, validation.purchasedQty);
+                    item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+                    filteredItems.push(item);
                 }
             }
+            saleItems = filteredItems;
             renderSaleItems();
         }
     }

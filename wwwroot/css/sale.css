@@ -47,6 +47,12 @@
     overflow-y: auto;
     background: #ffffff;
     border-right: 1px solid #f1f5f9;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.product-canvas::-webkit-scrollbar {
+    display: none;
 }
 
 @media (max-width: 1024px) {
@@ -579,6 +585,12 @@
     flex-direction: column;
     gap: 1rem;
     background: #fafbfc;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.checkout-items-v2::-webkit-scrollbar {
+    display: none;
 }
 
 @media (max-width: 1024px) {
