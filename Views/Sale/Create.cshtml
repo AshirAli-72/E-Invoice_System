@@ -565,6 +565,9 @@
             });
             const data = await response.json();
             if (data.success) {
+                // Update local list for search
+                allCustomers.push({ name: data.name, contact: contact, email: email });
+                
                 // Update new searchable dropdown
                 selectCustomer(data.name);
                 
@@ -931,7 +934,7 @@
     }
 
     // Custom Searchable Dropdown Logic
-    const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact_no, email = c.email })));
+    const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact, email = c.email })));
     let highlightedIndex = -1;
 
     const searchInput = document.getElementById('customerSearchInput');
