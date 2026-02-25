@@ -4,7 +4,6 @@ wwwroot\css\dashboard.css
 wwwroot\css\invoice.css
 wwwroot\css\login.css
 wwwroot\css\product.css
-wwwroot\css\sale.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\invoice-illustration.png
@@ -71,13 +70,13 @@ wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
 wwwroot\savepic\bac7a766-3665-4267-96ab-868ef05fdc77.png
+wwwroot\css\sale.css
 D:\netcore\E-Invoice_system\wwwroot\css\app-base.css
 D:\netcore\E-Invoice_system\wwwroot\css\customer.css
 D:\netcore\E-Invoice_system\wwwroot\css\dashboard.css
 D:\netcore\E-Invoice_system\wwwroot\css\invoice.css
 D:\netcore\E-Invoice_system\wwwroot\css\login.css
 D:\netcore\E-Invoice_system\wwwroot\css\product.css
-D:\netcore\E-Invoice_system\wwwroot\css\sale.css
 D:\netcore\E-Invoice_system\wwwroot\css\site.css
 D:\netcore\E-Invoice_system\wwwroot\favicon.ico
 D:\netcore\E-Invoice_system\wwwroot\js\site.js
@@ -140,3 +139,4 @@ D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.min.map
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\LICENSE.txt
+D:\netcore\E-Invoice_system\wwwroot\css\sale.css
