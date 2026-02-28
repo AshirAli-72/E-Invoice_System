@@ -195,12 +195,13 @@ thead {
 }
 
 .bottom-section {
-    padding: 40px 60px;
+    padding: 20px 60px 40px 60px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     position: relative;
-    z-index: 10;
+    z-index: 100;
+    /* Ensure content is above patterns */
 }
 
 .summary-box {
@@ -263,6 +264,8 @@ thead {
     height: 150px;
     width: 100%;
     margin-top: auto;
+    z-index: 1;
+    /* Keep patterns below content */
 }
 
 .shape-red-bottom {
@@ -300,8 +303,10 @@ thead {
 
 .signature-box {
     text-align: center;
-    width: 180px;
+    width: 200px;
     margin-top: 30px;
+    position: relative;
+    z-index: 110;
 }
 
 .footer-branding {
@@ -389,11 +394,18 @@ thead {
         width: calc(100% + 4px) !important;
     }
 
-    .shape-black-bottom-2 {
-        right: -2px !important;
-        bottom: -2px !important;
-        width: 352px !important;
-        height: 80px !important;
+    .bottom-section {
+        padding-top: 0 !important;
+        margin-top: -80px !important;
+        /* Pull up to sit over patterns nicely if needed */
+        z-index: 100 !important;
+    }
+
+    .signature-box {
+        background: rgba(255, 255, 255, 0.7);
+        /* Subtle bg to ensure readability over dark shapes */
+        padding: 5px;
+        border-radius: 4px;
     }
 
     .footer-branding {

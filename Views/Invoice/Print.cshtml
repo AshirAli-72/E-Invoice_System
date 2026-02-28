@@ -245,12 +245,12 @@
         .summary-box, .signature-box { page-break-inside: avoid; }
 
         .bottom-section {
-            padding: 40px 60px;
+            padding: 20px 60px 40px 60px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             position: relative;
-            z-index: 10;
+            z-index: 100;
         }
 
         .summary-box { width: 50%; }
@@ -302,8 +302,10 @@
 
         .signature-box { 
             text-align: center; 
-            width: 180px; 
-            margin-top: 30px; /* Space from Terms & Conditions */
+            width: 200px; 
+            margin-top: 30px;
+            position: relative;
+            z-index: 110;
         }
 
         .bottom-pattern {
@@ -466,8 +468,18 @@
 
             .bottom-section {
                 padding-top: 0 !important;
-                margin-top: 10px !important;
-                z-index: 100 !important;
+                margin-top: -60px !important; /* Pull up to sit over patterns */
+                z-index: 120 !important;
+                position: relative !important;
+            }
+
+            .signature-box {
+                background: rgba(255, 255, 255, 0.8) !important;
+                padding: 10px !important;
+                border-radius: 8px !important;
+                position: relative !important;
+                z-index: 130 !important;
+                width: 220px !important;
             }
 
             .summary-row span:first-child {
