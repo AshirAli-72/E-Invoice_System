@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
-using System.Linq;
-using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using Microsoft.AspNetCore.Http;
 
 namespace E_Invoice_system.Controllers
 {

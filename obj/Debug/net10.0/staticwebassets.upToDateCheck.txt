@@ -5,7 +5,6 @@ wwwroot\css\invoice.css
 wwwroot\css\login.css
 wwwroot\css\product.css
 wwwroot\css\sale.css
-wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\invoice-illustration.png
 wwwroot\images\sata-logo.png
@@ -76,7 +75,6 @@ D:\netcore\E-Invoice_system\wwwroot\css\customer.css
 D:\netcore\E-Invoice_system\wwwroot\css\login.css
 D:\netcore\E-Invoice_system\wwwroot\css\product.css
 D:\netcore\E-Invoice_system\wwwroot\css\sale.css
-D:\netcore\E-Invoice_system\wwwroot\css\site.css
 D:\netcore\E-Invoice_system\wwwroot\favicon.ico
 D:\netcore\E-Invoice_system\wwwroot\js\site.js
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
