@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "D:\\netcore\\E-Invoice_system\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\views\\shared\\error.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\views\\shared\\error.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,20 +19,8 @@
       "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\views\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|solutionrelative:e-invoice_system\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{44E2A4E0-8E11-8E26-7088-4D42E408AD01}|E-Invoice_system\\E-Invoice_system.csproj|d:\\netcore\\e-invoice_system\\e-invoice_system\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -38,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -50,7 +46,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "Error.cshtml",
+              "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Views\\Shared\\Error.cshtml",
+              "RelativeDocumentMoniker": "E-Invoice_system\\Views\\Shared\\Error.cshtml",
+              "ToolTip": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Views\\Shared\\Error.cshtml",
+              "RelativeToolTip": "E-Invoice_system\\Views\\Shared\\Error.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-17T03:30:18.685Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Program.cs",
               "RelativeDocumentMoniker": "E-Invoice_system\\Program.cs",
@@ -63,7 +72,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "_Layout.cshtml.css",
               "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Views\\Shared\\_Layout.cshtml.css",
               "RelativeDocumentMoniker": "E-Invoice_system\\Views\\Shared\\_Layout.cshtml.css",
@@ -72,30 +81,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2026-01-17T03:07:12.665Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "E-Invoice_system\\Controllers\\HomeController.cs",
-              "ToolTip": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "E-Invoice_system\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-17T03:06:58.432Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ErrorViewModel.cs",
-              "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Models\\ErrorViewModel.cs",
-              "RelativeDocumentMoniker": "E-Invoice_system\\Models\\ErrorViewModel.cs",
-              "ToolTip": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Models\\ErrorViewModel.cs",
-              "RelativeToolTip": "E-Invoice_system\\Models\\ErrorViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-17T03:06:48.338Z"
             },
             {
               "$type": "Document",
@@ -111,7 +96,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "E-Invoice_system\\Views\\Home\\Index.cshtml",
@@ -119,11 +104,12 @@
               "RelativeToolTip": "E-Invoice_system\\Views\\Home\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-17T03:05:40.937Z"
+              "WhenOpened": "2026-01-17T03:05:40.937Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "D:\\netcore\\E-Invoice_system\\E-Invoice_system\\Views\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "E-Invoice_system\\Views\\Shared\\_Layout.cshtml",

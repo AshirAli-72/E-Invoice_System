@@ -44,7 +44,11 @@
                         <td>@(item.barcode ?? "-")</td>
                         <td>@item.qty_unit_type</td>
                         <td class="font-bold">$@item.price.ToString("F2")</td>
-                        <td class="text-danger font-medium">$@item.discount.ToString("F2")</td>
+                        <td class="text-danger font-medium">
+                            <div style="display: flex; align-items: center; height: 50px;">
+                                $@item.discount.ToString("F2")
+                            </div>
+                        </td>
                         <td>
                             <span class="status-badge @(item.status == "Available" ? "status-available" : "status-out-of-stock")">
                                 @(item.status ?? "N/A")
