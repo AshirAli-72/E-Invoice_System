@@ -75,7 +75,6 @@
             margin: 0 auto;
             position: relative;
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -241,6 +240,10 @@
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; }
+        .summary-box, .signature-box { page-break-inside: avoid; }
+
         .bottom-section {
             padding: 40px 60px;
             display: flex;
@@ -250,8 +253,25 @@
             z-index: 10;
         }
 
-        .summary-box { width: 45%; }
-        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+        .summary-box { width: 50%; }
+        .summary-row { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 40px; 
+            padding: 6px 0; 
+            font-size: 14px; 
+        }
+        .summary-row span:first-child {
+            color: #6b7280;
+            font-weight: 700;
+            text-align: right;
+        }
+        .summary-row span:last-child {
+            color: #111827;
+            font-weight: 800;
+            min-width: 100px;
+            text-align: right;
+        }
         .summary-total {
             background: #BC1823;
             color: white;
@@ -259,12 +279,16 @@
             border-radius: 20px;
             margin-top: 15px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            gap: 15px;
+            gap: 40px;
             font-weight: 800;
             font-size: 18px;
             box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
+        }
+        .summary-total span:last-child {
+            min-width: 100px;
+            text-align: right;
         }
 
         .signature-line {
@@ -374,13 +398,12 @@
             }
 
             html, body {
-                visibility: hidden;
+                visibility: visible !important;
                 width: 210mm !important;
-                height: 297mm !important;
+                height: auto !important;
                 background: white !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden !important;
                 display: block !important; 
             }
 
@@ -391,16 +414,14 @@
             .invoice-container {
                 box-shadow: none !important;
                 width: 210mm !important;
-                height: 297mm !important; /* Exact A4 height */
+                height: auto !important; /* Allow auto height */
+                min-height: 297mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                position: fixed !important; 
-                top: 0 !important;
-                left: 0 !important;
-                display: block !important;
-                overflow: hidden !important;
-                page-break-after: avoid !important;
-                transform: none !important; /* Remove scaling to fill paper edges */
+                position: relative !important; /* Relative for natural flow */
+                display: flex !important;
+                flex-direction: column !important;
+                transform: none !important;
                 transform-origin: top left !important;
                 z-index: 9999 !important;
             }
@@ -440,7 +461,23 @@
             }
 
             .items-section {
-                padding-bottom: 160px !important;
+                padding-bottom: 20px !important;
+            }
+
+            .bottom-section {
+                padding-top: 0 !important;
+                margin-top: 10px !important;
+                z-index: 100 !important;
+            }
+
+            .summary-row span:first-child {
+                color: #374151 !important;
+            }
+            
+            /* Add high contrast if subtotal is over dark areas */
+            .summary-box {
+                position: relative;
+                z-index: 110 !important;
             }
         }
     </style>
@@ -562,8 +599,8 @@
                     <span style="font-weight: 800; color: #BC1823;">-$@discount.ToString("N2")</span>
                 </div>
                 <div class="summary-total">
-                    <span>Grand Total</span>
-                    <span>$@totalAmount.ToString("N2")</span>
+                    <span style="color: white !important;">Grand Total</span>
+                    <span style="color: white !important;">$@totalAmount.ToString("N2")</span>
                 </div>
             </div>
         </div>
