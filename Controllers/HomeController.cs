@@ -18,45 +18,54 @@ namespace E_Invoice_system.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // COUNTS
-            ViewBag.TotalInvoices = _context.invoices.Count();
-            ViewBag.TotalCustomers = _context.customers.Count();
-            ViewBag.TotalProducts = _context.products_services.Count();
-
-            // ✅ TOTAL SALES AMOUNT (Filtered: excluding 0 quantity / fully returned)
-            decimal totalSales = _context.sales
+            // COUNTS & TOTAL SALES (Sequential Async to avoid DbContext concurrency issues)
+            ViewBag.TotalInvoices = await _context.invoices.CountAsync();
+            ViewBag.TotalCustomers = await _context.customers.CountAsync();
+            ViewBag.TotalProducts = await _context.products_services.CountAsync();
+            
+            decimal totalSales = await _context.sales
                 .Where(s => s.total_price > 0)
-                .Sum(s => (decimal?)s.total_price) ?? 0;
+                .SumAsync(s => (decimal?)s.total_price) ?? 0;
 
             ViewBag.totalSales = Math.Max(0, totalSales);
 
             // Invoice Status Chart
-            var invoiceStatusData = _context.invoices
+            var invoiceStatusData = await _context.invoices
                 .GroupBy(i => i.status ?? "Pending")
                 .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToList();
+                .ToListAsync();
 
             ViewBag.StatusLabels = invoiceStatusData.Select(x => x.Status).ToArray();
             ViewBag.StatusCounts = invoiceStatusData.Select(x => x.Count).ToArray();
 
             // Recent invoices
-            var recentInvoices = _context.invoices
+            var recentInvoices = await _context.invoices
                 .OrderByDescending(i => i.date)
                 .Take(4)
-                .ToList();
+                .ToListAsync();
 
-            // ✅ TREND CHART DATA (Last 7 Days)
+            // ✅ TREND CHART DATA (Last 7 Days) - Optimized to 1 Query
+            var startDate = DateTime.Today.AddDays(-6);
+            var trendResults = await _context.invoices
+                .Where(inv => inv.date >= startDate)
+                .GroupBy(inv => inv.date.Date)
+                .Select(g => new { Date = g.Key, Count = g.Count() })
+                .ToListAsync();
+
             var trendLabels = new List<string>();
             var trendData = new List<int>();
+
             for (int i = 6; i >= 0; i--)
             {
-                var date = DateTime.Today.AddDays(-i);
-                trendLabels.Add(date.ToString("MMM dd"));
-                var count = _context.invoices.Count(inv => inv.date.Date == date);
-                trendData.Add(count);
+                var targetDate = DateTime.Today.AddDays(-i);
+                trendLabels.Add(targetDate.ToString("MMM dd"));
+
+                var countEntry = trendResults.FirstOrDefault(r => r.Date == targetDate);
+                trendData.Add(countEntry?.Count ?? 0);
             }
+
             ViewBag.TrendLabels = trendLabels.ToArray();
             ViewBag.TrendData = trendData.ToArray();
 
