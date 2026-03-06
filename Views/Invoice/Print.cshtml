@@ -75,7 +75,7 @@
             background: white;
             width: 210mm;
             min-height: 297mm;
-            margin: 20px auto;
+            margin: 0 auto; /* Removed 20px top margin */
             position: relative;
             box-shadow: 0 20px 60px rgba(0,0,0,0.12);
             display: flex;
@@ -357,12 +357,17 @@
         }
 
         /* Page-break helpers */
-        tr {
-            page-break-inside: avoid;
-        }
-
         thead {
             display: table-header-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
         }
 
         /* ─────────────────────────────────────────
@@ -417,7 +422,8 @@
 
         /* Summary box */
         .summary-box {
-            width: 46%;
+            width: 48%; /* Slightly wider to prevent drop-down */
+            align-self: flex-end; /* Strictly right align */
             page-break-inside: avoid;
         }
 
@@ -630,10 +636,9 @@
 
             .bottom-pattern {
                 position: relative !important;
-                bottom: 0 !important;
-                margin-top: auto !important;
-                width: 100% !important;
+                margin-top: 30px !important; /* Reduced from 100px to fix white space */
                 display: block !important;
+                page-break-before: avoid !important;
             }
 
             .shape-black-bottom-2 {
@@ -790,48 +795,47 @@
             </table>
         </div>
 
-        <!-- ══ Bottom Section ══ -->
-        <div class="bottom-section">
-
-            <!-- Terms & Signature -->
-            <div class="terms-block">
-                <div class="terms-title">Terms &amp; Conditions</div>
-                <div class="terms-text">
-                    Please make payment within 15 days of receiving this invoice.<br />
-                    Thank you for choosing SATA TECHNOLOGIES for your business needs.
+        <!-- ══ Bottom Section (Grouped for avoiding break) ══ -->
+        <div style="page-break-inside: avoid; break-inside: avoid;">
+            <div class="bottom-section" style="margin-top: 20px;">
+                <!-- Terms & Signature -->
+                <div class="terms-block">
+                    <div class="terms-title">Terms &amp; Conditions</div>
+                    <div class="terms-text">
+                        Please make payment within 15 days of receiving this invoice.<br />
+                        Thank you for choosing SATA TECHNOLOGIES for your business needs.
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line">Authorized Signature</div>
+                    </div>
                 </div>
-                <div class="signature-box">
-                    <div class="signature-line">Authorized Signature</div>
+
+                <!-- Summary -->
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span class="s-lbl">Sub Total</span>
+                        <span class="s-val">$@subtotal.ToString("N2")</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="s-lbl">Discount</span>
+                        <span class="s-val s-val-disc">− $@discount.ToString("N2")</span>
+                    </div>
+                    <hr class="summary-divider" />
+                    <div class="summary-total">
+                        <span>Grand Total</span>
+                        <span>$@totalAmount.ToString("N2")</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Summary -->
-            <div class="summary-box">
-                <div class="summary-row">
-                    <span class="s-lbl">Sub Total</span>
-                    <span class="s-val">$@subtotal.ToString("N2")</span>
-                </div>
-                <div class="summary-row">
-                    <span class="s-lbl">Discount</span>
-                    <span class="s-val s-val-disc">− $@discount.ToString("N2")</span>
-                </div>
-                <hr class="summary-divider" />
-                <div class="summary-total">
-                    <span>Grand Total</span>
-                    <span>$@totalAmount.ToString("N2")</span>
-                </div>
+            <!-- ══ Bottom Patterns (Pinned to Bottom Section) ══ -->
+            <div class="bottom-pattern">
+                <div class="shape-red-bottom"></div>
+                <div class="shape-black-bottom-1"></div>
+                <div class="shape-black-bottom-2"></div>
             </div>
-
+            <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
         </div>
-
-        <!-- ══ Bottom Patterns ══ -->
-        <div class="bottom-pattern">
-            <div class="shape-red-bottom"></div>
-            <div class="shape-black-bottom-1"></div>
-            <div class="shape-black-bottom-2"></div>
-        </div>
-        <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
-
     </div>
 </body>
 </html>
