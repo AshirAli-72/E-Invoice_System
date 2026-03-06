@@ -12,7 +12,8 @@
 
     try
     {
-        if (!string.IsNullOrEmpty(Model.prod_name_service) && Model.prod_name_service.Trim().StartsWith("["))
+        if (!string.IsNullOrEmpty(Model.prod_name_service) &&
+            Model.prod_name_service.Trim().StartsWith("["))
         {
             var jsonElements = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(Model.prod_name_service);
             if (jsonElements != null && jsonElements.Count > 0)
@@ -33,9 +34,7 @@
                     items.Add(newItem);
                 }
                 if (subtotal == 0 && items.Any())
-                {
                     subtotal = items.Sum(i => (decimal)i["price"] * (decimal)i["qty"]);
-                }
             }
         }
     }
@@ -50,7 +49,10 @@
     <title>Invoice #@(Model.invoice_no ?? Model.id.ToString())</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
+        /* ─────────────────────────────────────────
+                   RESET & BASE
+                ───────────────────────────────────────── */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -62,24 +64,27 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            padding: 0;
-            margin: 0;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
+        /* ─────────────────────────────────────────
+                   INVOICE WRAPPER
+                ───────────────────────────────────────── */
         .invoice-container {
             background: white;
             width: 210mm;
             min-height: 297mm;
-            margin: 0 auto;
+            margin: 20px auto;
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
             display: flex;
             flex-direction: column;
         }
 
-        /* Top Geometric Patterns */
+        /* ─────────────────────────────────────────
+                   TOP GEOMETRIC SHAPES
+                ───────────────────────────────────────── */
         .top-pattern {
             position: absolute;
             top: 0;
@@ -87,6 +92,7 @@
             width: 100%;
             height: 220px;
             z-index: 1;
+            pointer-events: none;
         }
 
         .shape-red-top {
@@ -107,9 +113,9 @@
             width: 150px;
             height: 150px;
             background: #1C2120;
+            opacity: 0.9;
             clip-path: polygon(0 0, 100% 0, 40% 100%);
             z-index: 1;
-            opacity: 0.9;
         }
 
         .shape-black-top-2 {
@@ -119,11 +125,14 @@
             width: 200px;
             height: 100px;
             background: #1C2120;
+            opacity: 0.8;
             clip-path: polygon(0 0, 100% 0, 60% 100%);
             z-index: 0;
-            opacity: 0.8;
         }
 
+        /* ─────────────────────────────────────────
+                   HEADER
+                ───────────────────────────────────────── */
         .header-content {
             position: relative;
             z-index: 10;
@@ -136,19 +145,22 @@
         .logo-box {
             background: white;
             padding: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border-radius: 4px;
-            width: fit-content;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        .logo-box img {
-            height: 60px;
-            width: auto;
-            display: block;
+            .logo-box img {
+                height: 60px;
+                width: auto;
+                display: block;
+            }
+
+        .invoice-title-section {
+            text-align: right;
         }
 
         .invoice-label {
-            font-size: 40px;
+            font-size: 42px;
             font-weight: 900;
             color: #BC1823;
             text-transform: uppercase;
@@ -156,48 +168,58 @@
         }
 
         .invoice-no {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: #1C2120;
-            text-align: right;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
         }
 
+        /* ─────────────────────────────────────────
+                   BILLING SECTION
+                ───────────────────────────────────────── */
         .details-section {
-            padding: 0 60px 40px 60px;
+            padding: 0 60px 28px 60px;
             display: flex;
             justify-content: space-between;
             position: relative;
             z-index: 10;
         }
 
-        .billing-box { width: 45%; }
+        .billing-box {
+            width: 46%;
+        }
 
         .section-label {
             background: #BC1823;
             color: white;
-            padding: 4px 15px;
-            font-size: 12px;
+            padding: 4px 14px;
+            font-size: 11px;
             font-weight: 800;
             display: inline-block;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
         .billing-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
-            color: #1C2120;
+            color: #111827;
             margin-bottom: 5px;
         }
 
         .billing-details {
-            font-size: 14px;
+            font-size: 13px;
             color: #4b5563;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
+        /* ─────────────────────────────────────────
+                   INFO BAR (Status / Payment)
+                ───────────────────────────────────────── */
         .info-bar {
-            padding: 0 60px 30px 60px;
+            padding: 0 60px 22px 60px;
             display: flex;
             gap: 40px;
             position: relative;
@@ -205,10 +227,12 @@
         }
 
         .info-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #9ca3af;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
         }
 
         .info-value {
@@ -218,12 +242,18 @@
         }
 
         .status-badge {
-            padding: 2px 10px;
+            display: inline-block;
+            padding: 3px 12px;
             border-radius: 4px;
             color: white;
             font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
+        /* ─────────────────────────────────────────
+                   ITEMS TABLE  ← main fix lives here
+                ───────────────────────────────────────── */
         .items-section {
             padding: 0 60px;
             flex-grow: 1;
@@ -234,98 +264,244 @@
             border-collapse: collapse;
         }
 
-        thead tr { background: #BC1823; color: white; }
-        th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #4b5563; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
+        /* Header row */
+        thead tr {
+            background: #BC1823 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
 
-        tr { page-break-inside: avoid; }
-        thead { display: table-header-group; }
-        .summary-box, .signature-box { page-break-inside: avoid; }
+        th {
+            padding: 11px 14px;
+            font-size: 11px;
+            font-weight: 800;
+            color: white !important;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
 
+            th.c-desc {
+                text-align: left;
+            }
+
+            th.c-price {
+                text-align: center;
+            }
+
+            th.c-qty {
+                text-align: center;
+            }
+
+            th.c-total {
+                text-align: right;
+            }
+
+        /* Body cells */
+        td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+            color: #4b5563;
+            word-break: break-word;
+            vertical-align: middle;
+        }
+
+            td.c-desc {
+                text-align: left;
+                vertical-align: top;
+            }
+
+            td.c-price {
+                text-align: center;
+            }
+
+            td.c-qty {
+                text-align: center;
+            }
+
+            td.c-total {
+                text-align: right;
+                font-weight: 800;
+                color: #111827;
+            }
+
+        /* Zebra rows */
+        tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        /* Item name & expiry inside desc cell */
+        .item-name {
+            font-weight: 800;
+            color: #111827;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .item-expiry {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 3px;
+        }
+
+        .item-no {
+            color: #BC1823;
+            font-weight: 900;
+            margin-right: 4px;
+        }
+
+        /* Page-break helpers */
+        tr {
+            page-break-inside: avoid;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        /* ─────────────────────────────────────────
+                   BOTTOM SECTION (Terms + Summary)
+                ───────────────────────────────────────── */
         .bottom-section {
-            padding: 20px 60px 40px 60px;
+            padding: 26px 60px 30px 60px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             position: relative;
             z-index: 100;
+            page-break-inside: avoid;
         }
 
-        .summary-box { width: 50%; }
-        .summary-row { 
-            display: flex; 
-            justify-content: flex-end; 
-            gap: 40px; 
-            padding: 6px 0; 
-            font-size: 14px; 
+        /* Terms */
+        .terms-block {
+            width: 46%;
         }
-        .summary-row span:first-child {
-            color: #6b7280;
-            font-weight: 700;
-            text-align: right;
-        }
-        .summary-row span:last-child {
+
+        .terms-title {
+            font-weight: 800;
+            font-size: 14px;
             color: #111827;
-            font-weight: 800;
-            min-width: 100px;
-            text-align: right;
+            margin-bottom: 8px;
         }
-        .summary-total {
-            background: #BC1823;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 20px;
-            margin-top: 15px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 40px;
-            font-weight: 800;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
+
+        .terms-text {
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.7;
         }
-        .summary-total span:last-child {
-            min-width: 100px;
-            text-align: right;
+
+        /* Signature */
+        .signature-box {
+            margin-top: 48px;
+            width: 200px;
+            text-align: center;
+            position: relative;
+            z-index: 110;
+            page-break-inside: avoid;
         }
 
         .signature-line {
             border-top: 2px solid #111827;
-            margin-top: 50px;
-            padding-top: 10px;
-            font-size: 12px;
+            padding-top: 8px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .signature-box { 
-            text-align: center; 
-            width: 200px; 
-            margin-top: 30px;
-            position: relative;
-            z-index: 110;
+        /* Summary box */
+        .summary-box {
+            width: 46%;
+            page-break-inside: avoid;
         }
 
+        .summary-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 30px;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .s-lbl {
+            color: #6b7280;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .s-val {
+            color: #111827;
+            font-weight: 800;
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .s-val-disc {
+            color: #BC1823;
+        }
+
+        .summary-divider {
+            border: none;
+            border-top: 1px dashed #d1d5db;
+            margin: 6px 0;
+        }
+
+        .summary-total {
+            background: #BC1823 !important;
+            color: white !important;
+            padding: 12px 24px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 30px;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
+            white-space: nowrap;
+            border-radius: 0; /* Align with invoice.css details view style if it's rectangular there */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+            .summary-total span {
+                color: white !important;
+            }
+
+            .summary-total span:last-child {
+                min-width: 100px;
+                text-align: right;
+            }
+
+        /* ─────────────────────────────────────────
+                   BOTTOM GEOMETRIC SHAPES
+                ───────────────────────────────────────── */
         .bottom-pattern {
             position: relative;
             height: 150px;
             width: 100%;
             margin-top: auto;
-            bottom: -1px;
-            right: -1px; /* Close right gap */
+            pointer-events: none;
         }
 
         .shape-red-bottom {
             position: absolute;
             bottom: 0;
-            left: 100px; /* Moved further left from 150px */
+            left: 100px;
             width: 400px;
             height: 120px;
             background: #BC1823;
             clip-path: polygon(20% 0, 100% 100%, 0 100%);
             z-index: 2;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .shape-black-bottom-1 {
@@ -337,33 +513,42 @@
             background: #1C2120;
             clip-path: polygon(0 0, 60% 100%, 0 100%);
             z-index: 1;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .shape-black-bottom-2 {
             position: absolute;
-            bottom: 0;
-            right: -1px; /* Close right gap */
+            bottom: -1px;
+            right: -1px;
             width: 350px;
             height: 80px;
             background: #1C2120;
             clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
             z-index: 1;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .footer-branding {
             position: absolute !important;
-            bottom: 8px !important;
+            bottom: 10px !important;
             right: 15px !important;
             color: white !important;
-            font-size: 8px !important;
-            font-weight: 800 !important;
-            letter-spacing: 1.5px !important;
-            text-transform: uppercase !important;
-            z-index: 99 !important;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            z-index: 999 !important;
+            text-align: right;
             display: block !important;
-            text-align: right !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
+        /* ─────────────────────────────────────────
+                   PRINT BUTTON
+                ───────────────────────────────────────── */
         .btn-print {
             position: fixed;
             top: 20px;
@@ -371,79 +556,109 @@
             background: #BC1823;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 14px 30px;
             border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 800;
+            font-size: 13px;
             cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 10px 20px rgba(188,24,35,0.3);
-            transition: all 0.3s ease;
+            z-index: 9999;
+            box-shadow: 0 8px 24px rgba(188,24,35,0.38);
+            transition: all .25s ease;
+            letter-spacing: 0.5px;
         }
 
-        .btn-print:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255,0,0,0.4);
-        }
+            .btn-print:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 32px rgba(188,24,35,0.50);
+            }
 
+        /* ─────────────────────────────────────────
+                   PRINT MEDIA
+                ───────────────────────────────────────── */
         @@page {
             size: A4;
             margin: 0 !important;
         }
 
         @@media print {
-            .btn-print { display: none !important; }
-            
-            * {
+            .btn-print {
+                display: none !important;
+            }
+
+            *, *::before, *::after {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
             }
 
             html, body {
-                visibility: visible !important;
                 width: 210mm !important;
-                height: auto !important;
                 background: white !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                display: block !important; 
-            }
-
-            .invoice-container, .invoice-container * {
-                visibility: visible !important;
+                display: block !important;
             }
 
             .invoice-container {
                 box-shadow: none !important;
                 width: 210mm !important;
-                height: auto !important; /* Allow auto height */
                 min-height: 297mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                position: relative !important; /* Relative for natural flow */
+                position: relative !important;
                 display: flex !important;
                 flex-direction: column !important;
-                transform: none !important;
-                transform-origin: top left !important;
-                z-index: 9999 !important;
+            }
+
+            thead tr {
+                background: #BC1823 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            th {
+                color: white !important;
+            }
+
+            .bottom-section {
+                position: relative !important;
+                margin-top: 0 !important;
+                z-index: 120 !important;
+                padding-top: 20px !important;
             }
 
             .bottom-pattern {
-                position: absolute !important;
-                bottom: -2px !important; 
-                right: -2px !important; 
-                left: -2px !important;
+                position: relative !important;
+                bottom: 0 !important;
+                margin-top: auto !important;
+                width: 100% !important;
                 display: block !important;
-                width: calc(100% + 4px) !important;
-                height: 150px !important;
             }
 
             .shape-black-bottom-2 {
                 right: -2px !important;
                 bottom: -2px !important;
-                width: 352px !important; /* Matches 350px + 2px overshoot */
-                height: 80px !important;
-                clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%) !important;
+                width: 352px !important;
+            }
+
+            .signature-box {
+                background: transparent !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                position: relative !important;
+                z-index: 130 !important;
+            }
+
+            .summary-box {
+                position: relative !important;
+                z-index: 110 !important;
+            }
+
+            .summary-total {
+                background: #BC1823 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             .footer-branding {
@@ -451,66 +666,31 @@
                 bottom: 8px !important;
                 right: 15px !important;
                 font-size: 8px !important;
+                color: white !important;
                 display: block !important;
                 z-index: 10000 !important;
-                color: white !important;
                 white-space: nowrap !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                text-transform: uppercase !important;
-                letter-spacing: 1.5px !important;
-                text-align: right !important;
-            }
-
-            .items-section {
-                padding-bottom: 20px !important;
-            }
-
-            .bottom-section {
-                padding-top: 0 !important;
-                margin-top: -60px !important; /* Pull up to sit over patterns */
-                z-index: 120 !important;
-                position: relative !important;
-            }
-
-            .signature-box {
-                background: rgba(255, 255, 255, 0.8) !important;
-                padding: 10px !important;
-                border-radius: 8px !important;
-                position: relative !important;
-                z-index: 130 !important;
-                width: 220px !important;
-            }
-
-            .summary-row span:first-child {
-                color: #374151 !important;
-            }
-            
-            /* Add high contrast if subtotal is over dark areas */
-            .summary-box {
-                position: relative;
-                z-index: 110 !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <button onclick="window.print()" class="btn-print no-print">PRINT INVOICE</button>
+    <button onclick="window.print()" class="btn-print">🖨&nbsp; PRINT INVOICE</button>
 
     <div class="invoice-container">
-        <!-- Top Patterns -->
+
+        <!-- ══ Top Patterns ══ -->
         <div class="top-pattern">
             <div class="shape-red-top"></div>
             <div class="shape-black-top-1"></div>
             <div class="shape-black-top-2"></div>
         </div>
 
+        <!-- ══ Header ══ -->
         <div class="header-content">
-            <div class="logo-section">
-                <div class="logo-box">
-                    <img src="/images/sata-logo.png" alt="SATA Logo" />
-                </div>
+            <div class="logo-box">
+                <img src="/images/sata-logo.png" alt="SATA Logo" />
             </div>
             <div class="invoice-title-section">
                 <div class="invoice-label">Invoice</div>
@@ -518,7 +698,7 @@
             </div>
         </div>
 
-        <!-- Billing Section -->
+        <!-- ══ Billing ══ -->
         <div class="details-section">
             <div class="billing-box">
                 <div class="section-label">Invoice To:</div>
@@ -528,103 +708,130 @@
                     <div>Phone: @Model.customer_contact</div>
                 </div>
             </div>
-            <div class="billing-box" style="text-align: right;">
+            <div class="billing-box" style="text-align:right;">
                 <div class="section-label">Invoice From:</div>
                 <div class="billing-details">
                     <div class="billing-name">@Model.seller_name</div>
                     <div>@Model.seller_address</div>
                     <div>Phone: @Model.seller_contact</div>
-                    <div style="font-weight: 800; color: #111827; margin-top: 5px;">Date: @Model.date.ToString("dd MMM yyyy")</div>
+                    <div style="font-weight:800;color:#111827;margin-top:5px;">
+                        Date: @Model.date.ToString("dd MMM yyyy")
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- ══ Info Bar ══ -->
         <div class="info-bar">
-            <div class="info-item">
+            <div>
                 <div class="info-label">Status</div>
-                <div class="info-value"><span class="status-badge" style="background: @(Model.status == "Paid" ? "#10b981" : "#BC1823")">@(Model.status ?? "PENDING")</span></div>
+                <div class="info-value">
+                    <span class="status-badge"
+                          style="background:@(Model.status == "Paid" ? "#10b981" : "#BC1823")">
+                        @(Model.status ?? "PENDING")
+                    </span>
+                </div>
             </div>
-            <div class="info-item">
+            <div>
                 <div class="info-label">Payment Method</div>
                 <div class="info-value">@(Model.payment ?? "Not Specified")</div>
             </div>
         </div>
 
-        <!-- Items Table -->
+        <!-- ══ Items Table ══ -->
         <div class="items-section">
             <table>
+
                 <thead>
                     <tr>
-                        <th width="50%">Item Description</th>
-                        <th class="text-center">Price</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-right">Total</th>
+                        <th width="50%" class="c-desc">Products/Services</th>
+                        <th class="text-center c-price">Price</th>
+                        <th class="text-center c-qty">Qty/Unit type</th>
+                        <th class="text-right c-total">Total Price</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (isMultiItem) {
-                        foreach(var item in items) {
+                    @if (isMultiItem)
+                    {
+                        int rowNum = 1;
+                        foreach (var item in items)
+                        {
                             <tr>
-                                <td>
-                                    <div style="font-weight: 800;">@item["name"]</div>
-                                    <div style="font-size: 11px; color: #6b7280;">Expiry: @(item.ContainsKey("expiryDate") ? item["expiryDate"] : "N/A")</div>
+                                <td class="c-desc">
+                                    <span class="item-no">@rowNum.</span>
+                                    <span class="item-name">@item["name"]</span>
+                                    <div class="item-expiry">
+                                        Expiry: @(item.ContainsKey("expiryDate") ? item["expiryDate"] : "N/A")
+                                    </div>
                                 </td>
-                                <td class="text-center">$@(((decimal)item["price"]).ToString("N2"))</td>
-                                <td class="text-center">@item["qty"]</td>
-                                <td class="text-right" style="font-weight: 800;">$@(((decimal)item["total"]).ToString("N2"))</td>
+                                <td class="c-price">$@(((decimal)item["price"]).ToString("N2"))</td>
+                                <td class="c-qty">@item["qty"]</td>
+                                <td class="c-total">$@(((decimal)item["total"]).ToString("N2"))</td>
                             </tr>
+                            rowNum++;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         <tr>
-                            <td>
-                                <div style="font-weight: 800;">@Model.prod_name_service</div>
-                                <div style="font-size: 11px; color: #6b7280;">Expiry: @(ViewBag.SingleItemExpiry ?? "N/A")</div>
+                            <td class="c-desc">
+                                <span class="item-no">1.</span>
+                                <span class="item-name">@Model.prod_name_service</span>
+                                <div class="item-expiry">
+                                    Expiry: @(ViewBag.SingleItemExpiry ?? "N/A")
+                                </div>
                             </td>
-                            <td class="text-center">$@Model.price.ToString("N2")</td>
-                            <td class="text-center">@Model.qty_unit_type</td>
-                            <td class="text-right" style="font-weight: 800;">$@((Model.price - Model.discount).ToString("N2"))</td>
+                            <td class="c-price">$@Model.price.ToString("N2")</td>
+                            <td class="c-qty">@Model.qty_unit_type</td>
+                            <td class="c-total">$@((Model.price - Model.discount).ToString("N2"))</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
 
-        <!-- Bottom Section -->
+        <!-- ══ Bottom Section ══ -->
         <div class="bottom-section">
-            <div style="width: 50%;">
-                <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Terms & Conditions</div>
-                <div style="font-size: 11px; color: #6b7280; line-height: 1.5;">
-                    Please make payment within 15 days of receiving this invoice. 
+
+            <!-- Terms & Signature -->
+            <div class="terms-block">
+                <div class="terms-title">Terms &amp; Conditions</div>
+                <div class="terms-text">
+                    Please make payment within 15 days of receiving this invoice.<br />
                     Thank you for choosing SATA TECHNOLOGIES for your business needs.
                 </div>
                 <div class="signature-box">
                     <div class="signature-line">Authorized Signature</div>
                 </div>
             </div>
+
+            <!-- Summary -->
             <div class="summary-box">
                 <div class="summary-row">
-                    <span style="font-weight: 700; color: #6b7280;">Sub Total</span>
-                    <span style="font-weight: 800; color: #111827;">$@subtotal.ToString("N2")</span>
+                    <span class="s-lbl">Sub Total</span>
+                    <span class="s-val">$@subtotal.ToString("N2")</span>
                 </div>
                 <div class="summary-row">
-                    <span style="font-weight: 700; color: #6b7280;">Discount</span>
-                    <span style="font-weight: 800; color: #BC1823;">-$@discount.ToString("N2")</span>
+                    <span class="s-lbl">Discount</span>
+                    <span class="s-val s-val-disc">− $@discount.ToString("N2")</span>
                 </div>
+                <hr class="summary-divider" />
                 <div class="summary-total">
-                    <span style="color: white !important;">Grand Total</span>
-                    <span style="color: white !important;">$@totalAmount.ToString("N2")</span>
+                    <span>Grand Total</span>
+                    <span>$@totalAmount.ToString("N2")</span>
                 </div>
             </div>
+
         </div>
 
-
-        <!-- Bottom Patterns -->
+        <!-- ══ Bottom Patterns ══ -->
         <div class="bottom-pattern">
             <div class="shape-red-bottom"></div>
             <div class="shape-black-bottom-1"></div>
             <div class="shape-black-bottom-2"></div>
         </div>
-        <div class="footer-branding">SATA E-Invoice System • Innovating the Future</div>
+        <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
+
     </div>
 </body>
 </html>
