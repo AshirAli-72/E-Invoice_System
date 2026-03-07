@@ -96,7 +96,7 @@
             <div class="info-item">
                 <div class="info-label">Status</div>
                 <div class="info-value">
-                    <span class="status-badge" style="background: @(Model.status == "Paid" ? "#10b981" : "#BC1823")">
+                    <span class="status-badge @(Model.status == "Paid" ? "status-paid" : "status-pending")">
                         @(Model.status ?? "PENDING")
                     </span>
                 </div>
@@ -147,7 +147,8 @@
         </div>
 
         <!-- Bottom Section -->
-        <div style="page-break-inside: avoid; break-inside: avoid;">
+        <!-- Footer -->
+        <div class="footer-wrapper">
             <div class="bottom-section" style="margin-top: 10px;">
                 <div class="terms-block">
                     <div class="terms-title">Terms & Conditions</div>

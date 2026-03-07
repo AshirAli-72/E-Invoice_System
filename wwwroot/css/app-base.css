@@ -109,31 +109,31 @@
 
 /* Status Badges */
 .status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 800;
     display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white !important;
 }
 
 .status-paid {
-    background: #ecfdf5;
-    color: #111827;
-    /* Changed to black */
+    background: #10b981;
+    /* Solid Green */
 }
 
 .status-inactive,
 .status-out-of-stock,
 .status-cancelled {
-    background: #fef2f2;
-    color: #111827;
-    /* Changed to black */
+    background: #BC1823;
+    /* Solid Red */
 }
 
 .status-pending {
-    background: #fff7ed;
-    color: #111827;
-    /* Changed to black */
+    background: #ea580c;
+    /* Solid Orange */
 }
 
 /* Actions & Buttons */

@@ -104,8 +104,7 @@
             <div class="info-item">
                 <div class="info-label">Status</div>
                 <div class="info-value">
-                    <span class="status-badge"
-                          style="background:@(Model.status == "Paid" ? "#10b981" : "#BC1823")">
+                    <span class="status-badge @(Model.status == "Paid" ? "status-paid" : "status-pending")">
                         @(Model.status ?? "PENDING")
                     </span>
                 </div>
@@ -163,9 +162,9 @@
             </table>
         </div>
 
-        <!-- ══ Bottom Section (Grouped for avoiding break) ══ -->
-        <div style="page-break-inside: avoid; break-inside: avoid;">
-            <div class="bottom-section" style="margin-top: 10px;">
+        <!-- ══ Footer (Pinned to Bottom) ══ -->
+        <div class="footer-wrapper">
+            <div class="bottom-section">
                 <!-- Terms & Signature -->
                 <div class="terms-block">
                     <div class="terms-title">Terms &amp; Conditions</div>
@@ -196,7 +195,7 @@
                 </div>
             </div>
 
-            <!-- ══ Bottom Patterns (Pinned to Bottom Section) ══ -->
+            <!-- ══ Bottom Patterns ══ -->
             <div class="bottom-pattern">
                 <div class="shape-red-bottom"></div>
                 <div class="shape-black-bottom-1"></div>
