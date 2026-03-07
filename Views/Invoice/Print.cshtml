@@ -54,154 +54,156 @@
 
     <button onclick="window.print()" class="btn-print">🖨&nbsp; PRINT INVOICE</button>
 
-    <div class="invoice-container" id="printableInvoice">
+    <div id="invoiceViewWrapper">
+        <div class="invoice-container" id="printableInvoice">
 
-        <!-- ══ Top Patterns ══ -->
-        <div class="top-pattern">
-            <div class="shape-red-top"></div>
-            <div class="shape-black-top-1"></div>
-            <div class="shape-black-top-2"></div>
-        </div>
+            <!-- ══ Top Patterns ══ -->
+            <div class="top-pattern">
+                <div class="shape-red-top"></div>
+                <div class="shape-black-top-1"></div>
+                <div class="shape-black-top-2"></div>
+            </div>
 
-        <!-- ══ Header ══ -->
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="logo-box">
-                    <img src="/images/sata-logo.png" alt="SATA Logo" />
+            <!-- ══ Header ══ -->
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-box">
+                        <img src="/images/sata-logo.png" alt="SATA Logo" />
+                    </div>
+                </div>
+                <div class="invoice-title-section">
+                    <div class="invoice-label">Invoice</div>
+                    <div class="invoice-no"># @(Model.invoice_no ?? Model.id.ToString())</div>
                 </div>
             </div>
-            <div class="invoice-title-section">
-                <div class="invoice-label">Invoice</div>
-                <div class="invoice-no"># @(Model.invoice_no ?? Model.id.ToString())</div>
-            </div>
-        </div>
 
-        <!-- ══ Billing ══ -->
-        <div class="details-section">
-            <div class="billing-box">
-                <div class="section-label">Invoice To:</div>
-                <div class="billing-details">
-                    <div class="billing-name">@Model.customer_name</div>
-                    <div>@Model.customer_address</div>
-                    <div>Phone: @Model.customer_contact</div>
+            <!-- ══ Billing ══ -->
+            <div class="details-section">
+                <div class="billing-box">
+                    <div class="section-label">Invoice To:</div>
+                    <div class="billing-details">
+                        <div class="billing-name">@Model.customer_name</div>
+                        <div>@Model.customer_address</div>
+                        <div>Phone: @Model.customer_contact</div>
+                    </div>
                 </div>
-            </div>
-            <div class="billing-box" style="text-align:right;">
-                <div class="section-label">Invoice From:</div>
-                <div class="billing-details">
-                    <div class="billing-name">@Model.seller_name</div>
-                    <div>@Model.seller_address</div>
-                    <div>Phone: @Model.seller_contact</div>
-                    <div style="font-weight:800;color:#111827;margin-top:5px;">
-                        Date: @Model.date.ToString("dd MMM yyyy")
+                <div class="billing-box text-right">
+                    <div class="section-label">Invoice From:</div>
+                    <div class="billing-details">
+                        <div class="billing-name">@Model.seller_name</div>
+                        <div>@Model.seller_address</div>
+                        <div>Phone: @Model.seller_contact</div>
+                        <div style="font-weight:800;color:#111827;margin-top:5px;">
+                            Date: @Model.date.ToString("dd MMM yyyy")
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- ══ Info Bar ══ -->
-        <div class="info-bar">
-            <div class="info-item">
-                <div class="info-label">Status</div>
-                <div class="info-value">
-                    <span class="status-badge @(Model.status == "Paid" ? "status-paid" : "status-pending")">
-                        @(Model.status ?? "PENDING")
-                    </span>
+            <!-- ══ Info Bar ══ -->
+            <div class="info-bar">
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        <span class="status-badge @(Model.status == "Paid" ? "status-paid" : "status-pending")">
+                            @(Model.status ?? "PENDING")
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Method</div>
+                    <div class="info-value">@(Model.payment ?? "Not Specified")</div>
                 </div>
             </div>
-            <div class="info-item">
-                <div class="info-label">Payment Method</div>
-                <div class="info-value">@(Model.payment ?? "Not Specified")</div>
-            </div>
-        </div>
 
-        <!-- ══ Items Table ══ -->
-        <div class="items-section">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="50%" class="c-desc">Products/Services</th>
-                        <th class="text-center c-price">Price</th>
-                        <th class="text-center c-qty">Qty/Unit type</th>
-                        <th class="text-right c-total">Total Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (isMultiItem)
-                    {
-                        foreach (var item in items)
+            <!-- ══ Items Table ══ -->
+            <div class="items-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="50%" class="c-desc">Products/Services</th>
+                            <th class="text-center c-price">Price</th>
+                            <th class="text-center c-qty">Qty/Unit type</th>
+                            <th class="text-right c-total">Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isMultiItem)
+                        {
+                            foreach (var item in items)
+                            {
+                                <tr>
+                                    <td class="c-desc">
+                                        <div class="item-name">@item["name"]</div>
+                                        <div class="item-expiry">
+                                            Expiry: @(item.ContainsKey("expiryDate") ? item["expiryDate"] : "N/A")
+                                        </div>
+                                    </td>
+                                    <td class="text-center c-price">$@(((decimal)item["price"]).ToString("N2"))</td>
+                                    <td class="text-center c-qty">@item["qty"]</td>
+                                    <td class="text-right c-total" style="font-weight: 800;">$@(((decimal)item["total"]).ToString("N2"))</td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
                                 <td class="c-desc">
-                                    <div class="item-name">@item["name"]</div>
+                                    <div class="item-name">@Model.prod_name_service</div>
                                     <div class="item-expiry">
-                                        Expiry: @(item.ContainsKey("expiryDate") ? item["expiryDate"] : "N/A")
+                                        Expiry: @(ViewBag.SingleItemExpiry ?? "N/A")
                                     </div>
                                 </td>
-                                <td class="c-price">$@(((decimal)item["price"]).ToString("N2"))</td>
-                                <td class="c-qty">@item["qty"]</td>
-                                <td class="c-total">$@(((decimal)item["total"]).ToString("N2"))</td>
+                                <td class="text-center c-price">$@Model.price.ToString("N2")</td>
+                                <td class="text-center c-qty">@Model.qty_unit_type</td>
+                                <td class="text-right c-total" style="font-weight: 800;">$@((Model.price - Model.discount).ToString("N2"))</td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td class="c-desc">
-                                <div class="item-name">@Model.prod_name_service</div>
-                                <div class="item-expiry">
-                                    Expiry: @(ViewBag.SingleItemExpiry ?? "N/A")
-                                </div>
-                            </td>
-                            <td class="c-price">$@Model.price.ToString("N2")</td>
-                            <td class="c-qty">@Model.qty_unit_type</td>
-                            <td class="c-total">$@((Model.price - Model.discount).ToString("N2"))</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- ══ Footer (Pinned to Bottom) ══ -->
-        <div class="footer-wrapper">
-            <div class="bottom-section">
-                <!-- Terms & Signature -->
-                <div class="terms-block">
-                    <div class="terms-title">Terms &amp; Conditions</div>
-                    <div class="terms-text">
-                        Please make payment within 15 days of receiving this invoice.<br />
-                        Thank you for choosing SATA TECHNOLOGIES for your business needs.
+            <!-- ══ Footer (Pinned to Bottom) ══ -->
+            <div class="footer-wrapper">
+                <div class="bottom-section" style="margin-top: 10px;">
+                    <!-- Terms & Signature -->
+                    <div class="terms-block">
+                        <div class="terms-title">Terms &amp; Conditions</div>
+                        <div class="terms-text">
+                            Please make payment within 15 days of receiving this invoice.<br />
+                            Thank you for choosing SATA TECHNOLOGIES for your business needs.
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line">Authorized Signature</div>
+                        </div>
                     </div>
-                    <div class="signature-box">
-                        <div class="signature-line">Authorized Signature</div>
+
+                    <!-- Summary -->
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span class="s-lbl">Sub Total</span>
+                            <span class="s-val">$@subtotal.ToString("N2")</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="s-lbl">Discount</span>
+                            <span class="s-val s-val-disc">$@discount.ToString("N2")</span>
+                        </div>
+                        <hr class="summary-divider" />
+                        <div class="summary-total">
+                            <span>Grand Total</span>
+                            <span>$@totalAmount.ToString("N2")</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Summary -->
-                <div class="summary-box">
-                    <div class="summary-row">
-                        <span class="s-lbl">Sub Total</span>
-                        <span class="s-val">$@subtotal.ToString("N2")</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="s-lbl">Discount</span>
-                        <span class="s-val s-val-disc">$@discount.ToString("N2")</span>
-                    </div>
-                    <hr class="summary-divider" />
-                    <div class="summary-total">
-                        <span>Grand Total</span>
-                        <span>$@totalAmount.ToString("N2")</span>
-                    </div>
+                <!-- ══ Bottom Patterns ══ -->
+                <div class="bottom-pattern">
+                    <div class="shape-red-bottom"></div>
+                    <div class="shape-black-bottom-1"></div>
+                    <div class="shape-black-bottom-2"></div>
                 </div>
+                <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
             </div>
-
-            <!-- ══ Bottom Patterns ══ -->
-            <div class="bottom-pattern">
-                <div class="shape-red-bottom"></div>
-                <div class="shape-black-bottom-1"></div>
-                <div class="shape-black-bottom-2"></div>
-            </div>
-            <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
         </div>
     </div>
 </body>
