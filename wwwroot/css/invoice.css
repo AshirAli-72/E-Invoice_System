@@ -12,13 +12,15 @@
 .invoice-container {
     background: white;
     width: 210mm;
-    min-height: 297mm;
+    min-height: 296mm;
+    /* Reduced slightly to prevent overflow */
     position: relative;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     margin: 0 auto;
-    /* Ensure no top margin */
+    overflow: hidden;
+    /* Prevent pattern bleed */
 }
 
 .top-pattern {
@@ -26,7 +28,8 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 220px;
+    height: 100px;
+    /* Reduced from 120px */
     z-index: 1;
 }
 
@@ -34,8 +37,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 180px;
-    height: 180px;
+    width: 120px;
+    height: 120px;
     background: #BC1823;
     clip-path: polygon(0 0, 100% 0, 0 100%);
     z-index: 2;
@@ -44,9 +47,9 @@
 .shape-black-top-1 {
     position: absolute;
     top: 0;
-    left: 80px;
-    width: 150px;
-    height: 150px;
+    left: 60px;
+    width: 110px;
+    height: 110px;
     background: #1C2120;
     clip-path: polygon(0 0, 100% 0, 40% 100%);
     z-index: 1;
@@ -56,9 +59,9 @@
 .shape-black-top-2 {
     position: absolute;
     top: 0;
-    left: 200px;
-    width: 200px;
-    height: 100px;
+    left: 150px;
+    width: 150px;
+    height: 80px;
     background: #1C2120;
     clip-path: polygon(0 0, 100% 0, 60% 100%);
     z-index: 0;
@@ -68,10 +71,16 @@
 .header-content {
     position: relative;
     z-index: 10;
-    padding: 40px 60px;
+    padding: 15px 40px 10px 40px;
+    /* Reduced from 20px ... */
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
 }
 
 .logo-box {
@@ -83,12 +92,12 @@
 }
 
 .logo-box img {
-    height: 60px;
+    height: 45px;
     width: auto;
 }
 
 .invoice-label {
-    font-size: 40px;
+    font-size: 28px;
     font-weight: 900;
     color: #BC1823;
     text-transform: uppercase;
@@ -103,21 +112,26 @@
 }
 
 .details-section {
-    padding: 0 60px 40px 60px;
+    padding: 0 40px 10px 40px;
+    /* Reduced from 20px */
     display: flex;
     justify-content: space-between;
     position: relative;
     z-index: 10;
 }
 
+.billing-box {
+    width: 46%;
+}
+
 .section-label {
     background: #BC1823;
     color: white;
-    padding: 4px 15px;
+    padding: 3px 12px;
     font-size: 12px;
     font-weight: 800;
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-transform: uppercase;
 }
 
@@ -129,15 +143,16 @@
 }
 
 .billing-details {
-    font-size: 14px;
+    font-size: 13px;
     color: #4b5563;
     line-height: 1.6;
 }
 
 .info-bar {
-    padding: 0 60px 30px 60px;
+    padding: 0 40px 10px 40px;
+    /* Reduced from 15px */
     display: flex;
-    gap: 40px;
+    gap: 30px;
     position: relative;
     z-index: 10;
 }
@@ -155,9 +170,25 @@
     color: #111827;
 }
 
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
 .items-section {
-    padding: 0 60px;
+    padding: 0 40px;
     flex-grow: 1;
+    min-height: 100px;
 }
 
 .items-section table {
@@ -171,7 +202,7 @@
 }
 
 .items-section th {
-    padding: 8px 12px;
+    padding: 6px 10px;
     text-align: left;
     font-size: 11px;
     font-weight: 800;
@@ -180,11 +211,40 @@
 }
 
 .items-section td {
-    padding: 10px 12px;
+    padding: 6px 10px;
     border-bottom: 1px solid #f3f4f6;
-    font-size: 13px;
+    font-size: 11px;
     color: #4b5563;
     page-break-inside: avoid;
+    vertical-align: middle;
+}
+
+.c-price,
+.c-qty {
+    text-align: center !important;
+}
+
+.c-total {
+    text-align: right !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+}
+
+th.c-total {
+    color: white !important;
+    /* Ensure header label is white */
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-left {
+    text-align: left !important;
 }
 
 thead {
@@ -201,7 +261,8 @@ tbody tr {
 }
 
 .bottom-section {
-    padding: 20px 60px 40px 60px;
+    padding: 10px 40px 15px 40px;
+    /* Reduced from 15px ... 20px */
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -221,8 +282,8 @@ tbody tr {
     justify-content: flex-end;
     align-items: center;
     gap: 30px;
-    padding: 6px 0;
-    font-size: 14px;
+    padding: 4px 0;
+    font-size: 13px;
 }
 
 .summary-row span:first-child {
@@ -241,14 +302,14 @@ tbody tr {
 .summary-total {
     background: #BC1823;
     color: white;
-    padding: 12px 24px;
-    margin-top: 15px;
+    padding: 8px 18px;
+    margin-top: 10px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 30px;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 16px;
     box-shadow: 0 4px 10px rgba(188, 24, 35, 0.1);
     white-space: nowrap;
 }
@@ -269,19 +330,19 @@ tbody tr {
 
 .bottom-pattern {
     position: relative;
-    height: 150px;
+    height: 60px;
+    /* Reduced from 80px */
     width: 100%;
     margin-top: auto;
     z-index: 1;
-    /* Keep patterns below content */
 }
 
 .shape-red-bottom {
     position: absolute;
     bottom: 0;
     left: 100px;
-    width: 400px;
-    height: 120px;
+    width: 300px;
+    height: 60px;
     background: #BC1823;
     clip-path: polygon(20% 0, 100% 100%, 0 100%);
     z-index: 2;
@@ -291,8 +352,8 @@ tbody tr {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 300px;
-    height: 150px;
+    width: 200px;
+    height: 80px;
     background: #1C2120;
     clip-path: polygon(0 0, 60% 100%, 0 100%);
     z-index: 1;
@@ -303,10 +364,19 @@ tbody tr {
     bottom: 0;
     right: 0;
     width: 350px;
-    height: 80px;
+    /* Wider for branding */
+    height: 40px;
     background: #1C2120;
-    clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
     z-index: 1;
+}
+
+.terms-text {
+    font-size: 11px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-top: 5px;
+    max-width: 350px;
 }
 
 .signature-box {
@@ -345,6 +415,7 @@ tbody tr {
     }
 
     .no-print,
+    .btn-print,
     .sidebar,
     .top-bar,
     .toast-container {
@@ -378,7 +449,11 @@ tbody tr {
         left: 0 !important;
         top: 0 !important;
         width: 210mm !important;
-        min-height: 297mm !important;
+        height: 296mm !important;
+        /* Fixed height to force one page */
+        min-height: 296mm !important;
+        overflow: hidden !important;
+        /* Force content cut-off if it exceeds */
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
@@ -402,12 +477,17 @@ tbody tr {
     }
 
     .bottom-section {
-        padding-top: 20px !important;
-        margin-top: 0 !important;
+        padding-top: 15px !important;
+        /* Reduced from 20px */
+        margin-top: -15px !important;
+        /* Tighter */
         z-index: 100 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        display: block !important;
+        display: flex !important;
+        /* Changed from block to flex */
+        justify-content: space-between !important;
+        align-items: flex-end !important;
     }
 
     .signature-box {
@@ -418,14 +498,14 @@ tbody tr {
 
     .footer-branding {
         position: absolute !important;
-        bottom: 10px !important;
-        right: 2px !important;
+        bottom: 8px !important;
+        right: 15px !important;
         color: white !important;
         font-size: 8px !important;
         font-weight: 800 !important;
         letter-spacing: 1.5px !important;
         text-transform: uppercase !important;
-        z-index: 99 !important;
+        z-index: 999 !important;
         display: block !important;
         text-align: right !important;
     }
