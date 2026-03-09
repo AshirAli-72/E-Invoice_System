@@ -18,11 +18,14 @@
 
     <div class="card-body">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
-            <div>
-                <label class="text-muted font-xs font-bold text-uppercase">Customer Info</label>
-                <div class="font-bold" style="font-size: 1.1rem; margin-top: 0.5rem;">@Model.customer_name</div>
-                <div class="status-badge status-paid" style="margin-top: 0.5rem;">
-                    @Model.status
+            <div style="grid-column: span 2;">
+                <label class="text-muted font-xs font-bold text-uppercase">Transaction Type</label>
+                <div class="font-bold" style="font-size: 1.1rem; margin-top: 0.5rem; color: @(isReturn ? "var(--primary)" : "var(--success)")">
+                    <i class="@(isReturn ? "ph-arrow-counter-clockwise" : "ph-shopping-bag")"></i>
+                    @(isReturn ? "Customer Return" : "Standard Sale")
+                    <span class="status-badge status-paid" style="margin-left: 1rem;">
+                        @Model.status
+                    </span>
                 </div>
             </div>
             <div>
@@ -31,13 +34,7 @@
                     <i class="ph-credit-card"></i> @Model.payment_method
                 </div>
             </div>
-            <div>
-                <label class="text-muted font-xs font-bold text-uppercase">Transaction Type</label>
-                <div class="font-bold" style="font-size: 1.1rem; margin-top: 0.5rem; color: @(isReturn ? "var(--primary)" : "var(--success)")">
-                    <i class="@(isReturn ? "ph-arrow-counter-clockwise" : "ph-shopping-bag")"></i>
-                    @(isReturn ? "Customer Return" : "Standard Sale")
-                </div>
-            </div>
+
         </div>
 
         <div style="background: #f8fafc; border-radius: 1.5rem; padding: 2rem; border: 1px solid rgba(0,0,0,0.05);">

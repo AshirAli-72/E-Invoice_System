@@ -963,7 +963,7 @@
 
         if (isReturn && customerName) {
             try {
-                const res = await fetch(`/Sale/CheckAnyPurchaseHistory?customerName=${encodeURIComponent(customerName)}`);
+                const res = await fetch(`/Sale/CheckAnyPurchaseHistory`);
                 const data = await res.json();
                 if (!data.hasAnyHistory) {
                     showStockAlert("Customer has no active purchases.");
@@ -976,7 +976,7 @@
             // Filter items that customer has actually purchased
             const filteredItems = [];
             for (const item of saleItems) {
-                const validation = await validateReturnEligibility(customerName, item.prod_name_service);
+                const validation = await validateReturnEligibility(item.prod_name_service);
                 if (validation.eligible) {
                     const absQty = Math.abs(item.qty);
                     item.qty = -Math.min(absQty, validation.purchasedQty);
@@ -989,10 +989,10 @@
         }
     }
 
-    async function validateReturnEligibility(customerName, productName) {
-        if (!customerName || !productName) return { eligible: true, purchasedQty: 0 };
+    async function validateReturnEligibility(productName) {
+        if (!productName) return { eligible: true, purchasedQty: 0 };
         try {
-            const response = await fetch(`/Sale/CheckPurchaseHistory?customerName=${encodeURIComponent(customerName)}&productName=${encodeURIComponent(productName)}`);
+            const response = await fetch(`/Sale/CheckPurchaseHistory?productName=${encodeURIComponent(productName)}`);
             const data = await response.json();
             return { eligible: data.hasPurchased, purchasedQty: data.purchasedQty || 0 };
         } catch (e) { return { eligible: true, purchasedQty: 999999 }; }
@@ -1038,7 +1038,6 @@
 
     function submitSaleForm() {
         const cust = document.getElementById('customerSelect').value;
-        if (!cust) return alert("Please select a customer.");
 
         const method = document.getElementById('hiddenPaymentMethod').value;
         const tenderedInput = document.getElementById('webTendered').value;

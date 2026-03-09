@@ -147,38 +147,12 @@ namespace E_Invoice_system.Controllers
         [HttpGet]
         public JsonResult GetSalesByCustomer(string customerName)
         {
-            if (string.IsNullOrEmpty(customerName))
-                return Json(new { success = false, message = "Customer name is required." });
+            // Now that customer_name is removed from sales, we can't reliably filter sales by customer 
+            // unless we join with invoices or another table. For now, we'll just return an empty list or 
+            // handle it differently based on the new schema. Assuming this method is no longer useful for sales filtering.
+            
+            return Json(new { success = false, message = "Customer tracking removed from individual sales." });
 
-            var salesAll = _context.sales
-                .Where(s => s.customer_name == customerName)
-                .OrderByDescending(s => s.date)
-                .ToList();
-
-            var sales = salesAll
-                .Where(s => {
-                    var match = System.Text.RegularExpressions.Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
-                    if (match.Success && decimal.TryParse(match.Groups[1].Value, out decimal q))
-                    {
-                        return q > 0;
-                    }
-                    return false; // Filter out if 0 or negative
-                })
-                .Select(s => new
-                {
-                    s.id,
-                    s.prod_name_service,
-                    s.qty_unit_type,
-                    s.price,
-                    s.discount,
-                    s.total_price,
-                    s.status,
-                    date = s.date.ToString("yyyy-MM-dd"),
-                    expiryDate = s.expiry_date.HasValue ? s.expiry_date.Value.ToString("yyyy-MM-dd") : null
-                })
-                .ToList();
-
-            return Json(new { success = true, sales });
         }
     }
 }

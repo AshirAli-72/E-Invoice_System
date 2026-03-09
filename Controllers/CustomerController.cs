@@ -84,12 +84,6 @@ namespace E_Invoice_system.Controllers
                         inv.customer_name = customer.name;
                     }
 
-                    // Update sales
-                    var sales = _context.sales.Where(s => s.customer_name == existingCustomer.name).ToList();
-                    foreach (var sale in sales)
-                    {
-                        sale.customer_name = customer.name;
-                    }
                 }
 
                 _context.customers.Update(customer);

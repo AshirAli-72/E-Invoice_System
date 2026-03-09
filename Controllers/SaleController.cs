@@ -76,7 +76,6 @@ namespace E_Invoice_system.Controllers
 
                 foreach (var item in items)
                 {
-                    item.customer_name = customer_name;
                     item.status = status;
                     item.payment_method = payment_method;
                     item.description = description;
@@ -103,11 +102,6 @@ namespace E_Invoice_system.Controllers
                     {
                         var originalSaleQuery = _context.sales.Where(s => s.prod_name_service == item.prod_name_service);
                         
-                        if (customer_name != "Walk-in")
-                        {
-                            originalSaleQuery = originalSaleQuery.Where(s => s.customer_name == customer_name);
-                        }
-
                         var originalSale = originalSaleQuery
                             .OrderByDescending(s => s.date)
                             .FirstOrDefault();
@@ -152,7 +146,6 @@ namespace E_Invoice_system.Controllers
                             {
                                 SaleId = originalSale.id,
                                 Date = now,
-                                CustomerName = customer_name,
                                 ProdNameService = item.prod_name_service,
                                 Barcode = item.barcode,
                                 QtyUnitType = $"{Math.Abs(qty)} {unit}".Trim(),
@@ -266,15 +259,15 @@ namespace E_Invoice_system.Controllers
         }
 
         [HttpGet]
-        public JsonResult CheckPurchaseHistory(string customerName, string productName)
+        public JsonResult CheckPurchaseHistory(string productName)
         {
-            if (string.IsNullOrEmpty(customerName) || string.IsNullOrEmpty(productName))
+            if (string.IsNullOrEmpty(productName))
             {
                 return Json(new { hasPurchased = false, purchasedQty = 0 });
             }
 
             var sales = _context.sales
-                .Where(s => s.customer_name == customerName && s.prod_name_service == productName)
+                .Where(s => s.prod_name_service == productName)
                 .ToList();
 
             decimal totalPurchased = 0;
@@ -296,15 +289,10 @@ namespace E_Invoice_system.Controllers
         }
 
         [HttpGet]
-        public JsonResult CheckAnyPurchaseHistory(string customerName)
+        public JsonResult CheckAnyPurchaseHistory()
         {
-            if (string.IsNullOrEmpty(customerName))
-            {
-                return Json(new { hasAnyHistory = false });
-            }
-
             // Check for any sales where qty > 0 (using the same parsing logic as Index)
-            var sales = _context.sales.Where(s => s.customer_name == customerName).ToList();
+            var sales = _context.sales.ToList();
             var hasAnyHistory = sales.Any(s => {
                 var match = System.Text.RegularExpressions.Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
                 if (match.Success && decimal.TryParse(match.Groups[1].Value, out decimal q))

@@ -13,9 +13,6 @@ namespace E_Invoice_system.Models
         [Column("sale_id")]
         public int SaleId { get; set; }
 
-        [Column("customer_name")]
-        public string? CustomerName { get; set; }
-
         [Column("date")]
         public DateTime Date { get; set; }
 
