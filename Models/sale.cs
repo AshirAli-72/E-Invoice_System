@@ -42,8 +42,8 @@ namespace E_Invoice_system.Models
         [Column("status")]
         public string? status { get; set; }
 
-
-
+        [Column("is_returned")]
+        public bool is_returned { get; set; } = false;
 
 
     }

@@ -10,6 +10,38 @@
 
 <style>
     /* Custom Searchable Dropdown Styling */
+    .return-mode-active {
+        border: 2px solid #BC1823 !important;
+        background-color: #fffafb !important;
+    }
+    .return-mode-active .checkout-header {
+        background-color: #BC1823 !important;
+        color: white !important;
+    }
+    .return-mode-active .checkout-header h3,
+    .return-mode-active .checkout-header .item-count-badge {
+        color: white !important;
+    }
+    .return-mode-active .btn-confirm {
+        background-color: #BC1823 !important;
+    }
+    .return-mode-active .btn-confirm:hover {
+        background-color: #9a131b !important;
+    }
+    .return-warning-banner {
+        display: none;
+        background-color: #fee2e2;
+        color: #991b1b;
+        padding: 8px 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #fca5a5;
+    }
+    .return-mode-active .return-warning-banner {
+        display: block;
+    }
+
     .customer-search-container {
         position: relative;
         flex: 1;
@@ -235,6 +267,9 @@
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
             
             <div class="checkout-header">
+                <div class="return-warning-banner">
+                    <i class="ph-warning"></i> RETURN MODE ACTIVE
+                </div>
                 <div class="checkout-header-main">
                     <div>
                         <h3 class="order-detail-title">Order Detail</h3>
@@ -732,14 +767,20 @@
                 </div>
                 <div class="item-v2-info">
                     <div class="title">${item.prod_name_service}</div>
-                    <div class="price-sub">${format(lineTotal)}</div>
+                    <div class="price-input-container">
+                        <span>$</span>
+                        <input type="number" step="0.01" class="manual-price-input" value="${item.price.toFixed(2)}" onchange="updateItemPrice(${index}, this.value)">
+                    </div>
                 </div>
                 <div class="item-v2-controls">
                     <div class="qty-stepper">
                         <button type="button" onclick="decreaseQtyBtn(${index})">-</button>
-                        <span>${item.qty < 0 ? '-' : ''}${Math.abs(item.qty)}</span>
+                        <input type="number" class="manual-qty-input" value="${item.qty < 0 ? '-' : ''}${Math.abs(item.qty)}" onchange="updateItemQty(${index}, this.value)">
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
+                </div>
+                <div class="item-total-info">
+                    <div class="price-sub">${format(lineTotal)}</div>
                 </div>
                 <i class="ph-trash btn-remove-item" onclick="removeItem(${index})"></i>
             `;
@@ -801,6 +842,55 @@
         renderSaleItems();
     }
 
+    function updateItemPrice(index, value) {
+        let val = parseFloat(value);
+        if (isNaN(val) || val < 0) val = 0;
+        saleItems[index].price = val;
+        saleItems[index].total_price = (val * saleItems[index].qty) - (saleItems[index].discount * saleItems[index].qty);
+        renderSaleItems();
+    }
+
+    async function updateItemQty(index, value) {
+        let val = parseInt(value, 10);
+        if (isNaN(val)) val = 1;
+        
+        const item = saleItems[index];
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+
+        if (isReturn) {
+            // Force negative
+            val = -Math.abs(val);
+            if (val === 0) {
+                 removeItem(index);
+                 return;
+            }
+            const customerName = document.getElementById('customerSelect').value;
+            if (customerName) {
+                const validation = await validateReturnEligibility(customerName, item.prod_name_service);
+                if (Math.abs(val) > validation.purchasedQty) { 
+                    showStockAlert("Max returnable reached.");
+                    val = -validation.purchasedQty;
+                }
+            }
+        } else {
+            // Force positive
+            val = Math.abs(val);
+            if (val === 0) {
+                 removeItem(index);
+                 return;
+            }
+            if (val > item.maxStock) {
+                showStockAlert("Max stock reached.");
+                val = item.maxStock;
+            }
+        }
+
+        item.qty = val;
+        item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+        renderSaleItems();
+    }
+
     function clearSaleItems() {
         if (saleItems.length > 0 && confirm("Clear current order?")) {
             saleItems = [];
@@ -820,10 +910,13 @@
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
         const customerName = document.getElementById('customerSelect').value;
-
+        const checkoutCenter = document.querySelector('.checkout-center');
+        
         if (isReturn) {
+            checkoutCenter.classList.add('return-mode-active');
             if (!customerName) {
-                showStockAlert("Please select a customer first.");
+                // Allow return mode without customer, but we can't filter history.
+                // Just clear items instead of alerting.
                 saleItems = [];
                 renderSaleItems();
                 return;
@@ -853,6 +946,7 @@
                 saleItems = filteredItems;
             } catch (e) { console.error(e); }
         } else {
+            checkoutCenter.classList.remove('return-mode-active');
             // Converting back to Sale mode
             saleItems.forEach(item => {
                 const absQty = Math.abs(item.qty);

@@ -51,6 +51,12 @@ namespace E_Invoice_system.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(string customer_name, string status, string payment_method, string? description, List<Sale> items)
         {
+            if (string.IsNullOrWhiteSpace(customer_name))
+            {
+                customer_name = "Walk-in";
+            }
+            ModelState.Remove("customer_name");
+
             // Remove description from validation as it is optional
             ModelState.Remove("description");
 
@@ -95,8 +101,14 @@ namespace E_Invoice_system.Controllers
                     // PROCESS AS RETURN
                     if (qty < 0)
                     {
-                        var originalSale = _context.sales
-                            .Where(s => s.customer_name == customer_name && s.prod_name_service == item.prod_name_service)
+                        var originalSaleQuery = _context.sales.Where(s => s.prod_name_service == item.prod_name_service);
+                        
+                        if (customer_name != "Walk-in")
+                        {
+                            originalSaleQuery = originalSaleQuery.Where(s => s.customer_name == customer_name);
+                        }
+
+                        var originalSale = originalSaleQuery
                             .OrderByDescending(s => s.date)
                             .FirstOrDefault();
 
@@ -106,7 +118,7 @@ namespace E_Invoice_system.Controllers
                             decimal originalQty = 0;
                             string originalUnit = "";
                             var originalMatch = System.Text.RegularExpressions.Regex.Match(originalSale.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
-                            if (originalMatch.Success) 
+                            if (originalMatch.Success)
                             {
                                 decimal.TryParse(originalMatch.Groups[1].Value, out originalQty);
                                 originalUnit = originalMatch.Groups[2].Value;
@@ -116,19 +128,26 @@ namespace E_Invoice_system.Controllers
                             decimal newQty = originalQty + qty; // qty is negative
                             if (newQty < 0) newQty = 0;
 
-                            // PRORATE DISCOUNT
-                            // We need to adjust original discount based on remaining items
+                            // PRORATE DISCOUNT based on remaining items
                             decimal unitDiscount = originalQty > 0 ? originalSale.discount / originalQty : 0;
                             decimal newDiscount = unitDiscount * newQty;
                             decimal returnDiscount = unitDiscount * Math.Abs(qty);
-                            
+
                             // Update original sale: quantity, discount and price
                             originalSale.qty_unit_type = $"{newQty} {originalUnit}".Trim();
                             originalSale.discount = newDiscount;
                             originalSale.total_price = (originalSale.price * newQty) - newDiscount;
+
+                            // ---- POS Logic: Mark original sale as returned if fully returned ----
+                            // Mirrors: "update pos_sales_accounts set is_returned = 'true' where billNo = ..."
+                            if (newQty == 0)
+                            {
+                                originalSale.is_returned = true;
+                                originalSale.status = "Returned";
+                            }
                             _context.sales.Update(originalSale);
 
-                            // Create return record
+                            // Create a dedicated return record (mirrors pos_return_accounts + pos_returns_details)
                             returnsToInsert.Add(new ReturnDetail
                             {
                                 SaleId = originalSale.id,
@@ -145,10 +164,10 @@ namespace E_Invoice_system.Controllers
                         else
                         {
                             // No original sale found - validation error
-                            ModelState.AddModelError("", $"No previous sale found for '{item.prod_name_service}' under customer '{customer_name}'. Return denied.");
+                            ModelState.AddModelError("", $"No previous sale found for '{item.prod_name_service}' under '{customer_name}'. Return denied.");
                             ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
                             ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
-                            return View(item); 
+                            return View();
                         }
                     }
                     else
