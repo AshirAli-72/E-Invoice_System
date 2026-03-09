@@ -662,14 +662,7 @@
         const customerName = document.getElementById('customerSelect').value;
 
         if (isReturn) {
-            if (!customerName) return showStockAlert("Please select a customer first.");
-            const validation = await validateReturnEligibility(customerName, name);
-            if (!validation.eligible) return showStockAlert(`Customer has no purchase history for ${name}.`);
-            
-            const existing = saleItems.find(i => i.prod_name_service === name);
-            if ((existing && Math.abs(existing.qty - 1) > validation.purchasedQty) || (!existing && 1 > validation.purchasedQty)) {
-                return showStockAlert(`Cannot return more than purchased.`);
-            }
+            // No customer validation needed - allow returns freely
         }
 
         const qtyToAdd = isReturn ? -1 : 1;
@@ -945,7 +938,7 @@
     // Payment Modal
     function openPaymentModal() {
         if (saleItems.length === 0) return alert("Cart is empty.");
-        document.getElementById('webModalTotal').innerText = format(currentTotal);
+        document.getElementById('webModalTotal').innerText = format(Math.abs(currentTotal));
         document.getElementById('webTendered').value = "";
         calculateWebChange();
         document.getElementById('paymentModal').classList.add('show');
@@ -964,7 +957,8 @@
 
     function calculateWebChange() {
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        const change = tendered - currentTotal;
+        const absTotal = Math.abs(currentTotal);
+        const change = tendered - absTotal;
         document.getElementById('webModalTendered').innerText = format(tendered);
         document.getElementById('webModalChange').innerText = format(change);
     }
@@ -976,7 +970,7 @@
     }
 
     function matchWebAmount() {
-        document.getElementById('webTendered').value = Math.max(0, currentTotal).toFixed(2);
+        document.getElementById('webTendered').value = Math.abs(currentTotal).toFixed(2);
         calculateWebChange();
     }
 
@@ -997,8 +991,8 @@
             return alert("Amount tendered must be greater than zero.");
         }
 
-        // For non-credit, must cover total
-        if (method !== 'Credit' && tendered < currentTotal) {
+        // For non-credit, must cover total (use absolute value for returns)
+        if (method !== 'Credit' && tendered < Math.abs(currentTotal)) {
             return alert("Amount tendered is less than the grand total.");
         }
 
