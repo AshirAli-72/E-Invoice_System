@@ -221,7 +221,7 @@
                          data-id="@p.id"
                          data-name="@p.prod_name_service" 
                          data-search-name="@p.prod_name_service.ToLower()"
-                         data-barcode="@(p.barcode?.ToLower() ?? "")" 
+                         data-barcode="@(p.barcode ?? "")" 
                          data-price="@p.price"
                          data-discount="@p.discount"
                          data-expiry="@(p.expiry_date?.ToString("yyyy-MM-dd") ?? "")"
