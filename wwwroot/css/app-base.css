@@ -119,7 +119,9 @@
     color: white !important;
 }
 
-.status-paid {
+.status-paid,
+.status-active,
+.status-available {
     background: #10b981;
     /* Solid Green */
 }
