@@ -10,37 +10,10 @@
 
 <style>
     /* Custom Searchable Dropdown Styling */
-    .return-mode-active {
-        border: 2px solid #BC1823 !important;
-        background-color: #fffafb !important;
-    }
-    .return-mode-active .checkout-header {
-        background-color: #BC1823 !important;
-        color: white !important;
-    }
-    .return-mode-active .checkout-header h3,
-    .return-mode-active .checkout-header .item-count-badge {
-        color: white !important;
-    }
-    .return-mode-active .btn-confirm {
-        background-color: #BC1823 !important;
-    }
-    .return-mode-active .btn-confirm:hover {
-        background-color: #9a131b !important;
-    }
     .return-warning-banner {
         display: none;
-        background-color: #fee2e2;
-        color: #991b1b;
-        padding: 8px 12px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.85rem;
-        border-bottom: 1px solid #fca5a5;
     }
-    .return-mode-active .return-warning-banner {
-        display: block;
-    }
+
 
     .customer-search-container {
         position: relative;
@@ -909,44 +882,15 @@
     async function handleModeChange() {
         const mode = document.querySelector('input[name="transMode"]:checked').value;
         const isReturn = mode === 'return';
-        const customerName = document.getElementById('customerSelect').value;
-        const checkoutCenter = document.querySelector('.checkout-center');
         
         if (isReturn) {
-            checkoutCenter.classList.add('return-mode-active');
-            if (!customerName) {
-                // Allow return mode without customer, but we can't filter history.
-                // Just clear items instead of alerting.
-                saleItems = [];
-                renderSaleItems();
-                return;
-            }
-
-            try {
-                const res = await fetch(`/Sale/CheckAnyPurchaseHistory?customerName=${encodeURIComponent(customerName)}`);
-                const data = await res.json();
-                if (!data.hasAnyHistory) {
-                    showStockAlert("Customer has no active purchases.");
-                    saleItems = [];
-                    renderSaleItems();
-                    return;
-                }
-
-                // Filter items that customer has actually purchased
-                const filteredItems = [];
-                for (const item of saleItems) {
-                    const validation = await validateReturnEligibility(customerName, item.prod_name_service);
-                    if (validation.eligible) {
-                        const absQty = Math.abs(item.qty);
-                        item.qty = -Math.min(absQty, validation.purchasedQty);
-                        item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-                        filteredItems.push(item);
-                    }
-                }
-                saleItems = filteredItems;
-            } catch (e) { console.error(e); }
+            // Convert existing items to negative qty for returns
+            saleItems.forEach(item => {
+                const absQty = Math.abs(item.qty);
+                item.qty = -absQty;
+                item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            });
         } else {
-            checkoutCenter.classList.remove('return-mode-active');
             // Converting back to Sale mode
             saleItems.forEach(item => {
                 const absQty = Math.abs(item.qty);
