@@ -146,37 +146,37 @@
             </table>
         </div>
 
-        <!-- Bottom Section -->
-        <!-- Footer -->
-        <div class="footer-wrapper">
-            <div class="bottom-section" style="margin-top: 10px;">
-                <div class="terms-block">
-                    <div class="terms-title">Terms & Conditions</div>
-                    <div class="terms-text">
-                        Please make payment within 15 days of receiving this invoice. <br/>
-                        Thank you for choosing SATA TECHNOLOGIES for your business needs.
-                    </div>
-                    <div class="signature-box">
-                        <div class="signature-line">Authorized Signature</div>
-                    </div>
+        <!-- Bottom Section (Terms & Summary) -->
+        <div class="bottom-section">
+            <div class="terms-block">
+                <div class="terms-title">Terms & Conditions</div>
+                <div class="terms-text">
+                    Please make payment within 15 days of receiving this invoice. <br/>
+                    Thank you for choosing SATA TECHNOLOGIES for your business needs.
                 </div>
-                <div class="summary-box">
-                    <div class="summary-row">
-                        <span class="s-lbl">Sub Total</span>
-                        <span class="s-val">$@subtotal.ToString("N2")</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="s-lbl">Discount</span>
-                        <span class="s-val s-val-disc">$@discount.ToString("N2")</span>
-                    </div>
-                    <hr class="summary-divider" />
-                    <div class="summary-total">
-                        <span>Grand Total</span>
-                        <span>$@totalAmount.ToString("N2")</span>
-                    </div>
+                <div class="signature-box">
+                    <div class="signature-line">Authorized Signature</div>
                 </div>
             </div>
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span class="s-lbl">Sub Total</span>
+                    <span class="s-val">$@subtotal.ToString("N2")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="s-lbl">Discount</span>
+                    <span class="s-val s-val-disc">$@discount.ToString("N2")</span>
+                </div>
+                <hr class="summary-divider" />
+                <div class="summary-total">
+                    <span>Grand Total</span>
+                    <span>$@totalAmount.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
 
+        <!-- Footer Decoration (Pinned to Bottom) -->
+        <div class="footer-wrapper">
             <!-- Bottom Patterns -->
             <div class="bottom-pattern">
                 <div class="shape-red-bottom"></div>
