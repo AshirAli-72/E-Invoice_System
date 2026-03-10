@@ -109,17 +109,26 @@
         color: var(--text-muted);
     }
 
-    /* Thermal Receipt Styles */
+    /* Thermal Receipt Styles - Pixel Perfect Match */
     #thermalReceipt {
         display: none;
         width: 80mm;
-        padding: 5mm;
+        padding: 2mm;
         background: white;
-        font-family: 'Courier New', Courier, monospace;
+        font-family: 'Arial Black', 'Arial', sans-serif;
         color: black;
+        line-height: 1.1;
     }
 
-    @media print {
+    @@media print {
+        @@page {
+            size: 80mm auto;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
         body * {
             visibility: hidden;
         }
@@ -132,103 +141,115 @@
             left: 0;
             top: 0;
             width: 80mm;
+            padding: 4mm;
         }
     }
 
-    .receipt-header-row {
+    .receipt-header-top {
         display: flex;
         justify-content: space-between;
-        font-size: 10px;
-        font-weight: bold;
-        margin-bottom: 5px;
+        font-size: 11px;
+        font-weight: 900;
+        margin-bottom: 2px;
     }
 
-    .shop-info {
+    .shop-info-center {
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
-    .shop-info h3 {
+    .shop-info-center h2 {
         margin: 0;
         font-size: 18px;
         font-weight: 900;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .shop-info p {
-        margin: 2px 0;
-        font-size: 12px;
-        font-weight: bold;
+    .shop-info-center p {
+        margin: 1px 0;
+        font-size: 13px;
+        font-weight: 900;
     }
 
-    .person-info {
-        font-size: 12px;
-        font-weight: bold;
+    .receipt-meta {
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .receipt-meta p {
+        margin: 1px 0;
+    }
+
+    .receipt-table-pos {
+        width: 100%;
+        border-collapse: collapse;
         margin-bottom: 5px;
     }
 
-    .person-info p {
-        margin: 2px 0;
+    .receipt-table-pos th {
+        border-top: 1.5px solid black;
+        border-bottom: 1.5px solid black;
+        font-size: 13px;
+        font-weight: 900;
+        padding: 3px 0;
+        text-transform: uppercase;
     }
 
-    .receipt-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 5px 0;
+    .receipt-table-pos td {
+        font-size: 13px;
+        font-weight: 900;
+        padding: 3px 0;
     }
 
-    .receipt-table th {
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-        text-align: left;
-        font-size: 11px;
-        padding: 4px 0;
+    .receipt-totals-pos {
+        margin-bottom: 8px;
+        border-bottom: 1.5px solid black;
+        padding-bottom: 4px;
     }
 
-    .receipt-table td {
-        font-size: 11px;
-        padding: 4px 0;
-    }
-
-    .text-right { text-align: right !important; }
-    .text-center { text-align: center !important; }
-
-    .receipt-totals {
-        margin-top: 5px;
-    }
-
-    .receipt-total-row {
+    .receipt-row-total {
         display: flex;
         justify-content: space-between;
-        font-size: 12px;
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-
-    .receipt-footer {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-    .receipt-thanks {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 900;
-        margin-bottom: 10px;
-        border-top: 1px solid black;
-        padding-top: 5px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
     }
 
-    .receipt-referral {
-        font-size: 10px;
-        font-weight: bold;
-        margin-bottom: 10px;
+    .receipt-footer-pos {
+        text-align: center;
     }
 
-    .receipt-copyright {
-        font-size: 8px;
-        border-top: 1px solid black;
-        padding-top: 3px;
+    .thank-you-line {
+        border-top: 1.5px solid black;
+        border-bottom: 1.5px solid black;
+        padding: 4px 0;
+        margin: 4px 0;
+        font-size: 16px;
+        font-weight: 900;
+        text-transform: uppercase;
     }
+
+    .referral-text {
+        font-size: 11px;
+        font-weight: 900;
+        margin: 4px 0;
+        border-bottom: 1px solid black;
+        padding-bottom: 4px;
+    }
+
+    .copyright-pos {
+        font-size: 9px;
+        font-weight: 900;
+        margin-top: 2px;
+        text-transform: uppercase;
+    }
+
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .text-left { text-align: left; }
 </style>
 
 <div class="pos-container-v2">
@@ -635,42 +656,47 @@
 
 <!-- Hidden Thermal Receipt Structure -->
 <div id="thermalReceipt">
-    <div class="receipt-header-row">
+    <div class="receipt-header-top">
         <span id="receiptDate">3/9/2026 3:56:23 PM</span>
-        <span class="order-no" id="receiptOrderNo">ORDER: SALE_NEW</span>
+        <span id="receiptOrderNo">ORDER: RETURN_2</span>
     </div>
-    <div class="shop-info">
-        <h3>THE SATA POS</h3>
+    
+    <div class="shop-info-center">
+        <h2>THE SATA POS</h2>
         <p>Address</p>
         <p>0313-3879645</p>
     </div>
-    <div class="person-info">
+
+    <div class="receipt-meta">
         <p>Cashier: @(User.Identity.Name ?? "nill")</p>
         <p>Customer: <span id="receiptCustomerName">Walk-In</span></p>
     </div>
-    <table class="receipt-table">
+
+    <table class="receipt-table-pos">
         <thead>
             <tr>
-                <th width="40%">PRODUCT</th>
-                <th width="15%" class="text-center">QTY</th>
-                <th width="20%" class="text-center">PRICE</th>
-                <th width="25%" class="text-right">AMOUNT</th>
+                <th class="text-left">PRODUCT</th>
+                <th class="text-center">QTY</th>
+                <th class="text-center">PRICE</th>
+                <th class="text-right">AMOUNT</th>
             </tr>
         </thead>
         <tbody id="receiptItemsBody">
             <!-- items -->
         </tbody>
     </table>
-    <div class="receipt-totals">
-        <div class="receipt-total-row"><span>TOTAL</span> <span id="receiptTotalVal">$0.00</span></div>
-        <div class="receipt-total-row"><span>AMOUNT DUE</span> <span id="receiptDueVal">$0.00</span></div>
-        <div class="receipt-total-row"><span>CASH</span> <span id="receiptTenderedVal">$0.00</span></div>
-        <div class="receipt-total-row"><span>PAY TYPE</span> <span id="receiptPayTypeVal">Cash</span></div>
+
+    <div class="receipt-totals-pos">
+        <div class="receipt-row-total"><span>TOTAL</span> <span id="receiptTotalVal">$2500</span></div>
+        <div class="receipt-row-total"><span>AMOUNT DUE</span> <span id="receiptDueVal">$2500</span></div>
+        <div class="receipt-row-total"><span>CASH</span> <span id="receiptTenderedVal">$2500</span></div>
+        <div class="receipt-row-total"><span>PAY TYPE</span> <span id="receiptPayTypeVal">Cash</span></div>
     </div>
-    <div class="receipt-footer">
-        <div class="receipt-thanks">THANK YOU!</div>
-        <div class="receipt-referral">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
-        <div class="receipt-copyright">Copyrights 2023, Powered by The SATA POS</div>
+
+    <div class="receipt-footer-pos">
+        <div class="thank-you-line">THANK YOU!</div>
+        <div class="referral-text">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
+        <div class="copyright-pos">Copyrights 2023, Powered by The SATA POS</div>
     </div>
 </div>
 
@@ -1196,12 +1222,16 @@
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
         const payMethod = document.getElementById('hiddenPaymentMethod').value;
 
+        // Custom format for receipt: integer if whole, else 2 decimals
+        const receiptFormat = (v) => v % 1 === 0 ? v.toString() : v.toFixed(2);
+        const receiptTotalFormat = (v) => '$' + receiptFormat(v);
+
         document.getElementById('receiptDate').innerText = new Date().toLocaleString();
         document.getElementById('receiptOrderNo').innerText = `ORDER: ${isReturn ? 'RETURN' : 'SALE'}_NEW`;
         document.getElementById('receiptCustomerName').innerText = customerName;
-        document.getElementById('receiptTotalVal').innerText = format(total);
-        document.getElementById('receiptDueVal').innerText = format(total);
-        document.getElementById('receiptTenderedVal').innerText = format(tendered);
+        document.getElementById('receiptTotalVal').innerText = receiptTotalFormat(total);
+        document.getElementById('receiptDueVal').innerText = receiptTotalFormat(total);
+        document.getElementById('receiptTenderedVal').innerText = receiptTotalFormat(tendered);
         document.getElementById('receiptPayTypeVal').innerText = payMethod;
 
         const itemsBody = document.getElementById('receiptItemsBody');
@@ -1210,10 +1240,10 @@
         saleItems.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.prod_name_service}</td>
+                <td class="text-left">${item.prod_name_service}</td>
                 <td class="text-center">${Math.abs(item.qty)}</td>
-                <td class="text-center">${item.price.toFixed(2)}</td>
-                <td class="text-right">${Math.abs(item.total_price).toFixed(2)}</td>
+                <td class="text-center">${receiptFormat(item.price)}</td>
+                <td class="text-right">${receiptFormat(Math.abs(item.total_price))}</td>
             `;
             itemsBody.appendChild(row);
         });
