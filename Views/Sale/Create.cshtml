@@ -108,6 +108,127 @@
         font-size: 0.8rem;
         color: var(--text-muted);
     }
+
+    /* Thermal Receipt Styles */
+    #thermalReceipt {
+        display: none;
+        width: 80mm;
+        padding: 5mm;
+        background: white;
+        font-family: 'Courier New', Courier, monospace;
+        color: black;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #thermalReceipt, #thermalReceipt * {
+            visibility: visible;
+        }
+        #thermalReceipt {
+            display: block !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 80mm;
+        }
+    }
+
+    .receipt-header-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .shop-info {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .shop-info h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .shop-info p {
+        margin: 2px 0;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .person-info {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .person-info p {
+        margin: 2px 0;
+    }
+
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 5px 0;
+    }
+
+    .receipt-table th {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        text-align: left;
+        font-size: 11px;
+        padding: 4px 0;
+    }
+
+    .receipt-table td {
+        font-size: 11px;
+        padding: 4px 0;
+    }
+
+    .text-right { text-align: right !important; }
+    .text-center { text-align: center !important; }
+
+    .receipt-totals {
+        margin-top: 5px;
+    }
+
+    .receipt-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .receipt-footer {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .receipt-thanks {
+        font-size: 14px;
+        font-weight: 900;
+        margin-bottom: 10px;
+        border-top: 1px solid black;
+        padding-top: 5px;
+    }
+
+    .receipt-referral {
+        font-size: 10px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .receipt-copyright {
+        font-size: 8px;
+        border-top: 1px solid black;
+        padding-top: 3px;
+    }
 </style>
 
 <div class="pos-container-v2">
@@ -398,7 +519,7 @@
                 
                 <div style="display: flex; gap: 16px;">
                     <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closePaymentModal()">Cancel</button>
-                    <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="submitSaleForm()">
+                    <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="askToPrintReceipt()">
                         Complete Order <i class="ph-check-circle"></i>
                     </button>
                 </div>
@@ -491,6 +612,68 @@
         </div>
     </div>
 </div>
+
+<!-- Print Confirmation Modal -->
+<div class="modal-overlay" id="printConfirmModal" style="z-index: 2000;">
+    <div class="payment-card" style="max-width: 400px; width: 90%; align-items: stretch; flex-direction: column;">
+        <div style="padding: 32px; text-align: center;">
+            <div style="margin-bottom: 24px;">
+                <i class="ph-printer" style="font-size: 4rem; color: var(--primary);"></i>
+            </div>
+            <h2 style="margin: 0 0 12px 0; color: var(--text-main); font-size: 1.5rem;">Print Receipt?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px;">Would you like to print the receipt for this transaction?</p>
+            
+            <div style="display: flex; gap: 16px;">
+                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="processFinalSubmission(false)">No</button>
+                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="processFinalSubmission(true)">
+                    Yes, Print <i class="ph-printer"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Thermal Receipt Structure -->
+<div id="thermalReceipt">
+    <div class="receipt-header-row">
+        <span id="receiptDate">3/9/2026 3:56:23 PM</span>
+        <span class="order-no" id="receiptOrderNo">ORDER: SALE_NEW</span>
+    </div>
+    <div class="shop-info">
+        <h3>THE SATA POS</h3>
+        <p>Address</p>
+        <p>0313-3879645</p>
+    </div>
+    <div class="person-info">
+        <p>Cashier: @(User.Identity.Name ?? "nill")</p>
+        <p>Customer: <span id="receiptCustomerName">Walk-In</span></p>
+    </div>
+    <table class="receipt-table">
+        <thead>
+            <tr>
+                <th width="40%">PRODUCT</th>
+                <th width="15%" class="text-center">QTY</th>
+                <th width="20%" class="text-center">PRICE</th>
+                <th width="25%" class="text-right">AMOUNT</th>
+            </tr>
+        </thead>
+        <tbody id="receiptItemsBody">
+            <!-- items -->
+        </tbody>
+    </table>
+    <div class="receipt-totals">
+        <div class="receipt-total-row"><span>TOTAL</span> <span id="receiptTotalVal">$0.00</span></div>
+        <div class="receipt-total-row"><span>AMOUNT DUE</span> <span id="receiptDueVal">$0.00</span></div>
+        <div class="receipt-total-row"><span>CASH</span> <span id="receiptTenderedVal">$0.00</span></div>
+        <div class="receipt-total-row"><span>PAY TYPE</span> <span id="receiptPayTypeVal">Cash</span></div>
+    </div>
+    <div class="receipt-footer">
+        <div class="receipt-thanks">THANK YOU!</div>
+        <div class="receipt-referral">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
+        <div class="receipt-copyright">Copyrights 2023, Powered by The SATA POS</div>
+    </div>
+</div>
+
 
 <script>
     // Global State
@@ -975,28 +1158,65 @@
     }
 
     function submitSaleForm() {
-        const cust = document.getElementById('customerSelect').value;
-
         const method = document.getElementById('hiddenPaymentMethod').value;
         const tenderedInput = document.getElementById('webTendered').value;
         const tendered = parseFloat(tenderedInput);
 
-        // Check if amount is entered
         if (tenderedInput === "" || isNaN(tendered)) {
             return alert("Please enter the amount tendered.");
         }
-
-        // Prevent zero or negative
         if (tendered <= 0) {
             return alert("Amount tendered must be greater than zero.");
         }
-
-        // For non-credit, must cover total (use absolute value for returns)
         if (method !== 'Credit' && tendered < Math.abs(currentTotal)) {
             return alert("Amount tendered is less than the grand total.");
         }
 
+        // Show print confirmation
+        document.getElementById('printConfirmModal').classList.add('show');
+    }
+
+    function askToPrintReceipt() {
+        submitSaleForm();
+    }
+
+    function processFinalSubmission(shouldPrint) {
+        if (shouldPrint) {
+            prepareReceiptData();
+            window.print();
+        }
         document.getElementById('saleForm').submit();
+    }
+
+    function prepareReceiptData() {
+        const mode = document.querySelector('input[name="transMode"]:checked').value;
+        const isReturn = mode === 'return';
+        const customerName = document.getElementById('customerSearchInput').value || "Walk-In";
+        const total = Math.abs(currentTotal);
+        const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
+        const payMethod = document.getElementById('hiddenPaymentMethod').value;
+
+        document.getElementById('receiptDate').innerText = new Date().toLocaleString();
+        document.getElementById('receiptOrderNo').innerText = `ORDER: ${isReturn ? 'RETURN' : 'SALE'}_NEW`;
+        document.getElementById('receiptCustomerName').innerText = customerName;
+        document.getElementById('receiptTotalVal').innerText = format(total);
+        document.getElementById('receiptDueVal').innerText = format(total);
+        document.getElementById('receiptTenderedVal').innerText = format(tendered);
+        document.getElementById('receiptPayTypeVal').innerText = payMethod;
+
+        const itemsBody = document.getElementById('receiptItemsBody');
+        itemsBody.innerHTML = "";
+
+        saleItems.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.prod_name_service}</td>
+                <td class="text-center">${Math.abs(item.qty)}</td>
+                <td class="text-center">${item.price.toFixed(2)}</td>
+                <td class="text-right">${Math.abs(item.total_price).toFixed(2)}</td>
+            `;
+            itemsBody.appendChild(row);
+        });
     }
 
     // Custom Searchable Dropdown Logic
