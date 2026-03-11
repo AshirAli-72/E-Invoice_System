@@ -44,6 +44,13 @@ namespace E_Invoice_system.Controllers
             ViewBag.Products = _context.products_services
                 .Where(p => p.status == "Available")
                 .ToList();
+            
+            // Fetch Seller Info for Receipt
+            var seller = _context.sellers.FirstOrDefault(s => s.status == "Active") 
+                         ?? _context.sellers.FirstOrDefault();
+            ViewBag.SellerAddress = seller?.address ?? "Address";
+            ViewBag.SellerContact = seller?.contact ?? "0313-3879645";
+
             return View();
         }
 

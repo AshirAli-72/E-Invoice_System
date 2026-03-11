@@ -44,156 +44,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice #@(Model.invoice_no ?? Model.id.ToString())</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/invoice.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SATA INVOICE - Receipt</title>
+    <style>
+        /* ===== THERMAL RECEIPT STYLES - EXACT MATCH ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        /* Print button (hidden on print) */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            font-family: 'Verdana', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            z-index: 999;
+        }
+
+        /* ===== RECEIPT WRAPPER ===== */
+        #thermalReceipt {
+            width: 185mm;
+            padding: 10mm;
+            background: white;
+            font-family: 'Verdana', sans-serif;
+            color: black;
+            line-height: 1.3;
+        }
+
+        /* ===== TOP BANNER: Date left, Order# right ===== */
+        .receipt-top-banner {
+            border-top: 2pt solid black;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13pt;
+            font-weight: 900;
+            padding-top: 8px;
+        }
+
+        /* ===== SHOP INFO BLOCK ===== */
+        .shop-info-block {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .shop-info-block h1 {
+            margin: 10px 0;
+            font-size: 32pt;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .shop-info-block .sub-info {
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 4px 0;
+        }
+
+        .shop-line-bottom {
+            border-top: 2pt solid black;
+            margin: 15px 0;
+        }
+
+        /* ===== META LINES: Cashier, Customer ===== */
+        .meta-line {
+            font-size: 15pt;
+            font-weight: 900;
+            margin: 6px 0;
+            text-align: left;
+        }
+
+        /* ===== ITEMS TABLE ===== */
+        .receipt-table-v3 {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-top: 2.5pt solid black;
+            border-bottom: 2.5pt solid black;
+        }
+
+        .receipt-table-v3 th {
+            font-size: 15pt;
+            font-weight: 900;
+            padding: 12px 0;
+            text-transform: uppercase;
+        }
+
+        .receipt-table-v3 td {
+            font-size: 15pt;
+            font-weight: bold;
+            padding: 10px 0;
+        }
+
+        /* ===== TOTALS AREA ===== */
+        .totals-area {
+            float: right;
+            width: 100%;
+            max-width: 450px;
+            font-size: 16pt;
+            font-weight: 900;
+            margin-top: 20px;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-section {
+            margin-top: 40px;
+            text-align: center;
+            clear: both;
+        }
+
+        .footer-line {
+            border-top: 1.5pt solid black;
+            margin: 10px 0;
+        }
+
+        .footer-msg {
+            font-size: 20pt;
+            font-weight: 900;
+            margin: 15px 0;
+            text-transform: uppercase;
+        }
+
+        .footer-promo {
+            font-size: 15pt;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .footer-copy {
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .text-center { text-align: center; }
+        .text-right  { text-align: right; }
+        .text-left   { text-align: left; }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                background: #fff !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: flex-start !important;
+            }
+
+            .print-btn {
+                display: none !important;
+            }
+
+            #thermalReceipt {
+                display: block !important;
+                width: 185mm !important;
+                margin: 5mm auto !important;
+                padding: 10mm !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                font-family: 'Verdana', sans-serif !important;
+                color: black !important;
+                border: none !important;
+            }
+
+            #thermalReceipt * {
+                visibility: visible !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <button onclick="window.print()" class="btn-print">🖨&nbsp; PRINT INVOICE</button>
+    <button class="print-btn" onclick="window.print()">🖨 PRINT RECEIPT</button>
 
-    <div id="invoiceViewWrapper">
-        <div class="invoice-container" id="printableInvoice">
-            <!-- Top Patterns -->
-            <div class="top-pattern">
-                <div class="shape-red-top"></div>
-                <div class="shape-black-top-1"></div>
-                <div class="shape-black-top-2"></div>
-            </div>
+    <!-- ===== RECEIPT ===== -->
+    <div id="thermalReceipt">
 
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-box">
-                        <img src="/images/sata-logo.png" alt="SATA Logo" />
-                    </div>
-                </div>
-                <div class="invoice-title-section">
-                    <div class="invoice-label">Invoice</div>
-                    <div class="invoice-no"># @(Model.invoice_no ?? Model.id.ToString())</div>
-                </div>
-            </div>
+        <!-- Top Banner -->
+        <div class="receipt-top-banner">
+            <span id="receiptDate">@Model.date.ToString("M/d/yyyy h:mm:ss tt")</span>
+            <span id="receiptOrderNo">ORDER: @(Model.invoice_no ?? Model.id.ToString())</span>
+        </div>
 
-            <!-- Billing Section -->
-            <div class="details-section">
-                <div class="billing-box">
-                    <div class="section-label">Invoice To:</div>
-                    <div class="billing-details">
-                        <div class="billing-name">@Model.customer_name</div>
-                        <div>@Model.customer_address</div>
-                        <div>Phone: @Model.customer_contact</div>
-                    </div>
-                </div>
-                <div class="billing-box text-right">
-                    <div class="section-label">Invoice From:</div>
-                    <div class="billing-details">
-                        <div class="billing-name">@Model.seller_name</div>
-                        <div>@Model.seller_address</div>
-                        <div>Phone: @Model.seller_contact</div>
-                        <div style="font-weight: 800; color: #111827; margin-top: 5px;">Date: @Model.date.ToString("dd MMM yyyy")</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Shop Info -->
+        <div class="shop-info-block">
+            <h1 id="receiptShopTitle">@Model.seller_name</h1>
+            <div class="sub-info">@Model.seller_address</div>
+            <div class="sub-info">@Model.seller_contact</div>
+            <div class="shop-line-bottom"></div>
+        </div>
 
-            <div class="info-bar">
-                <div class="info-item">
-                    <div class="info-label">Status</div>
-                    <div class="info-value">
-                        <span class="status-badge @(Model.status == "Paid" ? "status-paid" : "status-pending")">
-                            @(Model.status ?? "PENDING")
-                        </span>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Payment Method</div>
-                    <div class="info-value">@(Model.payment ?? "Not Specified")</div>
-                </div>
-            </div>
+        <!-- Meta -->
+        @if (Model.status == "Returned")
+        {
+            <div class="meta-line" style="text-align: center; color: red; font-size: 24pt; margin-bottom: 15px;">** RETURN RECEIPT **</div>
+        }
+        <div class="meta-line">Cashier: Admin</div>
+        <div class="meta-line">Customer: <span id="receiptCustomerName">@(string.IsNullOrEmpty(Model.customer_name) ? "Walk-In" : Model.customer_name)</span></div>
 
-            <!-- Items Table -->
-            <div class="items-section">
-                <table>
-                    <thead>
+        <!-- Items Table -->
+        <table class="receipt-table-v3">
+            <thead>
+                <tr>
+                    <th class="text-left"  style="width: 40%;">PRODUCT</th>
+                    <th class="text-center" style="width: 15%;">QTY</th>
+                    <th class="text-center" style="width: 20%;">PRICE</th>
+                    <th class="text-right"  style="width: 25%;">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody id="receiptItemsBody">
+                @if (isMultiItem)
+                {
+                    foreach (var item in items)
+                    {
                         <tr>
-                            <th width="50%" class="c-desc">Products/Services</th>
-                            <th class="text-center c-price">Price</th>
-                            <th class="text-center c-qty">Qty/Unit type</th>
-                            <th class="text-right c-total">Total Price</th>
+                            <td class="text-left">@item["name"]</td>
+                            <td class="text-center">@item["qty"]</td>
+                            <td class="text-center">@(((decimal)item["price"]).ToString("N2"))</td>
+                            <td class="text-right">@(((decimal)item["total"]).ToString("N2"))</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (isMultiItem) {
-                            foreach(var item in items) {
-                                <tr>
-                                    <td class="c-desc">
-                                        <div class="item-name">@item["name"]</div>
-                                        <div class="item-expiry">Expiry: @(item.ContainsKey("expiryDate") ? item["expiryDate"] : "N/A")</div>
-                                    </td>
-                                    <td class="text-center c-price">$@(((decimal)item["price"]).ToString("N2"))</td>
-                                    <td class="text-center c-qty">@item["qty"]</td>
-                                    <td class="text-right c-total" style="font-weight: 800;">$@(((decimal)item["total"]).ToString("N2"))</td>
-                                </tr>
-                            }
-                        } else {
-                            <tr>
-                                <td class="c-desc">
-                                    <div class="item-name">@Model.prod_name_service</div>
-                                    <div class="item-expiry">Expiry: @(ViewBag.SingleItemExpiry ?? "N/A")</div>
-                                </td>
-                                <td class="text-center c-price">$@Model.price.ToString("N2")</td>
-                                <td class="text-center c-qty">@Model.qty_unit_type</td>
-                                <td class="text-right c-total" style="font-weight: 800;">$@((Model.price - Model.discount).ToString("N2"))</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-left">@Model.prod_name_service</td>
+                        <td class="text-center">@Model.qty_unit_type</td>
+                        <td class="text-center">@Model.price.ToString("N2")</td>
+                        <td class="text-right">@((Model.price - Model.discount).ToString("N2"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="totals-area">
+            <div class="totals-row">
+                <span>TOTAL</span>
+                <span id="receiptTotalVal">$@totalAmount.ToString("N2")</span>
             </div>
-
-            
-            <!-- Bottom Section (Terms & Summary) -->
-            <div class="bottom-section">
-                <!-- Terms & Signature -->
-                <div class="terms-block">
-                    <div class="terms-title">Terms &amp; Conditions</div>
-                    <div class="terms-text">
-                        Please make payment within 15 days of receiving this invoice.<br />
-                        Thank you for choosing SATA TECHNOLOGIES for your business needs.
-                    </div>
-                    <div class="signature-box">
-                        <div class="signature-line">Authorized Signature</div>
-                    </div>
-                </div>
-
-                <!-- Summary -->
-                <div class="summary-box">
-                    <div class="summary-row">
-                        <span class="s-lbl">Sub Total</span>
-                        <span class="s-val">$@subtotal.ToString("N2")</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="s-lbl">Discount</span>
-                        <span class="s-val s-val-disc">$@discount.ToString("N2")</span>
-                    </div>
-                    <hr class="summary-divider" />
-                    <div class="summary-total">
-                        <span>Grand Total</span>
-                        <span>$@totalAmount.ToString("N2")</span>
-                    </div>
-                </div>
+            <div class="totals-row">
+                <span>AMOUNT DUE</span>
+                <span id="receiptDueVal">$@((Model.status == "Paid") ? "0.00" : totalAmount.ToString("N2"))</span>
             </div>
-
-            <!-- Footer Decoration (Pinned to Bottom) -->
-            <div class="footer-wrapper">
-                <!-- ══ Bottom Patterns ══ -->
-                <div class="bottom-pattern">
-                    <div class="shape-red-bottom"></div>
-                    <div class="shape-black-bottom-1"></div>
-                    <div class="shape-black-bottom-2"></div>
-                </div>
-                <div class="footer-branding">SATA E-Invoice System &bull; Innovating the Future</div>
+            <div class="totals-row">
+                <span>CASH</span>
+                <span id="receiptTenderedVal">$@totalAmount.ToString("N2")</span>
+            </div>
+            <div class="totals-row">
+                <span>PAY TYPE</span>
+                <span id="receiptPayType">@(Model.payment ?? "Cash")</span>
             </div>
         </div>
-    </div>
+
+        <!-- Footer -->
+        <div class="footer-section">
+            <div class="footer-line"></div>
+            <div class="footer-msg">THANK YOU!</div>
+            <div class="footer-line"></div>
+            <div class="footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
+            <div class="footer-line"></div>
+            <div class="footer-copy">Copyrights 2023, Powered by The SATA POS</div>
+            <div class="footer-line"></div>
+        </div>
+
+    </div><!-- end #thermalReceipt -->
+
 </body>
 </html>
+

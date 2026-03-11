@@ -680,14 +680,14 @@
 <!-- Hidden Receipt Structure - Refined to Match Image -->
 <div id="thermalReceipt">
     <div class="receipt-top-banner">
-        <span id="receiptDate">3/9/2026 3:56:23 PM</span>
-        <span id="receiptOrderNo">ORDER: RETURN_2</span>
+        <span id="receiptDate">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
+        <span id="receiptOrderNo">ORDER: SALE_NEW</span>
     </div>
     
     <div class="shop-info-block">
-        <h1 id="receiptShopTitle">THE SATA POS</h1>
-        <div class="sub-info">Address</div>
-        <div class="sub-info">0313-3879645</div>
+        <h1 id="receiptShopTitle">THE SATA INVOICE</h1>
+        <div class="sub-info">@ViewBag.SellerAddress</div>
+        <div class="sub-info">@ViewBag.SellerContact</div>
         <div class="shop-line-bottom"></div>
     </div>
 
@@ -697,8 +697,8 @@
     <table class="receipt-table-v3">
         <thead>
             <tr>
-                <th class="text-left" style="width: 45%;">PRODUCT</th>
-                <th class="text-center" style="width: 10%;">QTY</th>
+                <th class="text-left" style="width: 40%;">PRODUCT</th>
+                <th class="text-center" style="width: 15%;">QTY</th>
                 <th class="text-center" style="width: 20%;">PRICE</th>
                 <th class="text-right" style="width: 25%;">AMOUNT</th>
             </tr>
@@ -1274,6 +1274,10 @@
 
         const orderId = isReturn ? "RETURN_" + Math.floor(Math.random() * 10) : "SAL_" + Math.floor(Math.random() * 1000); 
         document.getElementById('receiptOrderNo').innerText = `ORDER: ${orderId}`;
+        
+        // Ensure formatting matches
+        const shopTitle = document.getElementById('receiptShopTitle');
+        if (shopTitle) shopTitle.innerText = "THE SATA INVOICE";
         document.getElementById('receiptCustomerName').innerText = customerName;
         
         document.getElementById('receiptTotalVal').innerText = formatWithCurrency(netAmount);
