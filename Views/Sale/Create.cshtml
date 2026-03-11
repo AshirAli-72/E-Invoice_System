@@ -9,11 +9,9 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <style>
-    /* Custom Searchable Dropdown Styling */
     .return-warning-banner {
         display: none;
     }
-
 
     .customer-search-container {
         position: relative;
@@ -35,16 +33,16 @@
         transition: all 0.2s;
     }
 
-    .customer-search-input-wrapper:focus-within {
-        border-color: var(--primary);
-        background: #ffffff;
-        box-shadow: 0 0 0 4px var(--primary-glow);
-    }
+        .customer-search-input-wrapper:focus-within {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
 
-    .customer-search-input-wrapper i {
-        color: var(--text-muted);
-        font-size: 1.25rem;
-    }
+        .customer-search-input-wrapper i {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+        }
 
     .customer-search-input {
         background: transparent;
@@ -75,13 +73,13 @@
         -ms-overflow-style: none;
     }
 
-    .customer-dropdown-results::-webkit-scrollbar {
-        display: none;
-    }
+        .customer-dropdown-results::-webkit-scrollbar {
+            display: none;
+        }
 
-    .customer-dropdown-results.show {
-        display: block;
-    }
+        .customer-dropdown-results.show {
+            display: block;
+        }
 
     .customer-result-item {
         padding: 12px 16px;
@@ -90,203 +88,223 @@
         border-bottom: 1px solid #f8fafc;
     }
 
-    .customer-result-item:last-child {
-        border-bottom: none;
-    }
+        .customer-result-item:last-child {
+            border-bottom: none;
+        }
 
-    .customer-result-item:hover, .customer-result-item.highlighted {
-        background-color: var(--primary-glow);
-        color: var(--primary);
-    }
+        .customer-result-item:hover,
+        .customer-result-item.highlighted {
+            background-color: var(--primary-glow);
+            color: var(--primary);
+        }
 
-    .customer-result-item .cust-name {
-        font-weight: 600;
-        display: block;
-    }
+        .customer-result-item .cust-name {
+            font-weight: 600;
+            display: block;
+        }
 
-    .customer-result-item .cust-details {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
+        .customer-result-item .cust-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
-    /* Thermal Receipt Styles - Spices_pos Exact Match */
+    /* ===================== RECEIPT STYLES ===================== */
     #thermalReceipt {
         display: none;
-        width: 80mm;
-        padding: 4mm;
-        background: white;
+        width: 190mm;
+        padding: 8mm 10mm;
         font-family: 'Verdana', sans-serif;
         color: black;
-        line-height: 1.3;
+        box-sizing: border-box;
     }
 
-    /* Receipt Printing Styles - Match Image 1 Exactly */
+    /* === SALE: Shop Header === */
+    .sale-shop-header {
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+        .sale-shop-header h1 {
+            font-size: 26pt;
+            font-weight: 900;
+            margin: 0 0 3px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sale-shop-header .sub-info {
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+    /* === RETURN: top banner === */
+    .return-top-banner {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11pt;
+        font-weight: 900;
+        border-top: 2.5pt solid black;
+        padding-top: 7px;
+        margin-bottom: 3px;
+    }
+
+    /* === RETURN: Shop Header === */
+    .return-shop-header {
+        text-align: center;
+        margin-bottom: 12px;
+        border-top: 2pt solid black;
+        padding-top: 10px;
+    }
+
+        .return-shop-header h1 {
+            font-size: 26pt;
+            font-weight: 900;
+            margin: 0 0 3px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .return-shop-header .sub-info {
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+    /* === META (Cashier / Customer) === */
+    .receipt-meta-line {
+        font-size: 13pt;
+        font-weight: 900;
+        margin: 4px 0;
+    }
+
+    /* === PRODUCT TABLE === */
+    .receipt-table-v3 {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        border-top: 2.5pt solid black;
+        border-bottom: 2.5pt solid black;
+    }
+
+        .receipt-table-v3 th {
+            font-size: 13pt;
+            font-weight: 900;
+            padding: 9px 5px;
+            text-transform: uppercase;
+        }
+
+        .receipt-table-v3 td {
+            font-size: 13pt;
+            font-weight: bold;
+            padding: 7px 5px;
+        }
+
+    /* === TOTALS === */
+    .receipt-totals {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .receipt-totals-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13pt;
+        font-weight: 900;
+        padding: 5px 0;
+    }
+
+    /* === FOOTER === */
+    .receipt-footer {
+        margin-top: 18px;
+        text-align: center;
+        clear: both;
+    }
+
+    .receipt-footer-line {
+        border-top: 1.5pt solid black;
+        margin: 8px 0;
+    }
+
+    .receipt-footer-thankyou {
+        font-size: 18pt;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin: 10px 0;
+    }
+
+    .receipt-footer-promo {
+        font-size: 11pt;
+        font-weight: bold;
+        margin: 7px 0;
+    }
+
+    .receipt-footer-copy {
+        font-size: 9pt;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    /* === SALE BOTTOM === */
+    .sale-bottom-section {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .sale-bottom-section .order-info {
+            font-size: 12pt;
+            font-weight: 900;
+            line-height: 1.7;
+        }
+
+    /* === PRINT === */
     @@media print {
         @@page {
             size: A4;
-            margin: 10mm;
+            margin: 8mm;
         }
+
         html, body {
             margin: 0 !important;
             padding: 0 !important;
-            width: 100% !important;
             background: #fff !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: flex-start !important;
         }
-        .pos-container-v2, .modal-overlay, header, footer, nav, .quick-actions-v2, .btn-pay-v2, button {
+
+        .pos-container-v2, .modal-overlay,
+        header, footer, nav,
+        .quick-actions-v2, .btn-pay-v2, button {
             display: none !important;
         }
+
         #thermalReceipt {
             display: block !important;
-            width: 185mm !important; /* Wide layout to match Pic 1 on A4 */
-            margin: 5mm auto !important;
-            padding: 10mm !important;
+            width: 190mm !important;
+            margin: 0 auto !important;
+            padding: 8mm 10mm !important;
             box-sizing: border-box !important;
             background: white !important;
             font-family: 'Verdana', sans-serif !important;
             color: black !important;
             border: none !important;
         }
-        #thermalReceipt * {
-            visibility: visible !important;
-        }
-    }
 
-    /* Receipt Styling - Refined for Pic 1 Scale */
-    #thermalReceipt {
-        display: none;
-        width: 185mm;
-        padding: 10mm;
-        font-family: 'Verdana', sans-serif;
-        color: black;
+            #thermalReceipt * {
+                visibility: visible !important;
+            }
     }
-
-    .receipt-top-banner {
-        border-top: 2pt solid black;
-        margin-bottom: 5px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 13pt;
-        font-weight: 900;
-        padding-top: 8px;
-    }
-
-    .shop-info-block {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .shop-info-block h1 {
-        margin: 10px 0;
-        font-size: 32pt;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .shop-info-block .sub-info {
-        font-size: 18pt;
-        font-weight: bold;
-        margin: 4px 0;
-    }
-
-    .shop-line-bottom {
-        border-top: 2pt solid black;
-        margin: 15px 0;
-    }
-
-    .meta-line {
-        font-size: 15pt;
-        font-weight: 900;
-        margin: 6px 0;
-        text-align: left;
-    }
-
-    .receipt-table-v3 {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        border-top: 2.5pt solid black;
-        border-bottom: 2.5pt solid black;
-    }
-
-    .receipt-table-v3 th {
-        font-size: 15pt;
-        font-weight: 900;
-        padding: 12px 0;
-        text-transform: uppercase;
-    }
-
-    .receipt-table-v3 td {
-        font-size: 15pt;
-        font-weight: bold;
-        padding: 10px 0;
-    }
-
-    .totals-area {
-        float: right;
-        width: 100%;
-        max-width: 450px;
-        font-size: 16pt;
-        font-weight: 900;
-        margin-top: 20px;
-    }
-
-    .totals-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .footer-section {
-        margin-top: 40px;
-        text-align: center;
-        clear: both;
-    }
-
-    .footer-line {
-        border-top: 1.5pt solid black;
-        margin: 10px 0;
-    }
-
-    .footer-msg {
-        font-size: 20pt;
-        font-weight: 900;
-        margin: 15px 0;
-        text-transform: uppercase;
-    }
-
-    .footer-promo {
-        font-size: 15pt;
-        font-weight: bold;
-        margin: 15px 0;
-    }
-
-    .footer-copy {
-        font-size: 10pt;
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-
-    .text-center { text-align: center; }
-    .text-right { text-align: right; }
-    .text-left { text-align: left; }
 </style>
 
 <div class="pos-container-v2">
-    <!-- Center: Product Discovery -->
     <div class="product-canvas">
         <div class="canvas-header">
             <div class="canvas-header-top">
                 <h3 class="canvas-title">Sales Transaction</h3>
-
                 <div class="search-bar-v2">
                     <i class="ph-magnifying-glass search-icon"></i>
                     <input type="text" id="prodSearch" class="search-input" placeholder="Scan or enter barcode..." oninput="filterProducts()">
                 </div>
-                
                 <div class="mode-toggle-v2 compact">
                     <div class="toggle-pill">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
@@ -295,21 +313,12 @@
                         <label for="searchBarcode">Barcode</label>
                     </div>
                 </div>
-
-                <!-- Quick Actions Toolbar -->
                 <div class="quick-actions-v2">
-                    <button type="button" class="btn-action-round" onclick="reloadPage()" title="Refresh">
-                        <i class="ph-arrows-clockwise"></i>
-                    </button>
-                    <button type="button" class="btn-action-round" onclick="toggleFullScreen()" title="Full Screen">
-                        <i class="ph-corners-out"></i>
-                    </button>
-                    <a href="/Home/Index" class="btn-action-round back" title="Back to Dashboard">
-                        <i class="ph-arrow-left"></i>
-                    </a>
+                    <button type="button" class="btn-action-round" onclick="reloadPage()" title="Refresh"><i class="ph-arrows-clockwise"></i></button>
+                    <button type="button" class="btn-action-round" onclick="toggleFullScreen()" title="Full Screen"><i class="ph-corners-out"></i></button>
+                    <a href="/Home/Index" class="btn-action-round back" title="Back to Dashboard"><i class="ph-arrow-left"></i></a>
                 </div>
             </div>
-
             <div class="category-tabs-v2">
                 <div class="tab-item active" onclick="filterByCategory('all', this)">All</div>
                 <div class="tab-item" onclick="filterByCategory('Foods', this)">Products</div>
@@ -317,17 +326,14 @@
             </div>
         </div>
 
-
         <div class="product-grid-v2" id="productGrid">
             @if (products != null)
-
             {
                 foreach (var p in products)
                 {
                     decimal stockValue = 0;
                     string unitLabel = "";
                     bool isService = false;
-
                     if (!string.IsNullOrEmpty(p.qty_unit_type))
                     {
                         var match = System.Text.RegularExpressions.Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
@@ -335,39 +341,20 @@
                         {
                             decimal.TryParse(match.Groups[1].Value, out stockValue);
                             unitLabel = match.Groups[2].Value.Trim();
-                            if (!string.IsNullOrEmpty(unitLabel))
-                            {
-                                isService = true;
-                                stockValue = 999999;
-                            }
+                            if (!string.IsNullOrEmpty(unitLabel)) { isService = true; stockValue = 999999; }
                         }
-                        else
-                        {
-                            isService = true;
-                            // Set high stock value for services so they can be added without restriction
-                            stockValue = 999999; 
-                        }
+                        else { isService = true; stockValue = 999999; }
                     }
-                    else 
-                    {
-                        // No qty_unit_type means unlimited/service
-                        isService = true;
-                        stockValue = 999999;
-                    }
+                    else { isService = true; stockValue = 999999; }
 
-                    <div class="product-card-v2" 
-                         data-id="@p.id"
-                         data-name="@p.prod_name_service" 
+                    <div class="product-card-v2"
+                         data-id="@p.id" data-name="@p.prod_name_service"
                          data-search-name="@p.prod_name_service.ToLower()"
-                         data-barcode="@(p.barcode ?? "")" 
-                         data-price="@p.price"
+                         data-barcode="@(p.barcode ?? "")" data-price="@p.price"
                          data-discount="@p.discount"
                          data-expiry="@(p.expiry_date?.ToString("yyyy-MM-dd") ?? "")"
-                         data-stock="@stockValue" 
-                         data-type="@(isService ? "service" : "product")"
-                         data-image="@(p.image ?? "")"
-                         onclick="addToSaleFromCard(this)">
-                        
+                         data-stock="@stockValue" data-type="@(isService ? "service" : "product")"
+                         data-image="@(p.image ?? "")" onclick="addToSaleFromCard(this)">
                         <div class="card-image">
                             @if (!string.IsNullOrEmpty(p.image))
                             {
@@ -375,9 +362,8 @@
                             }
                             else
                             {
-                                <div class="image-placeholder">
-                                    <i class="@(isService ? "ph-wrench" : "ph-cube-transparent")" style="font-size: 3rem; color: #cbd5e1;"></i>
-                                </div>
+
+                                <div class="image-placeholder"><i class="@(isService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i></div>
                             }
                         </div>
                         <div class="card-info">
@@ -391,31 +377,26 @@
                             </div>
                         </div>
                     </div>
-
                 }
             }
         </div>
     </div>
 
-    <!-- Right: Checkout Center -->
     <div class="checkout-center">
         <form asp-action="Create" method="post" id="saleForm" class="checkout-form">
             @Html.AntiForgeryToken()
             <input type="hidden" name="payment_method" id="hiddenPaymentMethod" value="Cash" />
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
-            
+
             <div class="checkout-header">
-                <div class="return-warning-banner">
-                    <i class="ph-warning"></i> RETURN MODE ACTIVE
-                </div>
+                <div class="return-warning-banner"><i class="ph-warning"></i> RETURN MODE ACTIVE</div>
                 <div class="checkout-header-main">
                     <div>
                         <h3 class="order-detail-title">Order Detail</h3>
                         <div id="itemCountDisplay" class="item-count-badge">0 items selected</div>
                     </div>
-                    
                     <div class="checkout-header-actions">
-                         <div class="mode-toggle-v2 compact">
+                        <div class="mode-toggle-v2 compact">
                             <div class="toggle-pill">
                                 <input type="radio" id="modeSale" name="transMode" value="sale" checked onchange="handleModeChange()">
                                 <label for="modeSale">Sale</label>
@@ -423,9 +404,7 @@
                                 <label for="modeReturn">Return</label>
                             </div>
                         </div>
-                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order">
-                            <i class="ph-trash"></i>
-                        </button>
+                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order"><i class="ph-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -437,20 +416,14 @@
                         <input type="text" id="customerSearchInput" class="customer-search-input" placeholder="Search Customer..." autocomplete="off" />
                         <input type="hidden" name="customer_name" id="customerSelect" required />
                     </div>
-                    <div id="customerResults" class="customer-dropdown-results shadow-luxury">
-                        <!-- Results will be populated by JS -->
-                    </div>
+                    <div id="customerResults" class="customer-dropdown-results shadow-luxury"></div>
                 </div>
                 <button type="button" onclick="triggerCustomerModalV2(event)" title="Add New Customer" class="btn-add-customer">
-                    <i class="ph-plus"></i>
-                    <span>Add Customer</span>
+                    <i class="ph-plus"></i><span>Add Customer</span>
                 </button>
             </div>
 
-            <div class="checkout-items-v2" id="saleItemsBody">
-                <!-- Items populated by JS -->
-            </div>
-
+            <div class="checkout-items-v2" id="saleItemsBody"></div>
             <div id="emptyStateV2" class="empty-state-v2">
                 <div class="empty-glow"></div>
                 <i class="ph-shopping-cart-simple"></i>
@@ -459,71 +432,40 @@
 
             <div class="checkout-footer-v2">
                 <div class="price-summary-v2">
-                    <div class="summary-line">
-                        <span>Subtotal</span>
-                        <span id="subtotalDisplay">$0.00</span>
-                    </div>
-                    <div class="summary-line" style="color: var(--success);">
-                        <span>Discount </span>
-                        <span id="discountDisplay">$0.00</span>
-                    </div>
-
-                
-                    
-                    <div id="stockAlert" class="alert-v2" style="display: none;">
-                        <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
-                    </div>
-
+                    <div class="summary-line"><span>Subtotal</span><span id="subtotalDisplay">$0.00</span></div>
+                    <div class="summary-line" style="color:var(--success);"><span>Discount</span><span id="discountDisplay">$0.00</span></div>
+                    <div id="stockAlert" class="alert-v2" style="display:none;"><i class="ph-warning"></i> <span id="stockAlertMsg"></span></div>
                     <div class="grand-total-row">
                         <div class="total-label">Grand Total</div>
                         <div class="total-value" id="grandTotal">$0.00</div>
                     </div>
                 </div>
-
                 <div id="hiddenInputsContainer"></div>
-
-                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
-                    <i class="ph-credit-card"></i>
-                    Payment
-                </button>
-
+                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()"><i class="ph-credit-card"></i> Payment</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modern Web Payment Modal -->
+<!-- Payment Modal -->
 <div class="modal-overlay" id="paymentModal">
     <div class="payment-card">
-        <!-- Left Side: Payment Input -->
         <div class="payment-left">
             <h1 class="payment-title">Checkout</h1>
             <p class="payment-subtitle">Complete your transaction by selecting a payment method.</p>
-            
             <div class="method-tabs">
-                <div class="method-tab active" id="btnCash" onclick="setWebPaymentMethod('Cash')">
-                    <i class="ph-money"></i> <span>Cash</span>
-                </div>
-                <div class="method-tab" id="btnCard" onclick="setWebPaymentMethod('Card')">
-                    <i class="ph-credit-card"></i> <span>Card</span>
-                </div>
-                <div class="method-tab" id="btnTransfer" onclick="setWebPaymentMethod('Transfer')">
-                    <i class="ph-bank"></i> <span>Bank</span>
-                </div>
-                <div class="method-tab" id="btnCredit" onclick="setWebPaymentMethod('Credit')">
-                    <i class="ph-user-focus"></i> <span>Credit</span>
-                </div>
+                <div class="method-tab active" id="btnCash" onclick="setWebPaymentMethod('Cash')"><i class="ph-money"></i> <span>Cash</span></div>
+                <div class="method-tab" id="btnCard" onclick="setWebPaymentMethod('Card')"><i class="ph-credit-card"></i> <span>Card</span></div>
+                <div class="method-tab" id="btnTransfer" onclick="setWebPaymentMethod('Transfer')"><i class="ph-bank"></i> <span>Bank</span></div>
+                <div class="method-tab" id="btnCredit" onclick="setWebPaymentMethod('Credit')"><i class="ph-user-focus"></i> <span>Credit</span></div>
             </div>
-
             <div class="web-input-group">
                 <label>Amount Tendered</label>
                 <input type="number" id="webTendered" class="web-input" placeholder="0.00" oninput="calculateWebChange()" step="0.01">
-                
                 <div class="quick-pills">
                     <div class="quick-pill" onclick="addWebAmount(10)">+ $10</div>
                     <div class="quick-pill" onclick="addWebAmount(20)">+ $20</div>
                     <div class="quick-pill" onclick="addWebAmount(50)">+ $50</div>
-
                     <div class="quick-pill" onclick="addWebAmount(100)">+ $100</div>
                     <div class="quick-pill" onclick="addWebAmount(500)">+ $500</div>
                     <div class="quick-pill" onclick="addWebAmount(1000)">+ $1000</div>
@@ -531,41 +473,30 @@
                     <div class="quick-pill" onclick="matchWebAmount()">Match Total</div>
                 </div>
             </div>
-
             <div class="web-input-group">
                 <label>Reference / Note</label>
                 <input type="text" name="notes" class="web-input" placeholder="Transaction notes (optional)">
             </div>
         </div>
-
-        <!-- Right Side: Summary & Confirm -->
         <div class="payment-right">
             <div class="summary-box-web">
                 <div class="summary-web-line">
-                    <span style="color: var(--text-muted); font-weight: 600;">Total Amount Due</span>
-                    <span id="webModalTotal" style="font-weight: 700;">$0.00</span>
+                    <span style="color:var(--text-muted);font-weight:600;">Total Amount Due</span>
+                    <span id="webModalTotal" style="font-weight:700;">$0.00</span>
                 </div>
-                <div class="summary-web-line" style="margin-top: 8px;">
-                    <span style="color: var(--text-muted); font-weight: 600;">Total Tendered</span>
-                    <span id="webModalTendered" style="font-weight: 700;">$0.00</span>
+                <div class="summary-web-line" style="margin-top:8px;">
+                    <span style="color:var(--text-muted);font-weight:600;">Total Tendered</span>
+                    <span id="webModalTendered" style="font-weight:700;">$0.00</span>
                 </div>
-                
-                <div class="summary-web-line grand">
-                    <span>Change Due</span>
-                    <span id="webModalChange">$0.00</span>
-                </div>
+                <div class="summary-web-line grand"><span>Change Due</span><span id="webModalChange">$0.00</span></div>
             </div>
-
-            <div style="margin-top: auto;">
-                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 24px; line-height: 1.5;">
+            <div style="margin-top:auto;">
+                <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.5;">
                     By completing this order, you agree to generate an official invoice and update stock levels.
                 </p>
-                
-                <div style="display: flex; gap: 16px;">
-                    <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closePaymentModal()">Cancel</button>
-                    <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="askToPrintReceipt()">
-                        Complete Order <i class="ph-check-circle"></i>
-                    </button>
+                <div style="display:flex;gap:16px;">
+                    <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="closePaymentModal()">Cancel</button>
+                    <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="askToPrintReceipt()">Complete Order <i class="ph-check-circle"></i></button>
                 </div>
             </div>
         </div>
@@ -574,25 +505,14 @@
 
 <!-- Custom Item Modal -->
 <div class="modal-overlay" id="customItemModal">
-    <div class="payment-card" style="max-width: 500px; width: 90%; align-items: stretch; flex-direction: column;">
-        <div style="padding: 32px;">
-            <h2 style="margin: 0 0 24px 0; color: var(--text-main); font-size: 1.5rem;">Add Custom Item</h2>
-            
-            <div class="web-input-group">
-                <label>Item Name / Description</label>
-                <input type="text" id="customName" class="web-input" placeholder="e.g. Delivery Charge">
-            </div>
-
-            <div class="web-input-group">
-                <label>Price</label>
-                <input type="number" id="customPrice" class="web-input" placeholder="0.00" step="0.01">
-            </div>
-
-            <div style="display: flex; gap: 16px; margin-top: 32px;">
-                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="closeCustomItemModal()">Cancel</button>
-                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="addCustomItem()">
-                    Add to Order
-                </button>
+    <div class="payment-card" style="max-width:500px;width:90%;align-items:stretch;flex-direction:column;">
+        <div style="padding:32px;">
+            <h2 style="margin:0 0 24px 0;color:var(--text-main);font-size:1.5rem;">Add Custom Item</h2>
+            <div class="web-input-group"><label>Item Name / Description</label><input type="text" id="customName" class="web-input" placeholder="e.g. Delivery Charge"></div>
+            <div class="web-input-group"><label>Price</label><input type="number" id="customPrice" class="web-input" placeholder="0.00" step="0.01"></div>
+            <div style="display:flex;gap:16px;margin-top:32px;">
+                <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="closeCustomItemModal()">Cancel</button>
+                <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="addCustomItem()">Add to Order</button>
             </div>
         </div>
     </div>
@@ -600,57 +520,24 @@
 
 <!-- Add Customer Modal -->
 <div class="modal-overlay" id="customerModal">
-    <div class="payment-card" style="max-width: 900px; width: 95%; align-items: stretch; flex-direction: column; overflow-y: auto; max-height: 90vh; padding: 40px;">
+    <div class="payment-card" style="max-width:900px;width:95%;align-items:stretch;flex-direction:column;overflow-y:auto;max-height:90vh;padding:40px;">
         <div class="dashboard-panel">
             <div class="page-header">
                 <h1 class="page-title-large">Add New Customer</h1>
-                <button type="button" class="btn-secondary" onclick="closeCustomerModal()">
-                    <i class="ph-arrow-left"></i> Back
-                </button>
+                <button type="button" class="btn-secondary" onclick="closeCustomerModal()"><i class="ph-arrow-left"></i> Back</button>
             </div>
-
             <div class="form-wrapper form-layout-left-wide">
-                <!-- Combined Information -->
                 <div class="form-section">
-                    <div class="form-section-header">
-                        <h3 class="form-section-title">
-                            <i class="ph-users form-icon-primary"></i>
-                            Customer Information
-                        </h3>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" id="newCustName" class="form-control" placeholder="Enter customer's full name" required />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Contact Number</label>
-                        <input type="text" id="newCustContact" class="form-control" placeholder="Enter contact number" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" id="newCustEmail" class="form-control" placeholder="Enter email address" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Address</label>
-                        <textarea id="newCustAddress" class="form-control" rows="3" placeholder="Enter physical address"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select id="newCustStatus" class="form-control">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
+                    <div class="form-section-header"><h3 class="form-section-title"><i class="ph-users form-icon-primary"></i> Customer Information</h3></div>
+                    <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="newCustName" class="form-control" placeholder="Enter customer's full name" required /></div>
+                    <div class="form-group"><label class="form-label">Contact Number</label><input type="text" id="newCustContact" class="form-control" placeholder="Enter contact number" /></div>
+                    <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="newCustEmail" class="form-control" placeholder="Enter email address" /></div>
+                    <div class="form-group"><label class="form-label">Address</label><textarea id="newCustAddress" class="form-control" rows="3" placeholder="Enter physical address"></textarea></div>
+                    <div class="form-group"><label class="form-label">Status</label><select id="newCustStatus" class="form-control"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
                 </div>
-
                 <div class="form-actions-sticky">
-                    <button type="button" class="btn-secondary" onclick="closeCustomerModal()">
-                        Cancel
-                    </button>
-                    <button type="button" class="btn-primary" onclick="saveCustomerAjax()">
-                        <i class="ph-check"></i>
-                        Save Customer
-                    </button>
+                    <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Cancel</button>
+                    <button type="button" class="btn-primary" onclick="saveCustomerAjax()"><i class="ph-check"></i> Save Customer</button>
                 </div>
             </div>
         </div>
@@ -658,150 +545,136 @@
 </div>
 
 <!-- Print Confirmation Modal -->
-<div class="modal-overlay" id="printConfirmModal" style="z-index: 2000;">
-    <div class="payment-card" style="max-width: 400px; width: 90%; align-items: stretch; flex-direction: column;">
-        <div style="padding: 32px; text-align: center;">
-            <div style="margin-bottom: 24px;">
-                <i class="ph-printer" style="font-size: 4rem; color: var(--primary);"></i>
-            </div>
-            <h2 style="margin: 0 0 12px 0; color: var(--text-main); font-size: 1.5rem;">Print Receipt?</h2>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Would you like to print the receipt for this transaction?</p>
-            
-            <div style="display: flex; gap: 16px;">
-                <button type="button" class="btn-confirm-web" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); flex: 1;" onclick="processFinalSubmission(false)">No</button>
-                <button type="button" class="btn-confirm-web" style="flex: 2; background: var(--primary); color: white;" onclick="processFinalSubmission(true)">
-                    Yes, Print <i class="ph-printer"></i>
-                </button>
+<div class="modal-overlay" id="printConfirmModal" style="z-index:2000;">
+    <div class="payment-card" style="max-width:400px;width:90%;align-items:stretch;flex-direction:column;">
+        <div style="padding:32px;text-align:center;">
+            <div style="margin-bottom:24px;"><i class="ph-printer" style="font-size:4rem;color:var(--primary);"></i></div>
+            <h2 style="margin:0 0 12px 0;color:var(--text-main);font-size:1.5rem;">Print Receipt?</h2>
+            <p style="color:var(--text-muted);margin-bottom:32px;">Would you like to print the receipt for this transaction?</p>
+            <div style="display:flex;gap:16px;">
+                <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="processFinalSubmission(false)">No</button>
+                <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="processFinalSubmission(true)">Yes, Print <i class="ph-printer"></i></button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Hidden Receipt Structure - Refined to Match Image -->
+<!-- ===================== RECEIPT HTML ===================== -->
 <div id="thermalReceipt">
-    <div class="receipt-top-banner">
-        <span id="receiptDate">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
-        <span id="receiptOrderNo">ORDER: SALE_NEW</span>
-    </div>
-    
-    <div class="shop-info-block">
-        <h1 id="receiptShopTitle">THE SATA INVOICE</h1>
-        <div class="sub-info">@ViewBag.SellerAddress</div>
-        <div class="sub-info">@ViewBag.SellerContact</div>
-        <div class="shop-line-bottom"></div>
+
+    <!-- RETURN ONLY: top banner -->
+    <div id="returnTopBanner" class="return-top-banner" style="display:none;">
+        <span id="receiptReturnDate"></span>
+        <span id="receiptReturnOrderNo"></span>
     </div>
 
-    <div class="meta-line">Cashier: @(User.Identity.Name ?? "nill")</div>
-    <div class="meta-line">Customer: <span id="receiptCustomerName">Walk-In</span></div>
+    <!-- SALE: shop header -->
+    <div id="saleShopHeader" class="sale-shop-header">
+        <h1>THE SATA POS</h1>
+        <div class="sub-info">@ViewBag.SellerAddress</div>
+        <div class="sub-info">@ViewBag.SellerContact</div>
+    </div>
+
+    <!-- RETURN: shop header -->
+    <div id="returnShopHeader" class="return-shop-header" style="display:none;">
+        <h1>THE SATA POS</h1>
+        <div class="sub-info">@ViewBag.SellerAddress</div>
+        <div class="sub-info">@ViewBag.SellerContact</div>
+    </div>
+
+    <div class="receipt-meta-line">Cashier: @(User.Identity.Name ?? "nill")</div>
+    <div class="receipt-meta-line">Customer: <span id="receiptCustomerName">Walk-In</span></div>
 
     <table class="receipt-table-v3">
         <thead>
             <tr>
-                <th class="text-left" style="width: 40%;">PRODUCT</th>
-                <th class="text-center" style="width: 15%;">QTY</th>
-                <th class="text-center" style="width: 20%;">PRICE</th>
-                <th class="text-right" style="width: 25%;">AMOUNT</th>
+                <th style="text-align:left;width:44%;">PRODUCT</th>
+                <th style="text-align:center;width:14%;">QTY</th>
+                <th style="text-align:center;width:21%;">PRICE</th>
+                <th style="text-align:right;width:21%;">AMOUNT</th>
             </tr>
         </thead>
-        <tbody id="receiptItemsBody">
-            <!-- items populated via JS -->
-        </tbody>
+        <tbody id="receiptItemsBody"></tbody>
     </table>
 
-    <div class="totals-area">
-        <div class="totals-row">
-            <span>TOTAL</span>
-            <span id="receiptTotalVal">$2500</span>
-        </div>
-        <div class="totals-row">
-            <span>AMOUNT DUE</span>
-            <span id="receiptDueVal">$2500</span>
-        </div>
-        <div class="totals-row">
-            <span>CASH</span>
-            <span id="receiptTenderedVal">$2500</span>
-        </div>
-        <div class="totals-row">
-            <span>PAY TYPE</span>
-            <span id="receiptPayType">Cash</span>
-        </div>
+    <!-- SALE totals -->
+    <div id="saleTotals" class="receipt-totals">
+        <div class="receipt-totals-row"><span>SUB TOTAL</span><span id="receiptSubTotalVal">$0</span></div>
+        <div class="receipt-totals-row"><span>TOTAL</span><span id="receiptTotalVal">$0</span></div>
+        <div class="receipt-totals-row"><span>AMOUNT DUE</span><span id="receiptDueVal">$0</span></div>
+        <div class="receipt-totals-row"><span>CASH SALE</span><span id="receiptTenderedVal">$0</span></div>
+        <div class="receipt-totals-row"><span>PAY TYPE</span><span id="receiptPayType">Cash</span></div>
     </div>
 
-    <div class="footer-section">
-        <div class="footer-line"></div>
-        <div class="footer-msg">THANK YOU!</div>
-        <div class="footer-line"></div>
-        <div class="footer-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
-        <div class="footer-line"></div>
-        <div class="footer-copy">Copyrights 2023, Powered by The SATA POS</div>
-        <div class="footer-line"></div>
+    <!-- RETURN totals -->
+    <div id="returnTotals" class="receipt-totals" style="display:none;">
+        <div class="receipt-totals-row"><span>TOTAL</span><span id="receiptReturnTotalVal">$0</span></div>
+        <div class="receipt-totals-row"><span>AMOUNT DUE</span><span id="receiptReturnDueVal">$0</span></div>
+        <div class="receipt-totals-row"><span>CASH</span><span id="receiptReturnTenderedVal">$0</span></div>
+        <div class="receipt-totals-row"><span>PAY TYPE</span><span id="receiptReturnPayType">Cash</span></div>
     </div>
+
+    <!-- Footer -->
+    <div class="receipt-footer">
+        <div class="receipt-footer-line"></div>
+        <div class="receipt-footer-thankyou">THANK YOU!</div>
+        <div class="receipt-footer-line"></div>
+        <div class="receipt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
+        <div class="receipt-footer-line"></div>
+        <div class="receipt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
+        <div class="receipt-footer-line"></div>
+    </div>
+
+    <!-- SALE ONLY: order + barcode -->
+    <div id="saleBottomSection" class="sale-bottom-section" style="display:none;">
+        <div class="order-info">
+            <div id="saleBottomOrderNo"></div>
+            <div id="saleBottomDate" style="margin-top:4px;"></div>
+        </div>
+        <svg id="receiptBarcodeSvg"></svg>
+    </div>
+
 </div>
-
+<!-- ===================== END RECEIPT ===================== -->
 
 <script>
-    // Global State
     let saleItems = [];
     let currentTotal = 0;
-    let searchMode = 'barcode'; 
+    let searchMode = 'barcode';
 
-    // Utility
     const format = (v) => (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
     function toggleFullScreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else if (document.exitFullscreen) document.exitFullscreen();
     }
 
     function reloadPage() {
-        if (saleItems.length > 0) {
-            if (confirm("Cart contains items. Reload and lose changes?")) {
-                window.location.reload();
-            }
-        } else {
-            window.location.reload();
-        }
+        if (saleItems.length > 0) { if (confirm("Cart contains items. Reload and lose changes?")) window.location.reload(); }
+        else window.location.reload();
     }
 
-    // Modal Controls
     function openCustomItemModal() {
         document.getElementById('customName').value = '';
         document.getElementById('customPrice').value = '';
         document.getElementById('customItemModal').classList.add('show');
         document.getElementById('customName').focus();
     }
-
-    function closeCustomItemModal() {
-        document.getElementById('customItemModal').classList.remove('show');
-    }
+    function closeCustomItemModal() { document.getElementById('customItemModal').classList.remove('show'); }
 
     function triggerCustomerModalV2(e) {
         if (e) e.preventDefault();
-        document.getElementById('newCustName').value = '';
-        document.getElementById('newCustContact').value = '';
-        document.getElementById('newCustEmail').value = '';
-        document.getElementById('newCustAddress').value = '';
+        ['newCustName','newCustContact','newCustEmail','newCustAddress'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('customerModal').classList.add('show');
         document.getElementById('newCustName').focus();
     }
+    function closeCustomerModal() { document.getElementById('customerModal').classList.remove('show'); }
 
-    function closeCustomerModal() {
-        document.getElementById('customerModal').classList.remove('show');
-    }
-
-    // Modal Actions
     function addCustomItem() {
         const name = document.getElementById('customName').value.trim();
         const price = parseFloat(document.getElementById('customPrice').value);
-
         if (!name) return alert("Please enter item name");
         if (isNaN(price) || price < 0) return alert("Please enter a valid price");
-
         addItemToSale(0, name, price, 0, null, null, 999999, null);
         closeCustomItemModal();
     }
@@ -812,76 +685,42 @@
         const email = document.getElementById('newCustEmail').value.trim();
         const address = document.getElementById('newCustAddress').value.trim();
         const status = document.getElementById('newCustStatus').value;
-
         if (!name) return alert("Customer name is required.");
-
         try {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
             const response = await fetch('/Customer/CreateAjax', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
                 body: JSON.stringify({ name, contact, email, address, status })
             });
             const data = await response.json();
-            if (data.success) {
-                // Update local list for search
-                allCustomers.push({ name: data.name, contact: contact, email: email });
-                
-                // Update new searchable dropdown
-                selectCustomer(data.name);
-                
-                closeCustomerModal();
-            } else {
-                alert("Error saving customer: " + (data.message || "Unknown error"));
-            }
-        } catch (err) {
-            console.error(err);
-            alert("An error occurred while saving the customer.");
-        }
+            if (data.success) { allCustomers.push({ name: data.name, contact, email }); selectCustomer(data.name); closeCustomerModal(); }
+            else alert("Error saving customer: " + (data.message || "Unknown error"));
+        } catch (err) { console.error(err); alert("An error occurred while saving the customer."); }
     }
 
-    // Filtering & Searching
     function handleSearchModeChange() {
         searchMode = document.querySelector('input[name="searchMode"]:checked').value;
         const input = document.getElementById('prodSearch');
         input.placeholder = searchMode === 'name' ? "Search by product name..." : "Scan or enter barcode...";
-        input.value = '';
-        filterProducts();
-        input.focus();
+        input.value = ''; filterProducts(); input.focus();
     }
 
     function filterProducts() {
         const query = document.getElementById('prodSearch').value.toLowerCase();
-        const cards = document.querySelectorAll('.product-card-v2');
-
-        cards.forEach(card => {
-            const name = (card.getAttribute('data-name') || card.dataset.searchName || "").toLowerCase();
-            const barcode = (card.getAttribute('data-barcode') || card.dataset.barcode || "").toLowerCase();
-            
-            if (!query) {
-                card.style.display = 'flex';
-                return;
-            }
-
-            if (searchMode === 'barcode') {
-                card.style.display = barcode.includes(query) ? 'flex' : 'none';
-            } else {
-                card.style.display = name.includes(query) ? 'flex' : 'none';
-            }
+        document.querySelectorAll('.product-card-v2').forEach(card => {
+            const name = (card.getAttribute('data-name') || "").toLowerCase();
+            const barcode = (card.getAttribute('data-barcode') || "").toLowerCase();
+            if (!query) { card.style.display = 'flex'; return; }
+            card.style.display = (searchMode === 'barcode' ? barcode : name).includes(query) ? 'flex' : 'none';
         });
     }
 
     function filterByCategory(cat, btn) {
         document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
         if (btn) btn.classList.add('active');
-        else if (event && event.currentTarget) event.currentTarget.classList.add('active');
-        
-        const cards = document.querySelectorAll('.product-card-v2');
-        cards.forEach(card => {
-            const type = card.getAttribute('data-type') || card.dataset.type;
+        document.querySelectorAll('.product-card-v2').forEach(card => {
+            const type = card.getAttribute('data-type');
             if (cat === 'all') card.style.display = 'flex';
             else if (cat === 'Foods' && type === 'product') card.style.display = 'flex';
             else if (cat === 'Beverages' && type === 'service') card.style.display = 'flex';
@@ -889,29 +728,14 @@
         });
     }
 
-    // Cart Logic
     function addToSaleFromCard(card) {
-        const id = card.dataset.id;
-        const name = card.dataset.name;
-        const price = parseFloat(card.dataset.price);
-        const discount = parseFloat(card.dataset.discount);
-        const expiry = card.dataset.expiry || null;
-        const barcode = card.dataset.barcode || null;
-        const maxStock = parseFloat(card.dataset.stock);
-        const image = card.dataset.image || null;
-
-        addItemToSale(id, name, price, discount, expiry, barcode, maxStock, image);
+        addItemToSale(card.dataset.id, card.dataset.name, parseFloat(card.dataset.price),
+            parseFloat(card.dataset.discount), card.dataset.expiry || null,
+            card.dataset.barcode || null, parseFloat(card.dataset.stock), card.dataset.image || null);
     }
 
     async function addItemToSale(id, name, price, discount, expiry, barcode, maxStock, image) {
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
-        const customerName = document.getElementById('customerSelect').value;
-
-        if (isReturn) {
-            // No customer validation needed - allow returns freely
-        }
-
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         const qtyToAdd = isReturn ? -1 : 1;
         const existing = saleItems.find(i => i.prod_name_service === name);
         if (existing) {
@@ -921,17 +745,7 @@
             existing.total_price = (existing.price * existing.qty) - (existing.discount * existing.qty);
         } else {
             if (!isReturn && qtyToAdd > maxStock) return showStockAlert(`Insufficient stock (${maxStock}).`);
-            saleItems.push({
-                prod_name_service: name,
-                barcode: barcode || null,
-                qty: qtyToAdd,
-                price: price,
-                discount: discount,
-                expiry_date: expiry || null,
-                maxStock: maxStock,
-                image: image || null,
-                total_price: (price * qtyToAdd) - (discount * qtyToAdd)
-            });
+            saleItems.push({ prod_name_service: name, barcode: barcode||null, qty: qtyToAdd, price, discount, expiry_date: expiry||null, maxStock, image: image||null, total_price: (price*qtyToAdd)-(discount*qtyToAdd) });
         }
         renderSaleItems();
     }
@@ -940,50 +754,34 @@
         const body = document.getElementById('saleItemsBody');
         const empty = document.getElementById('emptyStateV2');
         const hiddenContainer = document.getElementById('hiddenInputsContainer');
-        const subtotalSpan = document.getElementById('subtotalDisplay');
-        const discountSpan = document.getElementById('discountDisplay');
-        const grandTotalSpan = document.getElementById('grandTotal');
         const countDisplay = document.getElementById('itemCountDisplay');
 
-        body.innerHTML = "";
-        hiddenContainer.innerHTML = "";
+        body.innerHTML = ""; hiddenContainer.innerHTML = "";
         countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
 
         if (saleItems.length === 0) {
-            empty.style.display = "flex";
-            body.style.display = "none";
-            subtotalSpan.innerText = "$0.00";
-            discountSpan.innerText = "$0.00";
-            grandTotalSpan.innerText = "$0.00";
-            currentTotal = 0;
-            return;
+            empty.style.display = "flex"; body.style.display = "none";
+            document.getElementById('subtotalDisplay').innerText = "$0.00";
+            document.getElementById('discountDisplay').innerText = "$0.00";
+            document.getElementById('grandTotal').innerText = "$0.00";
+            currentTotal = 0; return;
         }
-        empty.style.display = "none";
-        body.style.display = "flex";
+        empty.style.display = "none"; body.style.display = "flex";
 
         let totalSub = 0, totalDisc = 0, totalBase = 0;
-
         saleItems.forEach((item, index) => {
             const lineSub = item.price * item.qty;
             const lineDisc = item.discount * item.qty;
             const lineTotal = lineSub - lineDisc;
-
-            totalSub += lineSub;
-            totalDisc += lineDisc;
-            totalBase += lineTotal;
+            totalSub += lineSub; totalDisc += lineDisc; totalBase += lineTotal;
 
             const div = document.createElement('div');
             div.className = "item-v2";
             div.innerHTML = `
-                <div class="item-v2-img">
-                    ${item.image ? `<img src="/product-images/${item.image}" />` : `<i class="ph-package" style="font-size:1.5rem; color:#cbd5e1;"></i>`}
-                </div>
+                <div class="item-v2-img">${item.image ? `<img src="/product-images/${item.image}" />` : `<i class="ph-package" style="font-size:1.5rem;color:#cbd5e1;"></i>`}</div>
                 <div class="item-v2-info">
                     <div class="title">${item.prod_name_service}</div>
-                    <div class="price-input-container">
-                        <span>$</span>
-                        <input type="number" step="0.01" class="manual-price-input" value="${item.price.toFixed(2)}" onchange="updateItemPrice(${index}, this.value)">
-                    </div>
+                    <div class="price-input-container"><span>$</span><input type="number" step="0.01" class="manual-price-input" value="${item.price.toFixed(2)}" onchange="updateItemPrice(${index}, this.value)"></div>
                 </div>
                 <div class="item-v2-controls">
                     <div class="qty-stepper">
@@ -992,9 +790,7 @@
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
                 </div>
-                <div class="item-total-info">
-                    <div class="price-sub">${format(lineTotal)}</div>
-                </div>
+                <div class="item-total-info"><div class="price-sub">${format(lineTotal)}</div></div>
                 <i class="ph-trash btn-remove-item" onclick="removeItem(${index})"></i>
             `;
             body.appendChild(div);
@@ -1011,23 +807,18 @@
             `;
         });
 
-        const finalTotal = totalBase;
-        currentTotal = finalTotal;
-
-        subtotalSpan.innerText = format(totalSub);
-        discountSpan.innerText = "" + format(totalDisc);
-        grandTotalSpan.innerText = format(finalTotal);
+        currentTotal = totalBase;
+        document.getElementById('subtotalDisplay').innerText = format(totalSub);
+        document.getElementById('discountDisplay').innerText = format(totalDisc);
+        document.getElementById('grandTotal').innerText = format(totalBase);
     }
 
     async function increaseQty(index) {
         const item = saleItems[index];
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
-
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn) {
-            const customerName = document.getElementById('customerSelect').value;
-            const validation = await validateReturnEligibility(customerName, item.prod_name_service);
-            if (Math.abs(item.qty - 1) > validation.purchasedQty) return showStockAlert("Max returnable reached.");
+            const v = await validateReturnEligibility(item.prod_name_service);
+            if (Math.abs(item.qty - 1) > v.purchasedQty) return showStockAlert("Max returnable reached.");
             item.qty--;
         } else {
             if (item.qty >= item.maxStock) return showStockAlert("Max stock reached.");
@@ -1040,75 +831,41 @@
     function decreaseQtyBtn(index) {
         const item = saleItems[index];
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
-        if (isReturn) item.qty++;
-        else item.qty--;
-
+        if (isReturn) item.qty++; else item.qty--;
         if (item.qty === 0) removeItem(index);
-        else {
-            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-            renderSaleItems();
-        }
+        else { item.total_price = (item.price * item.qty) - (item.discount * item.qty); renderSaleItems(); }
     }
 
-    function removeItem(index) {
-        saleItems.splice(index, 1);
-        renderSaleItems();
-    }
+    function removeItem(index) { saleItems.splice(index, 1); renderSaleItems(); }
 
     function updateItemPrice(index, value) {
-        let val = parseFloat(value);
-        if (isNaN(val) || val < 0) val = 0;
+        let val = parseFloat(value); if (isNaN(val) || val < 0) val = 0;
         saleItems[index].price = val;
         saleItems[index].total_price = (val * saleItems[index].qty) - (saleItems[index].discount * saleItems[index].qty);
         renderSaleItems();
     }
 
     async function updateItemQty(index, value) {
-        let val = parseInt(value, 10);
-        if (isNaN(val)) val = 1;
-        
+        let val = parseInt(value, 10); if (isNaN(val)) val = 1;
         const item = saleItems[index];
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
-
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn) {
-            // Force negative
             val = -Math.abs(val);
-            if (val === 0) {
-                 removeItem(index);
-                 return;
-            }
-            const customerName = document.getElementById('customerSelect').value;
-            if (customerName) {
-                const validation = await validateReturnEligibility(customerName, item.prod_name_service);
-                if (Math.abs(val) > validation.purchasedQty) { 
-                    showStockAlert("Max returnable reached.");
-                    val = -validation.purchasedQty;
-                }
-            }
+            if (val === 0) { removeItem(index); return; }
+            const v = await validateReturnEligibility(item.prod_name_service);
+            if (Math.abs(val) > v.purchasedQty) { showStockAlert("Max returnable reached."); val = -v.purchasedQty; }
         } else {
-            // Force positive
             val = Math.abs(val);
-            if (val === 0) {
-                 removeItem(index);
-                 return;
-            }
-            if (val > item.maxStock) {
-                showStockAlert("Max stock reached.");
-                val = item.maxStock;
-            }
+            if (val === 0) { removeItem(index); return; }
+            if (val > item.maxStock) { showStockAlert("Max stock reached."); val = item.maxStock; }
         }
-
         item.qty = val;
         item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         renderSaleItems();
     }
 
     function clearSaleItems() {
-        if (saleItems.length > 0 && confirm("Clear current order?")) {
-            saleItems = [];
-            renderSaleItems();
-        }
+        if (saleItems.length > 0 && confirm("Clear current order?")) { saleItems = []; renderSaleItems(); }
     }
 
     function showStockAlert(msg) {
@@ -1118,58 +875,35 @@
         setTimeout(() => el.style.display = 'none', 4000);
     }
 
-    // Handlers
     async function handleModeChange() {
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
-        
-        if (isReturn) {
-            // Convert existing items to negative qty for returns
-            saleItems.forEach(item => {
-                const absQty = Math.abs(item.qty);
-                item.qty = -absQty;
-                item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-            });
-        } else {
-            // Converting back to Sale mode
-            saleItems.forEach(item => {
-                const absQty = Math.abs(item.qty);
-                item.qty = absQty;
-                item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-            });
-        }
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
+        saleItems.forEach(item => {
+            const absQty = Math.abs(item.qty);
+            item.qty = isReturn ? -absQty : absQty;
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+        });
         renderSaleItems();
     }
 
     async function handleCustomerChange() {
         const customerName = document.getElementById('customerSelect').value;
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
-
         if (isReturn && customerName) {
             try {
                 const res = await fetch(`/Sale/CheckAnyPurchaseHistory`);
                 const data = await res.json();
-                if (!data.hasAnyHistory) {
-                    showStockAlert("Customer has no active purchases.");
-                    saleItems = [];
-                    renderSaleItems();
-                    return;
-                }
+                if (!data.hasAnyHistory) { showStockAlert("Customer has no active purchases."); saleItems = []; renderSaleItems(); return; }
             } catch (e) { console.error(e); }
-
-            // Filter items that customer has actually purchased
             const filteredItems = [];
             for (const item of saleItems) {
-                const validation = await validateReturnEligibility(item.prod_name_service);
-                if (validation.eligible) {
-                    const absQty = Math.abs(item.qty);
-                    item.qty = -Math.min(absQty, validation.purchasedQty);
+                const v = await validateReturnEligibility(item.prod_name_service);
+                if (v.eligible) {
+                    item.qty = -Math.min(Math.abs(item.qty), v.purchasedQty);
                     item.total_price = (item.price * item.qty) - (item.discount * item.qty);
                     filteredItems.push(item);
                 }
             }
-            saleItems = filteredItems;
-            renderSaleItems();
+            saleItems = filteredItems; renderSaleItems();
         }
     }
 
@@ -1182,7 +916,6 @@
         } catch (e) { return { eligible: true, purchasedQty: 999999 }; }
     }
 
-    // Payment Modal
     function openPaymentModal() {
         if (saleItems.length === 0) return alert("Cart is empty.");
         document.getElementById('webModalTotal').innerText = format(Math.abs(currentTotal));
@@ -1190,22 +923,18 @@
         calculateWebChange();
         document.getElementById('paymentModal').classList.add('show');
     }
-
-    function closePaymentModal() {
-        document.getElementById('paymentModal').classList.remove('show');
-    }
+    function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
 
     function setWebPaymentMethod(method) {
         document.getElementById('hiddenPaymentMethod').value = method;
-        document.getElementById('hiddenStatus').value = (method === 'Credit') ? 'Pending' : 'Paid';
+        document.getElementById('hiddenStatus').value = method === 'Credit' ? 'Pending' : 'Paid';
         document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
         if (event && event.currentTarget) event.currentTarget.classList.add('active');
     }
 
     function calculateWebChange() {
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        const absTotal = Math.abs(currentTotal);
-        const change = tendered - absTotal;
+        const change = tendered - Math.abs(currentTotal);
         document.getElementById('webModalTendered').innerText = format(tendered);
         document.getElementById('webModalChange').innerText = format(change);
     }
@@ -1215,92 +944,181 @@
         el.value = (parseFloat(el.value || 0) + amt).toFixed(2);
         calculateWebChange();
     }
-
-    function matchWebAmount() {
-        document.getElementById('webTendered').value = Math.abs(currentTotal).toFixed(2);
-        calculateWebChange();
-    }
+    function matchWebAmount() { document.getElementById('webTendered').value = Math.abs(currentTotal).toFixed(2); calculateWebChange(); }
 
     function submitSaleForm() {
         const method = document.getElementById('hiddenPaymentMethod').value;
         const tenderedInput = document.getElementById('webTendered').value;
         const tendered = parseFloat(tenderedInput);
-
-        if (tenderedInput === "" || isNaN(tendered)) {
-            return alert("Please enter the amount tendered.");
-        }
-        if (tendered <= 0) {
-            return alert("Amount tendered must be greater than zero.");
-        }
-        if (method !== 'Credit' && tendered < Math.abs(currentTotal)) {
-            return alert("Amount tendered is less than the grand total.");
-        }
-
-        // Show print confirmation
+        if (!tenderedInput || isNaN(tendered)) return alert("Please enter the amount tendered.");
+        if (tendered <= 0) return alert("Amount tendered must be greater than zero.");
+        if (method !== 'Credit' && tendered < Math.abs(currentTotal)) return alert("Amount tendered is less than the grand total.");
         document.getElementById('printConfirmModal').classList.add('show');
     }
-
-    function askToPrintReceipt() {
-        submitSaleForm();
-    }
+    function askToPrintReceipt() { submitSaleForm(); }
 
     function processFinalSubmission(shouldPrint) {
-        if (shouldPrint) {
-            prepareReceiptData();
-            window.print();
-        }
+        if (shouldPrint) { prepareReceiptData(); window.print(); }
         document.getElementById('saleForm').submit();
     }
 
+    // ── RECEIPT DATA PREPARATION ──
     function prepareReceiptData() {
-        const mode = document.querySelector('input[name="transMode"]:checked').value;
-        const isReturn = mode === 'return';
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         const customerName = document.getElementById('customerSearchInput').value || "Walk-In";
         const payMethod = document.getElementById('hiddenPaymentMethod').value || "Cash";
-        
         const netAmount = Math.abs(currentTotal);
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
+        const fv = (v) => '$' + (v % 1 === 0 ? v.toString() : v.toFixed(2));
+        const fmtVal = (v) => v % 1 === 0 ? v.toString() : v.toFixed(2);
 
-        // Custom format: match image (whole or decimal)
-        const formatVal = (v) => v % 1 === 0 ? v.toString() : v.toFixed(2);
-        const formatWithCurrency = (v) => '$' + formatVal(v);
-
-        // Date in format: M/D/YYYY H:MM:SS AM/PM
         const now = new Date();
-        document.getElementById('receiptDate').innerText = now.toLocaleString('en-US', { 
-            month: 'numeric', day: 'numeric', year: 'numeric', 
-            hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true 
-        });
+        const dateStr = now.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+        const orderId = isReturn ? "RETURN_" + Math.floor(Math.random() * 10) : "SALE_" + Math.floor(Math.random() * 1000);
 
-        const orderId = isReturn ? "RETURN_" + Math.floor(Math.random() * 10) : "SAL_" + Math.floor(Math.random() * 1000); 
-        document.getElementById('receiptOrderNo').innerText = `ORDER: ${orderId}`;
-        
-        // Ensure formatting matches
-        const shopTitle = document.getElementById('receiptShopTitle');
-        if (shopTitle) shopTitle.innerText = "THE SATA INVOICE";
         document.getElementById('receiptCustomerName').innerText = customerName;
-        
-        document.getElementById('receiptTotalVal').innerText = formatWithCurrency(netAmount);
-        document.getElementById('receiptDueVal').innerText = formatWithCurrency(netAmount);
-        document.getElementById('receiptTenderedVal').innerText = formatWithCurrency(tendered);
-        document.getElementById('receiptPayType').innerText = payMethod;
+
+        if (isReturn) {
+            document.getElementById('returnTopBanner').style.display = 'flex';
+            document.getElementById('receiptReturnDate').innerText = dateStr;
+            document.getElementById('receiptReturnOrderNo').innerText = 'ORDER: ' + orderId;
+            document.getElementById('saleShopHeader').style.display = 'none';
+            document.getElementById('returnShopHeader').style.display = 'block';
+            document.getElementById('saleTotals').style.display = 'none';
+            document.getElementById('returnTotals').style.display = 'block';
+            document.getElementById('saleBottomSection').style.display = 'none';
+            document.getElementById('receiptReturnTotalVal').innerText = fv(netAmount);
+            document.getElementById('receiptReturnDueVal').innerText = fv(netAmount);
+            document.getElementById('receiptReturnTenderedVal').innerText = fv(tendered);
+            document.getElementById('receiptReturnPayType').innerText = payMethod;
+        } else {
+            document.getElementById('returnTopBanner').style.display = 'none';
+            document.getElementById('saleShopHeader').style.display = 'block';
+            document.getElementById('returnShopHeader').style.display = 'none';
+            document.getElementById('saleTotals').style.display = 'block';
+            document.getElementById('returnTotals').style.display = 'none';
+            document.getElementById('saleBottomSection').style.display = 'flex';
+
+            let subTotal = 0;
+            saleItems.forEach(item => { subTotal += item.price * Math.abs(item.qty); });
+
+            document.getElementById('receiptSubTotalVal').innerText = fv(subTotal);
+            document.getElementById('receiptTotalVal').innerText = fv(netAmount);
+            document.getElementById('receiptDueVal').innerText = fv(netAmount);
+            document.getElementById('receiptTenderedVal').innerText = fv(tendered);
+            document.getElementById('receiptPayType').innerText = payMethod;
+            document.getElementById('saleBottomOrderNo').innerText = 'ORDER: ' + orderId;
+            document.getElementById('saleBottomDate').innerText = dateStr;
+            generateCode128SVG('receiptBarcodeSvg', orderId);
+        }
 
         const itemsBody = document.getElementById('receiptItemsBody');
         itemsBody.innerHTML = "";
-
         saleItems.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="text-left">${item.prod_name_service}</td>
-                <td class="text-center">${Math.abs(item.qty)}</td>
-                <td class="text-center">${formatVal(item.price)}</td>
-                <td class="text-right">${formatVal(Math.abs(item.total_price))}</td>
+                <td style="text-align:left;">${item.prod_name_service}</td>
+                <td style="text-align:center;">${Math.abs(item.qty)}</td>
+                <td style="text-align:center;">${fmtVal(item.price)}</td>
+                <td style="text-align:right;">${fmtVal(Math.abs(item.total_price))}</td>
             `;
             itemsBody.appendChild(row);
         });
     }
 
-    // Custom Searchable Dropdown Logic
+    // ── REAL Code128B Barcode (fully scannable) ──
+    function generateCode128SVG(svgId, text) {
+        const svg = document.getElementById(svgId);
+        if (!svg) return;
+        svg.innerHTML = '';
+
+        // Full Code128B pattern table (index = ASCII - 32, value = 11-bit pattern)
+        const CODE128B_PATTERNS = [
+            '11011001100','11001101100','11001100110','10010011000','10010001100',
+            '10001001100','10011001000','10011000100','10001100100','11001001000',
+            '11001000100','11000100100','10110011100','10011011100','10011001110',
+            '10111001100','10011101100','11001110010','11001011100','11001001110',
+            '11011100100','11001110100','11101101110','11101001100','11100101100',
+            '11100100110','11101100100','11100110100','11100110010','11011011000',
+            '11011000110','11000110110','10100011000','10001011000','10001000110',
+            '10110001000','10001101000','10001100010','11010001000','11000101000',
+            '11000100010','10110111000','10110001110','10001101110','10111011000',
+            '10111000110','10001110110','11101110100','11010001110','11000101110',
+            '11011101000','11011100010','11011101110','11101011000','11101000110',
+            '11100010110','11101101000','11101100010','11100011010','11101111010',
+            '11001000010','11110001010','10100110000','10100001100','10010110000',
+            '10010000110','10000101100','10000100110','10110010000','10110000100',
+            '10011010000','10011000010','10000110100','10000110010','11000010010',
+            '11001010000','11110111010','11000010100','10001111010','10100111100',
+            '10010111100','10010011110','10111100100','10011110100','10011110010',
+            '11110100100','11110010100','11110010010','11011011110','11011110110',
+            '11110110110','10101111000','10100011110','10001011110','10111101000',
+            '10111100010'
+        ];
+
+        const START_B  = '11010000100'; // Start Code B
+        const STOP     = '11000111010'; // Stop
+        const START_B_VAL = 104;        // checksum seed for Start B
+
+        // Build bit string
+        let bits = START_B;
+        let checksum = START_B_VAL;
+
+        for (let i = 0; i < text.length; i++) {
+            const code = text.charCodeAt(i);
+            const val = code - 32; // Code128B: space=0 ... ~=94
+            if (val < 0 || val >= CODE128B_PATTERNS.length) continue;
+            bits += CODE128B_PATTERNS[val];
+            checksum += val * (i + 1);
+        }
+
+        // Append check character
+        const checkVal = checksum % 103;
+        bits += CODE128B_PATTERNS[checkVal];
+        bits += STOP;
+        // Termination bar (always 1 module wide)
+        bits += '1';
+
+        // Render
+        const moduleW = 2.5;
+        const barH    = 60;
+        const textH   = 16;
+        const totalW  = bits.length * moduleW;
+        const totalH  = barH + textH;
+
+        svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+        svg.setAttribute('width', totalW);
+        svg.setAttribute('height', totalH);
+        svg.style.display = 'block';
+
+        // Draw bars (1 = black, 0 = white space)
+        for (let i = 0; i < bits.length; i++) {
+            if (bits[i] === '1') {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', i * moduleW);
+                rect.setAttribute('y', 0);
+                rect.setAttribute('width', moduleW);
+                rect.setAttribute('height', barH);
+                rect.setAttribute('fill', '#000000');
+                svg.appendChild(rect);
+            }
+        }
+
+        // Human-readable text below
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', totalW / 2);
+        t.setAttribute('y', barH + 12);
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('font-size', '11');
+        t.setAttribute('font-family', 'Verdana, sans-serif');
+        t.setAttribute('font-weight', 'bold');
+        t.setAttribute('fill', '#000000');
+        t.setAttribute('letter-spacing', '1');
+        t.textContent = text;
+        svg.appendChild(t);
+    }
+
+    // ── Customer Dropdown ──
     const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact, email = c.email })));
     let highlightedIndex = -1;
 
@@ -1308,52 +1126,27 @@
     const resultsContainer = document.getElementById('customerResults');
     const hiddenInput = document.getElementById('customerSelect');
 
-    searchInput.addEventListener('focus', () => {
-        filterCustomerResults();
-    });
-
-    searchInput.addEventListener('input', () => {
-        filterCustomerResults();
-    });
-
+    searchInput.addEventListener('focus', () => filterCustomerResults());
+    searchInput.addEventListener('input', () => filterCustomerResults());
     searchInput.addEventListener('keydown', (e) => {
         const items = resultsContainer.querySelectorAll('.customer-result-item');
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
-            updateHighlight(items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            highlightedIndex = Math.max(highlightedIndex - 1, 0);
-            updateHighlight(items);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (highlightedIndex >= 0 && items[highlightedIndex]) {
-                items[highlightedIndex].click();
-            }
-        } else if (e.key === 'Escape') {
-            hideResults();
-        }
+        if (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0); updateHighlight(items); }
+        else if (e.key === 'Enter') { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
+        else if (e.key === 'Escape') hideResults();
     });
 
     function filterCustomerResults() {
         const query = searchInput.value.toLowerCase();
         resultsContainer.innerHTML = "";
-        const filtered = allCustomers.filter(c => 
-            c.name.toLowerCase().includes(query) || 
-            (c.contact && c.contact.includes(query))
-        );
-
+        const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(query) || (c.contact && c.contact.includes(query)));
         if (filtered.length === 0) {
-            resultsContainer.innerHTML = `<div class="customer-result-item" style="cursor: default; color: var(--text-muted);">No customers found</div>`;
+            resultsContainer.innerHTML = `<div class="customer-result-item" style="cursor:default;color:var(--text-muted);">No customers found</div>`;
         } else {
-            filtered.forEach((c, idx) => {
+            filtered.forEach(c => {
                 const div = document.createElement('div');
                 div.className = "customer-result-item";
-                div.innerHTML = `
-                    <span class="cust-name">${c.name}</span>
-                    ${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}
-                `;
+                div.innerHTML = `<span class="cust-name">${c.name}</span>${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
                 div.onclick = () => selectCustomer(c.name);
                 resultsContainer.appendChild(div);
             });
@@ -1364,39 +1157,21 @@
 
     function updateHighlight(items) {
         items.forEach((item, idx) => {
-            if (idx === highlightedIndex) {
-                item.classList.add('highlighted');
-                item.scrollIntoView({ block: 'nearest' });
-            } else {
-                item.classList.remove('highlighted');
-            }
+            if (idx === highlightedIndex) { item.classList.add('highlighted'); item.scrollIntoView({ block: 'nearest' }); }
+            else item.classList.remove('highlighted');
         });
     }
 
-    function selectCustomer(name) {
-        searchInput.value = name;
-        hiddenInput.value = name;
-        hideResults();
-        handleCustomerChange();
-    }
+    function selectCustomer(name) { searchInput.value = name; hiddenInput.value = name; hideResults(); handleCustomerChange(); }
+    function hideResults() { resultsContainer.classList.remove('show'); }
 
-    function hideResults() {
-        resultsContainer.classList.remove('show');
-    }
-
-    // Close dropdown on outside click
     document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
-            hideResults();
-        }
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) hideResults();
     });
 
-    $(document).ready(function() {
-        // Any other initializations
-    });
+    $(document).ready(function () { });
 </script>
 
-<!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 @section Scripts {
