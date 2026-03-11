@@ -48,7 +48,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE SATA INVOICE - Receipt</title>
     <style>
-        /* ===== THERMAL RECEIPT STYLES - EXACT MATCH ===== */
+        /* ===== THERMAL RECEIPT STYLES - Pic 1 Exact Match ===== */
         * {
             margin: 0;
             padding: 0;
@@ -63,6 +63,7 @@
             min-height: 100vh;
             padding: 20px;
             font-family: 'Verdana', sans-serif;
+            font-weight: 900;
         }
 
         /* Print button (hidden on print) */
@@ -76,7 +77,7 @@
             padding: 12px 28px;
             font-family: 'Verdana', sans-serif;
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 900;
             cursor: pointer;
             letter-spacing: 1px;
             z-index: 999;
@@ -89,50 +90,49 @@
             background: white;
             font-family: 'Verdana', sans-serif;
             color: black;
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         /* ===== TOP BANNER: Date left, Order# right ===== */
         .receipt-top-banner {
-            border-top: 2pt solid black;
             margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
-            font-size: 13pt;
+            font-size: 14pt;
             font-weight: 900;
-            padding-top: 8px;
+            padding: 5px 0;
         }
 
         /* ===== SHOP INFO BLOCK ===== */
         .shop-info-block {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .shop-info-block h1 {
-            margin: 10px 0;
-            font-size: 32pt;
+            margin: 5px 0;
+            font-size: 34pt;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         .shop-info-block .sub-info {
-            font-size: 18pt;
-            font-weight: bold;
-            margin: 4px 0;
+            font-size: 20pt;
+            font-weight: 900;
+            margin: 2px 0;
         }
 
-        .shop-line-bottom {
-            border-top: 2pt solid black;
-            margin: 15px 0;
+        .line-divider {
+            border-top: 2.5pt solid black;
+            margin: 10px 0;
         }
 
         /* ===== META LINES: Cashier, Customer ===== */
         .meta-line {
-            font-size: 15pt;
+            font-size: 17pt;
             font-weight: 900;
-            margin: 6px 0;
+            margin: 4px 0;
             text-align: left;
         }
 
@@ -140,69 +140,69 @@
         .receipt-table-v3 {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 15px 0;
             border-top: 2.5pt solid black;
             border-bottom: 2.5pt solid black;
         }
 
         .receipt-table-v3 th {
-            font-size: 15pt;
+            font-size: 17pt;
             font-weight: 900;
-            padding: 12px 0;
+            padding: 10px 0;
             text-transform: uppercase;
         }
 
         .receipt-table-v3 td {
-            font-size: 15pt;
-            font-weight: bold;
-            padding: 10px 0;
+            font-size: 17pt;
+            font-weight: 900;
+            padding: 8px 0;
         }
 
         /* ===== TOTALS AREA ===== */
         .totals-area {
-            float: right;
             width: 100%;
-            max-width: 450px;
-            font-size: 16pt;
+            font-size: 18pt;
             font-weight: 900;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .totals-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            padding-left: 20%; /* Align labels more towards the middle-right like Pic 1 */
         }
 
         /* ===== FOOTER ===== */
         .footer-section {
-            margin-top: 40px;
+            margin-top: 20px;
             text-align: center;
             clear: both;
         }
 
         .footer-line {
-            border-top: 1.5pt solid black;
-            margin: 10px 0;
+            border-top: 2pt solid black;
+            margin: 8px 0;
         }
 
         .footer-msg {
-            font-size: 20pt;
+            font-size: 22pt;
             font-weight: 900;
-            margin: 15px 0;
+            margin: 10px 0;
             text-transform: uppercase;
         }
 
         .footer-promo {
-            font-size: 15pt;
-            font-weight: bold;
-            margin: 15px 0;
+            font-size: 16pt;
+            font-weight: 900;
+            margin: 12px 0;
         }
 
         .footer-copy {
-            font-size: 10pt;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 11pt;
+            font-weight: 900;
+            margin: 8px 0;
+            text-transform: uppercase;
         }
 
         .text-center { text-align: center; }
@@ -210,10 +210,10 @@
         .text-left   { text-align: left; }
 
         /* ===== PRINT STYLES ===== */
-        @media print {
-            @page {
+        @@media print {
+            @@page {
                 size: A4;
-                margin: 10mm;
+                margin: 0;
             }
 
             html, body {
@@ -233,7 +233,7 @@
             #thermalReceipt {
                 display: block !important;
                 width: 185mm !important;
-                margin: 5mm auto !important;
+                margin: 0 auto !important;
                 padding: 10mm !important;
                 box-sizing: border-box !important;
                 background: white !important;
@@ -257,7 +257,7 @@
 
         <!-- Top Banner -->
         <div class="receipt-top-banner">
-            <span id="receiptDate">@Model.date.ToString("M/d/yyyy h:mm:ss tt")</span>
+            <span id="receiptDate">@Model.date.ToString("M/d/yyyy h:mm:ss tt").ToUpper()</span>
             <span id="receiptOrderNo">ORDER: @(Model.invoice_no ?? Model.id.ToString())</span>
         </div>
 
@@ -266,25 +266,22 @@
             <h1 id="receiptShopTitle">@Model.seller_name</h1>
             <div class="sub-info">@Model.seller_address</div>
             <div class="sub-info">@Model.seller_contact</div>
-            <div class="shop-line-bottom"></div>
         </div>
 
+        <div class="line-divider"></div>
+
         <!-- Meta -->
-        @if (Model.status == "Returned")
-        {
-            <div class="meta-line" style="text-align: center; color: red; font-size: 24pt; margin-bottom: 15px;">** RETURN RECEIPT **</div>
-        }
-        <div class="meta-line">Cashier: Admin</div>
+        <div class="meta-line">Cashier: nill</div>
         <div class="meta-line">Customer: <span id="receiptCustomerName">@(string.IsNullOrEmpty(Model.customer_name) ? "Walk-In" : Model.customer_name)</span></div>
 
         <!-- Items Table -->
         <table class="receipt-table-v3">
             <thead>
                 <tr>
-                    <th class="text-left"  style="width: 40%;">PRODUCT</th>
+                    <th class="text-left"  style="width: 45%;">PRODUCT</th>
                     <th class="text-center" style="width: 15%;">QTY</th>
                     <th class="text-center" style="width: 20%;">PRICE</th>
-                    <th class="text-right"  style="width: 25%;">AMOUNT</th>
+                    <th class="text-right"  style="width: 20%;">AMOUNT</th>
                 </tr>
             </thead>
             <tbody id="receiptItemsBody">
@@ -295,8 +292,8 @@
                         <tr>
                             <td class="text-left">@item["name"]</td>
                             <td class="text-center">@item["qty"]</td>
-                            <td class="text-center">@(((decimal)item["price"]).ToString("N2"))</td>
-                            <td class="text-right">@(((decimal)item["total"]).ToString("N2"))</td>
+                            <td class="text-center">@(((decimal)item["price"]).ToString("0"))</td>
+                            <td class="text-right">@(((decimal)item["total"]).ToString("0"))</td>
                         </tr>
                     }
                 }
@@ -305,8 +302,8 @@
                     <tr>
                         <td class="text-left">@Model.prod_name_service</td>
                         <td class="text-center">@Model.qty_unit_type</td>
-                        <td class="text-center">@Model.price.ToString("N2")</td>
-                        <td class="text-right">@((Model.price - Model.discount).ToString("N2"))</td>
+                        <td class="text-center">@Model.price.ToString("0")</td>
+                        <td class="text-right">@((Model.price - Model.discount).ToString("0"))</td>
                     </tr>
                 }
             </tbody>
@@ -316,15 +313,15 @@
         <div class="totals-area">
             <div class="totals-row">
                 <span>TOTAL</span>
-                <span id="receiptTotalVal">$@totalAmount.ToString("N2")</span>
+                <span id="receiptTotalVal">$@totalAmount.ToString("0")</span>
             </div>
             <div class="totals-row">
                 <span>AMOUNT DUE</span>
-                <span id="receiptDueVal">$@((Model.status == "Paid") ? "0.00" : totalAmount.ToString("N2"))</span>
+                <span id="receiptDueVal">$@(totalAmount.ToString("0"))</span>
             </div>
             <div class="totals-row">
                 <span>CASH</span>
-                <span id="receiptTenderedVal">$@totalAmount.ToString("N2")</span>
+                <span id="receiptTenderedVal">$@totalAmount.ToString("0")</span>
             </div>
             <div class="totals-row">
                 <span>PAY TYPE</span>
@@ -332,9 +329,10 @@
             </div>
         </div>
 
+        <div class="line-divider" style="margin-top: 5px;"></div>
+
         <!-- Footer -->
         <div class="footer-section">
-            <div class="footer-line"></div>
             <div class="footer-msg">THANK YOU!</div>
             <div class="footer-line"></div>
             <div class="footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
