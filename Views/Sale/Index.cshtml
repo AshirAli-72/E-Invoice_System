@@ -36,7 +36,8 @@
         <table class="styled-table" style="min-width: 1000px;">
             <thead>
                 <tr>
-                    <th style="padding-left: 1.5rem;">Date</th>
+                    <th style="padding-left: 1.5rem;">Bill No</th>
+                    <th>Date</th>
                     <th>Product / Service</th>
                     <th>QTY/Unit Type</th>
                     <th>Price</th>
@@ -53,6 +54,9 @@
                     {
                         <tr>
                             <td style="padding-left: 1.5rem;">
+                                <div class="font-bold font-sm font-monospace">@sale.billNo</div>
+                            </td>
+                            <td>
                                 <div class="font-bold font-sm">@sale.date.ToString("MMM dd, yyyy")</div>
                                 <div class="text-muted font-xs">@sale.date.ToString("hh:mm tt")</div>
                             </td>
@@ -68,7 +72,18 @@
                                 <span class="font-medium font-sm">@sale.payment_method</span>
                             </td>
                             <td class="text-center">
-                                <span class="status-badge status-paid">Paid</span>
+                                @{
+                                    var statusClass = "status-paid";
+                                    var displayStatus = sale.status ?? "Paid";
+                                    
+                                    if (displayStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase)) {
+                                        statusClass = "status-pending";
+                                    } else if (displayStatus.Equals("Returned", StringComparison.OrdinalIgnoreCase) || sale.is_returned) {
+                                        statusClass = "status-inactive";
+                                        displayStatus = "Returned";
+                                    }
+                                }
+                                <span class="status-badge @statusClass">@displayStatus</span>
                             </td>
                             <td style="padding-right: 1.5rem;">
                                 <div class="actions-container actions-center">
@@ -99,7 +114,8 @@
         <table class="styled-table" style="min-width: 1000px;">
             <thead>
                 <tr>
-                    <th style="padding-left: 1.5rem;">Sale ID</th>
+                    <th style="padding-left: 1.5rem;">Bill No</th>
+                    <th>Sale ID</th>
                     <th>Date</th>
                     <th>Product / Service</th>
                     <th>QTY/Unit Type</th>
@@ -116,6 +132,9 @@
                     {
                         <tr>
                             <td style="padding-left: 1.5rem;">
+                                <div class="font-bold font-sm font-monospace">@ret.billNo</div>
+                            </td>
+                            <td>
                                 <div class="font-bold font-sm">#@ret.SaleId</div>
                             </td>
                             <td>

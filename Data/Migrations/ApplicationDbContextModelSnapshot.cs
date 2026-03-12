@@ -85,7 +85,8 @@ namespace E_Invoice_system.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -115,11 +116,17 @@ namespace E_Invoice_system.Migrations
 
                     b.Property<int>("SaleId")
                         .HasColumnType("int")
-                        .HasColumnName("sale_id");
+                        .HasColumnName("sale_id")
+                        .HasColumnOrder(2);
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
+
+                    b.Property<string>("billNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
 
                     b.HasKey("Id");
 
@@ -131,7 +138,8 @@ namespace E_Invoice_system.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
@@ -139,9 +147,15 @@ namespace E_Invoice_system.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("barcode");
 
+                    b.Property<string>("billNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
+
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2")
-                        .HasColumnName("date");
+                        .HasColumnName("date")
+                        .HasColumnOrder(2);
 
                     b.Property<string>("description")
                         .HasColumnType("nvarchar(max)")

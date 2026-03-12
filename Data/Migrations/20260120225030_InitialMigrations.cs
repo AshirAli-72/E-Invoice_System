@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -97,28 +97,28 @@ namespace E_Invoice_system.Migrations
                     table.PrimaryKey("PK_sellers", x => x.id);
                 });
             migrationBuilder.CreateTable(
-               name: "sale_details",
-               columns: table => new
-               {
-                   id = table.Column<int>(type: "int", nullable: false)
-                       .Annotation("SqlServer:Identity", "1, 1"),
-                   customer_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                   date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                   prod_name_service = table.Column<string>(name: "prod_name/service", type: "nvarchar(max)", nullable: true),
-                   barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                   qty_unit_type = table.Column<string>(name: "qty/unit_type", type: "nvarchar(max)", nullable: true),
-                   price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                   discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                   expiry_date = table.Column<decimal>(type: "datetime2", nullable: false),
-                   total_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                   payment_method = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                   description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                   status = table.Column<string>(type: "nvarchar(max)", nullable: true)
-               },
-               constraints: table =>
-               {
-                   table.PrimaryKey("PK_sale_details", x => x.id);
-               });
+                name: "sale_details",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    billNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    prod_name_service = table.Column<string>(name: "prod_name/service", type: "nvarchar(max)", nullable: true),
+                    barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    qty_unit_type = table.Column<string>(name: "qty/unit_type", type: "nvarchar(max)", nullable: true),
+                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    expiry_date = table.Column<decimal>(type: "datetime2", nullable: false),
+                    total_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    payment_method = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sale_details", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "users",

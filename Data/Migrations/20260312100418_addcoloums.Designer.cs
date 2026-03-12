@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Invoice_system.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260309120918_RemoveCustomerNameFromSalesAndReturns")]
-    partial class RemoveCustomerNameFromSalesAndReturns
+    [Migration("20260312100418_addcoloums")]
+    partial class addcoloums
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,7 +88,8 @@ namespace E_Invoice_system.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -124,6 +125,11 @@ namespace E_Invoice_system.Data.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
+                    b.Property<string>("billNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
+
                     b.HasKey("Id");
 
                     b.ToTable("return_details");
@@ -134,13 +140,19 @@ namespace E_Invoice_system.Data.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("barcode")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("barcode");
+
+                    b.Property<string>("billNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2")

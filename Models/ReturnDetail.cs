@@ -7,8 +7,11 @@ namespace E_Invoice_system.Models
     public class ReturnDetail
     {
         [Key]
-        [Column("id")]
+        [Column("id", Order = 0)]
         public int Id { get; set; }
+
+        [Column("billNo", Order = 1)]
+        public string? billNo { get; set; }
 
         [Column("sale_id")]
         public int SaleId { get; set; }

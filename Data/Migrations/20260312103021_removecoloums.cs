@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace E_Invoice_system.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveCustomerNameFromSalesAndReturns : Migration
+    public partial class removecoloums : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

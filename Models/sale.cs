@@ -7,8 +7,11 @@ namespace E_Invoice_system.Models
     public class Sale
     {
         [Key]
-        [Column("id")]
+        [Column("id", Order = 0)]
         public int id { get; set; }
+
+        [Column("billNo", Order = 1)]
+        public string? billNo { get; set; }
 
         [Column("date")]
         public DateTime date { get; set; }

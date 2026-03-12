@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace E_Invoice_system.Migrations
+namespace E_Invoice_system.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260309112655_AddIsReturnedToSale")]
-    partial class AddIsReturnedToSale
+    [Migration("20260312103021_removecoloums")]
+    partial class removecoloums
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,7 +88,8 @@ namespace E_Invoice_system.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -99,10 +100,6 @@ namespace E_Invoice_system.Migrations
                     b.Property<string>("Barcode")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("barcode");
-
-                    b.Property<string>("CustomerName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("customer_name");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
@@ -128,6 +125,11 @@ namespace E_Invoice_system.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
+                    b.Property<string>("billNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
+
                     b.HasKey("Id");
 
                     b.ToTable("return_details");
@@ -138,7 +140,8 @@ namespace E_Invoice_system.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
@@ -146,9 +149,10 @@ namespace E_Invoice_system.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("barcode");
 
-                    b.Property<string>("customer_name")
+                    b.Property<string>("billNo")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("customer_name");
+                        .HasColumnName("billNo")
+                        .HasColumnOrder(1);
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2")

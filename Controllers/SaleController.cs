@@ -56,7 +56,7 @@ namespace E_Invoice_system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string customer_name, string status, string payment_method, string? description, List<Sale> items)
+        public IActionResult Create(string customer_name, string status, string payment_method, string? description, string? billNo, List<Sale> items)
         {
             if (string.IsNullOrWhiteSpace(customer_name))
             {
@@ -151,6 +151,7 @@ namespace E_Invoice_system.Controllers
                             // Create a dedicated return record (mirrors pos_return_accounts + pos_returns_details)
                             returnsToInsert.Add(new ReturnDetail
                             {
+                                billNo = billNo,
                                 SaleId = originalSale.id,
                                 Date = now,
                                 ProdNameService = item.prod_name_service,
@@ -172,6 +173,7 @@ namespace E_Invoice_system.Controllers
                     }
                     else
                     {
+                        item.billNo = billNo;
                         salesToInsert.Add(item);
                     }
 
@@ -310,6 +312,39 @@ namespace E_Invoice_system.Controllers
             });
 
             return Json(new { hasAnyHistory = hasAnyHistory });
+        }
+
+        [HttpGet]
+        public JsonResult GetNextBillNo(string mode)
+        {
+            if (mode == "return")
+            {
+                var maxBill = _context.returns
+                    .Where(r => r.billNo != null && r.billNo.StartsWith("RETURN_"))
+                    .ToList()
+                    .Select(r => 
+                    {
+                        if (int.TryParse(r.billNo.Substring(7), out int n)) return n;
+                        return 0;
+                    })
+                    .DefaultIfEmpty(0)
+                    .Max();
+                return Json(new { billNo = $"RETURN_{maxBill + 1}" });
+            }
+            else
+            {
+                var maxBill = _context.sales
+                    .Where(s => s.billNo != null && s.billNo.StartsWith("SALE_"))
+                    .ToList()
+                    .Select(s => 
+                    {
+                        if (int.TryParse(s.billNo.Substring(5), out int n)) return n;
+                        return 0;
+                    })
+                    .DefaultIfEmpty(0)
+                    .Max();
+                return Json(new { billNo = $"SALE_{maxBill + 1}" });
+            }
         }
 
         [HttpPost]

@@ -1,4 +1,4 @@
-﻿@model E_Invoice_system.Models.Sale
+@model E_Invoice_system.Models.Sale
 @{
     Layout = "_SaleLayout";
     var customers = ViewBag.Customers as List<E_Invoice_system.Models.customers>;
@@ -8,6 +8,7 @@
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+<!-- ===================== RECEIPT STYLES ===================== -->
 <style>
     .return-warning-banner {
         display: none;
@@ -113,150 +114,159 @@
         display: none;
         width: 190mm;
         padding: 8mm 10mm;
-        font-family: 'Verdana', sans-serif;
-        color: black;
+        font-family: 'Courier New', Courier, monospace;
+        color: #000;
         box-sizing: border-box;
+        background: #fff;
     }
 
-    /* === SALE: Shop Header === */
-    .sale-shop-header {
-        text-align: center;
-        margin-bottom: 12px;
-    }
-
-        .sale-shop-header h1 {
-            font-size: 26pt;
-            font-weight: 900;
-            margin: 0 0 3px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sale-shop-header .sub-info {
-            font-size: 13pt;
-            font-weight: bold;
-            margin: 2px 0;
-        }
-
-    /* === RETURN: top banner === */
+    /* === RETURN TOP HEADER LINE (date left, order right) === */
     .return-top-banner {
-        display: flex;
+        display: none;
         justify-content: space-between;
-        font-size: 11pt;
-        font-weight: 900;
-        border-top: 2.5pt solid black;
-        padding-top: 7px;
-        margin-bottom: 3px;
+        align-items: center;
+        font-size: 10pt;
+        font-weight: 700;
+        font-family: 'Courier New', Courier, monospace;
+        padding-bottom: 6px;
+        margin-bottom: 4px;
     }
 
-    /* === RETURN: Shop Header === */
-    .return-shop-header {
+    /* === SHOP HEADER === */
+    .receipt-shop-header {
         text-align: center;
-        margin-bottom: 12px;
-        border-top: 2pt solid black;
-        padding-top: 10px;
+        margin-bottom: 4px;
     }
 
-        .return-shop-header h1 {
-            font-size: 26pt;
+        .receipt-shop-header h1 {
+            font-size: 20pt;
             font-weight: 900;
-            margin: 0 0 3px 0;
+            margin: 0 0 2px 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        .return-shop-header .sub-info {
-            font-size: 13pt;
-            font-weight: bold;
-            margin: 2px 0;
+        .receipt-shop-header .sub-info {
+            font-size: 10pt;
+            font-weight: 700;
+            margin: 1px 0;
+            font-family: 'Courier New', Courier, monospace;
         }
+
+    /* === SEPARATOR LINES === */
+    .rcpt-line-thick {
+        border: none;
+        border-top: 2pt solid #000;
+        margin: 4px 0;
+    }
+
+    .rcpt-line-thin {
+        border: none;
+        border-top: 1pt solid #000;
+        margin: 3px 0;
+    }
 
     /* === META (Cashier / Customer) === */
     .receipt-meta-line {
-        font-size: 13pt;
-        font-weight: 900;
-        margin: 4px 0;
+        font-size: 10pt;
+        font-weight: 700;
+        margin: 2px 0;
+        font-family: 'Courier New', Courier, monospace;
     }
 
     /* === PRODUCT TABLE === */
     .receipt-table-v3 {
         width: 100%;
         border-collapse: collapse;
-        margin: 12px 0;
-        border-top: 2.5pt solid black;
-        border-bottom: 2.5pt solid black;
+        margin: 3px 0;
     }
 
+        .receipt-table-v3 thead tr {
+            border-top: 2pt solid #000;
+            border-bottom: 2pt solid #000;
+        }
+
         .receipt-table-v3 th {
-            font-size: 13pt;
+            font-size: 10pt;
             font-weight: 900;
-            padding: 9px 5px;
+            padding: 5px 3px;
             text-transform: uppercase;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .receipt-table-v3 td {
-            font-size: 13pt;
-            font-weight: bold;
-            padding: 7px 5px;
+            font-size: 10pt;
+            font-weight: 600;
+            padding: 4px 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .receipt-table-v3 tbody tr:last-child td {
+            padding-bottom: 6px;
+        }
+
+        .receipt-table-v3 tfoot tr td {
+            padding: 0;
+            border-top: 2pt solid #000;
         }
 
     /* === TOTALS === */
     .receipt-totals {
         width: 100%;
-        margin-top: 8px;
+        margin-top: 0;
     }
 
     .receipt-totals-row {
         display: flex;
         justify-content: space-between;
-        font-size: 13pt;
-        font-weight: 900;
-        padding: 5px 0;
+        font-size: 10pt;
+        font-weight: 700;
+        padding: 3px 3px;
+        font-family: 'Courier New', Courier, monospace;
     }
 
     /* === FOOTER === */
     .receipt-footer {
-        margin-top: 18px;
+        margin-top: 8px;
         text-align: center;
         clear: both;
-    }
-
-    .receipt-footer-line {
-        border-top: 1.5pt solid black;
-        margin: 8px 0;
+        font-family: 'Courier New', Courier, monospace;
     }
 
     .receipt-footer-thankyou {
-        font-size: 18pt;
+        font-size: 14pt;
         font-weight: 900;
         text-transform: uppercase;
-        margin: 10px 0;
+        margin: 4px 0;
+        letter-spacing: 2px;
     }
 
     .receipt-footer-promo {
-        font-size: 11pt;
-        font-weight: bold;
-        margin: 7px 0;
+        font-size: 9pt;
+        font-weight: 700;
+        margin: 4px 0;
     }
 
     .receipt-footer-copy {
-        font-size: 9pt;
-        font-weight: bold;
-        margin: 5px 0;
+        font-size: 8pt;
+        font-weight: 600;
+        margin: 3px 0;
     }
 
-    /* === SALE BOTTOM === */
+    /* === SALE BOTTOM (order + barcode) — LEFT order, RIGHT barcode === */
     .sale-bottom-section {
-        margin-top: 16px;
+        margin-top: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
         .sale-bottom-section .order-info {
-            font-size: 12pt;
-            font-weight: 900;
-            line-height: 1.7;
+            font-size: 10pt;
+            font-weight: 700;
+            line-height: 1.8;
+            font-family: 'Courier New', Courier, monospace;
         }
 
     /* === PRINT === */
@@ -285,7 +295,6 @@
             padding: 8mm 10mm !important;
             box-sizing: border-box !important;
             background: white !important;
-            font-family: 'Verdana', sans-serif !important;
             color: black !important;
             border: none !important;
         }
@@ -295,7 +304,6 @@
             }
     }
 </style>
-
 <div class="pos-container-v2">
     <div class="product-canvas">
         <div class="canvas-header">
@@ -362,7 +370,6 @@
                             }
                             else
                             {
-
                                 <div class="image-placeholder"><i class="@(isService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i></div>
                             }
                         </div>
@@ -387,6 +394,7 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="payment_method" id="hiddenPaymentMethod" value="Cash" />
             <input type="hidden" name="status" id="hiddenStatus" value="Paid" />
+            <input type="hidden" name="billNo" id="hiddenBillNo" value="" />
 
             <div class="checkout-header">
                 <div class="return-warning-banner"><i class="ph-warning"></i> RETURN MODE ACTIVE</div>
@@ -560,41 +568,47 @@
 </div>
 
 <!-- ===================== RECEIPT HTML ===================== -->
+<!-- ===================== RECEIPT HTML ===================== -->
 <div id="thermalReceipt">
 
-    <!-- RETURN ONLY: top banner -->
-    <div id="returnTopBanner" class="return-top-banner" style="display:none;">
+    <!-- RETURN ONLY: top banner (date left, orderNo right) -->
+    <div id="returnTopBanner" class="return-top-banner">
         <span id="receiptReturnDate"></span>
         <span id="receiptReturnOrderNo"></span>
     </div>
 
-    <!-- SALE: shop header -->
-    <div id="saleShopHeader" class="sale-shop-header">
+    <!-- SALE: shop header (centered) -->
+    <div id="saleShopHeader" class="receipt-shop-header">
         <h1>THE SATA POS</h1>
         <div class="sub-info">@ViewBag.SellerAddress</div>
         <div class="sub-info">@ViewBag.SellerContact</div>
     </div>
 
-    <!-- RETURN: shop header -->
-    <div id="returnShopHeader" class="return-shop-header" style="display:none;">
+    <!-- RETURN: shop header (centered, shown after top banner) -->
+    <div id="returnShopHeader" class="receipt-shop-header" style="display:none;">
         <h1>THE SATA POS</h1>
         <div class="sub-info">@ViewBag.SellerAddress</div>
         <div class="sub-info">@ViewBag.SellerContact</div>
     </div>
+
+    <!-- thin separator under header -->
+    <hr class="rcpt-line-thin" />
 
     <div class="receipt-meta-line">Cashier: @(User.Identity.Name ?? "nill")</div>
     <div class="receipt-meta-line">Customer: <span id="receiptCustomerName">Walk-In</span></div>
 
+    <!-- Product Table -->
     <table class="receipt-table-v3">
         <thead>
             <tr>
-                <th style="text-align:left;width:44%;">PRODUCT</th>
-                <th style="text-align:center;width:14%;">QTY</th>
-                <th style="text-align:center;width:21%;">PRICE</th>
-                <th style="text-align:right;width:21%;">AMOUNT</th>
+                <th style="text-align:left; width:46%;">PRODUCT</th>
+                <th style="text-align:center; width:14%;">QTY</th>
+                <th style="text-align:center; width:20%;">PRICE</th>
+                <th style="text-align:right; width:20%;">AMOUNT</th>
             </tr>
         </thead>
         <tbody id="receiptItemsBody"></tbody>
+        <tfoot><tr><td colspan="4"></td></tr></tfoot>
     </table>
 
     <!-- SALE totals -->
@@ -614,22 +628,22 @@
         <div class="receipt-totals-row"><span>PAY TYPE</span><span id="receiptReturnPayType">Cash</span></div>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer (same for both) -->
     <div class="receipt-footer">
-        <div class="receipt-footer-line"></div>
+        <hr class="rcpt-line-thick" />
         <div class="receipt-footer-thankyou">THANK YOU!</div>
-        <div class="receipt-footer-line"></div>
+        <hr class="rcpt-line-thick" />
         <div class="receipt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
-        <div class="receipt-footer-line"></div>
+        <hr class="rcpt-line-thick" />
         <div class="receipt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
-        <div class="receipt-footer-line"></div>
+        <hr class="rcpt-line-thick" />
     </div>
 
-    <!-- SALE ONLY: order + barcode -->
+    <!-- SALE ONLY: order info left + small barcode right -->
     <div id="saleBottomSection" class="sale-bottom-section" style="display:none;">
         <div class="order-info">
             <div id="saleBottomOrderNo"></div>
-            <div id="saleBottomDate" style="margin-top:4px;"></div>
+            <div id="saleBottomDate" style="margin-top:2px;"></div>
         </div>
         <svg id="receiptBarcodeSvg"></svg>
     </div>
@@ -641,6 +655,20 @@
     let saleItems = [];
     let currentTotal = 0;
     let searchMode = 'barcode';
+
+    // ── Fetch Order ID from Backend ──
+    async function getNextOrderId(isReturn) {
+        try {
+            const mode = isReturn ? 'return' : 'sale';
+            const res = await fetch(`/Sale/GetNextBillNo?mode=${mode}`);
+            const data = await res.json();
+            return data.billNo;
+        } catch (e) {
+            console.error("Error fetching bill number:", e);
+            // Fallback for UI if network fails, but ideally won't happen
+            return isReturn ? "RETURN_ERR" : "SALE_ERR";
+        }
+    }
 
     const format = (v) => (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
@@ -706,14 +734,35 @@
         input.value = ''; filterProducts(); input.focus();
     }
 
+    // ── Filter Products + Auto-add on exact barcode match ──
     function filterProducts() {
-        const query = document.getElementById('prodSearch').value.toLowerCase();
+        const query = document.getElementById('prodSearch').value.trim();
+        const queryLower = query.toLowerCase();
+        let exactMatchCard = null;
+
         document.querySelectorAll('.product-card-v2').forEach(card => {
-            const name = (card.getAttribute('data-name') || "").toLowerCase();
+            const name = (card.getAttribute('data-search-name') || "");
             const barcode = (card.getAttribute('data-barcode') || "").toLowerCase();
+
             if (!query) { card.style.display = 'flex'; return; }
-            card.style.display = (searchMode === 'barcode' ? barcode : name).includes(query) ? 'flex' : 'none';
+
+            if (searchMode === 'barcode') {
+                const matches = barcode.includes(queryLower);
+                card.style.display = matches ? 'flex' : 'none';
+                // Exact match for auto-add
+                if (barcode === queryLower) exactMatchCard = card;
+            } else {
+                card.style.display = name.includes(queryLower) ? 'flex' : 'none';
+            }
         });
+
+        // Auto-add on exact barcode match (scanner sends Enter automatically)
+        if (searchMode === 'barcode' && exactMatchCard) {
+            addToSaleFromCard(exactMatchCard);
+            document.getElementById('prodSearch').value = '';
+            // Reset grid display
+            document.querySelectorAll('.product-card-v2').forEach(c => c.style.display = 'flex');
+        }
     }
 
     function filterByCategory(cat, btn) {
@@ -957,24 +1006,37 @@
     }
     function askToPrintReceipt() { submitSaleForm(); }
 
-    function processFinalSubmission(shouldPrint) {
-        if (shouldPrint) { prepareReceiptData(); window.print(); }
+    async function processFinalSubmission(shouldPrint) {
+        if (shouldPrint) { await prepareReceiptData(); window.print(); }
+        else { 
+            const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
+            const orderId = await getNextOrderId(isReturn);
+            document.getElementById('hiddenBillNo').value = orderId;
+        }
         document.getElementById('saleForm').submit();
     }
 
     // ── RECEIPT DATA PREPARATION ──
-    function prepareReceiptData() {
+    async function prepareReceiptData() {
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         const customerName = document.getElementById('customerSearchInput').value || "Walk-In";
         const payMethod = document.getElementById('hiddenPaymentMethod').value || "Cash";
         const netAmount = Math.abs(currentTotal);
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        const fv = (v) => '$' + (v % 1 === 0 ? v.toString() : v.toFixed(2));
-        const fmtVal = (v) => v % 1 === 0 ? v.toString() : v.toFixed(2);
+
+        // Format value — no decimals if whole number
+        const fv = (v) => '$' + (v % 1 === 0 ? Math.round(v).toString() : v.toFixed(2));
+        const fmtVal = (v) => v % 1 === 0 ? Math.round(v).toString() : v.toFixed(2);
 
         const now = new Date();
-        const dateStr = now.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-        const orderId = isReturn ? "RETURN_" + Math.floor(Math.random() * 10) : "SALE_" + Math.floor(Math.random() * 1000);
+        const dateStr = now.toLocaleString('en-US', {
+            month: 'numeric', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+        });
+
+        // ── Sequential order ID ──
+        const orderId = await getNextOrderId(isReturn);
+        document.getElementById('hiddenBillNo').value = orderId;
 
         document.getElementById('receiptCustomerName').innerText = customerName;
 
@@ -1009,9 +1071,13 @@
             document.getElementById('receiptPayType').innerText = payMethod;
             document.getElementById('saleBottomOrderNo').innerText = 'ORDER: ' + orderId;
             document.getElementById('saleBottomDate').innerText = dateStr;
-            generateCode128SVG('receiptBarcodeSvg', orderId);
+
+            // Use first product barcode if available, else orderId
+                // REPLACE WITH:
+    generateCode128SVG('receiptBarcodeSvg', orderId);
         }
 
+        // Build items table
         const itemsBody = document.getElementById('receiptItemsBody');
         itemsBody.innerHTML = "";
         saleItems.forEach(item => {
@@ -1026,14 +1092,16 @@
         });
     }
 
-    // ── REAL Code128B Barcode (fully scannable) ──
-    function generateCode128SVG(svgId, text) {
+    // ══════════════════════════════════════════════════════
+    //  FULLY SCANNABLE Code 128B Barcode Generator
+    //  Wider bars (moduleW=3) + taller (barH=80) for reliability
+    // ══════════════════════════════════════════════════════
+        function generateCode128SVG(svgId, text) {
         const svg = document.getElementById(svgId);
         if (!svg) return;
         svg.innerHTML = '';
 
-        // Full Code128B pattern table (index = ASCII - 32, value = 11-bit pattern)
-        const CODE128B_PATTERNS = [
+        const PATTERNS = [
             '11011001100','11001101100','11001100110','10010011000','10010001100',
             '10001001100','10011001000','10011000100','10001100100','11001001000',
             '11001000100','11000100100','10110011100','10011011100','10011001110',
@@ -1056,64 +1124,63 @@
             '10111100010'
         ];
 
-        const START_B  = '11010000100'; // Start Code B
-        const STOP     = '11000111010'; // Stop
-        const START_B_VAL = 104;        // checksum seed for Start B
+        const START_B     = '11010000100';
+        const STOP        = '11000111010';
+        const START_B_VAL = 104;
 
-        // Build bit string
-        let bits = START_B;
+        let bits     = START_B;
         let checksum = START_B_VAL;
 
         for (let i = 0; i < text.length; i++) {
-            const code = text.charCodeAt(i);
-            const val = code - 32; // Code128B: space=0 ... ~=94
-            if (val < 0 || val >= CODE128B_PATTERNS.length) continue;
-            bits += CODE128B_PATTERNS[val];
+            const charCode = text.charCodeAt(i);
+            const val = charCode - 32;
+            if (val < 0 || val >= PATTERNS.length) continue;
+            bits += PATTERNS[val];
             checksum += val * (i + 1);
         }
 
-        // Append check character
         const checkVal = checksum % 103;
-        bits += CODE128B_PATTERNS[checkVal];
-        bits += STOP;
-        // Termination bar (always 1 module wide)
-        bits += '1';
+        bits += PATTERNS[checkVal];
+        bits += STOP + '1';
 
-        // Render
-        const moduleW = 2.5;
-        const barH    = 60;
+        // ── Narrower barcode: moduleW=2, barH=55 ──
+        const moduleW = 2;
+        const barH    = 55;
         const textH   = 16;
         const totalW  = bits.length * moduleW;
         const totalH  = barH + textH;
 
         svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-        svg.setAttribute('width', totalW);
+        svg.setAttribute('width',  totalW);
         svg.setAttribute('height', totalH);
         svg.style.display = 'block';
 
-        // Draw bars (1 = black, 0 = white space)
-        for (let i = 0; i < bits.length; i++) {
+        let i = 0;
+        while (i < bits.length) {
             if (bits[i] === '1') {
+                let run = 0;
+                while (i + run < bits.length && bits[i + run] === '1') run++;
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', i * moduleW);
-                rect.setAttribute('y', 0);
-                rect.setAttribute('width', moduleW);
+                rect.setAttribute('x',      i * moduleW);
+                rect.setAttribute('y',      0);
+                rect.setAttribute('width',  run * moduleW);
                 rect.setAttribute('height', barH);
-                rect.setAttribute('fill', '#000000');
+                rect.setAttribute('fill',   '#000000');
                 svg.appendChild(rect);
+                i += run;
+            } else {
+                i++;
             }
         }
 
-        // Human-readable text below
         const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('x', totalW / 2);
-        t.setAttribute('y', barH + 12);
+        t.setAttribute('x',           totalW / 2);
+        t.setAttribute('y',           barH + 13);
         t.setAttribute('text-anchor', 'middle');
-        t.setAttribute('font-size', '11');
-        t.setAttribute('font-family', 'Verdana, sans-serif');
+        t.setAttribute('font-size',   '11');
+        t.setAttribute('font-family', 'Courier New, monospace');
         t.setAttribute('font-weight', 'bold');
-        t.setAttribute('fill', '#000000');
-        t.setAttribute('letter-spacing', '1');
+        t.setAttribute('fill',        '#000000');
         t.textContent = text;
         svg.appendChild(t);
     }
@@ -1122,24 +1189,26 @@
     const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact, email = c.email })));
     let highlightedIndex = -1;
 
-    const searchInput = document.getElementById('customerSearchInput');
-    const resultsContainer = document.getElementById('customerResults');
-    const hiddenInput = document.getElementById('customerSelect');
+    const searchInput       = document.getElementById('customerSearchInput');
+    const resultsContainer  = document.getElementById('customerResults');
+    const hiddenInput       = document.getElementById('customerSelect');
 
-    searchInput.addEventListener('focus', () => filterCustomerResults());
-    searchInput.addEventListener('input', () => filterCustomerResults());
+    searchInput.addEventListener('focus',   () => filterCustomerResults());
+    searchInput.addEventListener('input',   () => filterCustomerResults());
     searchInput.addEventListener('keydown', (e) => {
         const items = resultsContainer.querySelectorAll('.customer-result-item');
-        if (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
-        else if (e.key === 'ArrowUp') { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0); updateHighlight(items); }
-        else if (e.key === 'Enter') { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
-        else if (e.key === 'Escape') hideResults();
+        if      (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
+        else if (e.key === 'ArrowUp')   { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0); updateHighlight(items); }
+        else if (e.key === 'Enter')     { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
+        else if (e.key === 'Escape')    { hideResults(); }
     });
 
     function filterCustomerResults() {
         const query = searchInput.value.toLowerCase();
         resultsContainer.innerHTML = "";
-        const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(query) || (c.contact && c.contact.includes(query)));
+        const filtered = allCustomers.filter(c =>
+            c.name.toLowerCase().includes(query) || (c.contact && c.contact.includes(query))
+        );
         if (filtered.length === 0) {
             resultsContainer.innerHTML = `<div class="customer-result-item" style="cursor:default;color:var(--text-muted);">No customers found</div>`;
         } else {
