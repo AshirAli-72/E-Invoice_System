@@ -319,32 +319,56 @@ namespace E_Invoice_system.Controllers
         {
             if (mode == "return")
             {
-                var maxBill = _context.returns
+                var latestReturn = _context.returns
                     .Where(r => r.billNo != null && r.billNo.StartsWith("RETURN_"))
-                    .ToList()
-                    .Select(r => 
-                    {
-                        if (int.TryParse(r.billNo.Substring(7), out int n)) return n;
-                        return 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-                return Json(new { billNo = $"RETURN_{maxBill + 1}" });
+                    .OrderByDescending(r => r.Date)
+                    .ThenByDescending(r => r.Id)
+                    .Select(r => r.billNo)
+                    .FirstOrDefault();
+
+                int num = 0;
+                if (latestReturn != null && int.TryParse(latestReturn.Substring(7), out int n)) num = n;
+
+                return Json(new { billNo = $"RETURN_{num + 1}" });
             }
             else
             {
-                var maxBill = _context.sales
+                var latestSale = _context.sales
                     .Where(s => s.billNo != null && s.billNo.StartsWith("SALE_"))
-                    .ToList()
-                    .Select(s => 
-                    {
-                        if (int.TryParse(s.billNo.Substring(5), out int n)) return n;
-                        return 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-                return Json(new { billNo = $"SALE_{maxBill + 1}" });
+                    .OrderByDescending(s => s.date)
+                    .ThenByDescending(s => s.id)
+                    .Select(s => s.billNo)
+                    .FirstOrDefault();
+
+                int num = 0;
+                if (latestSale != null && int.TryParse(latestSale.Substring(5), out int n)) num = n;
+
+                return Json(new { billNo = $"SALE_{num + 1}" });
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetItemsByBillNo(string billNo)
+        {
+            if (string.IsNullOrEmpty(billNo)) return Json(new { success = false });
+
+            var items = _context.sales
+                .Where(s => s.billNo == billNo)
+                .Select(s => new
+                {
+                    prod_name_service = s.prod_name_service,
+                    barcode = s.barcode,
+                    qty = 1, // Reset to 1 for new cart load
+                    price = s.price,
+                    discount = s.discount,
+                    expiry_date = s.expiry_date,
+                    total_price = s.total_price
+                })
+                .ToList();
+
+            if (!items.Any()) return Json(new { success = false });
+
+            return Json(new { success = true, items = items });
         }
 
         [HttpPost]

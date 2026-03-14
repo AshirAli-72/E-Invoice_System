@@ -1,19 +1,19 @@
 @model E_Invoice_system.Models.Sale
 @{
     Layout = "_SaleLayout";
-    var customers = ViewBag.Customers as List<E_Invoice_system.Models.customers>;
+    var customerList = ViewBag.Customers as List<E_Invoice_system.Models.customers>;
     var products = ViewBag.Products as List<E_Invoice_system.Models.ProductService>;
 }
 
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<!-- ===================== RECEIPT STYLES ===================== -->
 <style>
     .return-warning-banner {
         display: none;
     }
 
+    /* ── Customer search ── */
     .customer-search-container {
         position: relative;
         flex: 1;
@@ -31,12 +31,12 @@
         align-items: center;
         padding: 0 12px;
         gap: 8px;
-        transition: all 0.2s;
+        transition: all .2s;
     }
 
         .customer-search-input-wrapper:focus-within {
             border-color: var(--primary);
-            background: #ffffff;
+            background: #fff;
             box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
@@ -51,7 +51,7 @@
         width: 100%;
         height: 100%;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: .95rem;
         color: var(--text-main);
         outline: none;
     }
@@ -64,7 +64,7 @@
         background: white;
         border: 1px solid var(--border);
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 25px rgba(0,0,0,.1);
         margin-top: 4px;
         max-height: 300px;
         overflow-y: auto;
@@ -85,7 +85,7 @@
     .customer-result-item {
         padding: 12px 16px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all .2s;
         border-bottom: 1px solid #f8fafc;
     }
 
@@ -105,171 +105,166 @@
         }
 
         .customer-result-item .cust-details {
-            font-size: 0.8rem;
+            font-size: .8rem;
             color: var(--text-muted);
         }
 
-    /* ===================== RECEIPT STYLES ===================== */
+    /* ══════════════════════════════════════════════
+           RECEIPT  — pixel-matched to PDF screenshot
+           Font : Courier New throughout
+           Width: 190 mm  |  Padding: 6mm top, 8mm sides
+        ══════════════════════════════════════════════ */
     #thermalReceipt {
         display: none;
-        width: 190mm;
-        padding: 8mm 10mm;
+        width: 80mm; /* Standard Thermal Receipt Width (Change to 190mm if using A4) */
+        padding: 4mm;
         font-family: 'Courier New', Courier, monospace;
         color: #000;
-        box-sizing: border-box;
         background: #fff;
+        box-sizing: border-box;
+        font-size: 12pt;
     }
 
-    /* === RETURN TOP HEADER LINE (date left, order right) === */
-    .return-top-banner {
+    /* RETURN: date-left / ORDER-right top banner */
+    #returnTopBanner {
         display: none;
         justify-content: space-between;
         align-items: center;
-        font-size: 10pt;
+        font-size: 9.5pt;
         font-weight: 700;
-        font-family: 'Courier New', Courier, monospace;
-        padding-bottom: 6px;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
     }
 
-    /* === SHOP HEADER === */
-    .receipt-shop-header {
+    /* Shop header */
+    .rcpt-shop-header {
         text-align: center;
-        margin-bottom: 4px;
+        line-height: 1.3;
+        margin-bottom: 2px;
     }
 
-        .receipt-shop-header h1 {
-            font-size: 20pt;
+        .rcpt-shop-header .shop-name {
+            font-size: 18pt;
             font-weight: 900;
-            margin: 0 0 2px 0;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-bottom: 1px;
         }
 
-        .receipt-shop-header .sub-info {
-            font-size: 10pt;
+        .rcpt-shop-header .shop-sub {
+            font-size: 9.5pt;
             font-weight: 700;
+            display: block;
             margin: 1px 0;
-            font-family: 'Courier New', Courier, monospace;
         }
 
-    /* === SEPARATOR LINES === */
-    .rcpt-line-thick {
-        border: none;
-        border-top: 2pt solid #000;
-        margin: 4px 0;
-    }
-
-    .rcpt-line-thin {
+    /* Separator lines */
+    .rcpt-hr-thin {
         border: none;
         border-top: 1pt solid #000;
         margin: 3px 0;
     }
 
-    /* === META (Cashier / Customer) === */
-    .receipt-meta-line {
-        font-size: 10pt;
-        font-weight: 700;
-        margin: 2px 0;
-        font-family: 'Courier New', Courier, monospace;
+    .rcpt-hr-thick {
+        border: none;
+        border-top: 2pt solid #000;
+        margin: 3px 0;
     }
 
-    /* === PRODUCT TABLE === */
-    .receipt-table-v3 {
+    /* Cashier / Customer / Bold Meta */
+    .rcpt-meta {
+        font-size: 13pt;
+        font-weight: 800;
+        margin: 4px 0;
+        line-height: 1.4;
+        color: #000;
+    }
+
+    /* Items table */
+    .rcpt-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 3px 0;
+        margin: 2px 0;
     }
 
-        .receipt-table-v3 thead tr {
+        .rcpt-table thead tr:first-child th {
             border-top: 2pt solid #000;
             border-bottom: 2pt solid #000;
-        }
-
-        .receipt-table-v3 th {
-            font-size: 10pt;
+            padding: 4px 2px;
+            font-size: 9.5pt;
             font-weight: 900;
-            padding: 5px 3px;
             text-transform: uppercase;
-            font-family: 'Courier New', Courier, monospace;
         }
 
-        .receipt-table-v3 td {
-            font-size: 10pt;
+        .rcpt-table tbody td {
+            font-size: 9.5pt;
             font-weight: 600;
-            padding: 4px 3px;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 3px 2px;
         }
 
-        .receipt-table-v3 tbody tr:last-child td {
-            padding-bottom: 6px;
-        }
-
-        .receipt-table-v3 tfoot tr td {
-            padding: 0;
+        .rcpt-table tfoot td {
             border-top: 2pt solid #000;
+            padding: 0;
+            line-height: 0;
         }
 
-    /* === TOTALS === */
-    .receipt-totals {
-        width: 100%;
-        margin-top: 0;
-    }
-
-    .receipt-totals-row {
+    /* Totals */
+    .rcpt-totals-row {
         display: flex;
         justify-content: space-between;
-        font-size: 10pt;
-        font-weight: 700;
-        padding: 3px 3px;
-        font-family: 'Courier New', Courier, monospace;
+        font-size: 13pt;
+        font-weight: 800;
+        padding: 4px 2px;
+        line-height: 1.3;
+        color: #000;
     }
 
-    /* === FOOTER === */
-    .receipt-footer {
-        margin-top: 8px;
+    /* Footer */
+    .rcpt-footer {
         text-align: center;
-        clear: both;
-        font-family: 'Courier New', Courier, monospace;
+        margin-top: 6px;
     }
 
-    .receipt-footer-thankyou {
-        font-size: 14pt;
+    .rcpt-footer-thankyou {
+        font-size: 13pt;
         font-weight: 900;
-        text-transform: uppercase;
-        margin: 4px 0;
         letter-spacing: 2px;
-    }
-
-    .receipt-footer-promo {
-        font-size: 9pt;
-        font-weight: 700;
-        margin: 4px 0;
-    }
-
-    .receipt-footer-copy {
-        font-size: 8pt;
-        font-weight: 600;
+        text-transform: uppercase;
         margin: 3px 0;
     }
 
-    /* === SALE BOTTOM (order + barcode) — LEFT order, RIGHT barcode === */
-    .sale-bottom-section {
-        margin-top: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .rcpt-footer-promo {
+        font-size: 8.5pt;
+        font-weight: 700;
+        margin: 3px 0;
     }
 
-        .sale-bottom-section .order-info {
-            font-size: 10pt;
+    .rcpt-footer-copy {
+        font-size: 7.5pt;
+        font-weight: 600;
+        margin: 2px 0;
+    }
+
+    /* Bottom: ORDER left · barcode right */
+    #receiptBottomSection {
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+    }
+
+        #receiptBottomSection .order-info {
+            font-size: 9.5pt;
             font-weight: 700;
-            line-height: 1.8;
-            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.7;
         }
 
-    /* === PRINT === */
+    #receiptBarcodeSvg {
+        display: block;
+        margin-top: 5px;
+    }
+
+    /* ── PRINT ── */
     @@media print {
         @@page {
             size: A4;
@@ -292,7 +287,7 @@
             display: block !important;
             width: 190mm !important;
             margin: 0 auto !important;
-            padding: 8mm 10mm !important;
+            padding: 6mm 8mm 8mm 8mm !important;
             box-sizing: border-box !important;
             background: white !important;
             color: black !important;
@@ -304,6 +299,10 @@
             }
     }
 </style>
+
+<!-- ═══════════════════════════════════════════
+     POS LAYOUT
+═══════════════════════════════════════════ -->
 <div class="pos-container-v2">
     <div class="product-canvas">
         <div class="canvas-header">
@@ -311,7 +310,8 @@
                 <h3 class="canvas-title">Sales Transaction</h3>
                 <div class="search-bar-v2">
                     <i class="ph-magnifying-glass search-icon"></i>
-                    <input type="text" id="prodSearch" class="search-input" placeholder="Scan or enter barcode..." oninput="filterProducts()">
+                    <input type="text" id="prodSearch" class="search-input"
+                           placeholder="Scan or enter barcode..." oninput="filterProducts()">
                 </div>
                 <div class="mode-toggle-v2 compact">
                     <div class="toggle-pill">
@@ -370,7 +370,10 @@
                             }
                             else
                             {
-                                <div class="image-placeholder"><i class="@(isService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i></div>
+                                <div class="image-placeholder">
+                                    <i class="@(isService ? "ph-wrench" : "ph-cube-transparent")"
+                                       style="font-size:3rem;color:#cbd5e1;"></i>
+                                </div>
                             }
                         </div>
                         <div class="card-info">
@@ -389,6 +392,7 @@
         </div>
     </div>
 
+    <!-- ═══ CHECKOUT PANEL ═══ -->
     <div class="checkout-center">
         <form asp-action="Create" method="post" id="saleForm" class="checkout-form">
             @Html.AntiForgeryToken()
@@ -412,7 +416,9 @@
                                 <label for="modeReturn">Return</label>
                             </div>
                         </div>
-                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order"><i class="ph-trash"></i></button>
+                        <button type="button" class="btn-clear-v2" onclick="clearSaleItems()" title="Clear Order">
+                            <i class="ph-trash"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -421,12 +427,14 @@
                 <div class="customer-search-container">
                     <div class="customer-search-input-wrapper">
                         <i class="ph-user-circle"></i>
-                        <input type="text" id="customerSearchInput" class="customer-search-input" placeholder="Search Customer..." autocomplete="off" />
+                        <input type="text" id="customerSearchInput" class="customer-search-input"
+                               placeholder="Search Customer..." autocomplete="off" />
                         <input type="hidden" name="customer_name" id="customerSelect" required />
                     </div>
                     <div id="customerResults" class="customer-dropdown-results shadow-luxury"></div>
                 </div>
-                <button type="button" onclick="triggerCustomerModalV2(event)" title="Add New Customer" class="btn-add-customer">
+                <button type="button" onclick="triggerCustomerModalV2(event)"
+                        title="Add New Customer" class="btn-add-customer">
                     <i class="ph-plus"></i><span>Add Customer</span>
                 </button>
             </div>
@@ -442,34 +450,39 @@
                 <div class="price-summary-v2">
                     <div class="summary-line"><span>Subtotal</span><span id="subtotalDisplay">$0.00</span></div>
                     <div class="summary-line" style="color:var(--success);"><span>Discount</span><span id="discountDisplay">$0.00</span></div>
-                    <div id="stockAlert" class="alert-v2" style="display:none;"><i class="ph-warning"></i> <span id="stockAlertMsg"></span></div>
+                    <div id="stockAlert" class="alert-v2" style="display:none;">
+                        <i class="ph-warning"></i> <span id="stockAlertMsg"></span>
+                    </div>
                     <div class="grand-total-row">
                         <div class="total-label">Grand Total</div>
                         <div class="total-value" id="grandTotal">$0.00</div>
                     </div>
                 </div>
                 <div id="hiddenInputsContainer"></div>
-                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()"><i class="ph-credit-card"></i> Payment</button>
+                <button type="button" class="btn-pay-v2" onclick="openPaymentModal()">
+                    <i class="ph-credit-card"></i> Payment
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Payment Modal -->
+<!-- ═══ PAYMENT MODAL ═══ -->
 <div class="modal-overlay" id="paymentModal">
     <div class="payment-card">
         <div class="payment-left">
             <h1 class="payment-title">Checkout</h1>
             <p class="payment-subtitle">Complete your transaction by selecting a payment method.</p>
             <div class="method-tabs">
-                <div class="method-tab active" id="btnCash" onclick="setWebPaymentMethod('Cash')"><i class="ph-money"></i> <span>Cash</span></div>
-                <div class="method-tab" id="btnCard" onclick="setWebPaymentMethod('Card')"><i class="ph-credit-card"></i> <span>Card</span></div>
-                <div class="method-tab" id="btnTransfer" onclick="setWebPaymentMethod('Transfer')"><i class="ph-bank"></i> <span>Bank</span></div>
-                <div class="method-tab" id="btnCredit" onclick="setWebPaymentMethod('Credit')"><i class="ph-user-focus"></i> <span>Credit</span></div>
+                <div class="method-tab active" id="btnCash" onclick="setWebPaymentMethod('Cash')">    <i class="ph-money"></i>       <span>Cash</span></div>
+                <div class="method-tab" id="btnCard" onclick="setWebPaymentMethod('Card')">    <i class="ph-credit-card"></i> <span>Card</span></div>
+                <div class="method-tab" id="btnTransfer" onclick="setWebPaymentMethod('Transfer')"><i class="ph-bank"></i>        <span>Bank</span></div>
+                <div class="method-tab" id="btnCredit" onclick="setWebPaymentMethod('Credit')"> <i class="ph-user-focus"></i>  <span>Credit</span></div>
             </div>
             <div class="web-input-group">
                 <label>Amount Tendered</label>
-                <input type="number" id="webTendered" class="web-input" placeholder="0.00" oninput="calculateWebChange()" step="0.01">
+                <input type="number" id="webTendered" class="web-input"
+                       placeholder="0.00" oninput="calculateWebChange()" step="0.01">
                 <div class="quick-pills">
                     <div class="quick-pill" onclick="addWebAmount(10)">+ $10</div>
                     <div class="quick-pill" onclick="addWebAmount(20)">+ $20</div>
@@ -499,111 +512,157 @@
                 <div class="summary-web-line grand"><span>Change Due</span><span id="webModalChange">$0.00</span></div>
             </div>
             <div style="margin-top:auto;">
-                <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.5;">
+                <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.5;">
                     By completing this order, you agree to generate an official invoice and update stock levels.
                 </p>
                 <div style="display:flex;gap:16px;">
-                    <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="closePaymentModal()">Cancel</button>
-                    <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="askToPrintReceipt()">Complete Order <i class="ph-check-circle"></i></button>
+                    <button type="button" class="btn-confirm-web"
+                            style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;"
+                            onclick="closePaymentModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn-confirm-web"
+                            style="flex:2;background:var(--primary);color:white;"
+                            onclick="askToPrintReceipt()">
+                        Complete Order <i class="ph-check-circle"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Custom Item Modal -->
+<!-- ═══ CUSTOM ITEM MODAL ═══ -->
 <div class="modal-overlay" id="customItemModal">
     <div class="payment-card" style="max-width:500px;width:90%;align-items:stretch;flex-direction:column;">
         <div style="padding:32px;">
             <h2 style="margin:0 0 24px 0;color:var(--text-main);font-size:1.5rem;">Add Custom Item</h2>
-            <div class="web-input-group"><label>Item Name / Description</label><input type="text" id="customName" class="web-input" placeholder="e.g. Delivery Charge"></div>
-            <div class="web-input-group"><label>Price</label><input type="number" id="customPrice" class="web-input" placeholder="0.00" step="0.01"></div>
+            <div class="web-input-group">
+                <label>Item Name / Description</label>
+                <input type="text" id="customName" class="web-input" placeholder="e.g. Delivery Charge">
+            </div>
+            <div class="web-input-group">
+                <label>Price</label>
+                <input type="number" id="customPrice" class="web-input" placeholder="0.00" step="0.01">
+            </div>
             <div style="display:flex;gap:16px;margin-top:32px;">
-                <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="closeCustomItemModal()">Cancel</button>
-                <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="addCustomItem()">Add to Order</button>
+                <button type="button" class="btn-confirm-web"
+                        style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;"
+                        onclick="closeCustomItemModal()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm-web"
+                        style="flex:2;background:var(--primary);color:white;"
+                        onclick="addCustomItem()">
+                    Add to Order
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add Customer Modal -->
+<!-- ═══ ADD CUSTOMER MODAL ═══ -->
 <div class="modal-overlay" id="customerModal">
-    <div class="payment-card" style="max-width:900px;width:95%;align-items:stretch;flex-direction:column;overflow-y:auto;max-height:90vh;padding:40px;">
+    <div class="payment-card"
+         style="max-width:900px;width:95%;align-items:stretch;flex-direction:column;overflow-y:auto;max-height:90vh;padding:40px;">
         <div class="dashboard-panel">
             <div class="page-header">
                 <h1 class="page-title-large">Add New Customer</h1>
-                <button type="button" class="btn-secondary" onclick="closeCustomerModal()"><i class="ph-arrow-left"></i> Back</button>
+                <button type="button" class="btn-secondary" onclick="closeCustomerModal()">
+                    <i class="ph-arrow-left"></i> Back
+                </button>
             </div>
             <div class="form-wrapper form-layout-left-wide">
                 <div class="form-section">
-                    <div class="form-section-header"><h3 class="form-section-title"><i class="ph-users form-icon-primary"></i> Customer Information</h3></div>
-                    <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="newCustName" class="form-control" placeholder="Enter customer's full name" required /></div>
-                    <div class="form-group"><label class="form-label">Contact Number</label><input type="text" id="newCustContact" class="form-control" placeholder="Enter contact number" /></div>
-                    <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="newCustEmail" class="form-control" placeholder="Enter email address" /></div>
-                    <div class="form-group"><label class="form-label">Address</label><textarea id="newCustAddress" class="form-control" rows="3" placeholder="Enter physical address"></textarea></div>
-                    <div class="form-group"><label class="form-label">Status</label><select id="newCustStatus" class="form-control"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+                    <div class="form-section-header">
+                        <h3 class="form-section-title">
+                            <i class="ph-users form-icon-primary"></i> Customer Information
+                        </h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="newCustName" class="form-control" placeholder="Enter customer's full name" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Number</label>
+                        <input type="text" id="newCustContact" class="form-control" placeholder="Enter contact number" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="newCustEmail" class="form-control" placeholder="Enter email address" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea id="newCustAddress" class="form-control" rows="3" placeholder="Enter physical address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="newCustStatus" class="form-control">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-actions-sticky">
                     <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Cancel</button>
-                    <button type="button" class="btn-primary" onclick="saveCustomerAjax()"><i class="ph-check"></i> Save Customer</button>
+                    <button type="button" class="btn-primary" onclick="saveCustomerAjax()">
+                        <i class="ph-check"></i> Save Customer
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Print Confirmation Modal -->
+<!-- ═══ PRINT CONFIRM MODAL ═══ -->
 <div class="modal-overlay" id="printConfirmModal" style="z-index:2000;">
     <div class="payment-card" style="max-width:400px;width:90%;align-items:stretch;flex-direction:column;">
         <div style="padding:32px;text-align:center;">
-            <div style="margin-bottom:24px;"><i class="ph-printer" style="font-size:4rem;color:var(--primary);"></i></div>
+            <div style="margin-bottom:24px;">
+                <i class="ph-printer" style="font-size:4rem;color:var(--primary);"></i>
+            </div>
             <h2 style="margin:0 0 12px 0;color:var(--text-main);font-size:1.5rem;">Print Receipt?</h2>
-            <p style="color:var(--text-muted);margin-bottom:32px;">Would you like to print the receipt for this transaction?</p>
+            <p style="color:var(--text-muted);margin-bottom:32px;">
+                Would you like to print the receipt for this transaction?
+            </p>
             <div style="display:flex;gap:16px;">
-                <button type="button" class="btn-confirm-web" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;" onclick="processFinalSubmission(false)">No</button>
-                <button type="button" class="btn-confirm-web" style="flex:2;background:var(--primary);color:white;" onclick="processFinalSubmission(true)">Yes, Print <i class="ph-printer"></i></button>
+                <button type="button" class="btn-confirm-web"
+                        style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;"
+                        onclick="processFinalSubmission(false)">
+                    No
+                </button>
+                <button type="button" class="btn-confirm-web"
+                        style="flex:2;background:var(--primary);color:white;"
+                        onclick="processFinalSubmission(true)">
+                    Yes, Print <i class="ph-printer"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ===================== RECEIPT HTML ===================== -->
-<!-- ===================== RECEIPT HTML ===================== -->
+<!-- ═══════════════════════════════════════════
+     RECEIPT HTML
+═══════════════════════════════════════════ -->
 <div id="thermalReceipt">
 
-    <!-- RETURN ONLY: top banner (date left, orderNo right) -->
-    <div id="returnTopBanner" class="return-top-banner">
-        <span id="receiptReturnDate"></span>
-        <span id="receiptReturnOrderNo"></span>
+    <div id="receiptShopHeader" class="rcpt-shop-header">
+        <span class="shop-name">THE SATA POS</span>
+        <span class="shop-sub">@ViewBag.SellerAddress</span>
+        <span class="shop-sub">@ViewBag.SellerContact</span>
     </div>
 
-    <!-- SALE: shop header (centered) -->
-    <div id="saleShopHeader" class="receipt-shop-header">
-        <h1>THE SATA POS</h1>
-        <div class="sub-info">@ViewBag.SellerAddress</div>
-        <div class="sub-info">@ViewBag.SellerContact</div>
-    </div>
+    <hr class="rcpt-hr-thin" />
 
-    <!-- RETURN: shop header (centered, shown after top banner) -->
-    <div id="returnShopHeader" class="receipt-shop-header" style="display:none;">
-        <h1>THE SATA POS</h1>
-        <div class="sub-info">@ViewBag.SellerAddress</div>
-        <div class="sub-info">@ViewBag.SellerContact</div>
-    </div>
+    <div class="rcpt-meta">Cashier: @(User.Identity.Name ?? "nill")</div>
+    <div class="rcpt-meta">Customer: <span id="receiptCustomerName">Walk-In</span></div>
 
-    <!-- thin separator under header -->
-    <hr class="rcpt-line-thin" />
-
-    <div class="receipt-meta-line">Cashier: @(User.Identity.Name ?? "nill")</div>
-    <div class="receipt-meta-line">Customer: <span id="receiptCustomerName">Walk-In</span></div>
-
-    <!-- Product Table -->
-    <table class="receipt-table-v3">
+    <table class="rcpt-table">
         <thead>
             <tr>
-                <th style="text-align:left; width:46%;">PRODUCT</th>
-                <th style="text-align:center; width:14%;">QTY</th>
-                <th style="text-align:center; width:20%;">PRICE</th>
+                <th style="text-align:left;  width:46%;">PRODUCT</th>
+                <th style="text-align:center;width:14%;">QTY</th>
+                <th style="text-align:center;width:20%;">PRICE</th>
                 <th style="text-align:right; width:20%;">AMOUNT</th>
             </tr>
         </thead>
@@ -611,79 +670,87 @@
         <tfoot><tr><td colspan="4"></td></tr></tfoot>
     </table>
 
-    <!-- SALE totals -->
-    <div id="saleTotals" class="receipt-totals">
-        <div class="receipt-totals-row"><span>SUB TOTAL</span><span id="receiptSubTotalVal">$0</span></div>
-        <div class="receipt-totals-row"><span>TOTAL</span><span id="receiptTotalVal">$0</span></div>
-        <div class="receipt-totals-row"><span>AMOUNT DUE</span><span id="receiptDueVal">$0</span></div>
-        <div class="receipt-totals-row"><span>CASH SALE</span><span id="receiptTenderedVal">$0</span></div>
-        <div class="receipt-totals-row"><span>PAY TYPE</span><span id="receiptPayType">Cash</span></div>
+    <div id="receiptTotals">
+        <div class="rcpt-totals-row"><span>SUB TOTAL</span> <span id="receiptSubTotalVal">$0</span></div>
+        <div class="rcpt-totals-row"><span>TOTAL</span>     <span id="receiptTotalVal">$0</span></div>
+        <div class="rcpt-totals-row"><span>AMOUNT DUE</span><span id="receiptDueVal">$0</span></div>
+        <div class="rcpt-totals-row"><span>CASH</span>       <span id="receiptTenderedVal">$0</span></div>
+        <div class="rcpt-totals-row"><span>PAY TYPE</span>  <span id="receiptPayType">Cash</span></div>
     </div>
 
-    <!-- RETURN totals -->
-    <div id="returnTotals" class="receipt-totals" style="display:none;">
-        <div class="receipt-totals-row"><span>TOTAL</span><span id="receiptReturnTotalVal">$0</span></div>
-        <div class="receipt-totals-row"><span>AMOUNT DUE</span><span id="receiptReturnDueVal">$0</span></div>
-        <div class="receipt-totals-row"><span>CASH</span><span id="receiptReturnTenderedVal">$0</span></div>
-        <div class="receipt-totals-row"><span>PAY TYPE</span><span id="receiptReturnPayType">Cash</span></div>
+    <!-- Footer -->
+    <div class="rcpt-footer">
+        <hr class="rcpt-hr-thick" />
+        <div class="rcpt-footer-thankyou">THANK YOU!</div>
+        <hr class="rcpt-hr-thick" />
+        <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
+        <hr class="rcpt-hr-thick" />
+        <div class="rcpt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
+        <hr class="rcpt-hr-thick" />
     </div>
 
-    <!-- Footer (same for both) -->
-    <div class="receipt-footer">
-        <hr class="rcpt-line-thick" />
-        <div class="receipt-footer-thankyou">THANK YOU!</div>
-        <hr class="rcpt-line-thick" />
-        <div class="receipt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
-        <hr class="rcpt-line-thick" />
-        <div class="receipt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
-        <hr class="rcpt-line-thick" />
-    </div>
-
-    <!-- SALE ONLY: order info left + small barcode right -->
-    <div id="saleBottomSection" class="sale-bottom-section" style="display:none;">
+    <div id="receiptBottomSection" style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
         <div class="order-info">
-            <div id="saleBottomOrderNo"></div>
-            <div id="saleBottomDate" style="margin-top:2px;"></div>
+            <div id="receiptOrderNo"></div>
+            <div id="receiptDate"></div>
         </div>
         <svg id="receiptBarcodeSvg"></svg>
     </div>
 
 </div>
-<!-- ===================== END RECEIPT ===================== -->
+<!-- END RECEIPT -->
+
 
 <script>
-    let saleItems = [];
+    /* ═══════════════════════════════════════════════════════
+       STATE
+    ═══════════════════════════════════════════════════════ */
+    let saleItems    = [];
     let currentTotal = 0;
-    let searchMode = 'barcode';
+    let searchMode   = 'barcode';
 
-    // ── Fetch Order ID from Backend ──
+    /* ═══════════════════════════════════════════════════════
+       HELPERS
+    ═══════════════════════════════════════════════════════ */
+    const format = (v) =>
+        (v < 0 ? '-' : '') + '$' +
+        Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
+
     async function getNextOrderId(isReturn) {
         try {
             const mode = isReturn ? 'return' : 'sale';
-            const res = await fetch(`/Sale/GetNextBillNo?mode=${mode}`);
+            const res  = await fetch(`/Sale/GetNextBillNo?mode=${mode}`);
             const data = await res.json();
             return data.billNo;
         } catch (e) {
-            console.error("Error fetching bill number:", e);
-            // Fallback for UI if network fails, but ideally won't happen
-            return isReturn ? "RETURN_ERR" : "SALE_ERR";
+            return isReturn ? 'RETURN_ERR' : 'SALE_ERR';
         }
     }
 
-    const format = (v) => (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
-
+    /* ═══════════════════════════════════════════════════════
+       UI HELPERS
+    ═══════════════════════════════════════════════════════ */
     function toggleFullScreen() {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
         else if (document.exitFullscreen) document.exitFullscreen();
     }
-
     function reloadPage() {
-        if (saleItems.length > 0) { if (confirm("Cart contains items. Reload and lose changes?")) window.location.reload(); }
-        else window.location.reload();
+        if (saleItems.length > 0) {
+            if (confirm('Cart contains items. Reload and lose changes?')) location.reload();
+        } else location.reload();
+    }
+    function showStockAlert(msg) {
+        const el = document.getElementById('stockAlert');
+        document.getElementById('stockAlertMsg').innerText = msg;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 4000);
     }
 
+    /* ═══════════════════════════════════════════════════════
+       MODALS
+    ═══════════════════════════════════════════════════════ */
     function openCustomItemModal() {
-        document.getElementById('customName').value = '';
+        document.getElementById('customName').value  = '';
         document.getElementById('customPrice').value = '';
         document.getElementById('customItemModal').classList.add('show');
         document.getElementById('customName').focus();
@@ -692,75 +759,121 @@
 
     function triggerCustomerModalV2(e) {
         if (e) e.preventDefault();
-        ['newCustName','newCustContact','newCustEmail','newCustAddress'].forEach(id => document.getElementById(id).value = '');
+        ['newCustName','newCustContact','newCustEmail','newCustAddress']
+            .forEach(id => document.getElementById(id).value = '');
         document.getElementById('customerModal').classList.add('show');
         document.getElementById('newCustName').focus();
     }
     function closeCustomerModal() { document.getElementById('customerModal').classList.remove('show'); }
 
+    function openPaymentModal() {
+        if (saleItems.length === 0) return alert('Cart is empty.');
+        document.getElementById('webModalTotal').innerText = format(Math.abs(currentTotal));
+        document.getElementById('webTendered').value = '';
+        calculateWebChange();
+        document.getElementById('paymentModal').classList.add('show');
+    }
+    function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
+
+    /* ═══════════════════════════════════════════════════════
+       CUSTOM ITEM
+    ═══════════════════════════════════════════════════════ */
     function addCustomItem() {
-        const name = document.getElementById('customName').value.trim();
+        const name  = document.getElementById('customName').value.trim();
         const price = parseFloat(document.getElementById('customPrice').value);
-        if (!name) return alert("Please enter item name");
-        if (isNaN(price) || price < 0) return alert("Please enter a valid price");
+        if (!name) return alert('Please enter item name');
+        if (isNaN(price) || price < 0) return alert('Please enter a valid price');
         addItemToSale(0, name, price, 0, null, null, 999999, null);
         closeCustomItemModal();
     }
 
+    /* ═══════════════════════════════════════════════════════
+       SAVE CUSTOMER AJAX
+    ═══════════════════════════════════════════════════════ */
     async function saveCustomerAjax() {
-        const name = document.getElementById('newCustName').value.trim();
+        const name    = document.getElementById('newCustName').value.trim();
         const contact = document.getElementById('newCustContact').value.trim();
-        const email = document.getElementById('newCustEmail').value.trim();
+        const email   = document.getElementById('newCustEmail').value.trim();
         const address = document.getElementById('newCustAddress').value.trim();
-        const status = document.getElementById('newCustStatus').value;
-        if (!name) return alert("Customer name is required.");
+        const status  = document.getElementById('newCustStatus').value;
+        if (!name) return alert('Customer name is required.');
         try {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const token    = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
             const response = await fetch('/Customer/CreateAjax', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
                 body: JSON.stringify({ name, contact, email, address, status })
             });
             const data = await response.json();
-            if (data.success) { allCustomers.push({ name: data.name, contact, email }); selectCustomer(data.name); closeCustomerModal(); }
-            else alert("Error saving customer: " + (data.message || "Unknown error"));
-        } catch (err) { console.error(err); alert("An error occurred while saving the customer."); }
+            if (data.success) {
+                allCustomers.push({ name: data.name, contact, email });
+                selectCustomer(data.name);
+                closeCustomerModal();
+            } else {
+                alert('Error saving customer: ' + (data.message || 'Unknown error'));
+            }
+        } catch (err) {
+            alert('An error occurred while saving the customer.');
+        }
     }
 
+    /* ═══════════════════════════════════════════════════════
+       PRODUCT SEARCH / FILTER
+    ═══════════════════════════════════════════════════════ */
     function handleSearchModeChange() {
         searchMode = document.querySelector('input[name="searchMode"]:checked').value;
         const input = document.getElementById('prodSearch');
-        input.placeholder = searchMode === 'name' ? "Search by product name..." : "Scan or enter barcode...";
-        input.value = ''; filterProducts(); input.focus();
+        input.placeholder = searchMode === 'name'
+            ? 'Search by product name...'
+            : 'Scan or enter barcode...';
+        input.value = '';
+        filterProducts();
+        input.focus();
     }
 
-    // ── Filter Products + Auto-add on exact barcode match ──
-    function filterProducts() {
-        const query = document.getElementById('prodSearch').value.trim();
-        const queryLower = query.toLowerCase();
+    async function filterProducts() {
+        const query        = document.getElementById('prodSearch').value.trim();
+        const queryLower   = query.toLowerCase();
         let exactMatchCard = null;
 
+        // Check for Sale Recall Pattern (SALE_X or RETURN_X)
+        if (query.match(/^(SALE_|RETURN_)\d+$/i)) {
+            const billNo = query.toUpperCase();
+            try {
+                const res = await fetch(`/Sale/GetItemsByBillNo?billNo=${billNo}`);
+                const data = await res.json();
+                if (data.success && data.items.length > 0) {
+                    if (confirm(`Detected Bill #${billNo}. Load items into cart?`)) {
+                        saleItems = data.items.map(i => ({
+                            ...i,
+                            maxStock: 999999, // Allow loading items even if current stock is unknown/service
+                            image: null
+                        }));
+                        renderSaleItems();
+                        document.getElementById('prodSearch').value = '';
+                        return; // Exit search
+                    }
+                }
+            } catch (e) {
+                console.error("Recall failed", e);
+            }
+        }
+
         document.querySelectorAll('.product-card-v2').forEach(card => {
-            const name = (card.getAttribute('data-search-name') || "");
-            const barcode = (card.getAttribute('data-barcode') || "").toLowerCase();
-
+            const name    = card.getAttribute('data-search-name') || '';
+            const barcode = (card.getAttribute('data-barcode') || '').toLowerCase();
             if (!query) { card.style.display = 'flex'; return; }
-
             if (searchMode === 'barcode') {
-                const matches = barcode.includes(queryLower);
-                card.style.display = matches ? 'flex' : 'none';
-                // Exact match for auto-add
+                card.style.display = barcode.includes(queryLower) ? 'flex' : 'none';
                 if (barcode === queryLower) exactMatchCard = card;
             } else {
                 card.style.display = name.includes(queryLower) ? 'flex' : 'none';
             }
         });
 
-        // Auto-add on exact barcode match (scanner sends Enter automatically)
         if (searchMode === 'barcode' && exactMatchCard) {
             addToSaleFromCard(exactMatchCard);
             document.getElementById('prodSearch').value = '';
-            // Reset grid display
             document.querySelectorAll('.product-card-v2').forEach(c => c.style.display = 'flex');
         }
     }
@@ -770,17 +883,25 @@
         if (btn) btn.classList.add('active');
         document.querySelectorAll('.product-card-v2').forEach(card => {
             const type = card.getAttribute('data-type');
-            if (cat === 'all') card.style.display = 'flex';
-            else if (cat === 'Foods' && type === 'product') card.style.display = 'flex';
+            if      (cat === 'all')                          card.style.display = 'flex';
+            else if (cat === 'Foods'     && type === 'product') card.style.display = 'flex';
             else if (cat === 'Beverages' && type === 'service') card.style.display = 'flex';
-            else card.style.display = 'none';
+            else                                              card.style.display = 'none';
         });
     }
 
+    /* ═══════════════════════════════════════════════════════
+       SALE ITEMS
+    ═══════════════════════════════════════════════════════ */
     function addToSaleFromCard(card) {
-        addItemToSale(card.dataset.id, card.dataset.name, parseFloat(card.dataset.price),
-            parseFloat(card.dataset.discount), card.dataset.expiry || null,
-            card.dataset.barcode || null, parseFloat(card.dataset.stock), card.dataset.image || null);
+        addItemToSale(
+            card.dataset.id, card.dataset.name,
+            parseFloat(card.dataset.price), parseFloat(card.dataset.discount),
+            card.dataset.expiry  || null,
+            card.dataset.barcode || null,
+            parseFloat(card.dataset.stock),
+            card.dataset.image   || null
+        );
     }
 
     async function addItemToSale(id, name, price, discount, expiry, barcode, maxStock, image) {
@@ -788,89 +909,118 @@
         const qtyToAdd = isReturn ? -1 : 1;
         const existing = saleItems.find(i => i.prod_name_service === name);
         if (existing) {
-            if (!isReturn && (existing.qty + qtyToAdd) > maxStock) return showStockAlert(`Only ${maxStock} available.`);
+            if (!isReturn && (existing.qty + qtyToAdd) > maxStock)
+                return showStockAlert(`Only ${maxStock} available.`);
             existing.qty += qtyToAdd;
             if (existing.qty === 0) return removeItem(saleItems.indexOf(existing));
             existing.total_price = (existing.price * existing.qty) - (existing.discount * existing.qty);
         } else {
-            if (!isReturn && qtyToAdd > maxStock) return showStockAlert(`Insufficient stock (${maxStock}).`);
-            saleItems.push({ prod_name_service: name, barcode: barcode||null, qty: qtyToAdd, price, discount, expiry_date: expiry||null, maxStock, image: image||null, total_price: (price*qtyToAdd)-(discount*qtyToAdd) });
+            if (!isReturn && qtyToAdd > maxStock)
+                return showStockAlert(`Insufficient stock (${maxStock}).`);
+            saleItems.push({
+                prod_name_service: name,
+                barcode:     barcode || null,
+                qty:         qtyToAdd,
+                price,
+                discount,
+                expiry_date: expiry  || null,
+                maxStock,
+                image:       image   || null,
+                total_price: (price * qtyToAdd) - (discount * qtyToAdd)
+            });
         }
         renderSaleItems();
     }
 
     function renderSaleItems() {
-        const body = document.getElementById('saleItemsBody');
-        const empty = document.getElementById('emptyStateV2');
+        const body            = document.getElementById('saleItemsBody');
+        const empty           = document.getElementById('emptyStateV2');
         const hiddenContainer = document.getElementById('hiddenInputsContainer');
-        const countDisplay = document.getElementById('itemCountDisplay');
+        const countDisplay    = document.getElementById('itemCountDisplay');
 
-        body.innerHTML = ""; hiddenContainer.innerHTML = "";
+        body.innerHTML = '';
+        hiddenContainer.innerHTML = '';
         countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
 
         if (saleItems.length === 0) {
-            empty.style.display = "flex"; body.style.display = "none";
-            document.getElementById('subtotalDisplay').innerText = "$0.00";
-            document.getElementById('discountDisplay').innerText = "$0.00";
-            document.getElementById('grandTotal').innerText = "$0.00";
-            currentTotal = 0; return;
+            empty.style.display = 'flex';
+            body.style.display  = 'none';
+            document.getElementById('subtotalDisplay').innerText = '$0.00';
+            document.getElementById('discountDisplay').innerText = '$0.00';
+            document.getElementById('grandTotal').innerText      = '$0.00';
+            currentTotal = 0;
+            return;
         }
-        empty.style.display = "none"; body.style.display = "flex";
+
+        empty.style.display = 'none';
+        body.style.display  = 'flex';
 
         let totalSub = 0, totalDisc = 0, totalBase = 0;
+
         saleItems.forEach((item, index) => {
-            const lineSub = item.price * item.qty;
-            const lineDisc = item.discount * item.qty;
+            const lineSub   = item.price    * item.qty;
+            const lineDisc  = item.discount * item.qty;
             const lineTotal = lineSub - lineDisc;
-            totalSub += lineSub; totalDisc += lineDisc; totalBase += lineTotal;
+            totalSub  += lineSub;
+            totalDisc += lineDisc;
+            totalBase += lineTotal;
 
             const div = document.createElement('div');
-            div.className = "item-v2";
+            div.className = 'item-v2';
             div.innerHTML = `
-                <div class="item-v2-img">${item.image ? `<img src="/product-images/${item.image}" />` : `<i class="ph-package" style="font-size:1.5rem;color:#cbd5e1;"></i>`}</div>
+                <div class="item-v2-img">${item.image
+                    ? `<img src="/product-images/${item.image}" />`
+                    : `<i class="ph-package" style="font-size:1.5rem;color:#cbd5e1;"></i>`}</div>
                 <div class="item-v2-info">
                     <div class="title">${item.prod_name_service}</div>
-                    <div class="price-input-container"><span>$</span><input type="number" step="0.01" class="manual-price-input" value="${item.price.toFixed(2)}" onchange="updateItemPrice(${index}, this.value)"></div>
+                    <div class="price-input-container">
+                        <span>$</span>
+                        <input type="number" step="0.01" class="manual-price-input"
+                               value="${item.price.toFixed(2)}"
+                               onchange="updateItemPrice(${index}, this.value)">
+                    </div>
                 </div>
                 <div class="item-v2-controls">
                     <div class="qty-stepper">
                         <button type="button" onclick="decreaseQtyBtn(${index})">-</button>
-                        <input type="number" class="manual-qty-input" value="${item.qty < 0 ? '-' : ''}${Math.abs(item.qty)}" onchange="updateItemQty(${index}, this.value)">
+                        <input type="number" class="manual-qty-input"
+                               value="${item.qty < 0 ? '-' : ''}${Math.abs(item.qty)}"
+                               onchange="updateItemQty(${index}, this.value)">
                         <button type="button" onclick="increaseQty(${index})">+</button>
                     </div>
                 </div>
-                <div class="item-total-info"><div class="price-sub">${format(lineTotal)}</div></div>
-                <i class="ph-trash btn-remove-item" onclick="removeItem(${index})"></i>
-            `;
+                <div class="item-total-info">
+                    <div class="price-sub">${format(lineTotal)}</div>
+                </div>
+                <i class="ph-trash btn-remove-item" onclick="removeItem(${index})"></i>`;
             body.appendChild(div);
 
             const prefix = `items[${index}]`;
             hiddenContainer.innerHTML += `
                 <input type="hidden" name="${prefix}.prod_name_service" value="${item.prod_name_service}" />
-                <input type="hidden" name="${prefix}.barcode" value="${item.barcode || ''}" />
-                <input type="hidden" name="${prefix}.qty_unit_type" value="${item.qty}" />
-                <input type="hidden" name="${prefix}.price" value="${item.price}" />
-                <input type="hidden" name="${prefix}.discount" value="${item.discount}" />
-                <input type="hidden" name="${prefix}.expiry_date" value="${item.expiry_date || ''}" />
-                <input type="hidden" name="${prefix}.total_price" value="${lineTotal}" />
-            `;
+                <input type="hidden" name="${prefix}.barcode"           value="${item.barcode || ''}" />
+                <input type="hidden" name="${prefix}.qty_unit_type"     value="${item.qty}" />
+                <input type="hidden" name="${prefix}.price"             value="${item.price}" />
+                <input type="hidden" name="${prefix}.discount"          value="${item.discount}" />
+                <input type="hidden" name="${prefix}.expiry_date"       value="${item.expiry_date || ''}" />
+                <input type="hidden" name="${prefix}.total_price"       value="${lineTotal}" />`;
         });
 
         currentTotal = totalBase;
         document.getElementById('subtotalDisplay').innerText = format(totalSub);
         document.getElementById('discountDisplay').innerText = format(totalDisc);
-        document.getElementById('grandTotal').innerText = format(totalBase);
+        document.getElementById('grandTotal').innerText      = format(totalBase);
     }
 
     async function increaseQty(index) {
-        const item = saleItems[index];
+        const item     = saleItems[index];
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn) {
             const v = await validateReturnEligibility(item.prod_name_service);
-            if (Math.abs(item.qty - 1) > v.purchasedQty) return showStockAlert("Max returnable reached.");
+            if (Math.abs(item.qty - 1) > v.purchasedQty) return showStockAlert('Max returnable reached.');
             item.qty--;
         } else {
-            if (item.qty >= item.maxStock) return showStockAlert("Max stock reached.");
+            if (item.qty >= item.maxStock) return showStockAlert('Max stock reached.');
             item.qty++;
         }
         item.total_price = (item.price * item.qty) - (item.discount * item.qty);
@@ -878,57 +1028,58 @@
     }
 
     function decreaseQtyBtn(index) {
-        const item = saleItems[index];
+        const item     = saleItems[index];
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn) item.qty++; else item.qty--;
         if (item.qty === 0) removeItem(index);
-        else { item.total_price = (item.price * item.qty) - (item.discount * item.qty); renderSaleItems(); }
+        else {
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
+            renderSaleItems();
+        }
     }
 
     function removeItem(index) { saleItems.splice(index, 1); renderSaleItems(); }
 
     function updateItemPrice(index, value) {
-        let val = parseFloat(value); if (isNaN(val) || val < 0) val = 0;
-        saleItems[index].price = val;
+        let val = parseFloat(value);
+        if (isNaN(val) || val < 0) val = 0;
+        saleItems[index].price       = val;
         saleItems[index].total_price = (val * saleItems[index].qty) - (saleItems[index].discount * saleItems[index].qty);
         renderSaleItems();
     }
 
     async function updateItemQty(index, value) {
-        let val = parseInt(value, 10); if (isNaN(val)) val = 1;
-        const item = saleItems[index];
+        let val        = parseInt(value, 10);
+        if (isNaN(val)) val = 1;
+        const item     = saleItems[index];
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn) {
             val = -Math.abs(val);
             if (val === 0) { removeItem(index); return; }
             const v = await validateReturnEligibility(item.prod_name_service);
-            if (Math.abs(val) > v.purchasedQty) { showStockAlert("Max returnable reached."); val = -v.purchasedQty; }
+            if (Math.abs(val) > v.purchasedQty) { showStockAlert('Max returnable reached.'); val = -v.purchasedQty; }
         } else {
             val = Math.abs(val);
             if (val === 0) { removeItem(index); return; }
-            if (val > item.maxStock) { showStockAlert("Max stock reached."); val = item.maxStock; }
+            if (val > item.maxStock) { showStockAlert('Max stock reached.'); val = item.maxStock; }
         }
-        item.qty = val;
+        item.qty         = val;
         item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         renderSaleItems();
     }
 
     function clearSaleItems() {
-        if (saleItems.length > 0 && confirm("Clear current order?")) { saleItems = []; renderSaleItems(); }
-    }
-
-    function showStockAlert(msg) {
-        const el = document.getElementById('stockAlert');
-        document.getElementById('stockAlertMsg').innerText = msg;
-        el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 4000);
+        if (saleItems.length > 0 && confirm('Clear current order?')) {
+            saleItems = [];
+            renderSaleItems();
+        }
     }
 
     async function handleModeChange() {
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
         saleItems.forEach(item => {
-            const absQty = Math.abs(item.qty);
-            item.qty = isReturn ? -absQty : absQty;
+            const absQty     = Math.abs(item.qty);
+            item.qty         = isReturn ? -absQty : absQty;
             item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         });
         renderSaleItems();
@@ -936,56 +1087,58 @@
 
     async function handleCustomerChange() {
         const customerName = document.getElementById('customerSelect').value;
-        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
+        const isReturn     = document.querySelector('input[name="transMode"]:checked').value === 'return';
         if (isReturn && customerName) {
             try {
-                const res = await fetch(`/Sale/CheckAnyPurchaseHistory`);
+                const res  = await fetch('/Sale/CheckAnyPurchaseHistory');
                 const data = await res.json();
-                if (!data.hasAnyHistory) { showStockAlert("Customer has no active purchases."); saleItems = []; renderSaleItems(); return; }
-            } catch (e) { console.error(e); }
-            const filteredItems = [];
+                if (!data.hasAnyHistory) {
+                    showStockAlert('Customer has no active purchases.');
+                    saleItems = [];
+                    renderSaleItems();
+                    return;
+                }
+            } catch (e) {}
+            const filtered = [];
             for (const item of saleItems) {
                 const v = await validateReturnEligibility(item.prod_name_service);
                 if (v.eligible) {
-                    item.qty = -Math.min(Math.abs(item.qty), v.purchasedQty);
+                    item.qty         = -Math.min(Math.abs(item.qty), v.purchasedQty);
                     item.total_price = (item.price * item.qty) - (item.discount * item.qty);
-                    filteredItems.push(item);
+                    filtered.push(item);
                 }
             }
-            saleItems = filteredItems; renderSaleItems();
+            saleItems = filtered;
+            renderSaleItems();
         }
     }
 
     async function validateReturnEligibility(productName) {
         if (!productName) return { eligible: true, purchasedQty: 0 };
         try {
-            const response = await fetch(`/Sale/CheckPurchaseHistory?productName=${encodeURIComponent(productName)}`);
-            const data = await response.json();
+            const res  = await fetch(`/Sale/CheckPurchaseHistory?productName=${encodeURIComponent(productName)}`);
+            const data = await res.json();
             return { eligible: data.hasPurchased, purchasedQty: data.purchasedQty || 0 };
-        } catch (e) { return { eligible: true, purchasedQty: 999999 }; }
+        } catch (e) {
+            return { eligible: true, purchasedQty: 999999 };
+        }
     }
 
-    function openPaymentModal() {
-        if (saleItems.length === 0) return alert("Cart is empty.");
-        document.getElementById('webModalTotal').innerText = format(Math.abs(currentTotal));
-        document.getElementById('webTendered').value = "";
-        calculateWebChange();
-        document.getElementById('paymentModal').classList.add('show');
-    }
-    function closePaymentModal() { document.getElementById('paymentModal').classList.remove('show'); }
-
+    /* ═══════════════════════════════════════════════════════
+       PAYMENT
+    ═══════════════════════════════════════════════════════ */
     function setWebPaymentMethod(method) {
         document.getElementById('hiddenPaymentMethod').value = method;
-        document.getElementById('hiddenStatus').value = method === 'Credit' ? 'Pending' : 'Paid';
+        document.getElementById('hiddenStatus').value        = method === 'Credit' ? 'Pending' : 'Paid';
         document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
         if (event && event.currentTarget) event.currentTarget.classList.add('active');
     }
 
     function calculateWebChange() {
         const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        const change = tendered - Math.abs(currentTotal);
+        const change   = tendered - Math.abs(currentTotal);
         document.getElementById('webModalTendered').innerText = format(tendered);
-        document.getElementById('webModalChange').innerText = format(change);
+        document.getElementById('webModalChange').innerText   = format(change);
     }
 
     function addWebAmount(amt) {
@@ -993,138 +1146,116 @@
         el.value = (parseFloat(el.value || 0) + amt).toFixed(2);
         calculateWebChange();
     }
-    function matchWebAmount() { document.getElementById('webTendered').value = Math.abs(currentTotal).toFixed(2); calculateWebChange(); }
+    function matchWebAmount() {
+        document.getElementById('webTendered').value = Math.abs(currentTotal).toFixed(2);
+        calculateWebChange();
+    }
 
     function submitSaleForm() {
-        const method = document.getElementById('hiddenPaymentMethod').value;
+        const method        = document.getElementById('hiddenPaymentMethod').value;
         const tenderedInput = document.getElementById('webTendered').value;
-        const tendered = parseFloat(tenderedInput);
-        if (!tenderedInput || isNaN(tendered)) return alert("Please enter the amount tendered.");
-        if (tendered <= 0) return alert("Amount tendered must be greater than zero.");
-        if (method !== 'Credit' && tendered < Math.abs(currentTotal)) return alert("Amount tendered is less than the grand total.");
+        const tendered      = parseFloat(tenderedInput);
+        if (!tenderedInput || isNaN(tendered)) return alert('Please enter the amount tendered.');
+        if (tendered <= 0)                     return alert('Amount tendered must be greater than zero.');
+        if (method !== 'Credit' && tendered < Math.abs(currentTotal))
+            return alert('Amount tendered is less than the grand total.');
         document.getElementById('printConfirmModal').classList.add('show');
     }
     function askToPrintReceipt() { submitSaleForm(); }
 
     async function processFinalSubmission(shouldPrint) {
-        if (shouldPrint) { await prepareReceiptData(); window.print(); }
-        else { 
+        if (shouldPrint) {
+            await prepareReceiptData();
+            window.print();
+        } else {
             const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
-            const orderId = await getNextOrderId(isReturn);
+            const orderId  = await getNextOrderId(isReturn);
             document.getElementById('hiddenBillNo').value = orderId;
         }
         document.getElementById('saleForm').submit();
     }
 
-    // ── RECEIPT DATA PREPARATION ──
+    /* ═══════════════════════════════════════════════════════
+       RECEIPT DATA PREPARATION
+    ═══════════════════════════════════════════════════════ */
     async function prepareReceiptData() {
-        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
-        const customerName = document.getElementById('customerSearchInput').value || "Walk-In";
-        const payMethod = document.getElementById('hiddenPaymentMethod').value || "Cash";
-        const netAmount = Math.abs(currentTotal);
-        const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
+        const isReturn     = document.querySelector('input[name="transMode"]:checked').value === 'return';
+        const customerName = document.getElementById('customerSearchInput').value || 'Walk-In';
+        const payMethod    = document.getElementById('hiddenPaymentMethod').value  || 'Cash';
+        const netAmount    = Math.abs(currentTotal);
+        const tendered     = parseFloat(document.getElementById('webTendered').value) || 0;
 
-        // Format value — no decimals if whole number
-        const fv = (v) => '$' + (v % 1 === 0 ? Math.round(v).toString() : v.toFixed(2));
+        const fv     = (v) => '$' + (v % 1 === 0 ? Math.round(v).toString() : v.toFixed(2));
         const fmtVal = (v) => v % 1 === 0 ? Math.round(v).toString() : v.toFixed(2);
 
-        const now = new Date();
+        const now     = new Date();
         const dateStr = now.toLocaleString('en-US', {
             month: 'numeric', day: 'numeric', year: 'numeric',
             hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
         });
 
-        // ── Sequential order ID ──
         const orderId = await getNextOrderId(isReturn);
         document.getElementById('hiddenBillNo').value = orderId;
-
         document.getElementById('receiptCustomerName').innerText = customerName;
 
-        if (isReturn) {
-            document.getElementById('returnTopBanner').style.display = 'flex';
-            document.getElementById('receiptReturnDate').innerText = dateStr;
-            document.getElementById('receiptReturnOrderNo').innerText = 'ORDER: ' + orderId;
-            document.getElementById('saleShopHeader').style.display = 'none';
-            document.getElementById('returnShopHeader').style.display = 'block';
-            document.getElementById('saleTotals').style.display = 'none';
-            document.getElementById('returnTotals').style.display = 'block';
-            document.getElementById('saleBottomSection').style.display = 'none';
-            document.getElementById('receiptReturnTotalVal').innerText = fv(netAmount);
-            document.getElementById('receiptReturnDueVal').innerText = fv(netAmount);
-            document.getElementById('receiptReturnTenderedVal').innerText = fv(tendered);
-            document.getElementById('receiptReturnPayType').innerText = payMethod;
-        } else {
-            document.getElementById('returnTopBanner').style.display = 'none';
-            document.getElementById('saleShopHeader').style.display = 'block';
-            document.getElementById('returnShopHeader').style.display = 'none';
-            document.getElementById('saleTotals').style.display = 'block';
-            document.getElementById('returnTotals').style.display = 'none';
-            document.getElementById('saleBottomSection').style.display = 'flex';
+        let subTotal = 0;
+        saleItems.forEach(item => { subTotal += item.price * Math.abs(item.qty); });
 
-            let subTotal = 0;
-            saleItems.forEach(item => { subTotal += item.price * Math.abs(item.qty); });
+        document.getElementById('receiptSubTotalVal').innerText = fv(subTotal);
+        document.getElementById('receiptTotalVal').innerText    = fv(netAmount);
+        document.getElementById('receiptDueVal').innerText      = fv(netAmount);
+        document.getElementById('receiptTenderedVal').innerText = fv(tendered);
+        document.getElementById('receiptPayType').innerText     = payMethod;
+        document.getElementById('receiptOrderNo').innerText     = 'ORDER: ' + orderId;
+        document.getElementById('receiptDate').innerText        = dateStr;
 
-            document.getElementById('receiptSubTotalVal').innerText = fv(subTotal);
-            document.getElementById('receiptTotalVal').innerText = fv(netAmount);
-            document.getElementById('receiptDueVal').innerText = fv(netAmount);
-            document.getElementById('receiptTenderedVal').innerText = fv(tendered);
-            document.getElementById('receiptPayType').innerText = payMethod;
-            document.getElementById('saleBottomOrderNo').innerText = 'ORDER: ' + orderId;
-            document.getElementById('saleBottomDate').innerText = dateStr;
+        // Ensure bottom section is visible
+        const bottomSection = document.getElementById('receiptBottomSection');
+        if (bottomSection) bottomSection.style.display = 'flex';
 
-            // Use first product barcode if available, else orderId
-                // REPLACE WITH:
-    generateCode128SVG('receiptBarcodeSvg', orderId);
-        }
+        /* Encoded (scanned): Bill ID (e.g. SALE_18) | Label (displayed): Bill ID */
+        generateCode128SVG('receiptBarcodeSvg', orderId);
 
-        // Build items table
         const itemsBody = document.getElementById('receiptItemsBody');
-        itemsBody.innerHTML = "";
+        itemsBody.innerHTML = '';
         saleItems.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td style="text-align:left;">${item.prod_name_service}</td>
                 <td style="text-align:center;">${Math.abs(item.qty)}</td>
                 <td style="text-align:center;">${fmtVal(item.price)}</td>
-                <td style="text-align:right;">${fmtVal(Math.abs(item.total_price))}</td>
-            `;
+                <td style="text-align:right;">${fmtVal(Math.abs(item.total_price))}</td>`;
             itemsBody.appendChild(row);
         });
     }
 
-    // ══════════════════════════════════════════════════════
-    //  FULLY SCANNABLE Code 128B Barcode Generator
-    //  Wider bars (moduleW=3) + taller (barH=80) for reliability
-    // ══════════════════════════════════════════════════════
-        function generateCode128SVG(svgId, text) {
+    /* ═══════════════════════════════════════════════════════
+       CODE 128B BARCODE GENERATOR
+       Encodes orderId (e.g. "SALE_27").
+       Label under bars = orderId.
+       Scanner output   = orderId.
+    ═══════════════════════════════════════════════════════ */
+    function generateCode128SVG(svgId, text, labelText) {
         const svg = document.getElementById(svgId);
         if (!svg) return;
+        svg.setAttribute('shape-rendering', 'crispEdges');
         svg.innerHTML = '';
 
         const PATTERNS = [
-            '11011001100','11001101100','11001100110','10010011000','10010001100',
-            '10001001100','10011001000','10011000100','10001100100','11001001000',
-            '11001000100','11000100100','10110011100','10011011100','10011001110',
-            '10111001100','10011101100','11001110010','11001011100','11001001110',
-            '11011100100','11001110100','11101101110','11101001100','11100101100',
-            '11100100110','11101100100','11100110100','11100110010','11011011000',
-            '11011000110','11000110110','10100011000','10001011000','10001000110',
-            '10110001000','10001101000','10001100010','11010001000','11000101000',
-            '11000100010','10110111000','10110001110','10001101110','10111011000',
-            '10111000110','10001110110','11101110100','11010001110','11000101110',
-            '11011101000','11011100010','11011101110','11101011000','11101000110',
-            '11100010110','11101101000','11101100010','11100011010','11101111010',
-            '11001000010','11110001010','10100110000','10100001100','10010110000',
-            '10010000110','10000101100','10000100110','10110010000','10110000100',
-            '10011010000','10011000010','10000110100','10000110010','11000010010',
-            '11001010000','11110111010','11000010100','10001111010','10100111100',
-            '10010111100','10010011110','10111100100','10011110100','10011110010',
-            '11110100100','11110010100','11110010010','11011011110','11011110110',
-            '11110110110','10101111000','10100011110','10001011110','10111101000',
-            '10111100010'
+            '11011001100','11001101100','11001100110','10010011000','10010001100','10001001100','10011001000','10011000100','10001100100','11001001000',
+            '11001000100','11000100100','10110011100','10011011100','10011001110','10111001100','10011101100','11001110010','11001011100','11001001110',
+            '11011100100','11001110100','11101101110','11101001100','11100101100','11100100110','11101100100','11100110100','11100110010','11011011000',
+            '11011000110','11000110110','10100011000','10001011000','10001000110','10110001000','10001101000','10001100010','11010001000','11000101000',
+            '11000100010','10110111000','10110001110','10001101110','10111011000','10111000110','10001110110','11101110100','11010001110','11000101110',
+            '11011101000','11011100010','11011101110','11101011000','11101000110','11100010110','11101101000','11101100010','11100011010','11101111010',
+            '11001000010','11110001010','10100110000','10100001100','10010110000','10010000110','10000101100','10000100110','10110010000','10110000100',
+            '10011010000','10011000010','10000110100','10000110010','11000010010','11001010000','11110111010','11000010100','10001111010','10100111100',
+            '10010111100','10010011110','10111100100','10011110100','10011110010','11110100100','11110010100','11110010010','11011011110','11011110110',
+            '11110110110','10101111000','10100011110','10001011110','10111101000','10111100010','11101011110','11110101110','11011110110','11101111010',
+            '10111101110','11101011110','11110101110'
         ];
 
-        const START_B     = '11010000100';
+        const START_B     = '11010010000';
         const STOP        = '11000111010';
         const START_B_VAL = 104;
 
@@ -1132,90 +1263,117 @@
         let checksum = START_B_VAL;
 
         for (let i = 0; i < text.length; i++) {
-            const charCode = text.charCodeAt(i);
-            const val = charCode - 32;
+            const val = text.charCodeAt(i) - 32;
             if (val < 0 || val >= PATTERNS.length) continue;
-            bits += PATTERNS[val];
+            bits     += PATTERNS[val];
             checksum += val * (i + 1);
         }
+        bits += PATTERNS[checksum % 103];
+        bits += STOP + '11';
 
-        const checkVal = checksum % 103;
-        bits += PATTERNS[checkVal];
-        bits += STOP + '1';
+        const moduleW      = 2;
+        const barH         = 100;
+        const textH        = 24;
+        const quietZoneStr = '00000000000000000000'; 
+        const fullBits     = quietZoneStr + bits + quietZoneStr;
 
-        // ── Narrower barcode: moduleW=2, barH=55 ──
-        const moduleW = 2;
-        const barH    = 55;
-        const textH   = 16;
-        const totalW  = bits.length * moduleW;
+        const totalW  = fullBits.length * moduleW;
         const totalH  = barH + textH;
 
         svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-        svg.setAttribute('width',  totalW);
-        svg.setAttribute('height', totalH);
+        svg.setAttribute('width',   totalW);
+        svg.setAttribute('height',  totalH);
         svg.style.display = 'block';
 
+        // White background to ensure quiet zones work on all paper types
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        bg.setAttribute('width', '100%');
+        bg.setAttribute('height', '100%');
+        bg.setAttribute('fill', '#fff');
+        svg.appendChild(bg);
+
         let i = 0;
-        while (i < bits.length) {
-            if (bits[i] === '1') {
+        while (i < fullBits.length) {
+            if (fullBits[i] === '1') {
                 let run = 0;
-                while (i + run < bits.length && bits[i + run] === '1') run++;
+                while (i + run < fullBits.length && fullBits[i + run] === '1') run++;
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 rect.setAttribute('x',      i * moduleW);
                 rect.setAttribute('y',      0);
                 rect.setAttribute('width',  run * moduleW);
                 rect.setAttribute('height', barH);
-                rect.setAttribute('fill',   '#000000');
+                rect.setAttribute('fill',   '#000');
+                rect.setAttribute('shape-rendering', 'crispEdges');
                 svg.appendChild(rect);
                 i += run;
-            } else {
-                i++;
-            }
+            } else { i++; }
         }
 
         const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         t.setAttribute('x',           totalW / 2);
-        t.setAttribute('y',           barH + 13);
+        t.setAttribute('y',           barH + 24);
         t.setAttribute('text-anchor', 'middle');
-        t.setAttribute('font-size',   '11');
+        t.setAttribute('font-size',   '13');
         t.setAttribute('font-family', 'Courier New, monospace');
         t.setAttribute('font-weight', 'bold');
-        t.setAttribute('fill',        '#000000');
-        t.textContent = text;
+        t.setAttribute('fill',        '#000');
+        t.textContent = labelText || text;
         svg.appendChild(t);
     }
 
-    // ── Customer Dropdown ──
-    const allCustomers = @Html.Raw(Json.Serialize(customers?.Select(c => new { name = c.name, contact = c.contact, email = c.email })));
+    /* ═══════════════════════════════════════════════════════
+       CUSTOMER DROPDOWN
+       allCustomers is always an array (never null)
+    ═══════════════════════════════════════════════════════ */
+    const allCustomers = @Html.Raw(Json.Serialize(
+                customerList?.Select(c => new { name = c.name, contact = c.contact, email = c.email })
+        )) ?? [];
+
     let highlightedIndex = -1;
+    let searchInput, resultsContainer, hiddenInput;
 
-    const searchInput       = document.getElementById('customerSearchInput');
-    const resultsContainer  = document.getElementById('customerResults');
-    const hiddenInput       = document.getElementById('customerSelect');
+    document.addEventListener('DOMContentLoaded', () => {
+        searchInput      = document.getElementById('customerSearchInput');
+        resultsContainer = document.getElementById('customerResults');
+        hiddenInput      = document.getElementById('customerSelect');
 
-    searchInput.addEventListener('focus',   () => filterCustomerResults());
-    searchInput.addEventListener('input',   () => filterCustomerResults());
-    searchInput.addEventListener('keydown', (e) => {
-        const items = resultsContainer.querySelectorAll('.customer-result-item');
-        if      (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
-        else if (e.key === 'ArrowUp')   { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0); updateHighlight(items); }
-        else if (e.key === 'Enter')     { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
-        else if (e.key === 'Escape')    { hideResults(); }
+        if (!searchInput) return;
+
+        searchInput.addEventListener('focus',   () => filterCustomerResults());
+        searchInput.addEventListener('input',   () => filterCustomerResults());
+        searchInput.addEventListener('keydown', (e) => {
+            const items = resultsContainer.querySelectorAll('.customer-result-item');
+            if      (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0);                updateHighlight(items); }
+            else if (e.key === 'Enter')     { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
+            else if (e.key === 'Escape')    { hideResults(); }
+        });
+
+        /* single global click-outside listener */
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target))
+                hideResults();
+        });
     });
 
     function filterCustomerResults() {
-        const query = searchInput.value.toLowerCase();
-        resultsContainer.innerHTML = "";
-        const filtered = allCustomers.filter(c =>
-            c.name.toLowerCase().includes(query) || (c.contact && c.contact.includes(query))
+        if (!searchInput || !resultsContainer) return;
+        const query    = searchInput.value.toLowerCase();
+        resultsContainer.innerHTML = '';
+        const filtered = (allCustomers || []).filter(c =>
+            c.name.toLowerCase().includes(query) ||
+            (c.contact && c.contact.includes(query))
         );
         if (filtered.length === 0) {
-            resultsContainer.innerHTML = `<div class="customer-result-item" style="cursor:default;color:var(--text-muted);">No customers found</div>`;
+            resultsContainer.innerHTML =
+                `<div class="customer-result-item"
+                      style="cursor:default;color:var(--text-muted);">No customers found</div>`;
         } else {
             filtered.forEach(c => {
                 const div = document.createElement('div');
-                div.className = "customer-result-item";
-                div.innerHTML = `<span class="cust-name">${c.name}</span>${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
+                div.className = 'customer-result-item';
+                div.innerHTML = `<span class="cust-name">${c.name}</span>
+                    ${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
                 div.onclick = () => selectCustomer(c.name);
                 resultsContainer.appendChild(div);
             });
@@ -1226,19 +1384,27 @@
 
     function updateHighlight(items) {
         items.forEach((item, idx) => {
-            if (idx === highlightedIndex) { item.classList.add('highlighted'); item.scrollIntoView({ block: 'nearest' }); }
-            else item.classList.remove('highlighted');
+            if (idx === highlightedIndex) {
+                item.classList.add('highlighted');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('highlighted');
+            }
         });
     }
 
-    function selectCustomer(name) { searchInput.value = name; hiddenInput.value = name; hideResults(); handleCustomerChange(); }
-    function hideResults() { resultsContainer.classList.remove('show'); }
+    function selectCustomer(name) {
+        searchInput.value = name;
+        hiddenInput.value = name;
+        hideResults();
+        handleCustomerChange();
+    }
 
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) hideResults();
-    });
+    function hideResults() {
+        if (resultsContainer) resultsContainer.classList.remove('show');
+    }
 
-    $(document).ready(function () { });
+    $(document).ready(function () {});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
