@@ -285,6 +285,17 @@
             #thermalReceipt * {
                 visibility: visible !important;
             }
+        .barcode-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        #rcptBarcodeSvg {
+            background: #fff;
+            shape-rendering: crispEdges;
+            image-rendering: pixelated;
+        }
     }
 </style>
 
@@ -637,7 +648,7 @@
 
     <!-- Shop Header -->
     <div class="rcpt-shop-header">
-        <span class="rcpt-shop-name">THE SATA POS</span>
+        <span class="rcpt-shop-name">THE SATA Invoice</span>
         <span class="rcpt-shop-sub">@ViewBag.SellerAddress</span>
         <span class="rcpt-shop-sub">@ViewBag.SellerContact</span>
     </div>
@@ -677,24 +688,25 @@
         <hr class="rcpt-hr" />
         <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
         <hr class="rcpt-hr" />
-        <div class="rcpt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
+        <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA Invoice</div>
         <hr class="rcpt-hr" />
     </div>
 
     <!-- Bottom: Order info (left) + Barcode (right) -->
     <div class="rcpt-bottom">
+
         <div class="order-info">
             <div id="rcptOrderNo">ORDER: SALE_1</div>
             <div id="rcptDate"></div>
         </div>
-        <!--
-            SVG barcode — Code 128B
-            Scanner output = bill number (e.g. SALE_27)
-            Label below bars = bill number
-        -->
-        <div style="display: flex; justify-content: center; margin-top: 10px;">
-            <svg id="rcptBarcodeSvg" shape-rendering="crispEdges" style="display:block; background: #fff;"></svg>
+
+        <!-- Barcode Section -->
+        <div class="barcode-container">
+
+            <svg id="rcptBarcodeSvg"></svg>
+
         </div>
+
     </div>
 
 </div>
@@ -1208,7 +1220,21 @@
         document.getElementById('rcptOrderNo').innerText  = 'ORDER: ' + orderId;
         document.getElementById('rcptDate').innerText     = dateStr;
 
-        generateCode128SVG('rcptBarcodeSvg', orderId);
+        // Use JsBarcode for reliable, industry-standard barcode generation
+        // width: 2 is the "sweet spot" for 58mm/80mm thermal printers
+        JsBarcode("#rcptBarcodeSvg", orderId, {
+            format: "CODE128",
+            width: 2,
+            height: 80,
+            displayValue: true,
+            fontSize: 20,
+            fontOptions: "bold",
+            margin: 10,
+            textMargin: 5,
+            background: "#ffffff",
+            lineColor: "#000000",
+            flat: true
+        });
 
         const itemsBody = document.getElementById('rcptItemsBody');
         itemsBody.innerHTML = '';
@@ -1223,95 +1249,7 @@
         });
     }
 
-    /* ═══════════════════════════════════════════════════════
-       CODE 128B BARCODE
-    ═══════════════════════════════════════════════════════ */
-         function generateCode128SVG(svgId, text) {
 
-        const svg = document.getElementById(svgId);
-        if (!svg) return;
-
-        const patterns = [
-    "11011001100","11001101100","11001100110","10010011000","10010001100","10001001100","10011001000","10011000100","10001100100","11001001000",
-    "11001000100","11000100100","10110011100","10011011100","10011001110","10111001100","10011101100","11001110010","11001011100","11001001110",
-    "11011100100","11001110100","11101101110","11101001100","11100101100","11100100110","11101100100","11100110100","11100110010","11011011000",
-    "11011000110","11000110110","10100011000","10001011000","10001000110","10110001000","10001101000","10001100010","11010001000","11000101000",
-    "11000100010","10110111000","10110001110","10001101110","10111011000","10111000110","10001110110","11101110100","11010001110","11000101110",
-    "11011101000","11011100010","11011101110","11101011000","11101000110","11100010110","11101101000","11101100010","11100011010","11101111010",
-    "11001000010","11110001010","10100110000","10100001100","10010110000","10010000110","10000101100","10000100110","10110010000","10110000100",
-    "10011010000","10011000010","10000110100","10000110010","11000010010","11001010000","11110111010","11000010100","10001111010","10100111100",
-    "10010111100","10010011110","10111100100","10011110100","10011110010","11110100100","11110010100","11110010010","11011011110","11011110110",
-    "11110110110","10101111000","10100011110","10001011110","10111101000","10111100010","11101011110","11110101110","11000111010"
-        ];
-
-        let checksum = 104;
-        let bits = patterns[104]; // Start Code B
-
-        for (let i = 0; i < text.length; i++) {
-
-            const code = text.charCodeAt(i) - 32;
-
-            if (code < 0 || code > 95) continue;
-
-            bits += patterns[code];
-            checksum += code * (i + 1);
-        }
-
-        const checkValue = checksum % 103;
-        bits += patterns[checkValue];
-
-        // Correct STOP pattern
-        bits += "1100011101011";
-
-        const moduleWidth = 3.5;
-        const barHeight = 150;
-        const quietZoneModules = 12;
-
-        const quiet = "0".repeat(quietZoneModules);
-        const finalBits = quiet + bits + quiet;
-
-        const width = finalBits.length * moduleWidth;
-        const height = barHeight + 40;
-
-        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-        svg.setAttribute("width", width);
-        svg.setAttribute("height", height);
-
-        svg.innerHTML = `<rect width="100%" height="100%" fill="white"/>`;
-
-        for (let i = 0; i < finalBits.length; i++) {
-
-            if (finalBits[i] === "1") {
-
-                let run = 1;
-
-                while (i + run < finalBits.length && finalBits[i + run] === "1") run++;
-
-                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-
-                rect.setAttribute("x", i * moduleWidth);
-                rect.setAttribute("y", 0);
-                rect.setAttribute("width", run * moduleWidth);
-                rect.setAttribute("height", barHeight);
-                rect.setAttribute("fill", "#000");
-
-                svg.appendChild(rect);
-
-                i += run - 1;
-            }
-        }
-
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-
-        label.setAttribute("x", width / 2);
-        label.setAttribute("y", barHeight + 25);
-        label.setAttribute("text-anchor", "middle");
-        label.setAttribute("font-size", "18");
-        label.setAttribute("font-family", "monospace");
-        label.textContent = text;
-
-        svg.appendChild(label);
-    }
 
     /* ═══════════════════════════════════════════════════════
        CUSTOMER DROPDOWN
@@ -1368,7 +1306,7 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
