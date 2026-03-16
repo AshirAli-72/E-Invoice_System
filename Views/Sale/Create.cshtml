@@ -110,159 +110,147 @@
         }
 
     /* ══════════════════════════════════════════════
-           RECEIPT  — pixel-matched to PDF screenshot
-           Font : Courier New throughout
-           Width: 190 mm  |  Padding: 6mm top, 8mm sides
+           RECEIPT  — pixel-matched to screenshot
+           Font : Courier New  |  Width: 190mm on print
         ══════════════════════════════════════════════ */
     #thermalReceipt {
         display: none;
-        width: 80mm; /* Standard Thermal Receipt Width (Change to 190mm if using A4) */
-        padding: 4mm;
+        width: 190mm;
+        padding: 6mm 8mm;
         font-family: 'Courier New', Courier, monospace;
         color: #000;
         background: #fff;
         box-sizing: border-box;
-        font-size: 12pt;
-    }
-
-    /* RETURN: date-left / ORDER-right top banner */
-    #returnTopBanner {
-        display: none;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 9.5pt;
-        font-weight: 700;
-        margin-bottom: 3px;
     }
 
     /* Shop header */
     .rcpt-shop-header {
         text-align: center;
-        line-height: 1.3;
-        margin-bottom: 2px;
+        line-height: 1.35;
+        margin-bottom: 4px;
     }
 
-        .rcpt-shop-header .shop-name {
-            font-size: 18pt;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 1px;
-        }
+    .rcpt-shop-name {
+        display: block;
+        font-size: 20pt;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
 
-        .rcpt-shop-header .shop-sub {
-            font-size: 9.5pt;
-            font-weight: 700;
-            display: block;
-            margin: 1px 0;
-        }
+    .rcpt-shop-sub {
+        display: block;
+        font-size: 10pt;
+        font-weight: 700;
+        margin: 1px 0;
+    }
 
-    /* Separator lines */
-    .rcpt-hr-thin {
+    /* Separator */
+    .rcpt-hr {
         border: none;
-        border-top: 1pt solid #000;
-        margin: 3px 0;
-    }
-
-    .rcpt-hr-thick {
-        border: none;
-        border-top: 2pt solid #000;
-        margin: 3px 0;
-    }
-
-    /* Cashier / Customer / Bold Meta */
-    .rcpt-meta {
-        font-size: 13pt;
-        font-weight: 800;
+        border-top: 1.5pt solid #000;
         margin: 4px 0;
+    }
+
+    /* Meta lines */
+    .rcpt-meta {
+        font-size: 11pt;
+        font-weight: 800;
+        margin: 3px 0;
         line-height: 1.4;
-        color: #000;
     }
 
     /* Items table */
     .rcpt-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 2px 0;
+        margin: 4px 0;
     }
 
-        .rcpt-table thead tr:first-child th {
+        .rcpt-table thead th {
             border-top: 2pt solid #000;
             border-bottom: 2pt solid #000;
             padding: 4px 2px;
-            font-size: 9.5pt;
+            font-size: 10pt;
             font-weight: 900;
             text-transform: uppercase;
         }
 
         .rcpt-table tbody td {
-            font-size: 9.5pt;
-            font-weight: 600;
-            padding: 3px 2px;
+            font-size: 10.5pt;
+            padding: 4px 2px;
+            vertical-align: top;
         }
 
-        .rcpt-table tfoot td {
-            border-top: 2pt solid #000;
-            padding: 0;
-            line-height: 0;
-        }
+    .rcpt-col-prod {
+        width: 50%;
+        text-align: left;
+    }
+
+    .rcpt-col-qty {
+        width: 12%;
+        text-align: center;
+    }
+
+    .rcpt-col-price {
+        width: 18%;
+        text-align: right;
+    }
+
+    .rcpt-col-amt {
+        width: 20%;
+        text-align: right;
+    }
 
     /* Totals */
     .rcpt-totals-row {
         display: flex;
         justify-content: space-between;
-        font-size: 13pt;
+        font-size: 11pt;
         font-weight: 800;
-        padding: 4px 2px;
+        padding: 3px 2px;
         line-height: 1.3;
-        color: #000;
     }
 
     /* Footer */
     .rcpt-footer {
         text-align: center;
-        margin-top: 6px;
+        margin-top: 4px;
     }
 
     .rcpt-footer-thankyou {
-        font-size: 13pt;
+        font-size: 14pt;
         font-weight: 900;
         letter-spacing: 2px;
         text-transform: uppercase;
-        margin: 3px 0;
+        margin: 4px 0;
     }
 
     .rcpt-footer-promo {
-        font-size: 8.5pt;
+        font-size: 9pt;
         font-weight: 700;
         margin: 3px 0;
     }
 
     .rcpt-footer-copy {
-        font-size: 7.5pt;
+        font-size: 8pt;
         font-weight: 600;
         margin: 2px 0;
     }
 
-    /* Bottom: ORDER left · barcode right */
-    #receiptBottomSection {
-        display: none;
+    /* Bottom row: order info + barcode */
+    .rcpt-bottom {
+        display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 8px;
     }
 
-        #receiptBottomSection .order-info {
-            font-size: 9.5pt;
-            font-weight: 700;
+        .rcpt-bottom .order-info {
+            font-size: 10pt;
+            font-weight: 800;
             line-height: 1.7;
         }
-
-    #receiptBarcodeSvg {
-        display: block;
-        margin-top: 5px;
-    }
 
     /* ── PRINT ── */
     @@media print {
@@ -429,7 +417,7 @@
                         <i class="ph-user-circle"></i>
                         <input type="text" id="customerSearchInput" class="customer-search-input"
                                placeholder="Search Customer..." autocomplete="off" />
-                        <input type="hidden" name="customer_name" id="customerSelect" required />
+                        <input type="hidden" name="customer_name" id="customerSelect" value="Walk-In" />
                     </div>
                     <div id="customerResults" class="customer-dropdown-results shadow-luxury"></div>
                 </div>
@@ -641,66 +629,79 @@
     </div>
 </div>
 
+
 <!-- ═══════════════════════════════════════════
-     RECEIPT HTML
+     RECEIPT HTML  (hidden — shown only on print)
 ═══════════════════════════════════════════ -->
 <div id="thermalReceipt">
 
-    <div id="receiptShopHeader" class="rcpt-shop-header">
-        <span class="shop-name">THE SATA POS</span>
-        <span class="shop-sub">@ViewBag.SellerAddress</span>
-        <span class="shop-sub">@ViewBag.SellerContact</span>
+    <!-- Shop Header -->
+    <div class="rcpt-shop-header">
+        <span class="rcpt-shop-name">THE SATA POS</span>
+        <span class="rcpt-shop-sub">@ViewBag.SellerAddress</span>
+        <span class="rcpt-shop-sub">@ViewBag.SellerContact</span>
     </div>
 
-    <hr class="rcpt-hr-thin" />
+    <hr class="rcpt-hr" />
 
-    <div class="rcpt-meta">Cashier: @(User.Identity.Name ?? "nill")</div>
-    <div class="rcpt-meta">Customer: <span id="receiptCustomerName">Walk-In</span></div>
+    <!-- Cashier / Customer -->
+    <div class="rcpt-meta">Cashier: @(User.Identity?.Name ?? "nill")</div>
+    <div class="rcpt-meta">Customer: <span id="rcptCustomer">Walk-In</span></div>
 
+    <!-- Items table -->
     <table class="rcpt-table">
         <thead>
             <tr>
-                <th style="text-align:left;  width:46%;">PRODUCT</th>
-                <th style="text-align:center;width:14%;">QTY</th>
-                <th style="text-align:center;width:20%;">PRICE</th>
-                <th style="text-align:right; width:20%;">AMOUNT</th>
+                <th class="rcpt-col-prod">PRODUCT</th>
+                <th class="rcpt-col-qty">QTY</th>
+                <th class="rcpt-col-price">PRICE</th>
+                <th class="rcpt-col-amt">AMOUNT</th>
             </tr>
         </thead>
-        <tbody id="receiptItemsBody"></tbody>
-        <tfoot><tr><td colspan="4"></td></tr></tfoot>
+        <tbody id="rcptItemsBody">
+            <!-- filled by JS -->
+        </tbody>
     </table>
 
-    <div id="receiptTotals">
-        <div class="rcpt-totals-row"><span>SUB TOTAL</span> <span id="receiptSubTotalVal">$0</span></div>
-        <div class="rcpt-totals-row"><span>TOTAL</span>     <span id="receiptTotalVal">$0</span></div>
-        <div class="rcpt-totals-row"><span>AMOUNT DUE</span><span id="receiptDueVal">$0</span></div>
-        <div class="rcpt-totals-row"><span>CASH</span>       <span id="receiptTenderedVal">$0</span></div>
-        <div class="rcpt-totals-row"><span>PAY TYPE</span>  <span id="receiptPayType">Cash</span></div>
-    </div>
+    <!-- Totals -->
+    <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span id="rcptSubTotal">$0</span></div>
+    <div class="rcpt-totals-row"><span>TOTAL</span>      <span id="rcptTotal">$0</span></div>
+    <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span id="rcptDue">$0</span></div>
+    <div class="rcpt-totals-row"><span>CASH SALE</span>  <span id="rcptCash">$0</span></div>
+    <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span id="rcptPayType">Cash</span></div>
 
     <!-- Footer -->
     <div class="rcpt-footer">
-        <hr class="rcpt-hr-thick" />
+        <hr class="rcpt-hr" />
         <div class="rcpt-footer-thankyou">THANK YOU!</div>
-        <hr class="rcpt-hr-thick" />
+        <hr class="rcpt-hr" />
         <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
-        <hr class="rcpt-hr-thick" />
+        <hr class="rcpt-hr" />
         <div class="rcpt-footer-copy">Copyrights 2023, Powered by The SATA POS</div>
-        <hr class="rcpt-hr-thick" />
+        <hr class="rcpt-hr" />
     </div>
 
-    <div id="receiptBottomSection" style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+    <!-- Bottom: Order info (left) + Barcode (right) -->
+    <div class="rcpt-bottom">
         <div class="order-info">
-            <div id="receiptOrderNo"></div>
-            <div id="receiptDate"></div>
+            <div id="rcptOrderNo">ORDER: SALE_1</div>
+            <div id="rcptDate"></div>
         </div>
-        <svg id="receiptBarcodeSvg"></svg>
+        <!--
+            SVG barcode — Code 128B
+            Scanner output = bill number (e.g. SALE_27)
+            Label below bars = bill number
+        -->
+        <div style="display: flex; justify-content: center; margin-top: 10px;">
+            <svg id="rcptBarcodeSvg" shape-rendering="crispEdges" style="display:block; background: #fff;"></svg>
+        </div>
     </div>
 
 </div>
 <!-- END RECEIPT -->
-
-
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
 <script>
     /* ═══════════════════════════════════════════════════════
        STATE
@@ -781,7 +782,7 @@
     function addCustomItem() {
         const name  = document.getElementById('customName').value.trim();
         const price = parseFloat(document.getElementById('customPrice').value);
-        if (!name) return alert('Please enter item name');
+        if (!name)                     return alert('Please enter item name');
         if (isNaN(price) || price < 0) return alert('Please enter a valid price');
         addItemToSale(0, name, price, 0, null, null, 999999, null);
         closeCustomItemModal();
@@ -832,31 +833,25 @@
     }
 
     async function filterProducts() {
-        const query        = document.getElementById('prodSearch').value.trim();
-        const queryLower   = query.toLowerCase();
+        const query      = document.getElementById('prodSearch').value.trim();
+        const queryLower = query.toLowerCase();
         let exactMatchCard = null;
 
-        // Check for Sale Recall Pattern (SALE_X or RETURN_X)
+        // Sale/Return recall by bill number
         if (query.match(/^(SALE_|RETURN_)\d+$/i)) {
             const billNo = query.toUpperCase();
             try {
-                const res = await fetch(`/Sale/GetItemsByBillNo?billNo=${billNo}`);
+                const res  = await fetch(`/Sale/GetItemsByBillNo?billNo=${billNo}`);
                 const data = await res.json();
                 if (data.success && data.items.length > 0) {
                     if (confirm(`Detected Bill #${billNo}. Load items into cart?`)) {
-                        saleItems = data.items.map(i => ({
-                            ...i,
-                            maxStock: 999999, // Allow loading items even if current stock is unknown/service
-                            image: null
-                        }));
+                        saleItems = data.items.map(i => ({ ...i, maxStock: 999999, image: null }));
                         renderSaleItems();
                         document.getElementById('prodSearch').value = '';
-                        return; // Exit search
+                        return;
                     }
                 }
-            } catch (e) {
-                console.error("Recall failed", e);
-            }
+            } catch (e) { console.error("Recall failed", e); }
         }
 
         document.querySelectorAll('.product-card-v2').forEach(card => {
@@ -883,10 +878,10 @@
         if (btn) btn.classList.add('active');
         document.querySelectorAll('.product-card-v2').forEach(card => {
             const type = card.getAttribute('data-type');
-            if      (cat === 'all')                          card.style.display = 'flex';
+            if      (cat === 'all')                             card.style.display = 'flex';
             else if (cat === 'Foods'     && type === 'product') card.style.display = 'flex';
             else if (cat === 'Beverages' && type === 'service') card.style.display = 'flex';
-            else                                              card.style.display = 'none';
+            else                                                card.style.display = 'none';
         });
     }
 
@@ -895,8 +890,9 @@
     ═══════════════════════════════════════════════════════ */
     function addToSaleFromCard(card) {
         addItemToSale(
-            card.dataset.id, card.dataset.name,
-            parseFloat(card.dataset.price), parseFloat(card.dataset.discount),
+            card.dataset.id,    card.dataset.name,
+            parseFloat(card.dataset.price),
+            parseFloat(card.dataset.discount),
             card.dataset.expiry  || null,
             card.dataset.barcode || null,
             parseFloat(card.dataset.stock),
@@ -938,9 +934,9 @@
         const hiddenContainer = document.getElementById('hiddenInputsContainer');
         const countDisplay    = document.getElementById('itemCountDisplay');
 
-        body.innerHTML = '';
+        body.innerHTML            = '';
         hiddenContainer.innerHTML = '';
-        countDisplay.innerText = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
+        countDisplay.innerText    = `${saleItems.length} item${saleItems.length !== 1 ? 's' : ''} selected`;
 
         if (saleItems.length === 0) {
             empty.style.display = 'flex';
@@ -1131,7 +1127,8 @@
         document.getElementById('hiddenPaymentMethod').value = method;
         document.getElementById('hiddenStatus').value        = method === 'Credit' ? 'Pending' : 'Paid';
         document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
-        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        if (typeof event !== 'undefined' && event.currentTarget) event.currentTarget.classList.add('active');
+        else if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
     }
 
     function calculateWebChange() {
@@ -1161,24 +1158,28 @@
             return alert('Amount tendered is less than the grand total.');
         document.getElementById('printConfirmModal').classList.add('show');
     }
+
     function askToPrintReceipt() { submitSaleForm(); }
 
     async function processFinalSubmission(shouldPrint) {
+        const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
+        const orderId  = await getNextOrderId(isReturn);
+        document.getElementById('hiddenBillNo').value = orderId;
+
+        // Ensure customer is set
+        const hi = document.getElementById('customerSelect');
+        const si = document.getElementById('customerSearchInput');
+        if (!hi.value) hi.value = si.value || 'Walk-In';
+
         if (shouldPrint) {
-            await prepareReceiptData();
+            await prepareReceiptData(orderId);
             window.print();
-        } else {
-            const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
-            const orderId  = await getNextOrderId(isReturn);
-            document.getElementById('hiddenBillNo').value = orderId;
         }
+        
         document.getElementById('saleForm').submit();
     }
 
-    /* ═══════════════════════════════════════════════════════
-       RECEIPT DATA PREPARATION
-    ═══════════════════════════════════════════════════════ */
-    async function prepareReceiptData() {
+    async function prepareReceiptData(orderId) {
         const isReturn     = document.querySelector('input[name="transMode"]:checked').value === 'return';
         const customerName = document.getElementById('customerSearchInput').value || 'Walk-In';
         const payMethod    = document.getElementById('hiddenPaymentMethod').value  || 'Cash';
@@ -1194,217 +1195,176 @@
             hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
         });
 
-        const orderId = await getNextOrderId(isReturn);
-        document.getElementById('hiddenBillNo').value = orderId;
-        document.getElementById('receiptCustomerName').innerText = customerName;
+        document.getElementById('rcptCustomer').innerText = customerName;
 
         let subTotal = 0;
-        saleItems.forEach(item => { subTotal += item.price * Math.abs(item.qty); });
+        saleItems.forEach(item => { subTotal += (item.price * item.qty); });
 
-        document.getElementById('receiptSubTotalVal').innerText = fv(subTotal);
-        document.getElementById('receiptTotalVal').innerText    = fv(netAmount);
-        document.getElementById('receiptDueVal').innerText      = fv(netAmount);
-        document.getElementById('receiptTenderedVal').innerText = fv(tendered);
-        document.getElementById('receiptPayType').innerText     = payMethod;
-        document.getElementById('receiptOrderNo').innerText     = 'ORDER: ' + orderId;
-        document.getElementById('receiptDate').innerText        = dateStr;
+        document.getElementById('rcptSubTotal').innerText = fv(Math.abs(subTotal));
+        document.getElementById('rcptTotal').innerText    = fv(netAmount);
+        document.getElementById('rcptDue').innerText      = fv(netAmount);
+        document.getElementById('rcptCash').innerText     = fv(tendered);
+        document.getElementById('rcptPayType').innerText  = payMethod;
+        document.getElementById('rcptOrderNo').innerText  = 'ORDER: ' + orderId;
+        document.getElementById('rcptDate').innerText     = dateStr;
 
-        // Ensure bottom section is visible
-        const bottomSection = document.getElementById('receiptBottomSection');
-        if (bottomSection) bottomSection.style.display = 'flex';
+        generateCode128SVG('rcptBarcodeSvg', orderId);
 
-        /* Encoded (scanned): Bill ID (e.g. SALE_18) | Label (displayed): Bill ID */
-        generateCode128SVG('receiptBarcodeSvg', orderId);
-
-        const itemsBody = document.getElementById('receiptItemsBody');
+        const itemsBody = document.getElementById('rcptItemsBody');
         itemsBody.innerHTML = '';
         saleItems.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td style="text-align:left;">${item.prod_name_service}</td>
-                <td style="text-align:center;">${Math.abs(item.qty)}</td>
-                <td style="text-align:center;">${fmtVal(item.price)}</td>
-                <td style="text-align:right;">${fmtVal(Math.abs(item.total_price))}</td>`;
+                <td class="rcpt-col-prod">${item.prod_name_service}</td>
+                <td class="rcpt-col-qty">${Math.abs(item.qty)}</td>
+                <td class="rcpt-col-price">${fmtVal(item.price)}</td>
+                <td class="rcpt-col-amt">${fmtVal(Math.abs(item.total_price))}</td>`;
             itemsBody.appendChild(row);
         });
     }
 
     /* ═══════════════════════════════════════════════════════
-       CODE 128B BARCODE GENERATOR
-       Encodes orderId (e.g. "SALE_27").
-       Label under bars = orderId.
-       Scanner output   = orderId.
+       CODE 128B BARCODE
     ═══════════════════════════════════════════════════════ */
-    function generateCode128SVG(svgId, text, labelText) {
+         function generateCode128SVG(svgId, text) {
+
         const svg = document.getElementById(svgId);
         if (!svg) return;
-        svg.setAttribute('shape-rendering', 'crispEdges');
-        svg.innerHTML = '';
 
-        const PATTERNS = [
-            '11011001100','11001101100','11001100110','10010011000','10010001100','10001001100','10011001000','10011000100','10001100100','11001001000',
-            '11001000100','11000100100','10110011100','10011011100','10011001110','10111001100','10011101100','11001110010','11001011100','11001001110',
-            '11011100100','11001110100','11101101110','11101001100','11100101100','11100100110','11101100100','11100110100','11100110010','11011011000',
-            '11011000110','11000110110','10100011000','10001011000','10001000110','10110001000','10001101000','10001100010','11010001000','11000101000',
-            '11000100010','10110111000','10110001110','10001101110','10111011000','10111000110','10001110110','11101110100','11010001110','11000101110',
-            '11011101000','11011100010','11011101110','11101011000','11101000110','11100010110','11101101000','11101100010','11100011010','11101111010',
-            '11001000010','11110001010','10100110000','10100001100','10010110000','10010000110','10000101100','10000100110','10110010000','10110000100',
-            '10011010000','10011000010','10000110100','10000110010','11000010010','11001010000','11110111010','11000010100','10001111010','10100111100',
-            '10010111100','10010011110','10111100100','10011110100','10011110010','11110100100','11110010100','11110010010','11011011110','11011110110',
-            '11110110110','10101111000','10100011110','10001011110','10111101000','10111100010','11101011110','11110101110','11011110110','11101111010',
-            '10111101110','11101011110','11110101110'
+        const patterns = [
+    "11011001100","11001101100","11001100110","10010011000","10010001100","10001001100","10011001000","10011000100","10001100100","11001001000",
+    "11001000100","11000100100","10110011100","10011011100","10011001110","10111001100","10011101100","11001110010","11001011100","11001001110",
+    "11011100100","11001110100","11101101110","11101001100","11100101100","11100100110","11101100100","11100110100","11100110010","11011011000",
+    "11011000110","11000110110","10100011000","10001011000","10001000110","10110001000","10001101000","10001100010","11010001000","11000101000",
+    "11000100010","10110111000","10110001110","10001101110","10111011000","10111000110","10001110110","11101110100","11010001110","11000101110",
+    "11011101000","11011100010","11011101110","11101011000","11101000110","11100010110","11101101000","11101100010","11100011010","11101111010",
+    "11001000010","11110001010","10100110000","10100001100","10010110000","10010000110","10000101100","10000100110","10110010000","10110000100",
+    "10011010000","10011000010","10000110100","10000110010","11000010010","11001010000","11110111010","11000010100","10001111010","10100111100",
+    "10010111100","10010011110","10111100100","10011110100","10011110010","11110100100","11110010100","11110010010","11011011110","11011110110",
+    "11110110110","10101111000","10100011110","10001011110","10111101000","10111100010","11101011110","11110101110","11000111010"
         ];
 
-        const START_B     = '11010010000';
-        const STOP        = '11000111010';
-        const START_B_VAL = 104;
-
-        let bits     = START_B;
-        let checksum = START_B_VAL;
+        let checksum = 104;
+        let bits = patterns[104]; // Start Code B
 
         for (let i = 0; i < text.length; i++) {
-            const val = text.charCodeAt(i) - 32;
-            if (val < 0 || val >= PATTERNS.length) continue;
-            bits     += PATTERNS[val];
-            checksum += val * (i + 1);
+
+            const code = text.charCodeAt(i) - 32;
+
+            if (code < 0 || code > 95) continue;
+
+            bits += patterns[code];
+            checksum += code * (i + 1);
         }
-        bits += PATTERNS[checksum % 103];
-        bits += STOP + '11';
 
-        const moduleW      = 2;
-        const barH         = 100;
-        const textH        = 24;
-        const quietZoneStr = '00000000000000000000'; 
-        const fullBits     = quietZoneStr + bits + quietZoneStr;
+        const checkValue = checksum % 103;
+        bits += patterns[checkValue];
 
-        const totalW  = fullBits.length * moduleW;
-        const totalH  = barH + textH;
+        // Correct STOP pattern
+        bits += "1100011101011";
 
-        svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-        svg.setAttribute('width',   totalW);
-        svg.setAttribute('height',  totalH);
-        svg.style.display = 'block';
+        const moduleWidth = 3.5;
+        const barHeight = 150;
+        const quietZoneModules = 12;
 
-        // White background to ensure quiet zones work on all paper types
-        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        bg.setAttribute('width', '100%');
-        bg.setAttribute('height', '100%');
-        bg.setAttribute('fill', '#fff');
-        svg.appendChild(bg);
+        const quiet = "0".repeat(quietZoneModules);
+        const finalBits = quiet + bits + quiet;
 
-        let i = 0;
-        while (i < fullBits.length) {
-            if (fullBits[i] === '1') {
-                let run = 0;
-                while (i + run < fullBits.length && fullBits[i + run] === '1') run++;
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x',      i * moduleW);
-                rect.setAttribute('y',      0);
-                rect.setAttribute('width',  run * moduleW);
-                rect.setAttribute('height', barH);
-                rect.setAttribute('fill',   '#000');
-                rect.setAttribute('shape-rendering', 'crispEdges');
+        const width = finalBits.length * moduleWidth;
+        const height = barHeight + 40;
+
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
+
+        svg.innerHTML = `<rect width="100%" height="100%" fill="white"/>`;
+
+        for (let i = 0; i < finalBits.length; i++) {
+
+            if (finalBits[i] === "1") {
+
+                let run = 1;
+
+                while (i + run < finalBits.length && finalBits[i + run] === "1") run++;
+
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+                rect.setAttribute("x", i * moduleWidth);
+                rect.setAttribute("y", 0);
+                rect.setAttribute("width", run * moduleWidth);
+                rect.setAttribute("height", barHeight);
+                rect.setAttribute("fill", "#000");
+
                 svg.appendChild(rect);
-                i += run;
-            } else { i++; }
+
+                i += run - 1;
+            }
         }
 
-        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('x',           totalW / 2);
-        t.setAttribute('y',           barH + 24);
-        t.setAttribute('text-anchor', 'middle');
-        t.setAttribute('font-size',   '13');
-        t.setAttribute('font-family', 'Courier New, monospace');
-        t.setAttribute('font-weight', 'bold');
-        t.setAttribute('fill',        '#000');
-        t.textContent = labelText || text;
-        svg.appendChild(t);
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+        label.setAttribute("x", width / 2);
+        label.setAttribute("y", barHeight + 25);
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("font-size", "18");
+        label.setAttribute("font-family", "monospace");
+        label.textContent = text;
+
+        svg.appendChild(label);
     }
 
     /* ═══════════════════════════════════════════════════════
        CUSTOMER DROPDOWN
-       allCustomers is always an array (never null)
     ═══════════════════════════════════════════════════════ */
-    const allCustomers = @Html.Raw(Json.Serialize(
-                customerList?.Select(c => new { name = c.name, contact = c.contact, email = c.email })
-        )) ?? [];
-
+    const allCustomers = @Html.Raw(Json.Serialize(customerList?.Select(c => new { name = c.name, contact = c.contact, email = c.email }))) ?? [];
     let highlightedIndex = -1;
-    let searchInput, resultsContainer, hiddenInput;
 
     document.addEventListener('DOMContentLoaded', () => {
-        searchInput      = document.getElementById('customerSearchInput');
-        resultsContainer = document.getElementById('customerResults');
-        hiddenInput      = document.getElementById('customerSelect');
+        const si = document.getElementById('customerSearchInput');
+        const rc = document.getElementById('customerResults');
+        const hi = document.getElementById('customerSelect');
+        if (!si) return;
 
-        if (!searchInput) return;
-
-        searchInput.addEventListener('focus',   () => filterCustomerResults());
-        searchInput.addEventListener('input',   () => filterCustomerResults());
-        searchInput.addEventListener('keydown', (e) => {
-            const items = resultsContainer.querySelectorAll('.customer-result-item');
-            if      (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
-            else if (e.key === 'ArrowUp')   { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0);                updateHighlight(items); }
-            else if (e.key === 'Enter')     { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
-            else if (e.key === 'Escape')    { hideResults(); }
+        si.addEventListener('focus', () => filterCustomerResults(si, rc));
+        si.addEventListener('input', () => filterCustomerResults(si, rc));
+        si.addEventListener('keydown', (e) => {
+            const items = rc.querySelectorAll('.customer-result-item');
+            if (e.key === 'ArrowDown') { e.preventDefault(); highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1); updateHighlight(items); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); highlightedIndex = Math.max(highlightedIndex - 1, 0); updateHighlight(items); }
+            else if (e.key === 'Enter') { e.preventDefault(); if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click(); }
+            else if (e.key === 'Escape') rc.classList.remove('show');
         });
-
-        /* single global click-outside listener */
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target))
-                hideResults();
-        });
+        document.addEventListener('click', (e) => { if (!si.contains(e.target) && !rc.contains(e.target)) rc.classList.remove('show'); });
     });
 
-    function filterCustomerResults() {
-        if (!searchInput || !resultsContainer) return;
-        const query    = searchInput.value.toLowerCase();
-        resultsContainer.innerHTML = '';
-        const filtered = (allCustomers || []).filter(c =>
-            c.name.toLowerCase().includes(query) ||
-            (c.contact && c.contact.includes(query))
-        );
-        if (filtered.length === 0) {
-            resultsContainer.innerHTML =
-                `<div class="customer-result-item"
-                      style="cursor:default;color:var(--text-muted);">No customers found</div>`;
-        } else {
+    function filterCustomerResults(si, rc) {
+        const query = si.value.toLowerCase(); rc.innerHTML = '';
+        const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(query) || (c.contact && c.contact.includes(query)));
+        if (filtered.length === 0) { rc.innerHTML = `<div class="customer-result-item" style="cursor:default;color:var(--text-muted);">No customers found</div>`; }
+        else {
             filtered.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'customer-result-item';
-                div.innerHTML = `<span class="cust-name">${c.name}</span>
-                    ${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
-                div.onclick = () => selectCustomer(c.name);
-                resultsContainer.appendChild(div);
+                const div = document.createElement('div'); div.className = 'customer-result-item';
+                div.innerHTML = `<span class="cust-name">${c.name}</span>${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
+                div.onclick = () => { si.value = c.name; hi.value = c.name; rc.classList.remove('show'); handleCustomerChange(); };
+                rc.appendChild(div);
             });
         }
-        resultsContainer.classList.add('show');
-        highlightedIndex = -1;
+        rc.classList.add('show'); highlightedIndex = -1;
     }
 
     function updateHighlight(items) {
         items.forEach((item, idx) => {
-            if (idx === highlightedIndex) {
-                item.classList.add('highlighted');
-                item.scrollIntoView({ block: 'nearest' });
-            } else {
-                item.classList.remove('highlighted');
-            }
+            if (idx === highlightedIndex) { item.classList.add('highlighted'); item.scrollIntoView({ block: 'nearest' }); }
+            else item.classList.remove('highlighted');
         });
     }
 
     function selectCustomer(name) {
-        searchInput.value = name;
-        hiddenInput.value = name;
-        hideResults();
+        const si = document.getElementById('customerSearchInput');
+        const hi = document.getElementById('customerSelect');
+        if (si) si.value = name; if (hi) hi.value = name;
         handleCustomerChange();
     }
-
-    function hideResults() {
-        if (resultsContainer) resultsContainer.classList.remove('show');
-    }
-
-    $(document).ready(function () {});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
