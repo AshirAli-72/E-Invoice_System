@@ -586,12 +586,12 @@
             </div>
             <div style="display:flex;gap:16px;margin-top:32px;">
                 <button type="button" class="btn-confirm-web"
-                        style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);flex:1;"
+                        style="flex:1;background:#ef4444;color:#fff;border:none;font-size:1rem;font-weight:700;"
                         onclick="closeCustomItemModal()">
                     Cancel
                 </button>
                 <button type="button" class="btn-confirm-web"
-                        style="flex:2;background:var(--primary);color:white;"
+                        style="flex:1;background:#22c55e;color:#fff;border:none;font-size:1rem;font-weight:700;"
                         onclick="addCustomItem()">
                     Add to Order
                 </button>
@@ -642,9 +642,15 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-actions-sticky">
-                    <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Cancel</button>
-                    <button type="button" class="btn-primary" onclick="saveCustomerAjax()">
+                <div class="form-actions-sticky" style="display:flex;gap:16px;margin-top:32px;">
+                    <button type="button" class="btn-confirm-web"
+                            style="flex:1;background:#ef4444;color:#fff;border:none;font-size:1rem;font-weight:700;"
+                            onclick="closeCustomerModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn-confirm-web"
+                            style="flex:1;background:#22c55e;color:#fff;border:none;font-size:1rem;font-weight:700;"
+                            onclick="saveCustomerAjax()">
                         <i class="ph-check"></i> Save Customer
                     </button>
                 </div>
@@ -1144,11 +1150,15 @@
     }
 
     function calculateWebChange() {
-        const tendered = parseFloat(document.getElementById('webTendered').value) || 0;
-        const change   = tendered - Math.abs(currentTotal);
+        var tendered = parseFloat(document.getElementById('webTendered').value) || 0;
+        var total    = Math.abs(currentTotal);
+        var change   = tendered - total;
         document.getElementById('webModalTendered').innerText = format(tendered);
-        // Never show a negative change due — show $0.00 when customer hasn't paid enough yet
-        document.getElementById('webModalChange').innerText   = change < 0 ? '$0.00' : format(change);
+        if (change >= 0) {
+            document.getElementById('webModalChange').innerText = format(change);
+        } else {
+            document.getElementById('webModalChange').innerText = '$0.00';
+        }
     }
 
     function addWebAmount(amt) {
