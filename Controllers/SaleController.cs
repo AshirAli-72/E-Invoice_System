@@ -211,7 +211,7 @@ namespace E_Invoice_system.Controllers
                 
                 _context.SaveChanges();
                 TempData["Success"] = "Transaction processed successfully!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Create));
             }
 
             ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
