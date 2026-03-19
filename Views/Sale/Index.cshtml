@@ -115,7 +115,6 @@
             <thead>
                 <tr>
                     <th style="padding-left: 1.5rem;">Bill No</th>
-                    <th>Sale ID</th>
                     <th>Date</th>
                     <th>Product / Service</th>
                     <th>QTY/Unit Type</th>
@@ -133,9 +132,6 @@
                         <tr>
                             <td style="padding-left: 1.5rem;">
                                 <div class="font-bold font-sm font-monospace">@ret.billNo</div>
-                            </td>
-                            <td>
-                                <div class="font-bold font-sm">#@ret.SaleId</div>
                             </td>
                             <td>
                                 <div class="font-bold font-sm">@ret.Date.ToString("MMM dd, yyyy")</div>
@@ -170,7 +166,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="9" class="empty-state"><p>No return records found.</p></td></tr>
+                    <tr><td colspan="8" class="empty-state"><p>No return records found.</p></td></tr>
                 }
             </tbody>
         </table>
