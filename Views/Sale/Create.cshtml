@@ -337,20 +337,20 @@
         <div class="canvas-header">
             <div class="canvas-header-top">
                 <h3 class="canvas-title">Sales Transaction</h3>
-                <div class="search-controls-group" style="display: flex; gap: 8px; flex: 1; align-items: center;">
-                    <div class="search-bar-v2" style="flex: 1;">
-                        <i id="searchIcon" class="ph-magnifying-glass search-icon"></i>
-                        <input type="text" id="mainSearchInput" class="search-input"
-                               placeholder="Scan item barcode" oninput="handleMainSearch(event)" onkeydown="handleMainSearchKey(event)">
-                    </div>
-                    <div class="search-type-container" style="width: 200px;">
-                        <select id="searchType" class="search-type-select" onchange="handleSearchTypeChange()" 
-                                style="height: 44px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 0 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                            <option value="item" selected>Scan Item</option>
-                            <option value="receipt">Scan Receipt</option>
-                        </select>
-                    </div>
+            <div class="search-bar-v2-container" style="display: flex; gap: 8px; flex: 1; align-items: center;">
+                <div class="search-bar-v2" style="flex: 1;">
+                    <i id="searchIcon" class="ph-magnifying-glass search-icon"></i>
+                    <input type="text" id="mainSearchInput" class="search-input"
+                           placeholder="Scan item barcode" oninput="handleMainSearch(event)" onkeydown="handleMainSearchKey(event)">
                 </div>
+            </div>
+            <div class="mode-toggle-v2 compact" style="min-width: 150px; background: transparent; border: none; box-shadow: none;">
+                <select id="searchType" class="search-type-select" onchange="handleSearchTypeChange()" 
+                        style="height: 44px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 0 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; transition: all 0.2s;">
+                    <option value="item" selected>Scan Item</option>
+                    <option value="receipt">Scan Receipt</option>
+                </select>
+            </div>
                 <div class="quick-actions-v2">
                     <button type="button" class="btn-action-round" onclick="reloadPage()" title="Refresh"><i class="ph-arrows-clockwise"></i></button>
                     <button type="button" class="btn-action-round" onclick="toggleFullScreen()" title="Full Screen"><i class="ph-corners-out"></i></button>
@@ -431,6 +431,7 @@
             <input type="hidden" name="billNo" id="hiddenBillNo" value="" />
 
             <div class="checkout-header">
+                <div class="return-warning-banner"><i class="ph-warning"></i> RETURN MODE ACTIVE</div>
                 <div class="checkout-header-main">
                     <div>
                         <h3 class="order-detail-title">Order Detail</h3>
@@ -461,9 +462,6 @@
                         <input type="hidden" name="customer_name" id="customerSelect" value="Walk-In" />
                     </div>
                     <div id="customerResults" class="customer-dropdown-results shadow-luxury"></div>
-                    <div id="customerCreditInfo" style="display:none; font-size: 0.85rem; margin-top: 6px; padding: 4px 8px; background: #f1f5f9; border-radius: 6px; color: #475569; font-weight: 500;">
-                        <span id="labelLimit">Limit: $0.00</span> • <span id="labelBalance">Balance: $0.00</span>
-                    </div>
                 </div>
                 <button type="button" onclick="triggerCustomerModalV2(event)"
                         title="Add New Customer" class="btn-add-customer">
@@ -1257,23 +1255,6 @@
         if (tendered <= 0)                     return alert('Amount tendered must be greater than zero.');
         if (method !== 'Credit' && tendered < Math.abs(currentTotal))
             return alert('Amount tendered is less than the grand total.');
-        
-        // ---- CREDIT VALIDATION ----
-        if (method === 'Credit') {
-            const customerName = document.getElementById('customerSelect').value;
-            if (!customerName || customerName === 'Walk-In') {
-                return alert('Please select a registered customer for Credit payment.');
-            }
-            
-            const customer = allCustomers.find(c => c.name === customerName);
-            if (customer && customer.creditLimit > 0) {
-                const newBalance = customer.balance + Math.abs(currentTotal);
-                if (newBalance > customer.creditLimit) {
-                    return alert(`Credit limit exceeded!\nLimit: $${customer.creditLimit.toFixed(2)}\nCurrent Balance: $${customer.balance.toFixed(2)}\nOrder Total: $${Math.abs(currentTotal).toFixed(2)}\nMaximum possible additional credit: $${(customer.creditLimit - customer.balance).toFixed(2)}`);
-                }
-            }
-        }
-
         // Read the print toggle and go directly — no popup
         const shouldPrint = document.getElementById('printReceiptToggle').checked;
         processFinalSubmission(shouldPrint);
@@ -1368,13 +1349,7 @@
     /* ═══════════════════════════════════════════════════════
        CUSTOMER DROPDOWN
     ═══════════════════════════════════════════════════════ */
-    const allCustomers = @Html.Raw(Json.Serialize(customerList?.Select(c => new { 
-        name = c.name, 
-        contact = c.contact, 
-        email = c.email,
-        creditLimit = (double)c.CreditLimit,
-        balance = (double)c.Balance
-    }))) ?? [];
+    const allCustomers = @Html.Raw(Json.Serialize(customerList?.Select(c => new { name = c.name, contact = c.contact, email = c.email }))) ?? [];
     let highlightedIndex = -1;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1403,13 +1378,7 @@
             filtered.forEach(c => {
                 const div = document.createElement('div'); div.className = 'customer-result-item';
                 div.innerHTML = `<span class="cust-name">${c.name}</span>${c.contact ? `<span class="cust-details">${c.contact}</span>` : ''}`;
-                div.onclick = () => { 
-                    si.value = c.name; 
-                    hi.value = c.name; 
-                    rc.classList.remove('show'); 
-                    updateCustomerCreditDisplay(c);
-                    handleCustomerChange(); 
-                };
+                div.onclick = () => { si.value = c.name; hi.value = c.name; rc.classList.remove('show'); handleCustomerChange(); };
                 rc.appendChild(div);
             });
         }
@@ -1427,33 +1396,7 @@
         const si = document.getElementById('customerSearchInput');
         const hi = document.getElementById('customerSelect');
         if (si) si.value = name; if (hi) hi.value = name;
-        
-        const customer = allCustomers.find(c => c.name === name);
-        if (customer) updateCustomerCreditDisplay(customer);
-        else document.getElementById('customerCreditInfo').style.display = 'none';
-
         handleCustomerChange();
-    }
-
-    function updateCustomerCreditDisplay(c) {
-        const infoDiv = document.getElementById('customerCreditInfo');
-        if (!c || c.name === 'Walk-In') {
-            infoDiv.style.display = 'none';
-            return;
-        }
-        
-        document.getElementById('labelLimit').innerText = `Limit: $${(c.creditLimit || 0).toFixed(2)}`;
-        document.getElementById('labelBalance').innerText = `Balance: $${(c.balance || 0).toFixed(2)}`;
-        infoDiv.style.display = 'block';
-
-        // Highlighting if near limit
-        if (c.creditLimit > 0 && c.balance >= c.creditLimit) {
-            infoDiv.style.background = '#fee2e2';
-            infoDiv.style.color = '#b91c1c';
-        } else {
-            infoDiv.style.background = '#f1f5f9';
-            infoDiv.style.color = '#475569';
-        }
     }
 </script>
 

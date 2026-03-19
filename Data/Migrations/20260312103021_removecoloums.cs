@@ -10,13 +10,13 @@ namespace E_Invoice_system.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // migrationBuilder.DropColumn(
-            //     name: "customer_name",
-            //     table: "sale_details");
+            migrationBuilder.DropColumn(
+                name: "customer_name",
+                table: "sale_details");
 
-            // migrationBuilder.DropColumn(
-            //     name: "customer_name",
-            //     table: "return_details");
+            migrationBuilder.DropColumn(
+                name: "customer_name",
+                table: "return_details");
         }
 
         /// <inheritdoc />

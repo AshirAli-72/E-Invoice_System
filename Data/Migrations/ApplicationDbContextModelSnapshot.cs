@@ -77,7 +77,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("products_services");
+                    b.ToTable("products_services", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.ReturnDetail", b =>
@@ -129,7 +129,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("return_details");
+                    b.ToTable("return_details", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.Sale", b =>
@@ -197,7 +197,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("sale_details");
+                    b.ToTable("sale_details", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.Sellers", b =>
@@ -231,7 +231,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("sellers");
+                    b.ToTable("sellers", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.customers", b =>
@@ -242,14 +242,6 @@ namespace E_Invoice_system.Migrations
                         .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("balance");
-
-                    b.Property<decimal>("CreditLimit")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("credit_limit");
 
                     b.Property<string>("address")
                         .HasColumnType("nvarchar(max)")
@@ -273,7 +265,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("customers");
+                    b.ToTable("customers", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.invoices", b =>
@@ -347,7 +339,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("invoices");
+                    b.ToTable("invoices", (string)null);
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.users", b =>
@@ -373,7 +365,7 @@ namespace E_Invoice_system.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

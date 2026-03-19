@@ -219,31 +219,6 @@ namespace E_Invoice_system.Controllers
                 
                 if (salesToInsert.Any()) _context.sales.AddRange(salesToInsert);
                 if (returnsToInsert.Any()) _context.returns.AddRange(returnsToInsert);
-
-                // ---- CREDIT LOGIC: Update Customer Balance ----
-                if (payment_method == "Credit" && !string.IsNullOrEmpty(customer_name))
-                {
-                    var customer = _context.customers.FirstOrDefault(c => c.name == customer_name);
-                    if (customer != null)
-                    {
-                        decimal orderTotal = salesToInsert.Sum(s => s.total_price);
-                        
-                        // Check Credit Limit (as in Spices_pos)
-                        if (customer.CreditLimit > 0 && (customer.Balance + orderTotal) > customer.CreditLimit)
-                        {
-                            ModelState.AddModelError("", $"Credit limit exceeded for {customer_name}. Limit: {customer.CreditLimit}, Current Balance: {customer.Balance}, Order: {orderTotal}");
-                            
-                            // Reload lists and return to view (abort save)
-                            ViewBag.Customers = _context.customers.Where(c => c.status == "Active").ToList();
-                            ViewBag.Products = _context.products_services.Where(p => p.status == "Available").ToList();
-                            return View();
-                        }
-
-                        // Update Balance
-                        customer.Balance += orderTotal;
-                        _context.customers.Update(customer);
-                    }
-                }
                 
                 _context.SaveChanges();
                 TempData["Success"] = "Transaction processed successfully!";

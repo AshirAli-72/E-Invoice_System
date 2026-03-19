@@ -67,14 +67,6 @@ namespace E_Invoice_system.Data
             modelBuilder.Entity<ReturnDetail>()
                 .Property(r => r.Amount)
                 .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<customers>()
-                .Property(c => c.CreditLimit)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<customers>()
-                .Property(c => c.Balance)
-                .HasColumnType("decimal(18,2)");
         }
     }
 }

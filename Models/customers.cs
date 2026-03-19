@@ -24,11 +24,5 @@ namespace E_Invoice_system.Models
 
         [Column("status")]
         public string? status { get; set; }
-
-        [Column("credit_limit")]
-        public decimal CreditLimit { get; set; }
-
-        [Column("balance")]
-        public decimal Balance { get; set; }
     }
 }
