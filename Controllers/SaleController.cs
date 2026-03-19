@@ -107,11 +107,22 @@ namespace E_Invoice_system.Controllers
                     // PROCESS AS RETURN
                     if (qty < 0)
                     {
-                        var originalSaleQuery = _context.sales.Where(s => s.prod_name_service == item.prod_name_service);
+                        Sale? originalSale = null;
                         
-                        var originalSale = originalSaleQuery
-                            .OrderByDescending(s => s.date)
-                            .FirstOrDefault();
+                        // If we have an ID (from a loaded invoice), use it for precise matching
+                        if (item.id > 0)
+                        {
+                            originalSale = _context.sales.FirstOrDefault(s => s.id == item.id);
+                        }
+                        
+                        // Fallback to searching by name (original logic)
+                        if (originalSale == null)
+                        {
+                            originalSale = _context.sales
+                                .Where(s => s.prod_name_service == item.prod_name_service)
+                                .OrderByDescending(s => s.date)
+                                .FirstOrDefault();
+                        }
 
                         if (originalSale != null)
                         {
@@ -352,21 +363,32 @@ namespace E_Invoice_system.Controllers
         {
             if (string.IsNullOrEmpty(billNo)) return Json(new { success = false });
 
-            var items = _context.sales
+            // Fetch all items with this billNo
+            var itemsRaw = _context.sales
                 .Where(s => s.billNo == billNo)
-                .Select(s => new
+                .ToList();
+
+            var items = itemsRaw.Select(s => {
+                decimal qty = 0;
+                var match = System.Text.RegularExpressions.Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
+                if (match.Success) decimal.TryParse(match.Groups[1].Value, out qty);
+
+                return new
                 {
+                    id = s.id,
                     prod_name_service = s.prod_name_service,
                     barcode = s.barcode,
-                    qty = 1, // Reset to 1 for new cart load
+                    qty = qty, 
                     price = s.price,
                     discount = s.discount,
                     expiry_date = s.expiry_date,
                     total_price = s.total_price
-                })
-                .ToList();
+                };
+            })
+            .Where(x => x.qty > 0) // Only load items that haven't been fully returned
+            .ToList();
 
-            if (!items.Any()) return Json(new { success = false });
+            if (!items.Any()) return Json(new { success = false, message = "No valid items found for this Bill No." });
 
             return Json(new { success = true, items = items });
         }

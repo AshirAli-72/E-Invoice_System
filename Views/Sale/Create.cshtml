@@ -342,6 +342,12 @@
                     <input type="text" id="prodSearch" class="search-input"
                            placeholder="Scan or enter barcode..." oninput="filterProducts()">
                 </div>
+                <!-- Invoice Search for Returns -->
+                <div class="search-bar-v2" style="max-width:200px; border-color:var(--primary);">
+                    <i class="ph-receipt search-icon" style="color:var(--primary);"></i>
+                    <input type="text" id="billNoSearch" class="search-input"
+                           placeholder="Return Bill No..." onkeydown="handleBillSearch(event)">
+                </div>
                 <div class="mode-toggle-v2 compact">
                     <div class="toggle-pill">
                         <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
@@ -1011,6 +1017,7 @@
 
             const prefix = `items[${index}]`;
             hiddenContainer.innerHTML += `
+                <input type="hidden" name="${prefix}.id"                   value="${item.id || 0}" />
                 <input type="hidden" name="${prefix}.prod_name_service" value="${item.prod_name_service}" />
                 <input type="hidden" name="${prefix}.barcode"           value="${item.barcode || ''}" />
                 <input type="hidden" name="${prefix}.qty_unit_type"     value="${item.qty}" />
@@ -1091,6 +1098,11 @@
 
     async function handleModeChange() {
         const isReturn = document.querySelector('input[name="transMode"]:checked').value === 'return';
+        
+        // Toggle banner
+        const banner = document.querySelector('.return-warning-banner');
+        if (banner) banner.style.display = isReturn ? 'flex' : 'none';
+
         saleItems.forEach(item => {
             const absQty     = Math.abs(item.qty);
             item.qty         = isReturn ? -absQty : absQty;
@@ -1139,6 +1151,47 @@
     }
 
     /* ═══════════════════════════════════════════════════════
+       INVOICE SEARCH & LOAD (RETURN BASIS)
+    ═══════════════════════════════════════════════════════ */
+    async function handleBillSearch(e) {
+        if (e.key !== 'Enter') return;
+        const billNo = e.target.value.trim();
+        if (!billNo) return;
+
+        try {
+            const res = await fetch(`/Sale/GetItemsByBillNo?billNo=${encodeURIComponent(billNo)}`);
+            const data = await res.json();
+
+            if (data.success) {
+                if (saleItems.length > 0 && !confirm('Clear current cart and load items for return?')) return;
+                
+                saleItems = data.items.map(item => ({
+                    id:                item.id,
+                    prod_name_service: item.prod_name_service,
+                    barcode:           item.barcode,
+                    qty:               -Math.abs(item.qty), // Set as return
+                    price:             item.price,
+                    discount:          item.discount,
+                    expiry_date:       item.expiry_date,
+                    maxStock:          item.qty, // Use original qty as limit for return
+                    total_price:       (item.price * -item.qty) - (item.discount * -item.qty)
+                }));
+
+                // Switch to Return Mode UI
+                document.getElementById('modeReturn').checked = true;
+                handleModeChange();
+                
+                e.target.value = '';
+                renderSaleItems();
+            } else {
+                alert(data.message || 'Invoice not found.');
+            }
+        } catch (err) {
+            alert('Error fetching invoice details.');
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════
        PAYMENT
     ═══════════════════════════════════════════════════════ */
     function setWebPaymentMethod(method) {
@@ -1154,10 +1207,16 @@
         var total    = Math.abs(currentTotal);
         var change   = tendered - total;
         document.getElementById('webModalTendered').innerText = format(tendered);
+        
+        var changeEl = document.getElementById('webModalChange');
+        // Always show the absolute value to avoid negative signs as requested
+        changeEl.innerText = format(Math.abs(change));
+        
+        // Use colors to indicate status: Green if fully paid/overpaid, Red if underpaid
         if (change >= 0) {
-            document.getElementById('webModalChange').innerText = format(change);
+            changeEl.style.color = "#22c55e"; 
         } else {
-            document.getElementById('webModalChange').innerText = '$0.00';
+            changeEl.style.color = "#ef4444";
         }
     }
 
