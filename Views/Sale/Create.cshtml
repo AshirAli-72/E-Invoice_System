@@ -344,9 +344,9 @@
                            placeholder="Scan item barcode" oninput="handleMainSearch(event)" onkeydown="handleMainSearchKey(event)">
                 </div>
             </div>
-            <div class="mode-toggle-v2 compact" style="min-width: 150px; background: transparent; border: none; box-shadow: none;">
+            <div class="mode-toggle-v2 compact" style="min-width: 200px; background: transparent; border: none; box-shadow: none;">
                 <select id="searchType" class="search-type-select" onchange="handleSearchTypeChange()" 
-                        style="height: 44px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 0 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; transition: all 0.2s;">
+                        style="height: 44px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 0 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <option value="item" selected>Scan Item</option>
                     <option value="receipt">Scan Receipt</option>
                 </select>
@@ -431,7 +431,6 @@
             <input type="hidden" name="billNo" id="hiddenBillNo" value="" />
 
             <div class="checkout-header">
-                <div class="return-warning-banner"><i class="ph-warning"></i> RETURN MODE ACTIVE</div>
                 <div class="checkout-header-main">
                     <div>
                         <h3 class="order-detail-title">Order Detail</h3>
