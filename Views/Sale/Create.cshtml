@@ -337,25 +337,20 @@
         <div class="canvas-header">
             <div class="canvas-header-top">
                 <h3 class="canvas-title">Sales Transaction</h3>
-                <div class="search-bar-v2">
-                    <i class="ph-magnifying-glass search-icon"></i>
-                    <input type="text" id="prodSearch" class="search-input"
-                           placeholder="Scan or enter barcode..." oninput="filterProducts()">
+            <div class="search-bar-v2-container" style="display: flex; gap: 8px; flex: 1; align-items: center;">
+                <div class="search-bar-v2" style="flex: 1;">
+                    <i id="searchIcon" class="ph-magnifying-glass search-icon"></i>
+                    <input type="text" id="mainSearchInput" class="search-input"
+                           placeholder="Scan item barcode" oninput="handleMainSearch(event)" onkeydown="handleMainSearchKey(event)">
                 </div>
-                <!-- Invoice Search for Returns -->
-                <div class="search-bar-v2" style="max-width:200px; border-color:var(--primary);">
-                    <i class="ph-receipt search-icon" style="color:var(--primary);"></i>
-                    <input type="text" id="billNoSearch" class="search-input"
-                           placeholder="Return Bill No..." onkeydown="handleBillSearch(event)">
-                </div>
-                <div class="mode-toggle-v2 compact">
-                    <div class="toggle-pill">
-                        <input type="radio" id="searchName" name="searchMode" value="name" onchange="handleSearchModeChange()">
-                        <label for="searchName">Name</label>
-                        <input type="radio" id="searchBarcode" name="searchMode" value="barcode" checked onchange="handleSearchModeChange()">
-                        <label for="searchBarcode">Barcode</label>
-                    </div>
-                </div>
+            </div>
+            <div class="mode-toggle-v2 compact" style="min-width: 150px; background: transparent; border: none; box-shadow: none;">
+                <select id="searchType" class="search-type-select" onchange="handleSearchTypeChange()" 
+                        style="height: 44px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 0 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; transition: all 0.2s;">
+                    <option value="item" selected>Scan Item</option>
+                    <option value="receipt">Scan Receipt</option>
+                </select>
+            </div>
                 <div class="quick-actions-v2">
                     <button type="button" class="btn-action-round" onclick="reloadPage()" title="Refresh"><i class="ph-arrows-clockwise"></i></button>
                     <button type="button" class="btn-action-round" onclick="toggleFullScreen()" title="Full Screen"><i class="ph-corners-out"></i></button>
@@ -391,8 +386,8 @@
                     else { isService = true; stockValue = 999999; }
 
                     <div class="product-card-v2"
-                         data-id="@p.id" data-name="@p.prod_name_service"
-                         data-search-name="@p.prod_name_service.ToLower()"
+                         data-id="@p.id" data-name="@(p.prod_name_service ?? "")"
+                         data-search-name="@(p.prod_name_service?.ToLower() ?? "")"
                          data-barcode="@(p.barcode ?? "")" data-price="@p.price"
                          data-discount="@p.discount"
                          data-expiry="@(p.expiry_date?.ToString("yyyy-MM-dd") ?? "")"
@@ -412,7 +407,7 @@
                             }
                         </div>
                         <div class="card-info">
-                            <h4 class="card-name">@p.prod_name_service</h4>
+                            <h4 class="card-name">@(p.prod_name_service ?? "")</h4>
                             <div class="card-price-row">
                                 <span class="price-tag">$@p.price.ToString("N2")</span>
                                 @if (p.discount > 0)
@@ -747,7 +742,6 @@
     ═══════════════════════════════════════════════════════ */
     let saleItems    = [];
     let currentTotal = 0;
-    let searchMode   = 'barcode';
 
     /* ═══════════════════════════════════════════════════════
        HELPERS
@@ -860,39 +854,63 @@
     /* ═══════════════════════════════════════════════════════
        PRODUCT SEARCH / FILTER
     ═══════════════════════════════════════════════════════ */
-    function handleSearchModeChange() {
-        searchMode = document.querySelector('input[name="searchMode"]:checked').value;
-        const input = document.getElementById('prodSearch');
-        input.placeholder = searchMode === 'name'
-            ? 'Search by product name...'
-            : 'Scan or enter barcode...';
+    function handleSearchTypeChange() {
+        const type = document.getElementById('searchType').value;
+        const input = document.getElementById('mainSearchInput');
+        const icon = document.getElementById('searchIcon');
+
+        if (type === 'receipt') {
+            input.placeholder = 'Scan receipt barcode';
+            icon.className = 'ph-receipt search-icon';
+            icon.style.color = 'var(--primary)';
+        } else {
+            input.placeholder = 'Scan item barcode';
+            icon.className = 'ph-magnifying-glass search-icon';
+            icon.style.color = 'var(--text-muted)';
+        }
         input.value = '';
         filterProducts();
         input.focus();
     }
 
+    function handleMainSearch(e) {
+        const type = document.getElementById('searchType').value;
+        if (type === 'item') {
+            filterProducts();
+        }
+    }
+
+    function handleMainSearchKey(e) {
+        if (e.key === 'Enter') {
+            const type = document.getElementById('searchType').value;
+            if (type === 'receipt') {
+                handleBillSearch(e);
+            }
+        }
+    }
+
     async function filterProducts() {
-        const query      = document.getElementById('prodSearch').value.trim();
+        const query      = document.getElementById('mainSearchInput').value.trim();
         const queryLower = query.toLowerCase();
         let exactMatchCard = null;
 
 
 
         document.querySelectorAll('.product-card-v2').forEach(card => {
-            const name    = card.getAttribute('data-search-name') || '';
+            const name    = (card.getAttribute('data-search-name') || '').toLowerCase();
             const barcode = (card.getAttribute('data-barcode') || '').toLowerCase();
             if (!query) { card.style.display = 'flex'; return; }
-            if (searchMode === 'barcode') {
-                card.style.display = barcode.includes(queryLower) ? 'flex' : 'none';
-                if (barcode === queryLower) exactMatchCard = card;
-            } else {
-                card.style.display = name.includes(queryLower) ? 'flex' : 'none';
-            }
+            
+            // Search both name and barcode
+            const matches = name.includes(queryLower) || barcode.includes(queryLower);
+            card.style.display = matches ? 'flex' : 'none';
+            
+            if (barcode === queryLower) exactMatchCard = card;
         });
 
-        if (searchMode === 'barcode' && exactMatchCard) {
+        if (exactMatchCard) {
             addToSaleFromCard(exactMatchCard);
-            document.getElementById('prodSearch').value = '';
+            document.getElementById('mainSearchInput').value = '';
             document.querySelectorAll('.product-card-v2').forEach(c => c.style.display = 'flex');
         }
     }
@@ -1154,8 +1172,7 @@
        INVOICE SEARCH & LOAD (RETURN BASIS)
     ═══════════════════════════════════════════════════════ */
     async function handleBillSearch(e) {
-        if (e.key !== 'Enter') return;
-        const billNo = e.target.value.trim();
+        const billNo = document.getElementById('mainSearchInput').value.trim();
         if (!billNo) return;
 
         try {
@@ -1181,7 +1198,7 @@
                 document.getElementById('modeReturn').checked = true;
                 handleModeChange();
                 
-                e.target.value = '';
+                document.getElementById('mainSearchInput').value = '';
                 renderSaleItems();
             } else {
                 alert(data.message || 'Invoice not found.');
@@ -1293,20 +1310,26 @@
         document.getElementById('rcptDate').innerText     = dateStr;
 
         // Use JsBarcode for reliable, industry-standard barcode generation
-        // width: 2 is the "sweet spot" for 58mm/80mm thermal printers
-        JsBarcode("#rcptBarcodeSvg", orderId, {
-            format: "CODE128",
-            width: 2,
-            height: 80,
-            displayValue: true,
-            fontSize: 20,
-            fontOptions: "bold",
-            margin: 10,
-            textMargin: 5,
-            background: "#ffffff",
-            lineColor: "#000000",
-            flat: true
-        });
+        // Only show barcode if NOT a return
+        const barcodeContainer = document.querySelector('.barcode-container');
+        if (isReturn) {
+            if (barcodeContainer) barcodeContainer.style.display = 'none';
+        } else {
+            if (barcodeContainer) barcodeContainer.style.display = 'flex';
+            JsBarcode("#rcptBarcodeSvg", orderId, {
+                format: "CODE128",
+                width: 2,
+                height: 80,
+                displayValue: true,
+                fontSize: 20,
+                fontOptions: "bold",
+                margin: 10,
+                textMargin: 5,
+                background: "#ffffff",
+                lineColor: "#000000",
+                flat: true
+            });
+        }
 
         const itemsBody = document.getElementById('rcptItemsBody');
         itemsBody.innerHTML = '';
