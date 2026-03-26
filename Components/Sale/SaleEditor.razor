@@ -1,0 +1,650 @@
+@namespace E_Invoice_system.Components.Sale
+@using Microsoft.EntityFrameworkCore
+@using System.Text.RegularExpressions
+@inject ApplicationDbContext DbContext
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<div class="pos-container-v2" @onclick="CloseDropdowns">
+    <!-- PRODUCT CANVAS (LEFT) -->
+    <div class="product-canvas">
+        <div class="canvas-header">
+            <div class="canvas-header-top">
+                <h3 class="canvas-title">Sales Transaction</h3>
+                <div class="search-bar-v2-container" style="display: flex; gap: 8px; flex: 1; align-items: center;">
+                    <div class="search-bar-v2" style="flex: 1;">
+                        <i class="ph-magnifying-glass search-icon" style="color: @(searchType == "receipt" ? "var(--primary)" : "var(--text-muted)")"></i>
+                        <input type="text" class="search-input" 
+                               placeholder="@(searchType == "receipt" ? "Scan receipt barcode" : "Scan item barcode")"
+                               @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearchKeyUp" />
+                    </div>
+                </div>
+                <div class="search-type-wrapper" style="min-width: 150px;">
+                    <div class="select-wrapper-v2">
+                        <i class="ph-magnifying-glass" style="font-size: 1.25rem;"></i>
+                        <select class="search-type-select" @bind="searchType">
+                            <option value="item">Scan Item</option>
+                            <option value="receipt">Scan Receipt</option>
+                        </select>
+                        <i class="ph-caret-down" style="margin-left: auto;"></i>
+                    </div>
+                </div>
+                <div class="quick-actions-v2">
+                    <button type="button" class="btn-action-round" @onclick='() => NavigationManager.NavigateTo(NavigationManager.Uri, true)' title="Refresh"><i class="ph-arrows-clockwise"></i></button>
+                    <button type="button" class="btn-action-round" @onclick="ToggleFullScreen" title="Full Screen"><i class="ph-corners-out"></i></button>
+                    <a href="/Sale/Index" class="btn-action-round back" title="Back to List"><i class="ph-arrow-left"></i></a>
+                </div>
+            </div>
+            <div class="category-tabs-v2">
+                <div class="tab-item @(selectedCategory == "all" ? "active" : "")" @onclick='() => FilterByCategory("all")'>All</div>
+                <div class="tab-item @(selectedCategory == "Foods" ? "active" : "")" @onclick='() => FilterByCategory("Foods")'>Products</div>
+                <div class="tab-item @(selectedCategory == "Beverages" ? "active" : "")" @onclick='() => FilterByCategory("Beverages")'>Services</div>
+            </div>
+        </div>
+
+        <div class="product-grid-v2">
+            @foreach (var p in filteredProducts)
+            {
+                <div class="product-card-v2" @onclick="() => AddToSale(p)">
+                    <div class="card-image">
+                        @if (!string.IsNullOrEmpty(p.Image))
+                        {
+                            <img src="/product-images/@p.Image" alt="Product" />
+                        }
+                        else
+                        {
+                            <div class="image-placeholder">
+                                <i class="@(p.IsService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-info">
+                        <h4 class="card-name">@p.Name</h4>
+                        <div class="card-price-row">
+                            <span class="price-tag">$@p.Price.ToString("N2")</span>
+                            @if (p.Discount > 0)
+                            {
+                                <span class="discount-pill">$@p.Discount.ToString("N2")</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- CHECKOUT PANEL (RIGHT) -->
+    <div class="checkout-center">
+        <div class="checkout-form">
+            <div class="checkout-header">
+                @if (transMode == "return")
+                {
+                    <div class="return-warning-banner" style="display: flex;"><i class="ph-warning"></i> RETURN MODE ACTIVE</div>
+                }
+                <div class="checkout-header-main">
+                    <div>
+                        <h3 class="order-detail-title">Order Detail</h3>
+                        <div class="item-count-badge">@saleItems.Count item@(saleItems.Count != 1 ? "s" : "") selected</div>
+                    </div>
+                    <div class="checkout-header-actions">
+                        <div class="mode-toggle-v2 compact">
+                            <div class="toggle-pill">
+                                <button type="button" class="toggle-item @(transMode == "sale" ? "active" : "")" @onclick='() => SetTransMode("sale")'>Sale</button>
+                                <button type="button" class="toggle-item @(transMode == "return" ? "active" : "")" @onclick='() => SetTransMode("return")'>Return</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-clear-v2" @onclick="ClearSaleItems" title="Clear Order">
+                            <i class="ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Selector -->
+            <div class="customer-selector-v2" @onclick:stopPropagation>
+                <div class="select-wrapper-v2" style="flex: 1;">
+                    <i class="ph-user-circle" style="font-size: 1.25rem;"></i>
+                    <div class="customer-search-container" style="flex: 1; position: relative;">
+                        <input type="text" class="customer-search-input" placeholder="Search Customer..." 
+                               style="border: none; background: transparent; width: 100%; outline: none; font-weight: 600;"
+                               @bind="customerSearchQuery" @bind:event="oninput" @bind:after="FilterCustomers"
+                               @onfocus="OnCustomerSearchFocus" 
+                               @onclick:stopPropagation />
+                        
+                        @if (showCustomerDropdown)
+                        {
+                            <div class="customer-dropdown-results shadow-luxury show">
+                                @foreach (var c in filteredCustomersList)
+                                {
+                                    <div class="customer-result-item" @onclick="() => SelectCustomer(c)" @onclick:stopPropagation>
+                                        <div class="cust-avatar">@(string.IsNullOrEmpty(c.name) ? "?" : c.name[0].ToString().ToUpper())</div>
+                                        <div class="cust-info-main">
+                                            <span class="cust-name">@c.name</span>
+                                            @if (!string.IsNullOrEmpty(c.contact))
+                                            {
+                                                <span class="cust-details">@c.contact</span>
+                                            }
+                                        </div>
+                                        <i class="ph-check select-icon"></i>
+                                    </div>
+                                }
+                                @if (!filteredCustomersList.Any())
+                                {
+                                    <div class="customer-result-item" style="cursor:default;color:var(--text-muted);justify-content:center;" @onclick:stopPropagation>
+                                        <i class="ph-user-minus" style="font-size:1.2rem;margin-right:8px;"></i> No customers found
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <i class="ph-caret-down"></i>
+                </div>
+                <button type="button" @onclick="() => showAddCustomerModal = true" class="btn-add-customer">
+                    <i class="ph-plus-circle"></i><span>New</span>
+                </button>
+            </div>
+
+            <!-- Items List -->
+            <div class="checkout-items-v2">
+                @foreach (var item in saleItems)
+                {
+                    <div class="item-v2">
+                        <div class="item-v2-img">
+                            @if (!string.IsNullOrEmpty(item.image))
+                            {
+                                <img src="/product-images/@item.image" />
+                            }
+                            else
+                            {
+                                <i class="ph-package" style="font-size:1.5rem;color:#cbd5e1;"></i>
+                            }
+                        </div>
+                        <div class="item-v2-info">
+                            <div class="title">@item.prod_name_service</div>
+                            <div class="price-input-container">
+                                <span>$</span>
+                                <input type="number" step="0.01" class="manual-price-input" 
+                                       @bind="item.price" @onbind:after="() => CalculateSaleItemTotal(item)" />
+                            </div>
+                        </div>
+                        <div class="item-v2-controls">
+                            <div class="qty-stepper">
+                                <button type="button" @onclick="() => DecreaseQty(item)">-</button>
+                                <input type="number" class="manual-qty-input" 
+                                       value="@(Math.Abs(item.qty_unit_type))" 
+                                       @onchange="(e) => UpdateItemQty(item, e.Value?.ToString())" />
+                                <button type="button" @onclick="() => IncreaseQty(item)">+</button>
+                            </div>
+                        </div>
+                        <div class="item-total-info">
+                            <div class="price-sub">@FormatCurrency(item.total_price)</div>
+                        </div>
+                        <i class="ph-trash btn-remove-item" @onclick="() => RemoveItem(item)"></i>
+                    </div>
+                }
+
+                @if (!saleItems.Any())
+                {
+                    <div class="empty-state-v2" style="display: flex;">
+                        <div class="empty-glow"></div>
+                        <i class="ph-shopping-cart-simple"></i>
+                        <p>Bag is empty</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Checkout Footer -->
+            <div class="checkout-footer-v2">
+                <div class="price-summary-v2">
+                    <div class="summary-line"><span>Subtotal</span><span>@FormatCurrency(totalSub)</span></div>
+                    <div class="summary-line" style="color:var(--success);"><span>Discount</span><span>@FormatCurrency(totalDisc)</span></div>
+                    
+                    @if (!string.IsNullOrEmpty(stockAlert))
+                    {
+                        <div class="alert-v2" style="display:block;">
+                            <i class="ph-warning"></i> <span>@stockAlert</span>
+                        </div>
+                    }
+
+                    <div class="grand-total-row">
+                        <div class="total-label">Grand Total</div>
+                        <div class="total-value">@FormatCurrency(currentTotal)</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-pay-v2" @onclick="OpenPaymentModal">
+                    <i class="ph-credit-card"></i> Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+@if (showPaymentModal)
+{
+    <div class="modal-overlay show" style="display: flex;">
+        <div class="payment-card">
+            <div class="payment-left">
+                <h1 class="payment-title">Checkout</h1>
+                <p class="payment-subtitle">Complete your transaction by selecting a payment method.</p>
+                <div class="method-tabs">
+                    <div class="method-tab @(paymentMethod == "Cash" ? "active" : "")" @onclick='() => SetPaymentMethod("Cash")'><i class="ph-money"></i> <span>Cash</span></div>
+                    <div class="method-tab @(paymentMethod == "Card" ? "active" : "")" @onclick='() => SetPaymentMethod("Card")'><i class="ph-credit-card"></i> <span>Card</span></div>
+                    <div class="method-tab @(paymentMethod == "Transfer" ? "active" : "")" @onclick='() => SetPaymentMethod("Transfer")'><i class="ph-bank"></i> <span>Bank</span></div>
+                    <div class="method-tab @(paymentMethod == "Credit" ? "active" : "")" @onclick='() => SetPaymentMethod("Credit")'><i class="ph-user-focus"></i> <span>Credit</span></div>
+                </div>
+                <div class="web-input-group">
+                    <label>Amount Tendered</label>
+                    <input type="number" class="web-input" step="0.01" @bind="tenderedAmount" @bind:event="oninput" placeholder="0.00" />
+                    <div class="quick-pills">
+                        @foreach (var amt in new[] { 10, 20, 50, 100, 500, 1000, 5000 })
+                        {
+                            <div class="quick-pill" @onclick="() => tenderedAmount += amt">+ $@amt</div>
+                        }
+                        <div class="quick-pill" @onclick="() => tenderedAmount = Math.Abs(currentTotal)">Match Total</div>
+                    </div>
+                </div>
+                <div class="web-input-group">
+                    <label>Reference / Note</label>
+                    <input type="text" class="web-input" @bind="notes" placeholder="Transaction notes (optional)" />
+                </div>
+            </div>
+            <div class="payment-right">
+                <div class="summary-box-web">
+                    <div class="summary-web-line">
+                        <span style="color:var(--text-muted);font-weight:600;">Total Amount Due</span>
+                        <span style="font-weight:700;">@FormatCurrency(Math.Abs(currentTotal))</span>
+                    </div>
+                    <div class="summary-web-line" style="margin-top:8px;">
+                        <span style="color:var(--text-muted);font-weight:600;">Total Tendered</span>
+                        <span style="font-weight:700;">@FormatCurrency(tenderedAmount)</span>
+                    </div>
+                    @{
+                        var change = tenderedAmount - Math.Abs(currentTotal);
+                        <div class="summary-web-line grand">
+                            <span>Change Due</span>
+                            <span style="color: @(change >= 0 ? "#22c55e" : "#ef4444")">@FormatCurrency(Math.Abs(change))</span>
+                        </div>
+                    }
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding:12px 16px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+                        <label style="font-weight:600;color:var(--text-main);cursor:pointer;display:flex;align-items:center;gap:8px;">
+                            <i class="ph-printer" style="font-size:1.2rem;color:var(--primary);"></i> Print Receipt
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" @bind="shouldPrintReceipt">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top:auto;">
+                    <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.5;">
+                        By completing this order, you agree to generate an official invoice and update stock levels.
+                    </p>
+                    <div style="display:flex;gap:16px;">
+                        <button type="button" class="btn-confirm-web cancel" style="flex:1;" @onclick="() => showPaymentModal = false">Cancel</button>
+                        <button type="button" class="btn-confirm-web confirm" style="flex:1;" @onclick="SubmitSale" disabled="@isSubmitting">
+                            @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> } else { @("Complete Order") } <i class="ph-check-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ADD CUSTOMER MODAL -->
+@if (showAddCustomerModal)
+{
+    <div class="modal-overlay show" style="display: flex;">
+        <div class="payment-card" style="max-width:900px;width:95%;flex-direction:column;overflow-y:auto;max-height:90vh;padding:40px;">
+            <div class="dashboard-panel">
+                <div class="page-header">
+                    <h1 class="page-title-large">Add New Customer</h1>
+                    <button type="button" class="btn-secondary" @onclick="() => showAddCustomerModal = false">
+                        <i class="ph-arrow-left"></i> Back
+                    </button>
+                </div>
+                <div class="form-wrapper form-layout-left-wide">
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <h3 class="form-section-title"><i class="ph-users form-icon-primary"></i> Customer Information</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" @bind="newCustomer.name" placeholder="Enter customer's full name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Number</label>
+                            <input type="text" class="form-control" @bind="newCustomer.contact" placeholder="Enter contact number" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" @bind="newCustomer.email" placeholder="Enter email address" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" rows="3" @bind="newCustomer.address" placeholder="Enter physical address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" @bind="newCustomer.status">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions-sticky" style="display:flex;gap:16px;margin-top:32px;">
+                        <button type="button" class="btn-confirm-web" style="flex:1;background:#ef4444;color:#fff;border:none;" @onclick="() => showAddCustomerModal = false">Cancel</button>
+                        <button type="button" class="btn-confirm-web" style="flex:1;background:#22c55e;color:#fff;border:none;" @onclick="SaveNewCustomer">
+                            <i class="ph-check"></i> Save Customer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- THERMAL RECEIPT (Only visible on print) -->
+<div id="thermalReceipt">
+    <div class="rcpt-shop-header">
+        <span class="rcpt-shop-name">THE SATA Invoice</span>
+        <span class="rcpt-shop-sub">Default Address</span>
+        <span class="rcpt-shop-sub">Default Contact</span>
+    </div>
+    <hr class="rcpt-hr" />
+    <div class="rcpt-meta">Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
+    <table class="rcpt-table">
+        <thead>
+            <tr>
+                <th class="rcpt-col-prod">PRODUCT</th>
+                <th class="rcpt-col-qty">QTY</th>
+                <th class="rcpt-col-price">PRICE</th>
+                <th class="rcpt-col-amt">AMOUNT</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in saleItems)
+            {
+                <tr>
+                    <td class="rcpt-col-prod">@item.prod_name_service</td>
+                    <td class="rcpt-col-qty">@Math.Abs(item.qty_unit_type)</td>
+                    <td class="rcpt-col-price">@item.price.ToString("N2")</td>
+                    <td class="rcpt-col-amt">@Math.Abs(item.total_price).ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span>@FormatCurrency(Math.Abs(totalSub))</span></div>
+    <div class="rcpt-totals-row"><span>TOTAL</span>      <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
+    <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
+    <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>@FormatCurrency(tenderedAmount)</span></div>
+    <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span>@paymentMethod</span></div>
+    <div class="rcpt-footer">
+        <hr class="rcpt-hr" />
+        <div class="rcpt-footer-thankyou">THANK YOU!</div>
+        <hr class="rcpt-hr" />
+        <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
+        <hr class="rcpt-hr" />
+        <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA Invoice</div>
+        <hr class="rcpt-hr" />
+    </div>
+    <div class="rcpt-bottom">
+        <div class="order-info">
+            <div>ORDER: @orderBillNo</div>
+            <div>@DateTime.Now.ToString("g")</div>
+        </div>
+        <div class="barcode-container">
+            <svg id="rcptBarcodeSvg"></svg>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ProductDisplay> allProducts = new();
+    private List<ProductDisplay> filteredProducts = new();
+    private List<customers> allCustomersList = new();
+    private List<customers> filteredCustomersList = new();
+    private List<SaleItem> saleItems = new();
+
+    private string searchQuery = "";
+    private string searchType = "item";
+    private string selectedCategory = "all";
+    private string transMode = "sale";
+    private string? customerSearchQuery;
+    private customers? selectedCustomer;
+    private bool showCustomerDropdown = false;
+    private bool showPaymentModal = false;
+    private bool showAddCustomerModal = false;
+    private string paymentMethod = "Cash";
+    private decimal tenderedAmount = 0;
+    private string notes = "";
+    private bool shouldPrintReceipt = true;
+    private string? stockAlert;
+    private bool isSubmitting = false;
+    private string orderBillNo = "";
+    private customers newCustomer = new customers { status = "Active" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var prods = await DbContext.products_services.Where(p => p.status == "Available").ToListAsync();
+        allProducts = prods.Select(p => {
+            decimal stock = 999999;
+            bool isSvc = true;
+            if (!string.IsNullOrEmpty(p.qty_unit_type)) {
+                var m = Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
+                if (m.Success) {
+                    decimal.TryParse(m.Groups[1].Value, out stock);
+                    var unit = m.Groups[2].Value.Trim();
+                    if (string.IsNullOrEmpty(unit)) isSvc = false;
+                }
+            }
+            return new ProductDisplay { 
+                Id = p.id, Name = p.prod_name_service ?? "", Price = p.price, Discount = p.discount, 
+                Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.image, 
+                Category = isSvc ? "Beverages" : "Foods", Barcode = p.barcode 
+            };
+        }).ToList();
+        
+        filteredProducts = allProducts;
+        allCustomersList = await DbContext.customers.OrderBy(c => c.name).ToListAsync();
+        filteredCustomersList = allCustomersList;
+    }
+
+    private void FilterByCategory(string cat)
+    {
+        selectedCategory = cat;
+        if (cat == "all") filteredProducts = allProducts;
+        else filteredProducts = allProducts.Where(p => p.Category == cat).ToList();
+    }
+
+    private void HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (searchType == "item") {
+            var query = searchQuery.ToLower();
+            filteredProducts = allProducts.Where(p => p.Name.ToLower().Contains(query) || (p.Barcode != null && p.Barcode.ToLower() == query)).ToList();
+            
+            // Auto-add if exact barcode match
+            var exact = allProducts.FirstOrDefault(p => p.Barcode != null && p.Barcode.ToLower() == query);
+            if (exact != null) {
+                AddToSale(exact);
+                searchQuery = "";
+                filteredProducts = allProducts;
+            }
+        } else if (e.Key == "Enter" && searchType == "receipt") {
+            LoadFromReceipt(searchQuery);
+            searchQuery = "";
+        }
+    }
+
+    private async void LoadFromReceipt(string billNo)
+    {
+        var sales = await DbContext.sales.Where(s => s.billNo == billNo).ToListAsync();
+        if (sales.Any()) {
+            transMode = "return";
+            saleItems = sales.Select(s => new SaleItem {
+                prod_name_service = s.prod_name_service,
+                barcode = s.barcode,
+                qty_unit_type = -decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
+                price = s.price,
+                discount = s.discount / decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
+                expiry_date = s.expiry_date,
+                maxStock = decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
+                total_price = (s.price * -decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value))
+            }).ToList();
+            StateHasChanged();
+        }
+    }
+
+    private void AddToSale(ProductDisplay p)
+    {
+        decimal qty = transMode == "return" ? -1 : 1;
+        var existing = saleItems.FirstOrDefault(i => i.prod_name_service == p.Name);
+        if (existing != null) {
+            if (transMode == "sale" && (existing.qty_unit_type + 1) > p.Stock) { ShowAlert("Insufficient stock."); return; }
+            existing.qty_unit_type += qty;
+            if (existing.qty_unit_type == 0) saleItems.Remove(existing);
+            else existing.total_price = (existing.price * existing.qty_unit_type) - (existing.discount * existing.qty_unit_type);
+        } else {
+            if (transMode == "sale" && p.Stock < 1) { ShowAlert("Out of stock."); return; }
+            saleItems.Add(new SaleItem {
+                prod_name_service = p.Name, barcode = p.Barcode, qty_unit_type = qty, 
+                price = p.Price, discount = p.Discount, expiry_date = p.Expiry, 
+                maxStock = p.Stock, image = p.Image, total_price = (p.Price * qty) - (p.Discount * qty)
+            });
+        }
+    }
+
+    private void RemoveItem(SaleItem i) { saleItems.Remove(i); }
+
+    private void ClearSaleItems() { saleItems.Clear(); }
+
+    private void CloseDropdowns() { showCustomerDropdown = false; }
+
+    private void SetTransMode(string mode) {
+        transMode = mode;
+        foreach (var item in saleItems) {
+            decimal abs = Math.Abs(item.qty_unit_type);
+            item.qty_unit_type = mode == "return" ? -abs : abs;
+            item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+        }
+    }
+
+    private void OnCustomerSearchFocus() {
+        showCustomerDropdown = true;
+        FilterCustomers();
+    }
+
+    private void FilterCustomers() {
+        if (string.IsNullOrEmpty(customerSearchQuery)) filteredCustomersList = allCustomersList;
+        else filteredCustomersList = allCustomersList.Where(c => c.name.ToLower().Contains(customerSearchQuery.ToLower()) || (c.contact != null && c.contact.Contains(customerSearchQuery))).ToList();
+    }
+
+    private void SelectCustomer(customers c) { selectedCustomer = c; customerSearchQuery = c.name; showCustomerDropdown = false; }
+
+    private void UpdateItemQty(SaleItem item, string? val) {
+        if (decimal.TryParse(val, out decimal q)) {
+            q = Math.Abs(q);
+            if (transMode == "return") q = -q;
+            if (q == 0) { saleItems.Remove(item); return; }
+            if (transMode == "sale" && q > item.maxStock) { ShowAlert("Stock limit reached."); q = item.maxStock; }
+            item.qty_unit_type = q;
+            item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+        }
+    }
+
+    private void CalculateSaleItemTotal(SaleItem item) {
+        item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+    }
+
+    private void IncreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty_unit_type) + 1).ToString());
+    private void DecreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty_unit_type) - 1).ToString());
+
+    private decimal totalSub => saleItems.Sum(i => i.price * i.qty_unit_type);
+    private decimal totalDisc => saleItems.Sum(i => i.discount * i.qty_unit_type);
+    private decimal currentTotal => totalSub - totalDisc;
+
+    private void OpenPaymentModal() { if (!saleItems.Any()) return; showPaymentModal = true; tenderedAmount = Math.Abs(currentTotal); }
+
+    private void SetPaymentMethod(string m) { paymentMethod = m; }
+
+    private void ShowAlert(string msg) { stockAlert = msg; StateHasChanged(); Task.Delay(3000).ContinueWith(_ => { stockAlert = null; InvokeAsync(StateHasChanged); }); }
+
+    private async Task SaveNewCustomer() {
+        if (string.IsNullOrEmpty(newCustomer.name)) return;
+        DbContext.customers.Add(newCustomer);
+        await DbContext.SaveChangesAsync();
+        allCustomersList.Add(newCustomer);
+        SelectCustomer(newCustomer);
+        newCustomer = new customers { status = "Active" };
+        showAddCustomerModal = false;
+    }
+
+    private async Task SubmitSale() {
+        if (isSubmitting) return;
+        isSubmitting = true;
+        try {
+            var count = await DbContext.sales.CountAsync();
+            orderBillNo = transMode == "return" ? $"RET-{count+1}" : $"SALE-{count+1}";
+
+            foreach (var item in saleItems) {
+                var sale = new Models.Sale {
+                    billNo = orderBillNo, date = DateTime.Now, prod_name_service = item.prod_name_service,
+                    barcode = item.barcode, qty_unit_type = $"{item.qty_unit_type}", price = item.price,
+                    discount = item.discount, total_price = item.total_price, payment_method = paymentMethod, status = paymentMethod == "Credit" ? "Pending" : "Paid",
+                    is_returned = transMode == "return", description = notes
+                };
+                DbContext.sales.Add(sale);
+                
+                // Inventory update
+                var prod = await DbContext.products_services.FirstOrDefaultAsync(p => p.prod_name_service == item.prod_name_service);
+                if (prod != null) {
+                    var m = Regex.Match(prod.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
+                    if (m.Success && decimal.TryParse(m.Groups[1].Value, out decimal currentStock)) {
+                        prod.qty_unit_type = $"{currentStock - item.qty_unit_type} {m.Groups[2].Value}".Trim();
+                        DbContext.products_services.Update(prod);
+                    }
+                }
+            }
+
+            await DbContext.SaveChangesAsync();
+            if (shouldPrintReceipt) {
+                await Task.Delay(500); // Wait for DOM
+                if (transMode != "return") {
+                    await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", orderBillNo);
+                }
+                await JSRuntime.InvokeVoidAsync("window.print");
+            }
+            NavigationManager.NavigateTo("/Sale/Index", true);
+        } catch (Exception ex) { ShowAlert("Error: " + ex.Message); isSubmitting = false; }
+    }
+
+    private string FormatCurrency(decimal val) => (val < 0 ? "-" : "") + "$" + Math.Abs(val).ToString("N2");
+
+    private async Task ToggleFullScreen() => await JSRuntime.InvokeVoidAsync("eval", "if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen();");
+
+    public class ProductDisplay {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public decimal Discount { get; set; }
+        public DateTime? Expiry { get; set; }
+        public decimal Stock { get; set; }
+        public bool IsService { get; set; }
+        public string? Image { get; set; }
+        public string Category { get; set; }
+        public string? Barcode { get; set; }
+    }
+
+    public class SaleItem {
+        public string prod_name_service { get; set; }
+        public string? barcode { get; set; }
+        public decimal qty_unit_type { get; set; }
+        public decimal price { get; set; }
+        public decimal discount { get; set; }
+        public DateTime? expiry_date { get; set; }
+        public decimal maxStock { get; set; }
+        public string? image { get; set; }
+        public decimal total_price { get; set; }
+    }
+}

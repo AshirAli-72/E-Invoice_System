@@ -116,9 +116,7 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.RazorAssemblyInfo
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjimswa.dswa.cache.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\scopedcss\bundle\E-Invoice_system.styles.css
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\scopedcss\projectbundle\E-Invoice_system.bundle.scp.css
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\s8t6rltn8a-{0}-61n19gt1b8-61n19gt1b8.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\b1np7zvhb8-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\1zrelvpahn-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -180,8 +178,6 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\uv3v6qpsf5-{0}-2z0ns9nr
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\zp9bjfvprz-{0}-muycvpuwrr-muycvpuwrr.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\51eglyklkc-{0}-87fc7y1x7t-87fc7y1x7t.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\x4jqt4nva0-{0}-mlv21k5csn-mlv21k5csn.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\gh20s8vrwg-{0}-gnmi0qdeg5-gnmi0qdeg5.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\u61nphyxyv-{0}-gnmi0qdeg5-gnmi0qdeg5.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.build.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.build.json.cache
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.development.json
@@ -328,4 +324,8 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-rduprelv
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-8qen53m6xm-8qen53m6xm.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\e5ers0z3f0-{0}-ygrnxh77pz-ygrnxh77pz.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-6ik66hnb2b-6ik66hnb2b.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\EmbeddedAttribute.cs
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\ValidatableTypeAttribute.cs
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\5bi2uwl4se-{0}-ax6tuj8tun-ax6tuj8tun.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\lj6xxfk8wj-{0}-zr4b1gdhaw-zr4b1gdhaw.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

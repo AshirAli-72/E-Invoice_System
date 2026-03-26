@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - E-Invoice System</title>
+    <base href="~/" />
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/app-base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/invoice.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sale.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header sidebar-logo-container">
+                <img src="/images/sata-logo.png" alt="SATA" class="sidebar-logo" />
+                <button id="sidebarClose" class="mobile-only mobile-close-btn">
+                    <i class="ph-x"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a asp-page="/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                    <i class="ph-house nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a asp-page="/Customer/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Customer") == true ? "active" : "")">
+                    <i class="ph-users nav-icon"></i>
+                    <span>Customers</span>
+                </a>
+                
+                <a asp-page="/Product/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Product") == true ? "active" : "")">
+                    <i class="ph-package nav-icon"></i>
+                    <span>Products/Services</span>
+                </a>
+                
+                <a asp-page="/Sale/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Sale") == true ? "active" : "")">
+                    <i class="ph-shopping-cart nav-icon"></i>
+                    <span>Sales</span>
+                </a>
+                
+                <a asp-page="/Invoice/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Invoice/Index" ? "active" : "")">
+                    <i class="ph-file-text nav-icon"></i>
+                    <span>Invoices</span>
+                </a>
+
+                <a asp-page="/Invoice/Create" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Invoice/Create" ? "active" : "")">
+                    <i class="ph-file-plus nav-icon"></i>
+                    <span>Create Invoice</span>
+                </a>
+
+                <a asp-page="/Seller/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Seller") == true ? "active" : "")">
+                    <i class="ph-storefront nav-icon"></i>
+                    <span>Seller Profile</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button id="sidebarToggle" class="mobile-only mobile-toggle-btn">
+                        <i class="ph-list"></i>
+                    </button>
+                </div>
+
+                <div class="user-profile">
+                    @{
+                        var userEmail = Context.Session.GetString("UserEmail") ?? "User";
+                        var initial = userEmail.Length > 0 ? userEmail.Substring(0, 1).ToUpper() : "U";
+                    }
+                    <div class="user-avatar-initial" id="profileDropdownToggle">
+                        @initial
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <p class="user-email">@userEmail</p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a asp-page="/Account/Logout" class="dropdown-item">
+                            <i class="ph-sign-out"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const mainContent = document.querySelector('.main-content');
+        
+        // Profile Dropdown
+        const profileToggle = document.getElementById('profileDropdownToggle');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                profileDropdown.classList.remove('show');
+            });
+
+            profileDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.add('open');
+            });
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+
+    <div id="toast-container"></div>
+    
+    <script>
+        // Check for success message from server
+        const successMessage = '@TempData["Success"]';
+        
+        if (successMessage) {
+            showToast('Successful', successMessage);
+        }
+
+        function showToast(title, message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="ph-check-circle" style="color:#10b981;"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="ph-x"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto dismiss
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 400); // Wait for transition out
+            }, 2500); // Close fast (2.5s)
+        }
+    </script>
+</body>
+</html>

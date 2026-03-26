@@ -1,0 +1,323 @@
+@namespace E_Invoice_system.Components.Invoice
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="form-wrapper form-layout-left-wide">
+    <!-- Invoice Details Section -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <h3 class="form-section-title">
+                <i class="ph-file-plus form-icon-primary"></i>
+                Invoice Details
+            </h3>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;">
+                @errorMessage
+            </div>
+        }
+
+        <!-- Seller Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+                <label class="form-label">Company Name / Seller</label>
+                <select class="form-control" @onchange="OnSellerChanged">
+                    <option value="">-- Select Seller --</option>
+                    @foreach (var s in sellersList)
+                    {
+                        <option value="@s.id">@s.name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Invoice Date</label>
+                <input class="form-control" type="date" @bind="invoiceDate" />
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
+
+        <!-- Customer Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+                <label class="form-label">Select Customer</label>
+                <select class="form-control" @onchange="OnCustomerChanged">
+                    <option value="">-- Choose Customer --</option>
+                    @foreach (var c in customersList)
+                    {
+                        <option value="@c.id">@c.name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Invoice Number</label>
+                <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
+
+        <!-- Line Items Header -->
+        <h4 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Line Items</h4>
+
+        <!-- Add Item Form -->
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
+            <h5 style="margin-top: 0; margin-bottom: 1rem; color: #334155; font-size: 0.9rem;">Add New Item</h5>
+            <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <label class="form-label">Product / Service</label>
+                    <select id="productSelect" class="form-control" @bind="selectedProductId">
+                        <option value="0">-- Select Product --</option>
+                        @foreach (var p in productsList)
+                        {
+                            <option value="@p.id">@p.prod_name_service (@p.qty_unit_type) - $@p.price</option>
+                        }
+                    </select>
+                </div>
+                
+                <button type="button" class="btn-primary" @onclick="AddItem">
+                    <i class="ph-plus"></i> Add to Invoice
+                </button>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div style="overflow-x: auto; max-height: 400px; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                <thead>
+                    <tr style="background: #f1f5f9; text-align: left;">
+                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 35%;">Product/Service</th>
+                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 15%;">Qty</th>
+                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 16%;">Expiry Date</th>
+                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 11%;">Price</th>
+                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 11%;">Total</th>
+                        <th style="padding: 1rem; width: 80px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (invoiceItems.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" style="padding: 2rem; text-align: center; color: #64748b;">No items added yet. Please select a product to begin.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in invoiceItems)
+                        {
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 0.75rem;">
+                                    <input class="form-control" @bind="item.Name" />
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    <input type="number" step="0.01" class="form-control" @bind="item.Qty" @onbind:after="() => CalculateItemTotal(item)" />
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    <input type="date" class="form-control" @bind="item.ExpiryDate" />
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    <input type="number" step="0.01" class="form-control" @bind="item.Price" @onbind:after="() => CalculateItemTotal(item)" />
+                                </td>
+                                <td style="padding: 0.75rem; font-weight: bold; vertical-align: middle;">
+                                    $@item.Total.ToString("F2")
+                                </td>
+                                <td style="padding: 0.75rem; text-align: center; vertical-align: middle;">
+                                    <button type="button" @onclick="() => RemoveItem(item)" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">
+                                        <i class="ph-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary & Payment -->
+        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+            <div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Status</label>
+                    <select class="form-control" @bind="status">
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-control" @bind="paymentMethod">
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Online">Online</option>
+                        <option value="Credit">Credit</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #64748b; font-weight: 600;">Subtotal:</span>
+                    <span style="font-weight: 700;">$@subtotal.ToString("F2")</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: center;">
+                    <span style="color: #64748b; font-weight: 600;">Discount:</span>
+                    <input type="number" step="0.01" style="width: 100px; text-align: right; border: 1px solid #cbd5e1; border-radius: 4px;" @bind="discount" />
+                </div>
+                <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 1rem 0;" />
+                <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
+                    <span style="font-weight: 800; color: #0f172a;">Total:</span>
+                    <span style="font-weight: 800; color: #BC1823;">$@total.ToString("F2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions-sticky">
+        <button type="button" class="btn-primary" @onclick="SubmitInvoice" disabled="@isSubmitting">
+            <span>
+                @if (isSubmitting)
+                {
+                    <i class="ph-spinner ph-spin"></i> @("Saving...")
+                }
+                else
+                {
+                    <i class="ph-check-circle"></i> @("Generate Invoice")
+                }
+            </span>
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<Sellers> sellersList = new();
+    private List<customers> customersList = new();
+    private List<ProductService> productsList = new();
+    private List<InvoiceItem> invoiceItems = new();
+
+    private Sellers? selectedSeller;
+    private customers? selectedCustomer;
+    private string? invoiceNo;
+    private DateTime invoiceDate = DateTime.Now;
+    private string status = "Pending";
+    private string paymentMethod = "Cash";
+    private decimal discount = 0;
+    private int selectedProductId;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sellersList = await DbContext.sellers.OrderBy(s => s.name).ToListAsync();
+        customersList = await DbContext.customers.OrderBy(c => c.name).ToListAsync();
+        productsList = await DbContext.products_services.Where(p => p.status == "Available").ToListAsync();
+    }
+
+    private void OnSellerChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            selectedSeller = sellersList.FirstOrDefault(s => s.id == id);
+        }
+        else
+        {
+            selectedSeller = null;
+        }
+    }
+
+    private void OnCustomerChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            selectedCustomer = customersList.FirstOrDefault(c => c.id == id);
+        }
+        else
+        {
+            selectedCustomer = null;
+        }
+    }
+
+    private void AddItem()
+    {
+        if (selectedProductId == 0) return;
+
+        var product = productsList.FirstOrDefault(p => p.id == selectedProductId);
+        if (product != null)
+        {
+            invoiceItems.Add(new InvoiceItem
+            {
+                Name = product.prod_name_service,
+                Qty = 1,
+                Price = product.price,
+                ExpiryDate = product.expiry_date,
+                Total = product.price
+            });
+        }
+        selectedProductId = 0;
+    }
+
+    private void RemoveItem(InvoiceItem item)
+    {
+        invoiceItems.Remove(item);
+    }
+
+    private void CalculateItemTotal(InvoiceItem item)
+    {
+        item.Total = item.Qty * item.Price;
+    }
+
+    private decimal subtotal => invoiceItems.Sum(i => i.Total);
+    private decimal total => subtotal - discount;
+
+    private async Task SubmitInvoice()
+    {
+        if (selectedSeller == null) { errorMessage = "Please select a seller."; return; }
+        if (selectedCustomer == null) { errorMessage = "Please select a customer."; return; }
+        if (invoiceItems.Count == 0) { errorMessage = "Please add at least one item."; return; }
+
+        isSubmitting = true;
+        try
+        {
+            var invoice = new invoices
+            {
+                invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.Ticks}" : invoiceNo,
+                date = invoiceDate,
+                seller_name = selectedSeller.name,
+                seller_contact = selectedSeller.contact,
+                seller_address = selectedSeller.address,
+                customer_name = selectedCustomer.name,
+                customer_contact = selectedCustomer.contact,
+                customer_address = selectedCustomer.address,
+                prod_name_service = System.Text.Json.JsonSerializer.Serialize(invoiceItems, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }),
+                qty_unit_type = $"{invoiceItems.Count} Items",
+                price = subtotal,
+                discount = discount,
+                total_price = total,
+                payment = paymentMethod,
+                status = status
+            };
+
+            DbContext.invoices.Add(invoice);
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/Invoice/Index", true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving invoice: " + ex.Message;
+            isSubmitting = false;
+        }
+    }
+
+    public class InvoiceItem
+    {
+        public string? Name { get; set; }
+        public decimal Qty { get; set; }
+        public decimal Price { get; set; }
+        public DateTime? ExpiryDate { get; set; }
+        public decimal Total { get; set; }
+    }
+}

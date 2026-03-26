@@ -1,0 +1,135 @@
+@namespace E_Invoice_system.Components.Customer
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<div class="form-wrapper form-layout-left-wide">
+    <div class="form-section">
+        <div class="form-section-header">
+            <h3 class="form-section-title">
+                <i class="ph-users form-icon-primary"></i>
+                Customer Information
+            </h3>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;">
+                <i class="ph-warning"></i> @errorMessage
+            </div>
+        }
+
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-control" @bind="customer.name" placeholder="Enter customer's full name" required />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Contact Number</label>
+            <input class="form-control" @bind="customer.contact" placeholder="Enter contact number" />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" @bind="customer.email" placeholder="Enter email address" />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" rows="3" @bind="customer.address" placeholder="Enter physical address"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-control" @bind="customer.status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-actions-sticky">
+        <button type="button" class="btn-secondary" @onclick="Cancel">
+            Cancel
+        </button>
+        <button type="button" class="btn-primary" @onclick="SaveCustomer" disabled="@isSubmitting">
+            <span>
+                @if (isSubmitting)
+                {
+                    <i class="ph-spinner ph-spin"></i> @("Saving...")
+                }
+                else
+                {
+                    <i class="ph-check"></i> @(CustomerId == 0 ? "Save Customer" : "Update Customer")
+                }
+            </span>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int CustomerId { get; set; }
+    
+    private customers customer = new customers { status = "Active" };
+    private string? originalName;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CustomerId != 0)
+        {
+            var existing = await DbContext.customers.FindAsync(CustomerId);
+            if (existing != null)
+            {
+                customer = existing;
+                originalName = existing.name;
+            }
+        }
+    }
+
+    private async Task SaveCustomer()
+    {
+        if (string.IsNullOrWhiteSpace(customer.name))
+        {
+            errorMessage = "Full Name is required.";
+            return;
+        }
+
+        isSubmitting = true;
+        try
+        {
+            if (CustomerId == 0)
+            {
+                DbContext.customers.Add(customer);
+            }
+            else
+            {
+                // Handle name change logic for invoices
+                if (!string.IsNullOrEmpty(originalName) && originalName != customer.name)
+                {
+                    var associatedInvoices = await DbContext.invoices.Where(i => i.customer_name == originalName).ToListAsync();
+                    foreach (var inv in associatedInvoices)
+                    {
+                        inv.customer_name = customer.name;
+                        DbContext.invoices.Update(inv);
+                    }
+                }
+                DbContext.customers.Update(customer);
+            }
+
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/Customer/Index", true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving customer: " + ex.Message;
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/Customer/Index", true);
+    }
+}

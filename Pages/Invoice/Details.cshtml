@@ -1,0 +1,108 @@
+@page "{id:int}"
+@model E_Invoice_system.Pages.Invoice.DetailsModel
+@{
+    ViewData["Title"] = "Invoice #" + (Model.Invoice.invoice_no ?? Model.Invoice.id.ToString());
+}
+
+<div class="card" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+        <div>
+            <h1 style="color: #BC1823; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">INVOICE</h1>
+            <p style="color: var(--text-muted);">#@(Model.Invoice.invoice_no ?? Model.Invoice.id.ToString())</p>
+        </div>
+        <div style="text-align: right;">
+            <a asp-page="./Print" asp-route-id="@Model.Invoice.id" target="_blank" class="btn-primary" style="background: #fff; color: var(--text); border: 1px solid var(--border);">
+                <i class="ph-printer"></i> Print Invoice
+            </a>
+            <p style="margin-top: 1rem; font-weight: 600;">Date: @Model.Invoice.date.ToString("MMM dd, yyyy")</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+        <div>
+            <h3 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 1rem;">From</h3>
+            <div style="line-height: 1.6;">
+                <p style="font-weight: 700; font-size: 1.1rem;">@Model.Invoice.seller_name</p>
+                <p>@Model.Invoice.seller_address</p>
+                <p>@Model.Invoice.seller_contact</p>
+            </div>
+        </div>
+        <div>
+            <h3 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 1rem;">Bill To</h3>
+            <div style="line-height: 1.6;">
+                <p style="font-weight: 700; font-size: 1.1rem;">@Model.Invoice.customer_name</p>
+                <p>@Model.Invoice.customer_address</p>
+                <p>@Model.Invoice.customer_contact</p>
+            </div>
+        </div>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 2rem;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Description</th>
+                <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Qty/Unit</th>
+                <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; text-align: right;">Price</th>
+                <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.IsMultiItem)
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1.5rem 0.5rem;">
+                            <div style="font-weight: 600;">@item["name"]</div>
+                            @if (item.ContainsKey("expiryDate") && (string)item["expiryDate"] != "N/A")
+                            {
+                                <div style="font-size: 0.75rem; color: #ef4444; margin-top: 0.25rem;">Expiry: @item["expiryDate"]</div>
+                            }
+                        </td>
+                        <td style="padding: 1.5rem 0.5rem;">@item["qty"]</td>
+                        <td style="padding: 1.5rem 0.5rem; text-align: right;">$@(((decimal)item["price"]).ToString("N2"))</td>
+                        <td style="padding: 1.5rem 0.5rem; text-align: right; font-weight: 700;">$@(((decimal)item["total"]).ToString("N2"))</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1.5rem 0.5rem;">
+                        <div style="font-weight: 600;">@Model.Invoice.prod_name_service</div>
+                        @if (Model.SingleItemExpiry != "N/A")
+                        {
+                            <div style="font-size: 0.75rem; color: #ef4444; margin-top: 0.25rem;">Expiry: @Model.SingleItemExpiry</div>
+                        }
+                    </td>
+                    <td style="padding: 1.5rem 0.5rem;">@Model.Invoice.qty_unit_type</td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: right;">$@Model.Invoice.price.ToString("N2")</td>
+                    <td style="padding: 1.5rem 0.5rem; text-align: right; font-weight: 700;">$@Model.Invoice.total_price.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: flex-end;">
+        <div style="width: 300px;">
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                <span style="color: var(--text-muted);">Discount</span>
+                <span style="color: #ef4444;">- $@Model.Invoice.discount.ToString("N2")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-top: 1px solid var(--border); margin-top: 1rem;">
+                <span style="font-size: 1.25rem; font-weight: 800;">Total Amount</span>
+                <span style="font-size: 1.25rem; font-weight: 800; color: #BC1823;">$@Model.Invoice.total_price.ToString("N2")</span>
+            </div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <span style="background: @(Model.Invoice.status == "Paid" ? "#ecfdf5" : "#fff7ed"); color: @(Model.Invoice.status == "Paid" ? "#10b981" : "#ea580c"); padding: 0.5rem 1.5rem; border-radius: 30px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Status: @Model.Invoice.status
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+        <p>Thank you for your business!</p>
+        <p>Payment Method: @Model.Invoice.payment</p>
+    </div>
+</div>
