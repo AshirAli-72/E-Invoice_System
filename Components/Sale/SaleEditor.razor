@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="quick-actions-v2">
-                    <button type="button" class="btn-action-round" @onclick='() => NavigationManager.NavigateTo(NavigationManager.Uri, true)' title="Refresh"><i class="ph-arrows-clockwise"></i></button>
+                    <button type="button" class="btn-action-round" @onclick='ResetComponent' title="Clean Form"><i class="ph-arrows-clockwise"></i></button>
                     <button type="button" class="btn-action-round" @onclick="ToggleFullScreen" title="Full Screen"><i class="ph-corners-out"></i></button>
                     <a href="/Sale/Index" class="btn-action-round back" title="Back to List"><i class="ph-arrow-left"></i></a>
                 </div>
@@ -620,8 +620,27 @@
                 }
                 await JSRuntime.InvokeVoidAsync("window.print");
             }
-            NavigationManager.NavigateTo("/Sale/Index", true);
+            
+            // Instead of force-reloading, just reset the state and show success
+            ShowAlert("Transaction completed successfully!");
+            ResetComponent();
+            isSubmitting = false;
         } catch (Exception ex) { ShowAlert("Error: " + ex.Message); isSubmitting = false; }
+    }
+
+    private void ResetComponent()
+    {
+        saleItems.Clear();
+        transMode = "sale";
+        selectedCustomer = null;
+        customerSearchQuery = "";
+        searchQuery = "";
+        paymentMethod = "Cash";
+        tenderedAmount = null;
+        notes = "";
+        showPaymentModal = false;
+        filteredProducts = allProducts;
+        StateHasChanged();
     }
 
     private string FormatCurrency(decimal val) => (val < 0 ? "-" : "") + "$" + Math.Abs(val).ToString("N2");
