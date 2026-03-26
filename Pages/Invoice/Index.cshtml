@@ -82,9 +82,9 @@
                         </td>
                         <td class="text-right" style="padding-right: 1.5rem;">
                             <div class="actions-container actions-right">
-                                <a asp-page="./Details" asp-route-id="@item.id" class="btn-icon-sm btn-view" title="View Invoice">
+                                <button type="button" onclick="viewInvoice(@item.id)" class="btn-icon-sm btn-view" title="View Invoice">
                                     <i class="ph-eye"></i>
-                                </a>
+                                </button>
                                 <form method="post" asp-page-handler="Delete" asp-route-id="@item.id" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this invoice?')">
                                     <button type="submit" class="btn-icon-sm btn-delete">
                                         <i class="ph-trash"></i>
@@ -107,3 +107,147 @@
         </table>
     </div>
 </div>
+
+<!-- Invoice View Modal -->
+<div id="invoiceModal" class="modal-overlay-v2">
+    <div class="modal-container-v2 shadow-luxury">
+        <div class="modal-header-v2">
+            <h3 class="modal-title-v2">Invoice Details</h3>
+            <button type="button" class="btn-close-v2" onclick="closeInvoiceModal()"><i class="ph-x"></i></button>
+        </div>
+        <div id="invoiceModalContent" class="modal-body-v2">
+            <div class="loading-state">
+                <i class="ph-spinner ph-spin"></i>
+                <span>Loading invoice...</span>
+            </div>
+        </div>
+        <div class="modal-footer-v2">
+            <button type="button" class="btn-secondary" onclick="closeInvoiceModal()">Close</button>
+            <button id="modalPrintBtn" type="button" class="btn-primary" style="background:#BC1823; border:none;">
+                <i class="ph-printer"></i> Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay-v2 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+    .modal-overlay-v2.show { display: flex; }
+    
+    .modal-container-v2 {
+        background: white;
+        width: 95%;
+        max-width: 900px;
+        max-height: 90vh;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .modal-header-v2 {
+        padding: 15px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-title-v2 { font-weight: 800; color: #1e293b; margin: 0; }
+    .btn-close-v2 { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+    
+    .modal-body-v2 {
+        padding: 25px;
+        overflow-y: auto;
+        flex: 1;
+        background: #f8fafc;
+    }
+    
+    .modal-footer-v2 {
+        padding: 15px 25px;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 50px;
+        color: #64748b;
+    }
+    .loading-state i { font-size: 2.5rem; }
+</style>
+
+@section Scripts {
+    <script>
+        function viewInvoice(id) {
+            const modal = document.getElementById('invoiceModal');
+            const content = document.getElementById('invoiceModalContent');
+            const printBtn = document.getElementById('modalPrintBtn');
+            
+            // Show modal and loading
+            modal.classList.add('show');
+            content.innerHTML = `
+                <div class="loading-state">
+                    <i class="ph-spinner ph-spin"></i>
+                    <span>Loading invoice details...</span>
+                </div>
+            `;
+
+            // Set print button action
+            printBtn.onclick = () => {
+                window.open(`/Invoice/Print?id=${id}`, '_blank');
+            };
+
+            // Fetch invoice details
+            fetch(`/Invoice/Details/${id}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                content.innerHTML = html;
+            })
+            .catch(error => {
+                content.innerHTML = `
+                    <div class="error-state" style="text-align:center; padding:40px; color:#ef4444;">
+                        <i class="ph-warning" style="font-size:2rem;"></i>
+                        <p>Error loading invoice details. Please try again.</p>
+                    </div>
+                `;
+                console.error('Error:', error);
+            });
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').classList.remove('show');
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeInvoiceModal();
+        });
+
+        // Close on click outside
+        document.getElementById('invoiceModal').addEventListener('click', (e) => {
+            if (e.target.id === 'invoiceModal') closeInvoiceModal();
+        });
+    </script>
+}

@@ -328,4 +328,4 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\ValidatableTypeAttribute.cs
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\5bi2uwl4se-{0}-ax6tuj8tun-ax6tuj8tun.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\lj6xxfk8wj-{0}-zr4b1gdhaw-zr4b1gdhaw.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-vdfbszoqjf-vdfbszoqjf.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-tmxlybgezs-tmxlybgezs.gz
