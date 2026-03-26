@@ -541,7 +541,10 @@
     }
 
     private void FilterCustomers() {
-        if (string.IsNullOrEmpty(customerSearchQuery)) filteredCustomersList = allCustomersList;
+        if (string.IsNullOrEmpty(customerSearchQuery)) {
+            filteredCustomersList = allCustomersList;
+            selectedCustomer = null; 
+        }
         else filteredCustomersList = allCustomersList.Where(c => c.name.ToLower().Contains(customerSearchQuery.ToLower()) || (c.contact != null && c.contact.Contains(customerSearchQuery))).ToList();
     }
 
@@ -587,45 +590,78 @@
 
     private async Task SubmitSale() {
         if (isSubmitting) return;
+        if (!saleItems.Any()) { ShowAlert("Cannot complete an empty order."); return; }
+
         isSubmitting = true;
         try {
             var count = await DbContext.sales.CountAsync();
             orderBillNo = transMode == "return" ? $"RET-{count+1}" : $"SALE-{count+1}";
+            
+            // Prepare customer tag for description - ensure it's not too long
+            string customerInfo = selectedCustomer != null ? $" [Customer: {selectedCustomer.name}]" : " [Walk-In]";
+            string saleDescription = ((notes ?? "") + customerInfo);
+            if (saleDescription.Length > 200) saleDescription = saleDescription.Substring(0, 200);
 
             foreach (var item in saleItems) {
                 var sale = new Models.Sale {
-                    billNo = orderBillNo, date = DateTime.Now, prod_name_service = item.prod_name_service,
-                    barcode = item.barcode, qty_unit_type = $"{item.qty_unit_type}", price = item.price,
-                    discount = item.discount, total_price = item.total_price, payment_method = paymentMethod, status = paymentMethod == "Credit" ? "Pending" : "Paid",
-                    is_returned = transMode == "return", description = notes
+                    billNo = orderBillNo, 
+                    date = DateTime.Now, 
+                    prod_name_service = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
+                    barcode = item.barcode, 
+                    qty_unit_type = $"{item.qty_unit_type}".Length > 50 ? $"{item.qty_unit_type}".Substring(0, 50) : $"{item.qty_unit_type}", 
+                    price = item.price,
+                    discount = item.discount, 
+                    total_price = item.total_price, 
+                    payment_method = paymentMethod, 
+                    status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
+                    is_returned = transMode == "return", 
+                    description = saleDescription
                 };
                 DbContext.sales.Add(sale);
                 
-                // Inventory update
-                var prod = await DbContext.products_services.FirstOrDefaultAsync(p => p.prod_name_service == item.prod_name_service);
-                if (prod != null) {
-                    var m = Regex.Match(prod.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
-                    if (m.Success && decimal.TryParse(m.Groups[1].Value, out decimal currentStock)) {
-                        prod.qty_unit_type = $"{currentStock - item.qty_unit_type} {m.Groups[2].Value}".Trim();
-                        DbContext.products_services.Update(prod);
+                // Inventory update logic - avoid long decimal strings
+                try {
+                    var prod = await DbContext.products_services.FirstOrDefaultAsync(p => p.prod_name_service == item.prod_name_service);
+                    if (prod != null) {
+                        var m = Regex.Match(prod.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
+                        if (m.Success && decimal.TryParse(m.Groups[1].Value, out decimal currentStock)) {
+                            var newQty = (currentStock - item.qty_unit_type).ToString("0.####");
+                            var unit = m.Groups[2].Value.Trim();
+                            var finalQtyStr = $"{newQty} {unit}".Trim();
+                            if (finalQtyStr.Length > 50) finalQtyStr = finalQtyStr.Substring(0, 50);
+                            prod.qty_unit_type = finalQtyStr;
+                            DbContext.products_services.Update(prod);
+                        }
                     }
+                } catch (Exception ex) { 
+                    Console.WriteLine("Stock Update Minor Error: " + ex.Message); 
                 }
             }
 
             await DbContext.SaveChangesAsync();
+            
             if (shouldPrintReceipt) {
-                await Task.Delay(500); // Wait for DOM
-                if (transMode != "return") {
-                    await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", orderBillNo);
+                await Task.Delay(300);
+                try {
+                    if (transMode != "return") {
+                        await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", orderBillNo);
+                    }
+                    await JSRuntime.InvokeVoidAsync("window.print");
+                } catch (Exception jsEx) {
+                    Console.WriteLine("Print Error: " + jsEx.Message);
                 }
-                await JSRuntime.InvokeVoidAsync("window.print");
             }
             
-            // Instead of force-reloading, just reset the state and show success
-            ShowAlert("Transaction completed successfully!");
+            ShowAlert("Transaction successfully completed!");
             ResetComponent();
+        } catch (Exception ex) { 
+            string errMessage = ex.Message;
+            if (ex.InnerException != null) errMessage += " | " + ex.InnerException.Message;
+            ShowAlert("Save Error: " + errMessage); 
+            StateHasChanged();
+        } finally {
             isSubmitting = false;
-        } catch (Exception ex) { ShowAlert("Error: " + ex.Message); isSubmitting = false; }
+        }
     }
 
     private void ResetComponent()

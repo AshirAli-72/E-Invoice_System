@@ -275,14 +275,14 @@
         {
             var invoice = new invoices
             {
-                invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.Ticks}" : invoiceNo,
+                invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.ToString("yyMMddHHmm")}" : (invoiceNo.Length > 50 ? invoiceNo.Substring(0, 50) : invoiceNo),
                 date = invoiceDate,
-                seller_name = selectedSeller.name,
-                seller_contact = selectedSeller.contact,
-                seller_address = selectedSeller.address,
-                customer_name = selectedCustomer.name,
-                customer_contact = selectedCustomer.contact,
-                customer_address = selectedCustomer.address,
+                seller_name = selectedSeller.name?.Length > 100 ? selectedSeller.name.Substring(0, 100) : selectedSeller.name,
+                seller_contact = selectedSeller.contact?.Length > 50 ? selectedSeller.contact.Substring(0, 50) : selectedSeller.contact,
+                seller_address = selectedSeller.address?.Length > 255 ? selectedSeller.address.Substring(0, 255) : selectedSeller.address,
+                customer_name = selectedCustomer.name?.Length > 100 ? selectedCustomer.name.Substring(0, 100) : selectedCustomer.name,
+                customer_contact = selectedCustomer.contact?.Length > 50 ? selectedCustomer.contact.Substring(0, 50) : selectedCustomer.contact,
+                customer_address = selectedCustomer.address?.Length > 255 ? selectedCustomer.address.Substring(0, 255) : selectedCustomer.address,
                 prod_name_service = System.Text.Json.JsonSerializer.Serialize(invoiceItems, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }),
                 qty_unit_type = $"{invoiceItems.Count} Items",
                 price = subtotal,
@@ -298,7 +298,9 @@
         }
         catch (Exception ex)
         {
-            errorMessage = "Error saving invoice: " + ex.Message;
+            string err = ex.Message;
+            if (ex.InnerException != null) err += " | " + ex.InnerException.Message;
+            errorMessage = "Error saving invoice: " + err;
             isSubmitting = false;
         }
     }
