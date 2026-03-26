@@ -140,7 +140,7 @@
                     <i class="ph-caret-down"></i>
                 </div>
                 <button type="button" @onclick="() => showAddCustomerModal = true" class="btn-add-customer">
-                    <i class="ph-plus-circle"></i><span>New</span>
+                    <i class="ph-plus-circle"></i><span>New Customer</span>
                 </button>
             </div>
 
@@ -239,7 +239,7 @@
                     <div class="quick-pills">
                         @foreach (var amt in new[] { 10, 20, 50, 100, 500, 1000, 5000 })
                         {
-                            <div class="quick-pill" @onclick="() => tenderedAmount += amt">+ $@amt</div>
+                            <div class="quick-pill" @onclick="() => tenderedAmount = (tenderedAmount ?? 0) + amt">+ $@amt</div>
                         }
                         <div class="quick-pill" @onclick="() => tenderedAmount = Math.Abs(currentTotal)">Match Total</div>
                     </div>
@@ -257,10 +257,10 @@
                     </div>
                     <div class="summary-web-line" style="margin-top:8px;">
                         <span style="color:var(--text-muted);font-weight:600;">Total Tendered</span>
-                        <span style="font-weight:700;">@FormatCurrency(tenderedAmount)</span>
+                        <span style="font-weight:700;">@FormatCurrency(tenderedAmount ?? 0)</span>
                     </div>
                     @{
-                        var change = tenderedAmount - Math.Abs(currentTotal);
+                        var change = (tenderedAmount ?? 0) - Math.Abs(currentTotal);
                         <div class="summary-web-line grand">
                             <span>Change Due</span>
                             <span style="color: @(change >= 0 ? "#22c55e" : "#ef4444")">@FormatCurrency(Math.Abs(change))</span>
@@ -378,7 +378,7 @@
     <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span>@FormatCurrency(Math.Abs(totalSub))</span></div>
     <div class="rcpt-totals-row"><span>TOTAL</span>      <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
     <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
-    <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>@FormatCurrency(tenderedAmount)</span></div>
+    <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>@FormatCurrency(tenderedAmount ?? 0)</span></div>
     <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span>@paymentMethod</span></div>
     <div class="rcpt-footer">
         <hr class="rcpt-hr" />
@@ -417,7 +417,7 @@
     private bool showPaymentModal = false;
     private bool showAddCustomerModal = false;
     private string paymentMethod = "Cash";
-    private decimal tenderedAmount = 0;
+    private decimal? tenderedAmount = null;
     private string notes = "";
     private bool shouldPrintReceipt = true;
     private string? stockAlert;
@@ -472,25 +472,30 @@
                 filteredProducts = allProducts;
             }
         } else if (e.Key == "Enter" && searchType == "receipt") {
-            LoadFromReceipt(searchQuery);
+            _ = LoadFromReceipt(searchQuery);
             searchQuery = "";
         }
     }
 
-    private async void LoadFromReceipt(string billNo)
+    private async Task LoadFromReceipt(string billNo)
     {
         var sales = await DbContext.sales.Where(s => s.billNo == billNo).ToListAsync();
         if (sales.Any()) {
             transMode = "return";
-            saleItems = sales.Select(s => new SaleItem {
-                prod_name_service = s.prod_name_service,
-                barcode = s.barcode,
-                qty_unit_type = -decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
-                price = s.price,
-                discount = s.discount / decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
-                expiry_date = s.expiry_date,
-                maxStock = decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value),
-                total_price = (s.price * -decimal.Parse(Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)").Groups[1].Value))
+            saleItems = sales.Select(s => {
+                var qtyMatch = Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)");
+                decimal qtyInDb = qtyMatch.Success ? decimal.Parse(qtyMatch.Groups[1].Value) : 0;
+                
+                return new SaleItem {
+                    prod_name_service = s.prod_name_service,
+                    barcode = s.barcode,
+                    qty_unit_type = -qtyInDb,
+                    price = s.price,
+                    discount = qtyInDb != 0 ? s.discount / qtyInDb : 0,
+                    expiry_date = s.expiry_date,
+                    maxStock = qtyInDb,
+                    total_price = (s.price * -qtyInDb)
+                };
             }).ToList();
             StateHasChanged();
         }
@@ -564,7 +569,7 @@
     private decimal totalDisc => saleItems.Sum(i => i.discount * i.qty_unit_type);
     private decimal currentTotal => totalSub - totalDisc;
 
-    private void OpenPaymentModal() { if (!saleItems.Any()) return; showPaymentModal = true; tenderedAmount = Math.Abs(currentTotal); }
+    private void OpenPaymentModal() { if (!saleItems.Any()) return; showPaymentModal = true; tenderedAmount = null; }
 
     private void SetPaymentMethod(string m) { paymentMethod = m; }
 
