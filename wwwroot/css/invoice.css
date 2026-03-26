@@ -61,35 +61,35 @@
 
 .logo-container {
     background: white;
-    padding: 12px;
+    padding: 10px;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    width: 180px;
+    width: 150px;
 }
 
 .logo-container img { width: 100%; height: auto; }
 
 .invoice-meta { text-align: right; }
 .invoice-title {
-    font-size: 42px;
+    font-size: 32px;
     font-weight: 900;
     color: var(--invoice-red);
     text-transform: uppercase;
     line-height: 1;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 .invoice-id {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
     color: #333;
 }
 
 /* ADDRESSES */
 .invoice-addresses {
-    padding: 10px 50px 30px 50px;
+    padding: 10px 50px 20px 50px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    gap: 40px;
 }
 
 .address-box { position: relative; }
@@ -98,43 +98,43 @@
 .address-label {
     background: var(--invoice-red);
     color: white;
-    padding: 5px 15px;
-    font-size: 13px;
+    padding: 4px 12px;
+    font-size: 11px;
     font-weight: 900;
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-transform: uppercase;
 }
 
-.address-name { font-size: 22px; font-weight: 900; margin-bottom: 8px; color: #111; }
-.address-details { font-size: 14px; color: #666; line-height: 1.6; }
+.address-name { font-size: 18px; font-weight: 900; margin-bottom: 5px; color: #111; }
+.address-details { font-size: 12px; color: #666; line-height: 1.5; }
 
 /* STATUS & PAYMENT */
 .status-bar {
-    padding: 0 50px 30px 50px;
+    padding: 0 50px 20px 50px;
     display: flex;
-    gap: 40px;
+    gap: 30px;
 }
 
 .status-item label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: #999;
     text-transform: uppercase;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .status-badge {
     background: #10b981; /* Default Paid */
     color: white;
-    padding: 3px 15px;
+    padding: 2px 12px;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 800;
 }
 
-.payment-text { font-size: 16px; font-weight: 800; }
+.payment-text { font-size: 14px; font-weight: 800; }
 
 /* TABLE */
 .invoice-table-container {
@@ -150,17 +150,17 @@
 .invoice-table thead tr { background: var(--invoice-red); }
 .invoice-table th {
     color: white;
-    padding: 12px 15px;
-    font-size: 13px;
+    padding: 10px 15px;
+    font-size: 11px;
     font-weight: 900;
     text-transform: uppercase;
     text-align: left;
 }
 
 .invoice-table td {
-    padding: 15px;
+    padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    font-size: 13px;
+    font-size: 11px;
     color: #333;
 }
 
@@ -170,37 +170,37 @@
 
 /* TOTALS & FOOTER */
 .invoice-footer {
-    padding: 40px 50px 100px 50px;
+    padding: 30px 50px 80px 50px;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
-    gap: 40px;
+    gap: 30px;
     align-items: flex-end;
 }
 
-.terms-section h3 { font-size: 18px; font-weight: 900; color: #111; margin-bottom: 10px; }
-.terms-section p { font-size: 12px; color: #666; line-height: 1.6; max-width: 400px; }
+.terms-section h3 { font-size: 15px; font-weight: 900; color: #111; margin-bottom: 8px; }
+.terms-section p { font-size: 11px; color: #666; line-height: 1.5; max-width: 350px; }
 
-.signature-section { margin-top: 40px; }
-.sig-line { border-top: 2px solid #000; width: 220px; margin-bottom: 10px; }
-.sig-label { font-size: 14px; font-weight: 900; text-transform: uppercase; }
+.signature-section { margin-top: 30px; }
+.sig-line { border-top: 2px solid #000; width: 180px; margin-bottom: 8px; }
+.sig-label { font-size: 12px; font-weight: 900; text-transform: uppercase; }
 
-.totals-section { display: flex; flex-direction: column; gap: 8px; }
-.total-row { display: flex; justify-content: flex-end; align-items: center; gap: 40px; }
-.total-label { font-size: 15px; font-weight: 700; color: #666; width: 100px; text-align: right; }
-.total-val { font-size: 16px; font-weight: 900; color: #111; width: 120px; text-align: right; }
+.totals-section { display: flex; flex-direction: column; gap: 6px; }
+.total-row { display: flex; justify-content: flex-end; align-items: center; gap: 30px; }
+.total-label { font-size: 13px; font-weight: 700; color: #666; width: 80px; text-align: right; }
+.total-val { font-size: 14px; font-weight: 900; color: #111; width: 100px; text-align: right; }
 
 .grand-total-bar {
     background: var(--invoice-red);
     color: white;
-    padding: 15px 25px;
+    padding: 12px 20px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 40px;
-    margin-top: 15px;
+    gap: 30px;
+    margin-top: 12px;
 }
-.grand-label { font-size: 20px; font-weight: 900; text-transform: uppercase; }
-.grand-val { font-size: 22px; font-weight: 900; width: 120px; text-align: right; }
+.grand-label { font-size: 16px; font-weight: 900; text-transform: uppercase; }
+.grand-val { font-size: 18px; font-weight: 900; width: 100px; text-align: right; }
 
 /* BOTTOM PATTERNS */
 .bottom-left-pattern {

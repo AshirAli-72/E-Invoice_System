@@ -6,7 +6,7 @@
     if (isAjax) { Layout = null; }
 }
 
-<div id="invoiceViewWrapper" class="main-content">
+<div id="invoiceViewWrapper" class="main-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 80px); padding: 40px 20px;">
     <!-- Action Bar (Not printed) -->
     <div class="no-print" style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 210mm;">
         <h2 style="font-weight: 800; margin: 0;">Invoice Details</h2>
@@ -50,7 +50,7 @@
                 <div class="address-details">
                     <p>@Model.Invoice.seller_address</p>
                     <p>Phone: @Model.Invoice.seller_contact</p>
-                    <p style="font-weight:900; color:#111; margin-top:10px; font-size:15px;">Date: @Model.Invoice.date.ToString("dd MMM yyyy")</p>
+                    <p style="font-weight:900; color:#111; margin-top:8px; font-size:13px;">Date: @Model.Invoice.date.ToString("dd MMM yyyy")</p>
                 </div>
             </div>
         </div>

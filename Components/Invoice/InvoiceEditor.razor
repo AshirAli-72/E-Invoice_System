@@ -22,41 +22,37 @@
         }
 
         <!-- Seller Info -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Company Name / Seller</label>
-                <select class="form-control" @onchange="OnSellerChanged">
-                    <option value="">-- Select Seller --</option>
-                    @foreach (var s in sellersList)
-                    {
-                        <option value="@s.id">@s.name</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Invoice Date</label>
-                <input class="form-control" type="date" @bind="invoiceDate" />
-            </div>
+        <div class="form-group">
+            <label class="form-label">Company Name / Seller</label>
+            <select class="form-control" @onchange="OnSellerChanged">
+                <option value="">-- Select Seller --</option>
+                @foreach (var s in sellersList)
+                {
+                    <option value="@s.id">@s.name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Invoice Date</label>
+            <input class="form-control" type="date" @bind="invoiceDate" />
         </div>
 
         <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
 
         <!-- Customer Info -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Select Customer</label>
-                <select class="form-control" @onchange="OnCustomerChanged">
-                    <option value="">-- Choose Customer --</option>
-                    @foreach (var c in customersList)
-                    {
-                        <option value="@c.id">@c.name</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Invoice Number</label>
-                <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
-            </div>
+        <div class="form-group">
+            <label class="form-label">Select Customer</label>
+            <select class="form-control" @onchange="OnCustomerChanged">
+                <option value="">-- Choose Customer --</option>
+                @foreach (var c in customersList)
+                {
+                    <option value="@c.id">@c.name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Invoice Number</label>
+            <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
         </div>
 
         <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
@@ -67,42 +63,41 @@
         <!-- Add Item Form -->
         <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
             <h5 style="margin-top: 0; margin-bottom: 1rem; color: #334155; font-size: 0.9rem;">Add New Item</h5>
-            <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 250px;">
-                    <label class="form-label">Product / Service</label>
-                    <select id="productSelect" class="form-control" @bind="selectedProductId">
+            <div class="form-group">
+                <label class="form-label">Product / Service</label>
+                <div style="display: flex; gap: 1rem;">
+                    <select id="productSelect" class="form-control" @bind="selectedProductId" style="flex:1;">
                         <option value="0">-- Select Product --</option>
                         @foreach (var p in productsList)
                         {
                             <option value="@p.id">@p.prod_name_service (@p.qty_unit_type) - $@p.price</option>
                         }
                     </select>
+                    <button type="button" class="btn-primary" @onclick="AddItem">
+                        <i class="ph-plus"></i> Add Item
+                    </button>
                 </div>
-                
-                <button type="button" class="btn-primary" @onclick="AddItem">
-                    <i class="ph-plus"></i> Add to Invoice
-                </button>
             </div>
         </div>
 
         <!-- Items Table -->
-        <div style="overflow-x: auto; max-height: 400px; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <div style="overflow-x: auto; max-height: 400px; margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 12px;">
             <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead>
                     <tr style="background: #f1f5f9; text-align: left;">
-                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 35%;">Product/Service</th>
-                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 15%;">Qty</th>
-                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 16%;">Expiry Date</th>
-                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 11%;">Price</th>
-                        <th style="padding: 1rem; font-size: 0.875rem; font-weight: 700; color: #475569; width: 11%;">Total</th>
-                        <th style="padding: 1rem; width: 80px;"></th>
+                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 35%;">Product/Service</th>
+                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 15%;">Qty</th>
+                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 16%;">Expiry</th>
+                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 11%;">Price</th>
+                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 11%;">Total</th>
+                        <th style="padding: 1rem; width: 60px;"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (invoiceItems.Count == 0)
                     {
                         <tr>
-                            <td colspan="6" style="padding: 2rem; text-align: center; color: #64748b;">No items added yet. Please select a product to begin.</td>
+                            <td colspan="6" style="padding: 2rem; text-align: center; color: #64748b; font-size: 0.85rem;">No items added yet.</td>
                         </tr>
                     }
                     else
@@ -110,23 +105,23 @@
                         @foreach (var item in invoiceItems)
                         {
                             <tr style="border-bottom: 1px solid #e2e8f0;">
-                                <td style="padding: 0.75rem;">
-                                    <input class="form-control" @bind="item.Name" />
+                                <td style="padding: 0.5rem 1rem;">
+                                    <input class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Name" />
                                 </td>
-                                <td style="padding: 0.75rem;">
-                                    <input type="number" step="0.01" class="form-control" @bind="item.Qty" @onbind:after="() => CalculateItemTotal(item)" />
+                                <td style="padding: 0.5rem 1rem;">
+                                    <input type="number" step="0.01" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Qty" @onbind:after="() => CalculateItemTotal(item)" />
                                 </td>
-                                <td style="padding: 0.75rem;">
-                                    <input type="date" class="form-control" @bind="item.ExpiryDate" />
+                                <td style="padding: 0.5rem 1rem;">
+                                    <input type="date" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.ExpiryDate" />
                                 </td>
-                                <td style="padding: 0.75rem;">
-                                    <input type="number" step="0.01" class="form-control" @bind="item.Price" @onbind:after="() => CalculateItemTotal(item)" />
+                                <td style="padding: 0.5rem 1rem;">
+                                    <input type="number" step="0.01" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Price" @onbind:after="() => CalculateItemTotal(item)" />
                                 </td>
-                                <td style="padding: 0.75rem; font-weight: bold; vertical-align: middle;">
+                                <td style="padding: 0.5rem 1rem; font-weight: bold; font-size: 0.85rem; vertical-align: middle;">
                                     $@item.Total.ToString("F2")
                                 </td>
-                                <td style="padding: 0.75rem; text-align: center; vertical-align: middle;">
-                                    <button type="button" @onclick="() => RemoveItem(item)" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">
+                                <td style="padding: 0.5rem 1rem; text-align: center; vertical-align: middle;">
+                                    <button type="button" @onclick="() => RemoveItem(item)" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
                                         <i class="ph-trash"></i>
                                     </button>
                                 </td>
@@ -138,41 +133,37 @@
         </div>
 
         <!-- Summary & Payment -->
-        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
-            <div>
-                <div class="form-group">
-                    <label class="form-label">Invoice Status</label>
-                    <select class="form-control" @bind="status">
-                        <option value="Pending">Pending</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Payment Method</label>
-                    <select class="form-control" @bind="paymentMethod">
-                        <option value="Cash">Cash</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                        <option value="Online">Online</option>
-                        <option value="Credit">Credit</option>
-                    </select>
-                </div>
-            </div>
+        <div class="form-group">
+            <label class="form-label">Invoice Status</label>
+            <select class="form-control" @bind="status">
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select class="form-control" @bind="paymentMethod">
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Online">Online</option>
+                <option value="Credit">Credit</option>
+            </select>
+        </div>
 
-            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="color: #64748b; font-weight: 600;">Subtotal:</span>
-                    <span style="font-weight: 700;">$@subtotal.ToString("F2")</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: center;">
-                    <span style="color: #64748b; font-weight: 600;">Discount:</span>
-                    <input type="number" step="0.01" style="width: 100px; text-align: right; border: 1px solid #cbd5e1; border-radius: 4px;" @bind="discount" />
-                </div>
-                <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 1rem 0;" />
-                <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
-                    <span style="font-weight: 800; color: #0f172a;">Total:</span>
-                    <span style="font-weight: 800; color: #BC1823;">$@total.ToString("F2")</span>
-                </div>
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 2rem; max-width: 400px; margin-left: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Subtotal:</span>
+                <span style="font-weight: 700; font-size: 0.9rem;">$@subtotal.ToString("F2")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: center;">
+                <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Discount:</span>
+                <input type="number" step="0.01" style="width: 100px; text-align: right; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem;" @bind="discount" />
+            </div>
+            <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 1rem 0;" />
+            <div style="display: flex; justify-content: space-between; font-size: 1.15rem;">
+                <span style="font-weight: 800; color: #0f172a;">Total:</span>
+                <span style="font-weight: 800; color: #BC1823;">$@total.ToString("F2")</span>
             </div>
         </div>
     </div>
