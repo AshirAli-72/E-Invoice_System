@@ -33,37 +33,37 @@
             </div>
             
             <nav class="sidebar-nav">
-                <a asp-page="/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                <a asp-page="/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
                     <i class="ph-house nav-icon"></i>
                     <span>Dashboard</span>
                 </a>
                 
-                <a asp-page="/Customer/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Customer") == true ? "active" : "")">
+                <a asp-page="/Customer/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Customer") == true ? "active" : "")">
                     <i class="ph-users nav-icon"></i>
                     <span>Customers</span>
                 </a>
                 
-                <a asp-page="/Product/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Product") == true ? "active" : "")">
+                <a asp-page="/Product/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Product") == true ? "active" : "")">
                     <i class="ph-package nav-icon"></i>
                     <span>Products/Services</span>
                 </a>
                 
-                <a asp-page="/Sale/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Sale") == true ? "active" : "")">
+                <a asp-page="/Sale/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Sale") == true ? "active" : "")">
                     <i class="ph-shopping-cart nav-icon"></i>
                     <span>Sales</span>
                 </a>
                 
-                <a asp-page="/Invoice/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Invoice/Index" ? "active" : "")">
+                <a asp-page="/Invoice/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().EndsWith("/Invoice/Index") == true || ViewContext.RouteData.Values["page"]?.ToString() == "/Invoice" ? "active" : "")">
                     <i class="ph-file-text nav-icon"></i>
                     <span>Invoices</span>
                 </a>
 
-                <a asp-page="/Invoice/Create" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString() == "/Invoice/Create" ? "active" : "")">
+                <a asp-page="/Invoice/Create" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().EndsWith("/Invoice/Create") == true ? "active" : "")">
                     <i class="ph-file-plus nav-icon"></i>
                     <span>Create Invoice</span>
                 </a>
 
-                <a asp-page="/Seller/Index" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Seller") == true ? "active" : "")">
+                <a asp-page="/Seller/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="nav-item @(ViewContext.RouteData.Values["page"]?.ToString().StartsWith("/Seller") == true ? "active" : "")">
                     <i class="ph-storefront nav-icon"></i>
                     <span>Seller Profile</span>
                 </a>
@@ -155,8 +155,79 @@
     </script>
 
     <div id="toast-container"></div>
+    <div id="global-loader" style="position:fixed;top:0;left:0;width:0%;height:3px;background:var(--primary);z-index:9999;transition:width 0.3s ease;"></div>
     
     <script>
+        async function softNavigate(url, push = true) {
+            const main = document.querySelector('.main-content');
+            const loader = document.getElementById('global-loader');
+            
+            try {
+                loader.style.width = '30%';
+                loader.style.opacity = '1';
+                
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                
+                loader.style.width = '70%';
+                const html = await response.text();
+                
+                // Create a temporary element to parse the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('.main-content') || doc.body;
+                
+                // Update title
+                const newTitle = doc.querySelector('title');
+                if (newTitle) document.title = newTitle.innerText;
+                
+                // Update main content
+                main.innerHTML = newContent.innerHTML;
+                
+                // Update active state in sidebar
+                const urlPath = new URL(url, window.location.origin).pathname.toLowerCase().replace(/\/index$/, '');
+                
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => {
+                    const href = (el.getAttribute('href') || '').toLowerCase().replace(/\/index$/, '');
+                    
+                    // Exact match or specific hierarchical match
+                    if (urlPath === href || (href !== '' && href !== '/' && urlPath === href + '/index')) {
+                        el.classList.add('active');
+                    } else if (href !== '' && href !== '/' && urlPath.startsWith(href + '/') && !href.startsWith('/invoice')) {
+                        // Use startsWith only for sections like /Customer or /Product, 
+                        // but NOT for /Invoice because /Invoice/Create is a sibling of /Invoice/Index
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+
+                if (push) history.pushState({ url }, '', url);
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+                
+                // Close sidebar on mobile
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) sidebar.classList.remove('open');
+
+                loader.style.width = '100%';
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.width = '0%', 300);
+                }, 200);
+
+            } catch (error) {
+                console.error('Soft navigation failed:', error);
+                window.location.href = url; // Fallback to hard reload
+            }
+        }
+
+        window.onpopstate = (e) => {
+            if (e.state && e.state.url) softNavigate(e.state.url, false);
+        };
+
         // Check for success message from server
         const successMessage = '@TempData["Success"]';
         

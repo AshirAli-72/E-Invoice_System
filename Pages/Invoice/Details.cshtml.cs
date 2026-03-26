@@ -20,6 +20,7 @@ namespace E_Invoice_system.Pages.Invoice
         public string SingleItemExpiry { get; set; } = "N/A";
         public bool IsMultiItem { get; set; } = false;
         public List<Dictionary<string, object>> Items { get; set; } = new();
+        public decimal Subtotal { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -88,6 +89,7 @@ namespace E_Invoice_system.Pages.Invoice
             }
 
             Invoice = invoice;
+            Subtotal = invoice.total_price + invoice.discount;
             return Page();
         }
     }

@@ -2,377 +2,78 @@
 @model E_Invoice_system.Pages.Invoice.DetailsModel
 @{
     ViewData["Title"] = "Invoice #" + (Model.Invoice.invoice_no ?? Model.Invoice.id.ToString());
-    // If it's an AJAX request (for the modal), don't use the full layout
     bool isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     if (isAjax) { Layout = null; }
 }
 
-@if (!isAjax)
-{
-    <div class="no-print" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-weight: 800;">Invoice Details</h2>
-        <div style="display: flex; gap: 10px;">
-            <a asp-page="./Index" class="btn-secondary"><i class="ph-arrow-left"></i> Back to List</a>
-            <a asp-page="./Print" asp-route-id="@Model.Invoice.id" target="_blank" class="btn-primary" style="background:#BC1823; border:none;">
-                <i class="ph-printer"></i> Print Invoice
+<div id="invoiceViewWrapper" class="main-content">
+    <!-- Action Bar (Not printed) -->
+    <div class="no-print" style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 210mm;">
+        <h2 style="font-weight: 800; margin: 0;">Invoice Details</h2>
+        <div style="display: flex; gap: 12px;">
+            <a href="/Invoice/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="btn-secondary">
+                <i class="ph-arrow-left"></i> Back to List
             </a>
+            <button onclick="window.print()" class="btn-primary" style="background: var(--invoice-red); border:none;">
+                <i class="ph-printer"></i> Print Invoice
+            </button>
         </div>
     </div>
-}
 
-<div id="invoice-details-container" class="@(isAjax ? "modal-body-content" : "card-elevated")">
-    <style>
-        .invoice-paper {
-            width: 100%;
-            max-width: 210mm;
-            background: white;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Top Shapes */
-        .top-shape-grey {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 45%;
-            height: 120px;
-            background: #1f2937;
-            clip-path: polygon(25% 0, 100% 0, 100% 100%);
-            z-index: 0;
-        }
-
-        .top-shape-grey-left {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 35%;
-            height: 100px;
-            background: #374151;
-            clip-path: polygon(0 0, 100% 0, 0 100%);
-            z-index: 0;
-        }
-
-        .header {
-            position: relative;
-            z-index: 10;
-            padding: 30px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .logo-box {
-            width: 150px;
-            background: white;
-            padding: 8px;
-            border-radius: 4px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .logo-box img { width: 100%; height: auto; }
-
-        .invoice-title-block {
-            text-align: right;
-        }
-
-        .invoice-label {
-            font-size: 36px;
-            font-weight: 900;
-            color: #BC1823;
-            text-transform: uppercase;
-            line-height: 1;
-        }
-
-        .invoice-number {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111827;
-            margin-top: 5px;
-        }
-
-        /* Address Section */
-        .address-section {
-            padding: 0 40px 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 10;
-        }
-
-        .address-box { width: 45%; }
-        .address-box.seller { text-align: right; }
-
-        .banner-label {
-            background: #BC1823;
-            color: white;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 900;
-            display: inline-block;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .name-bold {
-            font-size: 20px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 5px;
-        }
-
-        .details-text {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.5;
-        }
-
-        .status-container {
-            padding: 0 40px 20px 40px;
-            display: flex;
-            gap: 30px;
-        }
-
-        .status-item { display: flex; flex-direction: column; }
-        .status-item label { 
-            font-size: 10px; 
-            font-weight: 700; 
-            color: #9ca3af; 
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        .status-value { font-size: 14px; font-weight: 800; color: #111827; }
-        .status-badge {
-            background: #10b981;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        /* Items Table */
-        .items-container {
-            padding: 0 20px;
-            flex: 1;
-        }
-
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .invoice-table thead tr {
-            background: #BC1823;
-        }
-
-        .invoice-table th {
-            color: white;
-            text-transform: uppercase;
-            font-weight: 800;
-            font-size: 12px;
-            padding: 10px 15px;
-            text-align: left;
-        }
-
-        .invoice-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 13px;
-            color: #111827;
-        }
-
-        .col-price { text-align: right; width: 100px; }
-        .col-qty { text-align: center; width: 120px; }
-        .col-total { text-align: right; width: 120px; font-weight: 800; }
-
-        /* Summary & Footer */
-        .bottom-area {
-            padding: 30px 40px 80px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .left-bottom { width: 50%; }
-        .right-bottom { width: 40%; }
-
-        .terms-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #BC1823;
-            margin-bottom: 8px;
-        }
-
-        .terms-text {
-            font-size: 11px;
-            color: #4b5563;
-            line-height: 1.5;
-            margin-bottom: 30px;
-        }
-
-        .signature-block {
-            margin-top: 15px;
-        }
-
-        .sig-line {
-            border-top: 2px solid #111827;
-            width: 200px;
-            margin-bottom: 8px;
-        }
-
-        .sig-label {
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .summary-label {
-            font-size: 14px;
-            font-weight: 700;
-            color: #4b5563;
-            margin-right: 30px;
-        }
-
-        .summary-val {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111827;
-            width: 100px;
-            text-align: right;
-        }
-
-        .grand-total-bar {
-            background: #BC1823;
-            color: white;
-            padding: 12px 20px;
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 4px;
-        }
-
-        .gt-label { font-size: 18px; font-weight: 900; text-transform: uppercase; }
-        .gt-val { font-size: 20px; font-weight: 900; }
-
-        /* Footer Pattern (Adjusted for Detail View) */
-        .footer-pattern {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
-            z-index: 5;
-        }
-
-        .shape-black-bottom {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 30px;
-            background: #1f2937;
-            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-
-        .shape-red-bottom-1 {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 150px;
-            height: 50px;
-            background: #BC1823;
-            clip-path: polygon(0 20%, 80% 100%, 0 100%);
-        }
-
-        .footer-text {
-            position: absolute;
-            bottom: 8px;
-            right: 20px;
-            color: white;
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            z-index: 10;
-        }
-
-        .modal-body-content .invoice-paper {
-            box-shadow: none;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-        }
-    </style>
-
-    <div class="invoice-paper">
+    <div id="invoice-to-print" class="invoice-paper">
         <!-- Decoration Shapes -->
-        <div class="top-shape-grey-left"></div>
-        <div class="top-shape-grey"></div>
+        <div class="top-left-pattern"></div>
+        <div class="top-right-pattern"></div>
 
-        <div class="header">
-            <div class="logo-box">
-                <img src="/images/sata-logo.png" alt="SATA Logo" onerror="this.src='https://via.placeholder.com/150x50?text=SATA+TECHNOLOGIES'"/>
+        <div class="invoice-header">
+            <div class="logo-container">
+                <img src="/images/sata-logo.png" alt="SATA Logo" onerror="this.src='https://via.placeholder.com/180x60?text=SATA+TECHNOLOGIES'"/>
             </div>
-            <div class="invoice-title-block">
-                <h1 class="invoice-label">Invoice</h1>
-                <p class="invoice-number">#@(Model.Invoice.invoice_no ?? Model.Invoice.id.ToString())</p>
+            <div class="invoice-meta">
+                <h1 class="invoice-title">Invoice</h1>
+                <p class="invoice-id">#@(Model.Invoice.invoice_no ?? Model.Invoice.id.ToString())</p>
             </div>
         </div>
 
-        <div class="address-section">
+        <div class="invoice-addresses">
             <div class="address-box">
-                <div class="banner-label">Invoice To:</div>
-                <h2 class="name-bold">@Model.Invoice.customer_name</h2>
-                <div class="details-text">
+                <div class="address-label">Invoice To:</div>
+                <h2 class="address-name">@Model.Invoice.customer_name</h2>
+                <div class="address-details">
                     <p>@Model.Invoice.customer_address</p>
                     <p>Phone: @Model.Invoice.customer_contact</p>
                 </div>
             </div>
-            <div class="address-box seller">
-                <div class="banner-label">Invoice From:</div>
-                <h2 class="name-bold">@Model.Invoice.seller_name</h2>
-                <div class="details-text">
+            <div class="address-box right">
+                <div class="address-label">Invoice From:</div>
+                <h2 class="address-name">@Model.Invoice.seller_name</h2>
+                <div class="address-details">
                     <p>@Model.Invoice.seller_address</p>
                     <p>Phone: @Model.Invoice.seller_contact</p>
-                    <p style="font-weight:800; color:#111827; margin-top:8px;">Date: @Model.Invoice.date.ToString("dd MMM yyyy")</p>
+                    <p style="font-weight:900; color:#111; margin-top:10px; font-size:15px;">Date: @Model.Invoice.date.ToString("dd MMM yyyy")</p>
                 </div>
             </div>
         </div>
 
-        <div class="status-container">
+        <div class="status-bar">
             <div class="status-item">
                 <label>Status</label>
-                <div class="status-value">
-                    <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#10b981" : "#BC1823")">@Model.Invoice.status</span>
-                </div>
+                <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#10b981" : "#BC1823")">@Model.Invoice.status</span>
             </div>
             <div class="status-item">
                 <label>Payment Method</label>
-                <div class="status-value" style="text-transform:capitalize;">@Model.Invoice.payment</div>
+                <div class="payment-text">@Model.Invoice.payment</div>
             </div>
         </div>
 
-        <div class="items-container">
+        <div class="invoice-table-container">
             <table class="invoice-table">
                 <thead>
                     <tr>
-                        <th style="padding-left:15px;">Products/Services</th>
-                        <th class="col-price">Price</th>
-                        <th class="col-qty">Qty/Unit Type</th>
-                        <th class="col-total" style="padding-right:15px;">Total Price</th>
+                        <th style="width: 45%;">Products/Services</th>
+                        <th class="col-center" style="width: 15%;">Price</th>
+                        <th class="col-center" style="width: 20%;">Qty/Unit Type</th>
+                        <th class="col-right" style="width: 20%;">Total Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -381,74 +82,69 @@
                         foreach (var item in Model.Items)
                         {
                             <tr>
-                                <td style="padding-left:15px;">
-                                    <div style="font-weight:700;">@item["name"]</div>
+                                <td>
+                                    <div class="col-bold">@item["name"]</div>
                                     @if (item.ContainsKey("expiryDate") && (string)item["expiryDate"] != "N/A")
                                     {
-                                        <div style="font-size:11px; color:#ef4444; margin-top:2px;">Expiry: @item["expiryDate"]</div>
+                                        <div style="font-size:11px; color:#ef4444; margin-top:3px;">Expiry: @item["expiryDate"]</div>
                                     }
                                 </td>
-                                <td class="col-price">$@(((decimal)item["price"]).ToString("N2"))</td>
-                                <td class="col-qty">@item["qty"]</td>
-                                <td class="col-total" style="padding-right:15px;">$@(((decimal)item["total"]).ToString("N2"))</td>
+                                <td class="col-center">$@(((decimal)item["price"]).ToString("N2"))</td>
+                                <td class="col-center">@item["qty"]</td>
+                                <td class="col-right col-bold">$@(((decimal)item["total"]).ToString("N2"))</td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td style="padding-left:15px;">
-                                <div style="font-weight:700;">@Model.Invoice.prod_name_service</div>
+                            <td>
+                                <div class="col-bold">@Model.Invoice.prod_name_service</div>
                                 @if (Model.SingleItemExpiry != "N/A")
                                 {
-                                    <div style="font-size:11px; color:#ef4444; margin-top:2px;">Expiry: @Model.SingleItemExpiry</div>
+                                    <div style="font-size:11px; color:#ef4444; margin-top:3px;">Expiry: @Model.SingleItemExpiry</div>
                                 }
                             </td>
-                            <td class="col-price">$@Model.Invoice.price.ToString("N2")</td>
-                            <td class="col-qty">@Model.Invoice.qty_unit_type</td>
-                            <td class="col-total" style="padding-right:15px;">$@((Model.Invoice.price - Model.Invoice.discount).ToString("N2"))</td>
+                            <td class="col-center">$@Model.Invoice.price.ToString("N2")</td>
+                            <td class="col-center">@Model.Invoice.qty_unit_type</td>
+                            <td class="col-right col-bold">$@((Model.Invoice.price - Model.Invoice.discount).ToString("N2"))</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
 
-        <div class="bottom-area">
-            <div class="left-bottom">
-                <h3 class="terms-title">Terms & Conditions</h3>
-                <div class="terms-text">
-                    <p>Please make payment within 15 days of receiving this invoice.</p>
-                    <p>Thank you for choosing SATA TECHNOLOGIES for your business.</p>
-                </div>
+        <div class="invoice-footer">
+            <div class="terms-section">
+                <h3>Terms & Conditions</h3>
+                <p>Please make payment within 15 days of receiving this invoice. Thank you for choosing SATA TECHNOLOGIES for your business needs.</p>
                 
-                <div class="signature-block">
+                <div class="signature-section">
                     <div class="sig-line"></div>
                     <p class="sig-label">Authorized Signature</p>
                 </div>
             </div>
             
-            <div class="right-bottom">
-                <div class="summary-row">
-                    <span class="summary-label">Sub Total</span>
-                    <span class="summary-val">$@Model.Subtotal.ToString("N2")</span>
+            <div class="totals-section">
+                <div class="total-row">
+                    <span class="total-label">Sub Total</span>
+                    <span class="total-val">$@Model.Subtotal.ToString("N2")</span>
                 </div>
-                <div class="summary-row" style="color:#BC1823;">
-                    <span class="summary-label" style="color:#BC1823;">Discount</span>
-                    <span class="summary-val">- $@Model.Invoice.discount.ToString("N2")</span>
+                <div class="total-row" style="color:var(--invoice-red);">
+                    <span class="total-label" style="color:var(--invoice-red);">Discount</span>
+                    <span class="total-val">- $@Model.Invoice.discount.ToString("N2")</span>
                 </div>
                 
                 <div class="grand-total-bar">
-                    <span class="gt-label">Grand Total</span>
-                    <span class="gt-val">$@Model.Invoice.total_price.ToString("N2")</span>
+                    <span class="grand-label">Grand Total</span>
+                    <span class="grand-val">$@Model.Invoice.total_price.ToString("N2")</span>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Pattern -->
-        <div class="footer-pattern">
-            <div class="shape-red-bottom-1"></div>
-            <div class="shape-black-bottom"></div>
-            <p class="footer-text">SATA E-Invoice System Innovating the Future</p>
-        </div>
+        <!-- Footer Decoration -->
+        <div class="bottom-left-pattern"></div>
+        <div class="bottom-right-pattern"></div>
+        <p class="footer-branding">SATA E-Invoice System Innovating the Future</p>
     </div>
 </div>
