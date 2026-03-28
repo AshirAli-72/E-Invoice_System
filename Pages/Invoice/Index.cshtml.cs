@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
+using System.Text.Json;
 
 namespace E_Invoice_system.Pages.Invoice
 {
@@ -15,16 +16,77 @@ namespace E_Invoice_system.Pages.Invoice
             _context = context;
         }
 
-        public IList<invoices> Invoices { get; set; } = default!;
+        public IList<InvoiceDisplayItem> Invoices { get; set; } = new List<InvoiceDisplayItem>();
+
+        public class InvoiceDisplayItem
+        {
+            public int id { get; set; }
+            public string? InvoiceNo { get; set; }
+            public string? CustomerName { get; set; }
+            public DateTime Date { get; set; }
+            public string DisplayName { get; set; } = "";
+            public string DisplayQty { get; set; } = "";
+            public string DisplayExpiry { get; set; } = "";
+            public decimal Discount { get; set; }
+            public decimal TotalPrice { get; set; }
+            public string? Payment { get; set; }
+            public string? Status { get; set; }
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            Invoices = await _context.invoices
+            var rawInvoices = await _context.invoices
+                .AsNoTracking()
                 .OrderByDescending(i => i.date)
                 .ToListAsync();
+
+            Invoices = rawInvoices.Select(item => {
+                var display = new InvoiceDisplayItem
+                {
+                    id = item.id,
+                    InvoiceNo = item.invoice_no,
+                    CustomerName = item.customer_name,
+                    Date = item.date,
+                    DisplayName = item.prod_name_service ?? "",
+                    DisplayQty = item.qty_unit_type ?? "",
+                    DisplayExpiry = "N/A",
+                    Discount = item.discount,
+                    TotalPrice = item.total_price,
+                    Payment = item.payment,
+                    Status = item.status
+                };
+
+                try {
+                    if (!string.IsNullOrEmpty(display.DisplayName) && display.DisplayName.Trim().StartsWith("["))
+                    {
+                        var items = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(display.DisplayName);
+                        if (items != null && items.Any())
+                        {
+                            var names = items.Select(i => i.ContainsKey("name") ? i["name"]?.ToString() : "").Where(n => !string.IsNullOrEmpty(n));
+                            display.DisplayName = string.Join(", ", names);
+                            
+                            var qtys = items.Select(i => i.ContainsKey("qty") ? i["qty"]?.ToString() : "").Where(q => !string.IsNullOrEmpty(q));
+                            display.DisplayQty = string.Join(", ", qtys);
+
+                            var dates = items.Select(i => i.ContainsKey("expiryDate") ? i["expiryDate"]?.ToString() : null)
+                                             .Where(d => !string.IsNullOrEmpty(d))
+                                             .Select(d => DateTime.TryParse(d, out var dt) ? dt.ToString("MMM dd, yyyy") : d);
+                            display.DisplayExpiry = string.Join(", ", dates);
+
+                            // Truncate if too long
+                            if (display.DisplayName.Length > 40) display.DisplayName = display.DisplayName.Substring(0, 37) + "...";
+                            if (display.DisplayQty.Length > 20) display.DisplayQty = display.DisplayQty.Substring(0, 17) + "...";
+                            if (display.DisplayExpiry.Length > 25) display.DisplayExpiry = display.DisplayExpiry.Substring(0, 22) + "...";
+                        }
+                    }
+                } catch { }
+
+                return display;
+            }).ToList();
+
             return Page();
         }
 

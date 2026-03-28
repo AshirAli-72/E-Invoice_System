@@ -41,6 +41,7 @@ namespace E_Invoice_system.Pages.Account
             try
             {
                 var user = await _context.users
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.email == Email && u.password == Password);
 
                 if (user != null)

@@ -38,14 +38,15 @@
             border: none;
             text-transform: uppercase;
         }
-        .btn-print { background: #BC1823; color: white; }
+        .btn-print { background: #9B111E; color: white; }
         .btn-close { background: #1f2937; color: white; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
         @@media print {
-            .print-controls { display: none; }
-            body { background: white; padding: 0; }
-            .invoice-paper { box-shadow: none; margin: 0; }
+            .print-controls, .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; visibility: visible !important; }
+            body * { visibility: visible !important; }
+            .invoice-paper { box-shadow: none !important; margin: 0 !important; visibility: visible !important; }
         }
     </style>
 </head>
@@ -93,7 +94,7 @@
         <div class="status-bar">
             <div class="status-item">
                 <label>Status</label>
-                <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#10b981" : "#BC1823")">@Model.Invoice.status</span>
+                <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#065f46" : "#9B111E")">@Model.Invoice.status</span>
             </div>
             <div class="status-item">
                 <label>Payment Method</label>

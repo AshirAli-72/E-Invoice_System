@@ -16,27 +16,54 @@ namespace E_Invoice_system.Pages.Sale
             _context = context;
         }
 
-        public IList<Models.Sale> Sales { get; set; } = default!;
+        public IList<SaleDisplayItem> Sales { get; set; } = new List<SaleDisplayItem>();
         public IList<ReturnDetail> Returns { get; set; } = default!;
+
+        public class SaleDisplayItem
+        {
+            public int id { get; set; }
+            public string? BillNo { get; set; }
+            public DateTime Date { get; set; }
+            public string? ProductName { get; set; }
+            public string DisplayQty { get; set; } = "";
+            public decimal Price { get; set; }
+            public decimal TotalPrice { get; set; }
+            public string? PaymentMethod { get; set; }
+            public string? Status { get; set; }
+            public bool IsReturned { get; set; }
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            // Filter out sales where qty is 0 (fully returned)
-            var allSales = await _context.sales.OrderByDescending(s => s.date).ToListAsync();
-            Sales = allSales.Where(s =>
+            // Fetch all and filter in memory, but use AsNoTracking for speed
+            var allSales = await _context.sales.AsNoTracking().OrderByDescending(s => s.date).ToListAsync();
+            
+            Sales = allSales.Select(s => new SaleDisplayItem
             {
-                var match = Regex.Match(s.qty_unit_type ?? "", @"^([0-9.-]+)");
-                if (match.Success && decimal.TryParse(match.Groups[1].Value, out decimal q))
+                id = s.id,
+                BillNo = s.billNo,
+                Date = s.date,
+                ProductName = s.prod_name_service,
+                DisplayQty = Regex.Replace(s.qty_unit_type ?? "", @"[^0-9.-]", ""),
+                Price = s.price,
+                TotalPrice = s.total_price,
+                PaymentMethod = s.payment_method,
+                Status = s.status,
+                IsReturned = s.is_returned
+            }).Where(s => {
+                // Keep the filter for non-zero qty if that's what was intended
+                // The previous Regex check was: match.Success && q > 0
+                if (decimal.TryParse(s.DisplayQty, out decimal q))
                 {
                     return q > 0;
                 }
                 return true;
             }).ToList();
 
-            Returns = await _context.returns.OrderByDescending(r => r.Date).ToListAsync();
+            Returns = await _context.returns.AsNoTracking().OrderByDescending(r => r.Date).ToListAsync();
             
             return Page();
         }

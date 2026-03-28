@@ -11,7 +11,7 @@
     <div class="no-print" style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 210mm;">
         <h2 style="font-weight: 800; margin: 0;">Invoice Details</h2>
         <div style="display: flex; gap: 12px;">
-            <a href="/Invoice/Index" onclick="event.preventDefault(); softNavigate(this.href)" class="btn-secondary">
+            <a href="/Invoice/Index" class="btn-secondary">
                 <i class="ph-arrow-left"></i> Back to List
             </a>
             <button onclick="window.print()" class="btn-primary" style="background: var(--invoice-red); border:none;">
@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <div id="invoice-to-print" class="invoice-paper">
+    <div id="invoice-to-print" class="invoice-paper" style="margin: 0 auto;">
         <!-- Decoration Shapes -->
         <div class="top-left-pattern"></div>
         <div class="top-right-pattern"></div>
@@ -58,7 +58,7 @@
         <div class="status-bar">
             <div class="status-item">
                 <label>Status</label>
-                <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#10b981" : "#BC1823")">@Model.Invoice.status</span>
+                <span class="status-badge" style="background:@(Model.Invoice.status == "Paid" ? "#065f46" : "#9B111E")">@Model.Invoice.status</span>
             </div>
             <div class="status-item">
                 <label>Payment Method</label>

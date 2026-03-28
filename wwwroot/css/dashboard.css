@@ -12,6 +12,18 @@
     --sidebar-width: 260px;
 }
 
+/* Sidebar Collapsed State (Desktop) */
+body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+}
+body.sidebar-collapsed .main-content {
+    margin-left: 0;
+}
+body.sidebar-collapsed #sidebarToggle {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
 body {
     margin: 0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;

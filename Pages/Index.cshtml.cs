@@ -36,18 +36,20 @@ namespace E_Invoice_system.Pages
                 return RedirectToPage("/Account/Login");
             }
 
-            TotalInvoices = await _context.invoices.CountAsync();
-            TotalCustomers = await _context.customers.CountAsync();
-            TotalProducts = await _context.products_services.CountAsync();
+            _context.Database.SetCommandTimeout(60); // Increase timeout for dashboard aggregation
+            var sw = Stopwatch.StartNew();
+
+            TotalInvoices = await _context.invoices.AsNoTracking().CountAsync();
+            TotalCustomers = await _context.customers.AsNoTracking().CountAsync();
+            TotalProducts = await _context.products_services.AsNoTracking().CountAsync();
             
-            decimal sales = await _context.sales
+            TotalSales = await _context.sales
+                .AsNoTracking()
                 .Where(s => s.total_price > 0)
                 .SumAsync(s => (decimal?)s.total_price) ?? 0;
 
-            TotalSales = Math.Max(0, sales);
-
-            // Invoice Status Chart
             var invoiceStatusData = await _context.invoices
+                .AsNoTracking()
                 .GroupBy(i => i.status ?? "Pending")
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToListAsync();
@@ -55,19 +57,21 @@ namespace E_Invoice_system.Pages
             StatusLabels = invoiceStatusData.Select(x => x.Status).ToArray();
             StatusCounts = invoiceStatusData.Select(x => x.Count).ToArray();
 
-            // Recent invoices
             RecentInvoices = await _context.invoices
+                .AsNoTracking()
                 .OrderByDescending(i => i.date)
                 .Take(4)
                 .ToListAsync();
 
-            // TREND CHART DATA (Last 7 Days)
             var startDate = DateTime.Today.AddDays(-6);
             var trendResults = await _context.invoices
+                .AsNoTracking()
                 .Where(inv => inv.date >= startDate)
                 .GroupBy(inv => inv.date.Date)
                 .Select(g => new { Date = g.Key, Count = g.Count() })
                 .ToListAsync();
+
+            _logger.LogInformation("Dashboard loaded in {ms}ms", sw.ElapsedMilliseconds);
 
             var trendLabelsList = new List<string>();
             var trendDataList = new List<int>();

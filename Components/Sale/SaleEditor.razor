@@ -49,7 +49,7 @@
                     <div class="card-image">
                         @if (!string.IsNullOrEmpty(p.Image))
                         {
-                            <img src="/product-images/@p.Image" alt="Product" />
+                            <img src="/product-images/@System.IO.Path.GetFileName(p.Image)" alt="Product" />
                         }
                         else
                         {
@@ -152,7 +152,7 @@
                         <div class="item-v2-img">
                             @if (!string.IsNullOrEmpty(item.image))
                             {
-                                <img src="/product-images/@item.image" />
+                                <img src="/product-images/@System.IO.Path.GetFileName(item.image)" />
                             }
                             else
                             {
@@ -334,11 +334,12 @@
                         </div>
                     </div>
                     <div class="form-actions-sticky" style="display:flex;gap:16px;margin-top:32px;">
-                        <button type="button" class="btn-confirm-web" style="flex:1;background:#ef4444;color:#fff;border:none;" @onclick="() => showAddCustomerModal = false">Cancel</button>
-                        <button type="button" class="btn-confirm-web" style="flex:1;background:#22c55e;color:#fff;border:none;" @onclick="SaveNewCustomer">
+                        <button type="button" class="btn-confirm-web" style="flex:1;background:#991b1b;color:#fff;border:none;box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);" @onclick="() => showAddCustomerModal = false">Cancel</button>
+                        <button type="button" class="btn-confirm-web" style="flex:1;background:#166534;color:#fff;border:none;box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);" @onclick="SaveNewCustomer">
                             <i class="ph-check"></i> Save Customer
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -348,15 +349,23 @@
 <!-- THERMAL RECEIPT (Only visible on print) -->
 <div id="thermalReceipt">
     <div class="rcpt-shop-header">
-        <span class="rcpt-shop-name">THE SATA Invoice</span>
-        <span class="rcpt-shop-sub">Default Address</span>
-        <span class="rcpt-shop-sub">Default Contact</span>
+        <div class="rcpt-shop-name">THE SATA POS</div>
+        <div class="rcpt-shop-sub">Daniyore</div>
+        <div class="rcpt-shop-sub">03134711970</div>
     </div>
-    <hr class="rcpt-hr" />
-    <div class="rcpt-meta">Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
+    
+    <div class="rcpt-hr-thick"></div>
+    
+    <div class="rcpt-top-info">
+        <div>Cashier: @(UserEmail?.Split('@')[0] ?? "nill")</div>
+        <div>Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
+    </div>
+    
+    <div class="rcpt-hr-thick"></div>
+    
     <table class="rcpt-table">
         <thead>
-            <tr>
+            <tr class="rcpt-header-row">
                 <th class="rcpt-col-prod">PRODUCT</th>
                 <th class="rcpt-col-qty">QTY</th>
                 <th class="rcpt-col-price">PRICE</th>
@@ -369,34 +378,44 @@
                 <tr>
                     <td class="rcpt-col-prod">@item.prod_name_service</td>
                     <td class="rcpt-col-qty">@Math.Abs(item.qty_unit_type)</td>
-                    <td class="rcpt-col-price">@item.price.ToString("N2")</td>
-                    <td class="rcpt-col-amt">@Math.Abs(item.total_price).ToString("N2")</td>
+                    <td class="rcpt-col-price">@item.price.ToString("N0")</td>
+                    <td class="rcpt-col-amt">@Math.Abs(item.total_price).ToString("N0")</td>
                 </tr>
             }
         </tbody>
     </table>
-    <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span>@FormatCurrency(Math.Abs(totalSub))</span></div>
-    <div class="rcpt-totals-row"><span>TOTAL</span>      <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
-    <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span>@FormatCurrency(Math.Abs(currentTotal))</span></div>
-    <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>@FormatCurrency(tenderedAmount ?? 0)</span></div>
-    <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span>@paymentMethod</span></div>
-    <div class="rcpt-footer">
-        <hr class="rcpt-hr" />
-        <div class="rcpt-footer-thankyou">THANK YOU!</div>
-        <hr class="rcpt-hr" />
-        <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
-        <hr class="rcpt-hr" />
-        <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA Invoice</div>
-        <hr class="rcpt-hr" />
+    
+    <div class="rcpt-totals-section">
+        <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>TOTAL</span>      <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
+        <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span>@paymentMethod</span></div>
     </div>
-    <div class="rcpt-bottom">
-        <div class="order-info">
-            <div>ORDER: @orderBillNo</div>
-            <div>@DateTime.Now.ToString("g")</div>
+    
+    <div class="rcpt-hr-thick"></div>
+    
+    <div class="rcpt-footer">
+        <div class="rcpt-footer-thankyou">THANK YOU!</div>
+        <div class="rcpt-hr-double"></div>
+        <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
+        <div class="rcpt-hr-double"></div>
+        <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA POS</div>
+        <div class="rcpt-hr-thick"></div>
+    </div>
+    
+    <div class="rcpt-bottom-flex">
+        <div class="rcpt-order-info">
+            <div class="rcpt-order-id">ORDER: @orderBillNo</div>
+            <div class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy, h:mm:ss tt")</div>
         </div>
-        <div class="barcode-container">
-            <svg id="rcptBarcodeSvg"></svg>
-        </div>
+        @if (transMode != "return")
+        {
+            <div class="rcpt-barcode-wrap">
+                <svg id="rcptBarcodeSvg"></svg>
+                <div class="rcpt-barcode-text">@orderBillNo</div>
+            </div>
+        }
     </div>
 </div>
 
@@ -425,9 +444,17 @@
     private string orderBillNo = "";
     private customers newCustomer = new customers { status = "Active" };
 
+    [Parameter] public string? UserEmail { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        var prods = await DbContext.products_services.Where(p => p.status == "Available").ToListAsync();
+        // ✅ Optimization: AsNoTracking and Limit for initial load
+        var prods = await DbContext.products_services
+            .AsNoTracking()
+            .Where(p => p.status == "Available")
+            .Take(200) // Don't load everything at once if it's huge
+            .ToListAsync();
+
         allProducts = prods.Select(p => {
             decimal stock = 999999;
             bool isSvc = true;
@@ -447,7 +474,13 @@
         }).ToList();
         
         filteredProducts = allProducts;
-        allCustomersList = await DbContext.customers.OrderBy(c => c.name).ToListAsync();
+
+        // ✅ Optimization: Limit initial customer list
+        allCustomersList = await DbContext.customers
+            .AsNoTracking()
+            .OrderBy(c => c.name)
+            .Take(50) 
+            .ToListAsync();
         filteredCustomersList = allCustomersList;
     }
 
@@ -460,11 +493,19 @@
 
     private void HandleSearchKeyUp(KeyboardEventArgs e)
     {
+        if (string.IsNullOrEmpty(searchQuery)) return;
+
+        // Auto-detect Receipt Scan (SALE_ or RET_)
+        if (searchQuery.ToUpper().StartsWith("SALE_") || searchQuery.ToUpper().StartsWith("RET_")) {
+            _ = LoadFromReceipt(searchQuery);
+            searchQuery = "";
+            return;
+        }
+
         if (searchType == "item") {
             var query = searchQuery.ToLower();
             filteredProducts = allProducts.Where(p => p.Name.ToLower().Contains(query) || (p.Barcode != null && p.Barcode.ToLower() == query)).ToList();
             
-            // Auto-add if exact barcode match
             var exact = allProducts.FirstOrDefault(p => p.Barcode != null && p.Barcode.ToLower() == query);
             if (exact != null) {
                 AddToSale(exact);
@@ -594,10 +635,26 @@
 
         isSubmitting = true;
         try {
-            var count = await DbContext.sales.CountAsync();
-            orderBillNo = transMode == "return" ? $"RET-{count+1}" : $"SALE-{count+1}";
+                    var prefix = transMode == "return" ? "RET_" : "SALE_";
+                    var maxBillNoList = await DbContext.sales
+                        .Where(s => s.billNo.StartsWith(prefix))
+                        .Select(s => s.billNo)
+                        .ToListAsync();
+
+                    int nextIdNum = 1;
+                    if (maxBillNoList.Any())
+                    {
+                        nextIdNum = maxBillNoList
+                            .Select(b => {
+                                var parts = b.Split(new[] { '_', '-' });
+                                return parts.Length > 1 && int.TryParse(parts[1], out int n) ? n : 0;
+                            })
+                            .Max() + 1;
+                    }
+                    orderBillNo = $"{prefix}{nextIdNum}";
+
             
-            // Prepare customer tag for description - ensure it's not too long
+           
             string customerInfo = selectedCustomer != null ? $" [Customer: {selectedCustomer.name}]" : " [Walk-In]";
             string saleDescription = ((notes ?? "") + customerInfo);
             if (saleDescription.Length > 200) saleDescription = saleDescription.Substring(0, 200);
@@ -615,11 +672,12 @@
                     payment_method = paymentMethod, 
                     status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
                     is_returned = transMode == "return", 
-                    description = saleDescription
+                    description = saleDescription,
+                    expiry_date = item.expiry_date ?? DateTime.Now 
                 };
                 DbContext.sales.Add(sale);
                 
-                // Inventory update logic - avoid long decimal strings
+              
                 try {
                     var prod = await DbContext.products_services.FirstOrDefaultAsync(p => p.prod_name_service == item.prod_name_service);
                     if (prod != null) {

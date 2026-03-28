@@ -1,8 +1,8 @@
 /* --- Premium Invoice Styling --- */
 :root {
-    --invoice-red: #BC1823;
-    --invoice-black: #1C2120;
-    --invoice-grey: #4b5563;
+    --invoice-red: #9B111E; /* Darker, more premium red */
+    --invoice-black: #111827;
+    --invoice-grey: #374151;
     --invoice-light-grey: #f3f4f6;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .status-badge {
-    background: #10b981; /* Default Paid */
+    background: #065f46; /* Darker green */
     color: white;
     padding: 2px 12px;
     border-radius: 4px;
@@ -240,7 +240,7 @@
 /* PRINTING */
 @media print {
     body * { visibility: hidden; }
-    #invoice-to-print, #invoice-to-print * { visibility: visible; }
+    #invoice-to-print, #invoice-to-print * { visibility: visible !important; }
     #invoice-to-print {
         position: absolute;
         left: 0;

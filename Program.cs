@@ -18,6 +18,14 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ✅ RESPONSE COMPRESSION
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,18 +36,19 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseResponseCompression(); // ✅ BEFORE StaticFiles
 app.UseStaticFiles();
 
-// Serve images from bin/Debug/images
-string imagesPath = Path.Combine(app.Environment.ContentRootPath, "bin", "Debug", "images");
-if (!Directory.Exists(imagesPath)) Directory.CreateDirectory(imagesPath);
-
+string imagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\images";
+if (!System.IO.Directory.Exists(imagesDir))
+{
+    System.IO.Directory.CreateDirectory(imagesDir);
+}
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imagesPath),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imagesDir),
     RequestPath = "/product-images"
 });
-
 app.UseRouting();
 
 // ✅ USE SESSION (Routing ke baad, Authorization se pehle)

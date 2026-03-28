@@ -39,17 +39,17 @@
 
         <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
 
-        <!-- Customer Info -->
         <div class="form-group">
             <label class="form-label">Select Customer</label>
             <select class="form-control" @onchange="OnCustomerChanged">
                 <option value="">-- Choose Customer --</option>
                 @foreach (var c in customersList)
                 {
-                    <option value="@c.id">@c.name</option>
+                    <option value="@c.id" selected="@(selectedCustomer?.id == c.id)">@c.name</option>
                 }
             </select>
         </div>
+
         <div class="form-group">
             <label class="form-label">Invoice Number</label>
             <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
@@ -184,6 +184,7 @@
     </div>
 </div>
 
+
 @code {
     private List<Sellers> sellersList = new();
     private List<customers> customersList = new();
@@ -194,12 +195,13 @@
     private customers? selectedCustomer;
     private string? invoiceNo;
     private DateTime invoiceDate = DateTime.Now;
-    private string status = "Pending";
+    private string status = "Paid";
     private string paymentMethod = "Cash";
     private decimal discount = 0;
     private int selectedProductId;
     private bool isSubmitting = false;
     private string? errorMessage;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -234,7 +236,11 @@
 
     private void AddItem()
     {
-        if (selectedProductId == 0) return;
+        if (selectedProductId == 0) 
+        {
+            errorMessage = "Please select a product first.";
+            return;
+        }
 
         var product = productsList.FirstOrDefault(p => p.id == selectedProductId);
         if (product != null)
@@ -247,6 +253,7 @@
                 ExpiryDate = product.expiry_date,
                 Total = product.price
             });
+            errorMessage = null; // Clear error on success
         }
         selectedProductId = 0;
     }
@@ -306,6 +313,7 @@
     }
 
     public class InvoiceItem
+
     {
         public string? Name { get; set; }
         public decimal Qty { get; set; }

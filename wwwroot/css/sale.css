@@ -1639,3 +1639,217 @@
     font-size: 0.75rem;
     color: var(--text-muted);
 }
+
+/* --- Print Styles --- */
+/* --- Print Styles --- */
+@media print {
+    @page {
+        margin: 0;
+        size: 80mm auto;
+    }
+    
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+
+    /* Reset Blazor layout wrappers to avoid page breaks or margins */
+    .page, main, .content, #app, article, .sale-layout-container, .sale-main-wrapper, .sale-content-body {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Hide UI components */
+    .sidebar, .top-row, .top-bar, .pos-container-v2, .modal-overlay, .navbar, #toast-container {
+        display: none !important;
+    }
+
+    /* Ensure thermal receipt is visible and left-aligned for thermal printers */
+    #thermalReceipt {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
+        width: 80mm !important;
+        max-width: 100% !important;
+        min-height: 100% !important;
+        background: white !important;
+        color: black !important;
+        padding: 4mm !important; 
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+    }
+
+    .rcpt-shop-header {
+        text-align: center !important;
+        margin-bottom: 5px !important;
+    }
+
+    .rcpt-shop-name {
+        display: block !important;
+        font-size: 20px !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        margin-bottom: 2px !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    .rcpt-shop-sub {
+        display: block !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        margin-bottom: 1px !important;
+        color: #333 !important;
+    }
+
+    .rcpt-hr-thick {
+        border-top: 2px dashed #000 !important;
+        margin: 8px 0 !important;
+    }
+
+    .rcpt-hr-double {
+        border-top: 1px solid #000 !important;
+        border-bottom: 1px solid #000 !important;
+        height: 2px !important;
+        margin: 8px 0 !important;
+    }
+
+    .rcpt-top-info {
+        margin: 5px 0 !important;
+        font-weight: 600 !important;
+        font-size: 11px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    .rcpt-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+        margin-bottom: 8px !important;
+    }
+
+    .rcpt-header-row th {
+        border-bottom: 1px dashed #000 !important;
+        padding-bottom: 4px !important;
+    }
+
+    .rcpt-table th {
+        text-align: left !important;
+        font-size: 10px !important;
+        padding: 4px 0 !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+    }
+
+    .rcpt-table td {
+        font-size: 11px !important;
+        padding: 4px 0 !important;
+        vertical-align: top !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .rcpt-col-prod { width: 45% !important; text-align: left !important; }
+    .rcpt-col-qty  { width: 15% !important; text-align: center !important; }
+    .rcpt-col-price { width: 20% !important; text-align: right !important; }
+    .rcpt-col-amt   { width: 20% !important; text-align: right !important; }
+
+    .rcpt-table th.rcpt-col-qty, .rcpt-table td.rcpt-col-qty { text-align: center !important; }
+    .rcpt-table th.rcpt-col-price, .rcpt-table td.rcpt-col-price { text-align: right !important; }
+    .rcpt-table th.rcpt-col-amt, .rcpt-table td.rcpt-col-amt { text-align: right !important; }
+
+    .rcpt-totals-section {
+        margin-top: 8px !important;
+    }
+
+    .rcpt-totals-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Make Amount Due and Total bolder/bigger */
+    .rcpt-totals-row:nth-child(2),
+    .rcpt-totals-row:nth-child(3) {
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        margin: 5px 0 !important;
+    }
+
+    .rcpt-footer {
+        text-align: center !important;
+        margin-top: 15px !important;
+    }
+
+    .rcpt-footer-thankyou {
+        font-weight: 800 !important;
+        font-size: 14px !important;
+        margin: 5px 0 !important;
+    }
+
+    .rcpt-footer-promo {
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        margin: 8px 0 !important;
+        padding: 0 4mm !important;
+    }
+
+    .rcpt-footer-copy {
+        font-size: 9px !important;
+        font-weight: 600 !important;
+        color: #000 !important;
+        margin-top: 4px !important;
+    }
+
+    .rcpt-bottom-flex {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-top: 10px !important;
+    }
+
+    .rcpt-order-info {
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        flex: 1 !important;
+    }
+
+    .rcpt-order-id {
+        font-weight: 800 !important;
+        margin-bottom: 2px !important;
+    }
+
+    .rcpt-barcode-wrap {
+        text-align: right !important;
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+    }
+
+    #rcptBarcodeSvg {
+        width: 100% !important;
+        max-width: 120px !important;
+        height: 30px !important;
+    }
+
+    .rcpt-barcode-text {
+        font-size: 10px !important;
+        font-weight: 800 !important;
+        margin-top: 2px !important;
+    }
+}
+

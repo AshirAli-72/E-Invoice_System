@@ -5,17 +5,21 @@
     ViewData["Title"] = "Create Sale";
 }
 
-<component type="typeof(E_Invoice_system.Components.Sale.SaleEditor)" render-mode="ServerPrerendered" />
+<component type="typeof(E_Invoice_system.Components.Sale.SaleEditor)" render-mode="ServerPrerendered" 
+           param-UserEmail='@HttpContext.Session.GetString("UserEmail")' />
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="~/lib/jsbarcode/JsBarcode.all.min.js"></script>
+
     <script>
         window.renderBarcode = (elementId, value) => {
             JsBarcode("#" + elementId, value, {
                 format: "CODE128",
-                width: 2,
+                width: 3,
                 height: 80,
-                displayValue: true
+                displayValue: true,
+                fontSize: 20,
+                margin: 0
             });
         };
     </script>

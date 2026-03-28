@@ -53,31 +53,31 @@
                     {
                         <tr>
                             <td style="padding-left: 1.5rem;">
-                                <div class="font-bold font-sm font-monospace">@sale.billNo</div>
+                                <div class="font-bold font-sm font-monospace">@sale.BillNo</div>
                             </td>
                             <td>
-                                <div class="font-bold font-sm">@sale.date.ToString("MMM dd, yyyy")</div>
-                                <div class="text-muted font-xs">@sale.date.ToString("hh:mm tt")</div>
+                                <div class="font-bold font-sm">@sale.Date.ToString("MMM dd, yyyy")</div>
+                                <div class="text-muted font-xs">@sale.Date.ToString("hh:mm tt")</div>
                             </td>
                             <td>
-                                <div class="font-bold">@sale.prod_name_service</div>
+                                <div class="font-bold">@sale.ProductName</div>
                             </td>
-                            <td>@System.Text.RegularExpressions.Regex.Replace(sale.qty_unit_type ?? "", @"[^0-9.-]", "")</td>
-                            <td class="text-muted">$@sale.price.ToString("N2")</td>
+                            <td>@sale.DisplayQty</td>
+                            <td class="text-muted">$@sale.Price.ToString("N2")</td>
                             <td>
-                                <div class="font-bold text-primary" style="font-size: 1rem;">$@sale.total_price.ToString("N2")</div>
+                                <div class="font-bold text-primary" style="font-size: 1rem;">$@sale.TotalPrice.ToString("N2")</div>
                             </td>
                             <td class="text-center">
-                                <span class="font-medium font-sm">@sale.payment_method</span>
+                                <span class="font-medium font-sm">@sale.PaymentMethod</span>
                             </td>
                             <td class="text-center">
                                 @{
                                     var statusClass = "status-paid";
-                                    var displayStatus = sale.status ?? "Paid";
+                                    var displayStatus = sale.Status ?? "Paid";
                                     
                                     if (displayStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase)) {
                                         statusClass = "status-pending";
-                                    } else if (displayStatus.Equals("Returned", StringComparison.OrdinalIgnoreCase) || sale.is_returned) {
+                                    } else if (displayStatus.Equals("Returned", StringComparison.OrdinalIgnoreCase) || sale.IsReturned) {
                                         statusClass = "status-inactive";
                                         displayStatus = "Returned";
                                     }

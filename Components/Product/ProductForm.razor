@@ -76,13 +76,9 @@
             <label class="form-label">Product Image</label>
             <div style="display:flex; gap:1.5rem; align-items:flex-start; background:#f8fafc; padding:1.5rem; border-radius:12px; border:1px dashed #cbd5e1;">
                 <div style="width:120px; height:120px; border-radius:8px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-                    @if (!string.IsNullOrEmpty(imgUrl))
+                    @if (!string.IsNullOrEmpty(GetImageUrl()))
                     {
-                        <img src="@imgUrl" style="width:100%; height:100%; object-fit:cover;" />
-                    }
-                    else if (!string.IsNullOrEmpty(product.image))
-                    {
-                        <img src="/product-images/@product.image" style="width:100%; height:100%; object-fit:cover;" />
+                        <img src="@GetImageUrl()" style="width:100%; height:100%; object-fit:cover;" />
                     }
                     else
                     {
@@ -98,7 +94,7 @@
     </div>
 
     <div class="form-actions-sticky">
-        <button type="button" class="btn-secondary" @onclick="Cancel">Cancel</button>
+        <a href="/Product/Index" class="btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Cancel</a>
         <button type="button" class="btn-primary" @onclick="SaveProduct" disabled="@isSubmitting">
             <span>
                 @if (isSubmitting)
@@ -156,7 +152,7 @@
             // Handle Image Upload
             if (selectedFile != null)
             {
-                string storagePath = Path.Combine(Environment.WebRootPath, "product-images");
+                string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\images";
                 if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
 
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
@@ -165,14 +161,19 @@
                 // Delete old image
                 if (!string.IsNullOrEmpty(product.image))
                 {
-                    string oldPath = Path.Combine(storagePath, product.image);
+                    string oldPath = product.image;
+                    // If the old path was just a filename, assume it was in the new directory for deletion
+                    if (!Path.IsPathRooted(oldPath))
+                    {
+                        oldPath = Path.Combine(storagePath, oldPath);
+                    }
                     if (File.Exists(oldPath)) File.Delete(oldPath);
                 }
 
                 await using var stream = selectedFile.OpenReadStream(2048000);
                 await using var fs = new FileStream(path, FileMode.Create);
                 await stream.CopyToAsync(fs);
-                product.image = fileName;
+                product.image = path; // Save exact path in DB
             }
 
             // Auto-generate barcode
@@ -220,6 +221,17 @@
             }
         }
         return $"P{(maxId + 1):D10}";
+    }
+
+    private string GetImageUrl()
+    {
+        if (!string.IsNullOrEmpty(imgUrl)) return imgUrl;
+        if (!string.IsNullOrEmpty(product.image))
+        {
+            try { return "/product-images/" + Path.GetFileName(product.image); }
+            catch { return "/product-images/" + product.image; }
+        }
+        return "";
     }
 
     private void Cancel() => NavigationManager.NavigateTo("/Product/Index", true);
