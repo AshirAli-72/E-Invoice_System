@@ -354,14 +354,10 @@
         <div class="rcpt-shop-sub">03134711970</div>
     </div>
     
-    <div class="rcpt-hr-thick"></div>
-    
     <div class="rcpt-top-info">
         <div>Cashier: @(UserEmail?.Split('@')[0] ?? "nill")</div>
         <div>Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
     </div>
-    
-    <div class="rcpt-hr-thick"></div>
     
     <table class="rcpt-table">
         <thead>
@@ -386,28 +382,24 @@
     </table>
     
     <div class="rcpt-totals-section">
-        <div class="rcpt-totals-row"><span>SUB TOTAL</span>  <span>$@Math.Abs(totalSub).ToString("N0")</span></div>
-        <div class="rcpt-totals-row"><span>TOTAL</span>      <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-totals-row"><span>AMOUNT DUE</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-totals-row"><span>CASH SALE</span>  <span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
-        <div class="rcpt-totals-row"><span>PAY TYPE</span>   <span>@paymentMethod</span></div>
+        <div class="rcpt-totals-row"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>AMOUNT DUE</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-totals-row"><span>CASH TENDERED</span><span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
+        <div class="rcpt-totals-row"><span>CHANGE</span><span>$@(Math.Max(0, (tenderedAmount ?? 0) - Math.Abs(currentTotal)).ToString("N0"))</span></div>
+        <div class="rcpt-totals-row"><span>PAY TYPE</span><span>@paymentMethod</span></div>
     </div>
-    
-    <div class="rcpt-hr-thick"></div>
     
     <div class="rcpt-footer">
         <div class="rcpt-footer-thankyou">THANK YOU!</div>
-        <div class="rcpt-hr-double"></div>
         <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
-        <div class="rcpt-hr-double"></div>
         <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA POS</div>
-        <div class="rcpt-hr-thick"></div>
     </div>
     
     <div class="rcpt-bottom-flex">
         <div class="rcpt-order-info">
-            <div class="rcpt-order-id">ORDER: @orderBillNo</div>
-            <div class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy, h:mm:ss tt")</div>
+            <span class="rcpt-order-id">ORDER: @orderBillNo</span>
+            <span class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy, h:mm:ss tt")</span>
         </div>
         @if (transMode != "return")
         {
