@@ -149,14 +149,11 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjimswa.dswa.cache.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\scopedcss\bundle\E-Invoice_system.styles.css
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-6zgryscer0-6zgryscer0.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\dfpdpy54t7-{0}-8xhe4h775t-8xhe4h775t.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\2lv90o6rja-{0}-0mslahxp3r-0mslahxp3r.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\e5ers0z3f0-{0}-cy2vb91bg9-cy2vb91bg9.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-timfbiolvn-timfbiolvn.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\rg1vk5gd84-{0}-u5owk5v596-u5owk5v596.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\s8t6rltn8a-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\b1np7zvhb8-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\1zrelvpahn-{0}-bqjiyaj88i-bqjiyaj88i.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\rushtyq0i4-{0}-c2jlpeoesf-c2jlpeoesf.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\j96kwqsqci-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -234,3 +231,7 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.genruntimeconfig.
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\ref\E-Invoice_system.dll
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-v7rykdwbw9-v7rykdwbw9.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\b1np7zvhb8-{0}-e710dyq4bi-e710dyq4bi.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-6zgryscer0-6zgryscer0.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3l620vsmkj-{0}-nu0egamgrm-nu0egamgrm.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-33pvmghu2p-33pvmghu2p.gz

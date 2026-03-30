@@ -3,14 +3,14 @@ using E_Invoice_system.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-// ✅ ADD SESSION
+
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // timeout control
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -18,7 +18,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ RESPONSE COMPRESSION
+
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -28,7 +28,7 @@ builder.Services.AddResponseCompression(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -36,7 +36,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseResponseCompression(); // ✅ BEFORE StaticFiles
+app.UseResponseCompression(); 
 app.UseStaticFiles();
 
 string imagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\images";
@@ -51,7 +51,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.UseRouting();
 
-// ✅ USE SESSION (Routing ke baad, Authorization se pehle)
+
 app.UseSession();
 
 app.UseAuthorization();

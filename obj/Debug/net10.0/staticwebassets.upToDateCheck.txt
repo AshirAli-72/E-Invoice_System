@@ -2,12 +2,13 @@ wwwroot\css\app-base.css
 wwwroot\css\customer.css
 wwwroot\css\dashboard.css
 wwwroot\css\invoice.css
-wwwroot\css\login.css
 wwwroot\css\product.css
+wwwroot\css\sale.css
 wwwroot\favicon.ico
 wwwroot\images\invoice-illustration.png
 wwwroot\images\sata-logo.png
 wwwroot\js\site.js
+wwwroot\js\sw.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -72,17 +73,18 @@ wwwroot\lib\jquery\LICENSE.txt
 wwwroot\lib\jsbarcode\JsBarcode.all.min.js
 wwwroot\lib\phosphor\icons.css
 wwwroot\savepic\bac7a766-3665-4267-96ab-868ef05fdc77.png
-wwwroot\css\sale.css
+wwwroot\css\login.css
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.web.js
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.server.js
 D:\netcore\E-Invoice_system\wwwroot\css\app-base.css
 D:\netcore\E-Invoice_system\wwwroot\css\customer.css
 D:\netcore\E-Invoice_system\wwwroot\css\dashboard.css
 D:\netcore\E-Invoice_system\wwwroot\css\invoice.css
-D:\netcore\E-Invoice_system\wwwroot\css\login.css
 D:\netcore\E-Invoice_system\wwwroot\css\product.css
+D:\netcore\E-Invoice_system\wwwroot\css\sale.css
 D:\netcore\E-Invoice_system\wwwroot\favicon.ico
 D:\netcore\E-Invoice_system\wwwroot\js\site.js
+D:\netcore\E-Invoice_system\wwwroot\js\sw.js
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -147,4 +149,4 @@ D:\netcore\E-Invoice_system\wwwroot\lib\jsbarcode\JsBarcode.all.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\phosphor\icons.css
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.web.js
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.server.js
-D:\netcore\E-Invoice_system\wwwroot\css\sale.css
+D:\netcore\E-Invoice_system\wwwroot\css\login.css

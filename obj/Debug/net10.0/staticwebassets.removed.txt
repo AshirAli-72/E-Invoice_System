@@ -1,1 +1,1 @@
-D:\netcore\E-Invoice_system\wwwroot\product-images\a1605172-e4f7-48b6-a65e-0e05cc860189.webp
+D:\netcore\E-Invoice_system\wwwroot\sw.js
