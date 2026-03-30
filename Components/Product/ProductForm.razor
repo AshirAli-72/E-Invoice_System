@@ -162,7 +162,7 @@
                 if (!string.IsNullOrEmpty(product.image))
                 {
                     string oldPath = product.image;
-                    // If the old path was just a filename, assume it was in the new directory for deletion
+                 
                     if (!Path.IsPathRooted(oldPath))
                     {
                         oldPath = Path.Combine(storagePath, oldPath);
