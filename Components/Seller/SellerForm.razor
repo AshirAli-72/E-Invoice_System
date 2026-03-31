@@ -2,6 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div class="form-wrapper form-layout-left-wide">
     <div class="form-section">
@@ -113,6 +114,8 @@
             }
 
             await DbContext.SaveChangesAsync();
+            
+            // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Seller/Index", true);
         }
         catch (Exception ex)

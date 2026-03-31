@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
             <div class="form-group">
                 <label class="form-label">Price</label>
                 <input type="number" step="0.01" class="form-control" @bind="product.price" />
@@ -38,6 +38,10 @@
             <div class="form-group">
                 <label class="form-label">Discount</label>
                 <input type="number" step="0.01" class="form-control" @bind="product.discount" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tax (%)</label>
+                <input type="number" step="0.01" class="form-control" @bind="product.tax" placeholder="0.00" />
             </div>
         </div>
 
@@ -144,10 +148,15 @@
 
     private async Task SaveProduct()
     {
+        if (isSubmitting) return;
+        
+        errorMessage = null;
         if (string.IsNullOrWhiteSpace(product.prod_name_service)) { errorMessage = "Name is required."; return; }
         if (product.discount > product.price) { errorMessage = "Discount cannot exceed price."; return; }
 
         isSubmitting = true;
+        StateHasChanged(); // Force UI to show "Saving..."
+
         try
         {
             // Handle Image Upload
@@ -159,12 +168,10 @@
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
                 string path = Path.Combine(storagePath, fileName);
 
-                // Delete old image
-                if (!string.IsNullOrEmpty(product.image))
+                // Delete old image if it exists and is different
+                if (!string.IsNullOrEmpty(product.image) && product.image != path)
                 {
-                    string oldPath = product.image;
-                    if (!Path.IsPathRooted(oldPath)) oldPath = Path.Combine(storagePath, oldPath);
-                    if (File.Exists(oldPath)) try { File.Delete(oldPath); } catch {}
+                    if (File.Exists(product.image)) try { File.Delete(product.image); } catch {}
                 }
 
                 await using var stream = selectedFile.OpenReadStream(2048000);
@@ -184,22 +191,37 @@
                 else if (product.status == "Out of Stock") product.status = "Available";
             }
 
-            if (ProductId == 0) DbContext.products_services.Add(product);
+            // ROBUST DB UPDATE LOGIC
+            if (ProductId == 0 || product.id == 0) 
+            {
+                product.date = DateTime.Now;
+                DbContext.products_services.Add(product);
+            }
             else 
             {
-                // Ensure entity is tracked and marked as modified
-                DbContext.Entry(product).State = EntityState.Modified;
+                // Ensure no conflict with already tracked entities
+                var trackedEntity = DbContext.products_services.Local.FirstOrDefault(p => p.id == product.id);
+                if (trackedEntity != null)
+                {
+                    DbContext.Entry(trackedEntity).State = EntityState.Detached;
+                }
+                
+                DbContext.products_services.Update(product);
             }
 
             await DbContext.SaveChangesAsync();
             
-            // Navigate without refreshing using softNavigate
-            await JSRuntime.InvokeVoidAsync("softNavigate", "/Product/Index");
+            // Standard Blazor Navigation
+            NavigationManager.NavigateTo("/Product/Index", true);
         }
         catch (Exception ex)
         {
-            errorMessage = "Error saving product: " + ex.Message;
+            string fullMsg = ex.Message;
+            if (ex.InnerException != null) fullMsg += " | " + ex.InnerException.Message;
+            
+            errorMessage = "Save Error: " + fullMsg;
             isSubmitting = false;
+            StateHasChanged();
         }
     }
 
@@ -233,5 +255,5 @@
         return "";
     }
 
-    private async Task Cancel() => await JSRuntime.InvokeVoidAsync("softNavigate", "/Product/Index");
+    private void Cancel() => NavigationManager.NavigateTo("/Product/Index", true);
 }

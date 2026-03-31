@@ -301,6 +301,8 @@
 
             DbContext.invoices.Add(invoice);
             await DbContext.SaveChangesAsync();
+
+            // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Invoice/Index", true);
         }
         catch (Exception ex)

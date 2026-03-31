@@ -36,37 +36,37 @@
             </div>
             <nav class="sidebar-nav">
 
-                <a href="/" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/" class="nav-item">
                     <i class="ph-house nav-icon"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="/customer" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/customer" class="nav-item">
                     <i class="ph-users nav-icon"></i>
                     <span>Customers</span>
                 </a>
 
-                <a href="/product" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/product" class="nav-item">
                     <i class="ph-package nav-icon"></i>
                     <span>Products/Services</span>
                 </a>
 
-                <a href="/sale" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/sale" class="nav-item">
                     <i class="ph-shopping-cart nav-icon"></i>
                     <span>Sales</span>
                 </a>
 
-                <a href="/invoice" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/invoice" class="nav-item">
                     <i class="ph-file-text nav-icon"></i>
                     <span>Invoices</span>
                 </a>
 
-                <a href="/invoice/create" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/invoice/create" class="nav-item">
                     <i class="ph-file-plus nav-icon"></i>
                     <span>Create Invoice</span>
                 </a>
 
-                <a href="/seller" class="nav-item" onclick="event.preventDefault(); softNavigate(this.href);">
+                <a href="/seller" class="nav-item">
                     <i class="ph-storefront nav-icon"></i>
                     <span>Seller Profile</span>
                 </a>
@@ -108,13 +108,12 @@
         </main>
     </div>
 
-    <script src="~/lib/blazor-server/blazor.server.js"></script>
+    <script src="_framework/blazor.server.js"></script>
     <script src="~/js/app-main.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     <input type="hidden" id="nav-active-page" value="@ViewContext.RouteData.Values["page"]?.ToString().ToLower()" />
     <div id="toast-container"></div>
-    <div id="global-loader" style="position:fixed;top:0;left:0;width:0%;height:3px;background:var(--primary);z-index:9999;transition:width 0.3s ease;"></div>
 
     <script>
         // Check for success message from server
