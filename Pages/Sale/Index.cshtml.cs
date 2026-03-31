@@ -38,8 +38,20 @@ namespace E_Invoice_system.Pages.Sale
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            // Fetch all and filter in memory, but use AsNoTracking for speed
-            var allSales = await _context.sales.AsNoTracking().OrderByDescending(s => s.date).ToListAsync();
+            // Temporary DB Fix for older 'RETURNED' / negative quantity records
+            var returnsToFix = await _context.returns.Where(r => r.Status == "RETURNED" || r.Status == "Returned" || (r.QtyUnitType != null && r.QtyUnitType.StartsWith("-")) || r.Amount < 0).ToListAsync();
+            foreach (var r in returnsToFix) {
+                if (r.Status == "RETURNED" || r.Status == "Returned") r.Status = "RETURN";
+                if (r.QtyUnitType != null && r.QtyUnitType.StartsWith("-")) r.QtyUnitType = r.QtyUnitType.Substring(1);
+                if (r.Amount < 0) r.Amount = Math.Abs(r.Amount);
+            }
+            if (returnsToFix.Any()) {
+                _context.returns.UpdateRange(returnsToFix);
+                await _context.SaveChangesAsync();
+            }
+
+            // Fetch recent 200 items in memory, use AsNoTracking for speed
+            var allSales = await _context.sales.AsNoTracking().OrderByDescending(s => s.date).Take(200).ToListAsync();
             
             Sales = allSales.Select(s => new SaleDisplayItem
             {
@@ -63,7 +75,7 @@ namespace E_Invoice_system.Pages.Sale
                 return true;
             }).ToList();
 
-            Returns = await _context.returns.AsNoTracking().OrderByDescending(r => r.Date).ToListAsync();
+            Returns = await _context.returns.AsNoTracking().OrderByDescending(r => r.Date).Take(200).ToListAsync();
             
             return Page();
         }

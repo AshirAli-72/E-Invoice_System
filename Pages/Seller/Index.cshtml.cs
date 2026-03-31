@@ -22,7 +22,7 @@ namespace E_Invoice_system.Pages.Seller
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            Sellers = await _context.sellers.ToListAsync();
+            Sellers = await _context.sellers.AsNoTracking().Take(100).ToListAsync();
             return Page();
         }
 

@@ -41,6 +41,7 @@ namespace E_Invoice_system.Pages.Invoice
             var rawInvoices = await _context.invoices
                 .AsNoTracking()
                 .OrderByDescending(i => i.date)
+                .Take(200)
                 .ToListAsync();
 
             Invoices = rawInvoices.Select(item => {

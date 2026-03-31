@@ -171,7 +171,7 @@
                             <div class="qty-stepper">
                                 <button type="button" @onclick="() => DecreaseQty(item)">-</button>
                                 <input type="number" class="manual-qty-input" 
-                                       value="@(Math.Abs(item.qty_unit_type))" 
+                                       value="@item.qty_unit_type" 
                                        @onchange="(e) => UpdateItemQty(item, e.Value?.ToString())" />
                                 <button type="button" @onclick="() => IncreaseQty(item)">+</button>
                             </div>
@@ -346,18 +346,28 @@
     </div>
 }
 
-<!-- THERMAL RECEIPT (Only visible on print) -->
+<!-- THERMAL RECEIPT (Strict Match to Pic 1 & 2) -->
 <div id="thermalReceipt">
+    @if (transMode == "return")
+    {
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10px; margin-bottom: 5px;">
+            <span>@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
+            <span>ORDER: @orderBillNo</span>
+        </div>
+    }
+
     <div class="rcpt-shop-header">
         <div class="rcpt-shop-name">THE SATA POS</div>
-        <div class="rcpt-shop-sub">Daniyore</div>
-        <div class="rcpt-shop-sub">03134711970</div>
+        <div class="rcpt-shop-sub">Address</div>
+        <div class="rcpt-shop-sub">0313-3879645</div>
     </div>
     
     <div class="rcpt-top-info">
         <div>Cashier: @(UserEmail?.Split('@')[0] ?? "nill")</div>
         <div>Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
     </div>
+
+    <div class="rcpt-hr-double"></div>
     
     <table class="rcpt-table">
         <thead>
@@ -380,35 +390,50 @@
             }
         </tbody>
     </table>
+
+    <div class="rcpt-hr-thick"></div>
     
     <div class="rcpt-totals-section">
-        <div class="rcpt-totals-row"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        @if (transMode != "return")
+        {
+            <div class="rcpt-totals-row"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        }
         <div class="rcpt-totals-row"><span>TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
         <div class="rcpt-totals-row"><span>AMOUNT DUE</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-totals-row"><span>CASH TENDERED</span><span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
-        <div class="rcpt-totals-row"><span>CHANGE</span><span>$@(Math.Max(0, (tenderedAmount ?? 0) - Math.Abs(currentTotal)).ToString("N0"))</span></div>
+        @if (transMode == "return")
+        {
+            <div class="rcpt-totals-row"><span>CASH</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        }
+        else
+        {
+            <div class="rcpt-totals-row"><span>CASH SALE</span><span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
+        }
         <div class="rcpt-totals-row"><span>PAY TYPE</span><span>@paymentMethod</span></div>
     </div>
     
+    <div class="rcpt-hr-thick"></div>
+
     <div class="rcpt-footer">
         <div class="rcpt-footer-thankyou">THANK YOU!</div>
         <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
+        <div class="rcpt-hr-thick"></div>
         <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA POS</div>
     </div>
     
-    <div class="rcpt-bottom-flex">
-        <div class="rcpt-order-info">
-            <span class="rcpt-order-id">ORDER: @orderBillNo</span>
-            <span class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy, h:mm:ss tt")</span>
-        </div>
-        @if (transMode != "return")
-        {
+    @if (transMode != "return")
+    {
+        <div class="rcpt-hr-thick"></div>
+        <div class="rcpt-bottom-flex">
+            <div class="rcpt-order-info">
+                <span class="rcpt-order-id">ORDER: @orderBillNo</span>
+                <span class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
+            </div>
             <div class="rcpt-barcode-wrap">
                 <svg id="rcptBarcodeSvg"></svg>
                 <div class="rcpt-barcode-text">@orderBillNo</div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -487,8 +512,8 @@
     {
         if (string.IsNullOrEmpty(searchQuery)) return;
 
-        // Auto-detect Receipt Scan (SALE_ or RET_)
-        if (searchQuery.ToUpper().StartsWith("SALE_") || searchQuery.ToUpper().StartsWith("RET_")) {
+        // Auto-detect Receipt Scan (SALE_ or RETURN_)
+        if (searchQuery.ToUpper().StartsWith("SALE_") || searchQuery.ToUpper().StartsWith("RETURN_")) {
             _ = LoadFromReceipt(searchQuery);
             searchQuery = "";
             return;
@@ -527,7 +552,8 @@
                     discount = qtyInDb != 0 ? s.discount / qtyInDb : 0,
                     expiry_date = s.expiry_date,
                     maxStock = qtyInDb,
-                    total_price = (s.price * -qtyInDb)
+                    total_price = (s.price * -qtyInDb),
+                    OriginalSaleId = s.id
                 };
             }).ToList();
             StateHasChanged();
@@ -627,11 +653,20 @@
 
         isSubmitting = true;
         try {
-                    var prefix = transMode == "return" ? "RET_" : "SALE_";
-                    var maxBillNoList = await DbContext.sales
-                        .Where(s => s.billNo.StartsWith(prefix))
-                        .Select(s => s.billNo)
-                        .ToListAsync();
+                    var prefix = transMode == "return" ? "RETURN_" : "SALE_";
+                    
+                    List<string> maxBillNoList;
+                    if (transMode == "return") {
+                        maxBillNoList = await DbContext.returns
+                            .Where(r => r.billNo != null && r.billNo.StartsWith(prefix))
+                            .Select(r => r.billNo!)
+                            .ToListAsync();
+                    } else {
+                        maxBillNoList = await DbContext.sales
+                            .Where(s => s.billNo != null && s.billNo.StartsWith(prefix))
+                            .Select(s => s.billNo!)
+                            .ToListAsync();
+                    }
 
                     int nextIdNum = 1;
                     if (maxBillNoList.Any())
@@ -652,22 +687,37 @@
             if (saleDescription.Length > 200) saleDescription = saleDescription.Substring(0, 200);
 
             foreach (var item in saleItems) {
-                var sale = new Models.Sale {
-                    billNo = orderBillNo, 
-                    date = DateTime.Now, 
-                    prod_name_service = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
-                    barcode = item.barcode, 
-                    qty_unit_type = $"{item.qty_unit_type}".Length > 50 ? $"{item.qty_unit_type}".Substring(0, 50) : $"{item.qty_unit_type}", 
-                    price = item.price,
-                    discount = item.discount, 
-                    total_price = item.total_price, 
-                    payment_method = paymentMethod, 
-                    status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
-                    is_returned = transMode == "return", 
-                    description = saleDescription,
-                    expiry_date = item.expiry_date ?? DateTime.Now 
-                };
-                DbContext.sales.Add(sale);
+                if (transMode == "return") {
+                    var returnRec = new Models.ReturnDetail {
+                        billNo = orderBillNo,
+                        SaleId = item.OriginalSaleId,
+                        Date = DateTime.Now,
+                        ProdNameService = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
+                        Barcode = item.barcode,
+                        QtyUnitType = $"{Math.Abs(item.qty_unit_type)}".Length > 50 ? $"{Math.Abs(item.qty_unit_type)}".Substring(0, 50) : $"{Math.Abs(item.qty_unit_type)}",
+                        Amount = Math.Abs(item.total_price),
+                        Method = paymentMethod,
+                        Status = "RETURN"
+                    };
+                    DbContext.returns.Add(returnRec);
+                } else {
+                    var sale = new Models.Sale {
+                        billNo = orderBillNo, 
+                        date = DateTime.Now, 
+                        prod_name_service = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
+                        barcode = item.barcode, 
+                        qty_unit_type = $"{item.qty_unit_type}".Length > 50 ? $"{item.qty_unit_type}".Substring(0, 50) : $"{item.qty_unit_type}", 
+                        price = item.price,
+                        discount = item.discount, 
+                        total_price = item.total_price, 
+                        payment_method = paymentMethod, 
+                        status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
+                        is_returned = false, 
+                        description = saleDescription,
+                        expiry_date = item.expiry_date ?? DateTime.Now 
+                    };
+                    DbContext.sales.Add(sale);
+                }
                 
               
                 try {
@@ -756,5 +806,6 @@
         public decimal maxStock { get; set; }
         public string? image { get; set; }
         public decimal total_price { get; set; }
+        public int OriginalSaleId { get; set; }
     }
 }

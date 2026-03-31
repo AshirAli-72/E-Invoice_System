@@ -4,6 +4,7 @@
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment Environment
+@inject IJSRuntime JSRuntime
 
 <div class="form-wrapper form-layout-left-wide">
     <div class="form-section">
@@ -94,7 +95,7 @@
     </div>
 
     <div class="form-actions-sticky">
-        <a href="/Product/Index" class="btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Cancel</a>
+        <button type="button" @onclick="Cancel" class="btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Cancel</button>
         <button type="button" class="btn-primary" @onclick="SaveProduct" disabled="@isSubmitting">
             <span>
                 @if (isSubmitting)
@@ -162,41 +163,38 @@
                 if (!string.IsNullOrEmpty(product.image))
                 {
                     string oldPath = product.image;
-                 
-                    if (!Path.IsPathRooted(oldPath))
-                    {
-                        oldPath = Path.Combine(storagePath, oldPath);
-                    }
-                    if (File.Exists(oldPath)) File.Delete(oldPath);
+                    if (!Path.IsPathRooted(oldPath)) oldPath = Path.Combine(storagePath, oldPath);
+                    if (File.Exists(oldPath)) try { File.Delete(oldPath); } catch {}
                 }
 
                 await using var stream = selectedFile.OpenReadStream(2048000);
                 await using var fs = new FileStream(path, FileMode.Create);
                 await stream.CopyToAsync(fs);
-                product.image = path; // Save exact path in DB
+                product.image = path; 
             }
 
             // Auto-generate barcode
-            if (string.IsNullOrWhiteSpace(product.barcode))
-            {
-                product.barcode = await GenerateUniqueBarcode();
-            }
+            if (string.IsNullOrWhiteSpace(product.barcode)) product.barcode = await GenerateUniqueBarcode();
 
             // Sync status with quantity
             if (!string.IsNullOrEmpty(product.qty_unit_type))
             {
                 var val = product.qty_unit_type.Trim();
-                if (val == "0" || val.StartsWith("0 "))
-                {
-                    product.status = "Out of Stock";
-                }
+                if (val == "0" || val.StartsWith("0 ")) product.status = "Out of Stock";
+                else if (product.status == "Out of Stock") product.status = "Available";
             }
 
             if (ProductId == 0) DbContext.products_services.Add(product);
-            else DbContext.products_services.Update(product);
+            else 
+            {
+                // Ensure entity is tracked and marked as modified
+                DbContext.Entry(product).State = EntityState.Modified;
+            }
 
             await DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/Product/Index", true);
+            
+            // Navigate without refreshing using softNavigate
+            await JSRuntime.InvokeVoidAsync("softNavigate", "/Product/Index");
         }
         catch (Exception ex)
         {
@@ -208,6 +206,7 @@
     private async Task<string> GenerateUniqueBarcode()
     {
         var barcodes = await DbContext.products_services
+            .AsNoTracking()
             .Where(p => p.barcode != null && p.barcode.StartsWith("P"))
             .Select(p => p.barcode)
             .ToListAsync();
@@ -234,5 +233,5 @@
         return "";
     }
 
-    private void Cancel() => NavigationManager.NavigateTo("/Product/Index", true);
+    private async Task Cancel() => await JSRuntime.InvokeVoidAsync("softNavigate", "/Product/Index");
 }

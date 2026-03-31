@@ -229,9 +229,11 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\refint\E-Invoice_system.dll
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.pdb
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\E-Invoice_system.genruntimeconfig.cache
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\ref\E-Invoice_system.dll
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-v7rykdwbw9-v7rykdwbw9.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\b1np7zvhb8-{0}-e710dyq4bi-e710dyq4bi.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-6zgryscer0-6zgryscer0.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3l620vsmkj-{0}-nu0egamgrm-nu0egamgrm.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\iuu60c21so-{0}-33pvmghu2p-33pvmghu2p.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\ns0mu67c64-{0}-cwexp7hjwf-cwexp7hjwf.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-k7bvb2sdtx-k7bvb2sdtx.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\3sdy1zx8ma-{0}-jn09xp1q7c-jn09xp1q7c.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\q0d5wq4o0r-{0}-sg9ex5r6ps-sg9ex5r6ps.gz

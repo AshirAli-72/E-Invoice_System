@@ -142,7 +142,7 @@
                             </td>
                             <td class="text-danger font-bold">@ret.QtyUnitType</td>
                             <td>
-                                <div class="font-bold text-danger" style="font-size: 1rem;">$@ret.Amount.ToString("N2")</div>
+                                <div class="font-bold text-danger" style="font-size: 1rem;">$@Math.Abs(ret.Amount).ToString("N2")</div>
                             </td>
                             <td class="text-center">
                                 <span class="font-medium font-sm">@ret.Method</span>

@@ -356,6 +356,31 @@
     cursor: pointer;
 }
 
+.btn-primary, .btn-secondary, .btn-confirm-web, .btn-pay-v2 {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover, .btn-confirm-web:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    filter: brightness(1.05);
+}
+
+.btn-primary:active, .btn-confirm-web:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+    filter: brightness(0.95);
+}
+
+.btn-primary:disabled, .btn-confirm-web:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+    transform: none !important;
+}
+
 .form-icon-primary {
     color: var(--primary);
 }
