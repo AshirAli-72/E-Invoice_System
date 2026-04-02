@@ -346,18 +346,17 @@
     </div>
 }
 
-<!-- THERMAL RECEIPT (Strict Match to Pic 1 & 2) -->
-<!-- THERMAL RECEIPT (Strict Match to Pic 1) -->
+<!-- THERMAL RECEIPT -->
 <div id="thermalReceipt">
     <div class="rcpt-header">
         <div class="rcpt-shop-name">THE SATA POS</div>
         <div class="rcpt-address">Address</div>
         <div class="rcpt-phone">0313-3879645</div>
     </div>
-    
+
     <div class="rcpt-info">
-        <div class="rcpt-info-line"><span>Cashier:</span> <span>@(UserEmail?.Split('@')[0] ?? "nill")</span></div>
-        <div class="rcpt-info-line"><span>Customer:</span> <span>@(selectedCustomer?.name ?? "Walk-In")</span></div>
+        <div class="rcpt-info-line"><b>Cashier:</b> @(UserEmail?.Split('@')[0] ?? "nill")</div>
+        <div class="rcpt-info-line"><b>Customer:</b> @(selectedCustomer?.name ?? "Walk-In")</div>
     </div>
 
     <table class="rcpt-table">
@@ -383,21 +382,21 @@
     </table>
 
     <div class="rcpt-totals">
-        <div class="rcpt-total-line"><span>SUB TOTAL</span> <span>$@Math.Abs(totalSub).ToString("N0")</span></div>
-        <div class="rcpt-total-line"><span>TOTAL</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-total-line"><span>AMOUNT DUE</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-total-line"><span>CASH SALE</span> <span>$@(tenderedAmount?.ToString("N0") ?? Math.Abs(currentTotal).ToString("N0"))</span></div>
-        <div class="rcpt-total-line"><span>PAY TYPE</span> <span>@paymentMethod</span></div>
+        <div class="rcpt-total-line"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>AMOUNT DUE</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>CASH SALE</span><span>$@(tenderedAmount?.ToString("N0") ?? Math.Abs(currentTotal).ToString("N0"))</span></div>
+        <div class="rcpt-total-line"><span>PAY TYPE</span><span>@paymentMethod</span></div>
     </div>
 
     <div class="rcpt-footer">
         <div class="rcpt-hr-thick"></div>
         <div class="rcpt-thank-you">THANK YOU!</div>
         <div class="rcpt-hr-thick"></div>
-        <div class="rcpt-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
-        <div class="rcpt-hr-thick-small"></div>
+        <div class="rcpt-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
+        <div class="rcpt-hr-thin"></div>
         <div class="rcpt-copyright">Copyrights 2023, Powered by The SATA POS</div>
-        <div class="rcpt-hr-thick-small"></div>
+        <div class="rcpt-hr-thin"></div>
     </div>
 
     <div class="rcpt-bottom">

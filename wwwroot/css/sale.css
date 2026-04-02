@@ -1556,6 +1556,9 @@
         font-size: 1.1rem;
     }
 }
+/* ── Hide receipt on screen, only show on print ── */
+
+
 /* --- Added by Assistant --- */
 .btn-confirm-web.confirm {
     background: #22c55e !important;
@@ -1641,195 +1644,198 @@
 }
 
 /* ============================================================
-   THERMAL RECEIPT — PROFESSIONAL PRINT STYLES
+   THERMAL RECEIPT — PRINT STYLES (Exact Match to Reference Image)
    ============================================================ */
 @media print {
+    /* Page: no margins, auto height to fit content exactly */
     @page {
-        margin: 0;
         size: 80mm auto;
+        margin: 0;
     }
-    
+
+    /* Reset everything */
     html, body {
         margin: 0 !important;
         padding: 0 !important;
+        width: 80mm !important;
         background: white !important;
-        color: black !important;
+        color: #000 !important;
     }
 
-    /* Reset Blazor layout wrappers */
-    .page, main, .content, #app, article,
-    .sale-layout-container, .sale-main-wrapper, .sale-content-body,
-    .app-container, .main-content {
-        display: block !important;
+    /* Hide ALL screen UI */
+    .sidebar, nav, .top-row, .top-bar,
+    .pos-container-v2, .modal-overlay,
+    .navbar, #toast-container, .no-print,
+    .page > header, .page > .sidebar,
+    .page, main article, .content {
+        display: none !important;
+    }
+
+    /* Reset layout wrappers so they don't add space */
+    body > *, #app, .page, main, article,
+    .blazor-error-boundary {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100% !important;
         min-height: 0 !important;
         height: auto !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+        overflow: visible !important;
     }
-
-    /* Hide all UI except the receipt */
-    .sidebar, .top-row, .top-bar, .pos-container-v2,
-    .modal-overlay, .navbar, #toast-container,
-    .print-controls, .no-print {
-        display: none !important;
-    }
-
-    @page {
-        size: auto;
-        margin: 0 !important;
-    }
-
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
-
-    /* ── Receipt Container ── */
     #thermalReceipt {
         display: block !important;
         visibility: visible !important;
-        position: absolute !important;
+        position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        width: 80mm !important; 
-        max-width: 80mm !important;
-        background: white !important;
+        width: 76mm !important;
+        background: #fff !important;
         color: #000 !important;
-        padding: 5mm 2mm !important;
-        margin: 0 !important; 
+        padding: 4mm 2mm 2mm 2mm !important;
+        margin: 0 !important;
         box-sizing: border-box !important;
         font-family: 'Courier New', Courier, monospace !important;
-        font-size: 13px !important; 
-        line-height: 1.2 !important;
+        font-size: 12pt !important;
+        line-height: 1.1 !important;
     }
 
+    /* HEADER */
     .rcpt-header {
         text-align: center !important;
-        margin-bottom: 8px !important;
+        margin: 0 0 2px 0 !important;
     }
 
     .rcpt-shop-name {
-        font-size: 22px !important;
+        font-size: 18pt !important;
         font-weight: 900 !important;
-        margin-bottom: 2px !important;
+        letter-spacing: 1px !important;
+        margin: 0 !important;
     }
 
-    .rcpt-address, .rcpt-phone {
-        font-size: 14px !important;
+    .rcpt-address,
+    .rcpt-phone {
+        font-size: 11pt !important;
         font-weight: 700 !important;
-        margin-bottom: 1px !important;
+        margin-top: -2px !important;
     }
 
+    /* INFO */
     .rcpt-info {
-        margin: 10px 0 !important;
+        margin: 2px 0 0 0 !important;
     }
 
     .rcpt-info-line {
-        display: flex !important;
-        justify-content: flex-start !important;
-        gap: 5px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
+        font-size: 11pt !important;
+        font-weight: 900 !important;
     }
 
-    .rcpt-hr-thick {
-        border-top: 2px solid #000 !important;
-        margin: 4px 0 !important;
-    }
-
-    .rcpt-hr-thick-small {
-        border-top: 1.5px solid #000 !important;
-        margin: 2px 0 !important;
-    }
-
-    /* ── Items Table ── */
+    /* TABLE */
     .rcpt-table {
         width: 100% !important;
         border-collapse: collapse !important;
-        margin-top: 5px !important;
+        margin-top: 3px !important;
     }
 
-    .rcpt-table th {
-        font-size: 14px !important;
-        font-weight: 900 !important;
+        .rcpt-table thead th {
+            font-size: 11pt !important;
+            font-weight: 900 !important;
+            padding: 2px !important;
+            border-top: 2px solid #000 !important;
+            border-bottom: 2px solid #000 !important;
+            text-align: left !important;
+        }
+
+        .rcpt-table tbody td {
+            font-size: 11pt !important;
+            font-weight: 800 !important;
+            padding: 1px 2px !important;
+        }
+
+    .col-prod {
         text-align: left !important;
-        padding: 4px 0 !important;
-        border-top: 2px solid #000 !important;
-        border-bottom: 1px solid #000 !important;
     }
 
-    .rcpt-table td {
-        font-size: 14px !important;
-        font-weight: 800 !important;
-        padding: 4px 0 !important;
+    .col-qty {
+        text-align: center !important;
+        width: 28px !important;
     }
 
-    .col-prod { text-align: left !important; }
-    .col-qty { text-align: center !important; width: 40px !important; }
-    .col-price { text-align: right !important; width: 70px !important; }
-    .col-amt { text-align: right !important; width: 80px !important; }
+    .col-price {
+        text-align: right !important;
+        width: 54px !important;
+    }
 
-    /* ── Totals Section ── */
+    .col-amt {
+        text-align: right !important;
+        width: 54px !important;
+    }
+
+    /* TOTALS */
     .rcpt-totals {
         border-top: 2px solid #000 !important;
-        padding-top: 4px !important;
-        margin-top: 5px !important;
+        margin-top: 2px !important;
+        padding-top: 2px !important;
     }
 
     .rcpt-total-line {
         display: flex !important;
         justify-content: space-between !important;
-        font-size: 15px !important;
+        font-size: 11pt !important;
         font-weight: 900 !important;
-        padding: 2px 0 !important;
+        line-height: 1.2 !important;
     }
 
-    /* ── Footer ── */
+    /* FOOTER */
     .rcpt-footer {
         text-align: center !important;
-        margin-top: 10px !important;
+    }
+
+    .rcpt-hr-thick {
+        border-top: 2px solid #000 !important;
+        margin: 3px 0 !important;
+    }
+
+    .rcpt-hr-thin {
+        border-top: 1px solid #000 !important;
+        margin: 2px 0 !important;
     }
 
     .rcpt-thank-you {
-        font-size: 18px !important;
+        font-size: 15pt !important;
         font-weight: 900 !important;
-        padding: 5px 0 !important;
+        letter-spacing: 1px !important;
     }
 
     .rcpt-promo {
-        font-size: 11px !important;
+        font-size: 9pt !important;
         font-weight: 800 !important;
-        margin: 5px 0 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
     }
 
     .rcpt-copyright {
-        font-size: 10px !important;
+        font-size: 8pt !important;
         font-weight: 700 !important;
-        margin-top: 2px !important;
     }
 
-    /* ── Bottom: Order Info + Barcode ── */
+    /* BOTTOM */
     .rcpt-bottom {
         display: flex !important;
         justify-content: space-between !important;
-        align-items: flex-end !important;
-        margin-top: 10px !important;
+        align-items: center !important;
         border-top: 1px solid #000 !important;
-        padding-top: 8px !important;
+        margin-top: 2px !important;
+        padding-top: 2px !important;
     }
 
     .rcpt-order-id {
-        font-size: 14px !important;
+        font-size: 11pt !important;
         font-weight: 900 !important;
     }
 
     .rcpt-date {
-        font-size: 14px !important;
+        font-size: 11pt !important;
         font-weight: 700 !important;
     }
 
@@ -1840,13 +1846,12 @@
     }
 
     #rcptBarcodeSvg {
-        width: 150px !important;
+        width: 140px !important;
         height: 50px !important;
     }
 
     .rcpt-barcode-text {
-        font-size: 12px !important;
+        font-size: 9pt !important;
         font-weight: 700 !important;
-        margin-top: -5px !important;
     }
 }

@@ -39,15 +39,7 @@ namespace E_Invoice_system.Pages
             _context.Database.SetCommandTimeout(60); // Increase timeout for dashboard aggregation
             var sw = Stopwatch.StartNew();
 
-            TotalInvoices = await _context.invoices.AsNoTracking().CountAsync();
-            TotalCustomers = await _context.customers.AsNoTracking().CountAsync();
-            TotalProducts = await _context.products_services.AsNoTracking().CountAsync();
-            
-            TotalSales = await _context.sales
-                .AsNoTracking()
-                .Where(s => s.total_price > 0)
-                .SumAsync(s => (decimal?)s.total_price) ?? 0;
-
+            // Combine status data and total count to save one query
             var invoiceStatusData = await _context.invoices
                 .AsNoTracking()
                 .GroupBy(i => i.status ?? "Pending")
@@ -56,6 +48,15 @@ namespace E_Invoice_system.Pages
 
             StatusLabels = invoiceStatusData.Select(x => x.Status).ToArray();
             StatusCounts = invoiceStatusData.Select(x => x.Count).ToArray();
+            TotalInvoices = StatusCounts.Sum();
+
+            TotalCustomers = await _context.customers.AsNoTracking().CountAsync();
+            TotalProducts = await _context.products_services.AsNoTracking().CountAsync();
+            
+            TotalSales = await _context.sales
+                .AsNoTracking()
+                .Where(s => s.total_price > 0)
+                .SumAsync(s => (decimal?)s.total_price) ?? 0;
 
             RecentInvoices = await _context.invoices
                 .AsNoTracking()

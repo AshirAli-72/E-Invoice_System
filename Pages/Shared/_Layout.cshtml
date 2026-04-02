@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- View Transitions API: smooth browser-level page transitions -->
+    <meta name="view-transition" content="same-origin" />
     <title>@ViewData["Title"] - E-Invoice System</title>
     <base href="~/" />
     
@@ -112,15 +114,16 @@
     <script src="~/js/app-main.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <input type="hidden" id="nav-active-page" value="@ViewContext.RouteData.Values["page"]?.ToString().ToLower()" />
     <div id="toast-container"></div>
 
     <script>
-        // Check for success message from server
-        const successMessage = '@TempData["Success"]';
-        if (successMessage && typeof showToast === 'function') {
-            showToast('Successful', successMessage);
-        }
+        // Show server-side TempData success toast after app-main.js loads
+        (function() {
+            var msg = '@Html.Raw((TempData["Success"] as string)?.Replace("'", "\\'") ?? "")';
+            if (msg && typeof window.showToast === 'function') {
+                window.showToast('Success', msg, 'success');
+            }
+        })();
     </script>
 </body>
 </html>

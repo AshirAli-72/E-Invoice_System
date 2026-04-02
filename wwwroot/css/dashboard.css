@@ -86,6 +86,25 @@ body {
     color: white;
 }
 
+/* Nav item: instant visual feedback when clicking */
+.nav-item.active {
+    /* Pulse animation on active to feel responsive */
+    animation: navActivate 0.18s ease;
+}
+
+@keyframes navActivate {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(0.97); }
+    100% { transform: scale(1); }
+}
+
+/* Loading state — dims main content while page loads */
+body.page-loading .main-content > *:not(header) {
+    opacity: 0.45;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
 .nav-icon {
     font-size: 1.25rem;
 }
