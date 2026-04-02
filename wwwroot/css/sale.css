@@ -1696,221 +1696,157 @@
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100% !important; 
-        max-width: 100% !important;
+        width: 80mm !important; 
+        max-width: 80mm !important;
         background: white !important;
         color: #000 !important;
-        padding: 2mm 3mm !important; /* Minimized padding to fill space */
+        padding: 5mm 2mm !important;
         margin: 0 !important; 
         box-sizing: border-box !important;
         font-family: 'Courier New', Courier, monospace !important;
         font-size: 13px !important; 
         line-height: 1.2 !important;
-        page-break-after: avoid !important;
-        transform: none !important;
     }
 
-    /* ── Shop Header ── */
-    .rcpt-shop-header {
+    .rcpt-header {
         text-align: center !important;
-        padding-bottom: 5px !important;
-        margin-bottom: 0 !important;
-        border-bottom: 2px solid #000 !important;
+        margin-bottom: 8px !important;
     }
 
     .rcpt-shop-name {
-        display: block !important;
-        font-size: 24px !important; /* Increased from 18px */
+        font-size: 22px !important;
         font-weight: 900 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 3px !important;
-        margin-bottom: 5px !important;
-    }
-
-    .rcpt-shop-sub {
-        display: block !important;
-        font-size: 14px !important; /* Increased from 11px */
-        font-weight: 700 !important;
         margin-bottom: 2px !important;
-        color: #000 !important;
-        letter-spacing: 0.8px !important;
     }
 
-    /* ── Dividers ── */
+    .rcpt-address, .rcpt-phone {
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        margin-bottom: 1px !important;
+    }
+
+    .rcpt-info {
+        margin: 10px 0 !important;
+    }
+
+    .rcpt-info-line {
+        display: flex !important;
+        justify-content: flex-start !important;
+        gap: 5px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
     .rcpt-hr-thick {
-        border: none !important;
-        border-top: 1.5px solid #000 !important;
-        margin: 6px 0 !important;
-        height: 0 !important;
-    }
-
-    .rcpt-hr-double {
-        border: none !important;
         border-top: 2px solid #000 !important;
         margin: 4px 0 !important;
-        height: 0 !important;
     }
 
-    /* ── Cashier / Customer Info ── */
-    .rcpt-top-info {
-        display: flex !important;
-        justify-content: space-between !important;
-        font-size: 14px !important; /* Increased from 11px */
-        font-weight: 600 !important;
-        padding: 8px 0 !important;
-        margin: 5px 0 !important;
-        border-bottom: 1.5px solid #000 !important;
+    .rcpt-hr-thick-small {
+        border-top: 1.5px solid #000 !important;
+        margin: 2px 0 !important;
     }
 
     /* ── Items Table ── */
     .rcpt-table {
         width: 100% !important;
-        table-layout: fixed !important;
         border-collapse: collapse !important;
-        margin: 0 !important;
-    }
-
-    .rcpt-header-row th {
-        padding: 4px 0 3px !important;
-        border-bottom: 1px solid #000 !important;
-        border-top: 1px solid #000 !important;
+        margin-top: 5px !important;
     }
 
     .rcpt-table th {
-        font-size: 10px !important;
+        font-size: 14px !important;
         font-weight: 900 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
+        text-align: left !important;
+        padding: 4px 0 !important;
+        border-top: 2px solid #000 !important;
+        border-bottom: 1px solid #000 !important;
     }
 
     .rcpt-table td {
-        font-size: 11px !important;
-        padding: 3px 0 !important;
-        vertical-align: top !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        padding: 4px 0 !important;
     }
 
-    /* Last data row: small separator before totals */
-    .rcpt-table tbody tr:last-child td {
-        padding-bottom: 4px !important;
-    }
-
-    .rcpt-col-prod  { width: 44% !important; text-align: left !important;   }
-    .rcpt-col-qty   { width: 12% !important; text-align: center !important; }
-    .rcpt-col-price { width: 22% !important; text-align: right !important;  }
-    .rcpt-col-amt   { width: 22% !important; text-align: right !important;  }
+    .col-prod { text-align: left !important; }
+    .col-qty { text-align: center !important; width: 40px !important; }
+    .col-price { text-align: right !important; width: 70px !important; }
+    .col-amt { text-align: right !important; width: 80px !important; }
 
     /* ── Totals Section ── */
-    .rcpt-totals-section {
-        border-top: 1px solid #000 !important;
+    .rcpt-totals {
+        border-top: 2px solid #000 !important;
         padding-top: 4px !important;
-        margin-top: 0 !important;
+        margin-top: 5px !important;
     }
 
-    .rcpt-totals-row {
+    .rcpt-total-line {
         display: flex !important;
         justify-content: space-between !important;
-        font-size: 11px !important;
-        font-weight: 600 !important;
-        padding: 1px 0 !important;
-        margin: 0 !important;
-    }
-
-    /* TOTAL row — larger */
-    .rcpt-totals-row:nth-child(2) {
-        font-size: 18px !important; /* Increased from 13px */
-        font-weight: 800 !important;
-        padding: 5px 0 !important;
-        margin: 5px 0 !important;
-    }
-
-    /* AMOUNT DUE — bold & biggest */
-    .rcpt-totals-row:nth-child(3) {
-        font-size: 20px !important; /* Increased from 14px */
+        font-size: 15px !important;
         font-weight: 900 !important;
-        padding: 6px 0 !important;
-        letter-spacing: 1px !important;
-        border-top: 2px solid #000 !important;
-        border-bottom: 2px solid #000 !important;
+        padding: 2px 0 !important;
     }
 
     /* ── Footer ── */
     .rcpt-footer {
         text-align: center !important;
-        border-top: 2px solid #000 !important;
-        margin-top: 4px !important;
-        padding-top: 5px !important;
+        margin-top: 10px !important;
     }
 
-    .rcpt-footer-thankyou {
-        font-size: 15px !important;
+    .rcpt-thank-you {
+        font-size: 18px !important;
         font-weight: 900 !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 4px !important;
-        text-transform: uppercase !important;
+        padding: 5px 0 !important;
     }
 
-    .rcpt-footer-promo {
+    .rcpt-promo {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        margin: 5px 0 !important;
+    }
+
+    .rcpt-copyright {
         font-size: 10px !important;
-        font-weight: 600 !important;
-        margin: 3px 0 !important;
-        font-style: italic !important;
-    }
-
-    .rcpt-footer-copy {
-        font-size: 9px !important;
-        font-weight: 500 !important;
-        color: #444 !important;
-        margin-top: 3px !important;
+        font-weight: 700 !important;
+        margin-top: 2px !important;
     }
 
     /* ── Bottom: Order Info + Barcode ── */
-    .rcpt-bottom-flex {
+    .rcpt-bottom {
         display: flex !important;
         justify-content: space-between !important;
-        align-items: flex-start !important;
-        margin-top: 5px !important;
+        align-items: flex-end !important;
+        margin-top: 10px !important;
         border-top: 1px solid #000 !important;
-        padding-top: 4px !important;
-    }
-
-    .rcpt-order-info {
-        font-size: 10px !important;
-        font-weight: 600 !important;
-        flex: 1 !important;
-        line-height: 1.5 !important;
+        padding-top: 8px !important;
     }
 
     .rcpt-order-id {
+        font-size: 14px !important;
         font-weight: 900 !important;
-        font-size: 11px !important;
-        display: block !important;
     }
 
-    .rcpt-order-date {
-        display: block !important;
-        color: #333 !important;
+    .rcpt-date {
+        font-size: 14px !important;
+        font-weight: 700 !important;
     }
 
     .rcpt-barcode-wrap {
-        flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: flex-end !important;
+        align-items: center !important;
     }
 
     #rcptBarcodeSvg {
-        width: 100% !important;
-        max-width: 140px !important; /* Increased from 110px */
-        height: 40px !important; /* Increased from 28px */
+        width: 150px !important;
+        height: 50px !important;
     }
 
     .rcpt-barcode-text {
-        font-size: 11px !important; /* Increased from 9px */
+        font-size: 12px !important;
         font-weight: 700 !important;
-        margin-top: 2px !important;
-        text-align: center !important;
-        width: 140px !important;
+        margin-top: -5px !important;
     }
 }

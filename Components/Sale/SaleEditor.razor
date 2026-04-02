@@ -347,94 +347,71 @@
 }
 
 <!-- THERMAL RECEIPT (Strict Match to Pic 1 & 2) -->
+<!-- THERMAL RECEIPT (Strict Match to Pic 1) -->
 <div id="thermalReceipt">
-    @if (transMode == "return")
-    {
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10px; margin-bottom: 5px;">
-            <span>@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
-            <span>ORDER: @orderBillNo</span>
-        </div>
-    }
-
-    <div class="rcpt-shop-header">
+    <div class="rcpt-header">
         <div class="rcpt-shop-name">THE SATA POS</div>
-        <div class="rcpt-shop-sub">Address</div>
-        <div class="rcpt-shop-sub">0313-3879645</div>
+        <div class="rcpt-address">Address</div>
+        <div class="rcpt-phone">0313-3879645</div>
     </div>
     
-    <div class="rcpt-top-info">
-        <div>Cashier: @(UserEmail?.Split('@')[0] ?? "nill")</div>
-        <div>Customer: @(selectedCustomer?.name ?? "Walk-In")</div>
+    <div class="rcpt-info">
+        <div class="rcpt-info-line"><span>Cashier:</span> <span>@(UserEmail?.Split('@')[0] ?? "nill")</span></div>
+        <div class="rcpt-info-line"><span>Customer:</span> <span>@(selectedCustomer?.name ?? "Walk-In")</span></div>
     </div>
 
-    <div class="rcpt-hr-double"></div>
-    
     <table class="rcpt-table">
         <thead>
-            <tr class="rcpt-header-row">
-                <th class="rcpt-col-prod">PRODUCT</th>
-                <th class="rcpt-col-qty">QTY</th>
-                <th class="rcpt-col-price">PRICE</th>
-                <th class="rcpt-col-amt">AMOUNT</th>
+            <tr>
+                <th class="col-prod">PRODUCT</th>
+                <th class="col-qty">QTY</th>
+                <th class="col-price">PRICE</th>
+                <th class="col-amt">AMOUNT</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in saleItems)
             {
                 <tr>
-                    <td class="rcpt-col-prod">@item.prod_name_service</td>
-                    <td class="rcpt-col-qty">@Math.Abs(item.qty_unit_type)</td>
-                    <td class="rcpt-col-price">@item.price.ToString("N0")</td>
-                    <td class="rcpt-col-amt">@Math.Abs(item.total_price).ToString("N0")</td>
+                    <td class="col-prod">@item.prod_name_service</td>
+                    <td class="col-qty">@Math.Abs(item.qty_unit_type)</td>
+                    <td class="col-price">@item.price.ToString("N0")</td>
+                    <td class="col-amt">@Math.Abs(item.total_price).ToString("N0")</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <div class="rcpt-hr-thick"></div>
-    
-    <div class="rcpt-totals-section">
-        @if (transMode != "return")
-        {
-            <div class="rcpt-totals-row"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
-        }
-        <div class="rcpt-totals-row"><span>TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-totals-row"><span>AMOUNT DUE</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        @if (transMode == "return")
-        {
-            <div class="rcpt-totals-row"><span>CASH</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        }
-        else
-        {
-            <div class="rcpt-totals-row"><span>CASH SALE</span><span>$@(tenderedAmount?.ToString("N0") ?? "0")</span></div>
-        }
-        <div class="rcpt-totals-row"><span>PAY TYPE</span><span>@paymentMethod</span></div>
+    <div class="rcpt-totals">
+        <div class="rcpt-total-line"><span>SUB TOTAL</span> <span>$@Math.Abs(totalSub).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>TOTAL</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>AMOUNT DUE</span> <span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        <div class="rcpt-total-line"><span>CASH SALE</span> <span>$@(tenderedAmount?.ToString("N0") ?? Math.Abs(currentTotal).ToString("N0"))</span></div>
+        <div class="rcpt-total-line"><span>PAY TYPE</span> <span>@paymentMethod</span></div>
     </div>
-    
-    <div class="rcpt-hr-thick"></div>
 
     <div class="rcpt-footer">
-        <div class="rcpt-footer-thankyou">THANK YOU!</div>
-        <div class="rcpt-footer-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
         <div class="rcpt-hr-thick"></div>
-        <div class="rcpt-footer-copy">Copyrights 2026, Powered by The SATA POS</div>
+        <div class="rcpt-thank-you">THANK YOU!</div>
+        <div class="rcpt-hr-thick"></div>
+        <div class="rcpt-promo">*** Refer a Friend To Smoke Drop & Get 5% off. ***</div>
+        <div class="rcpt-hr-thick-small"></div>
+        <div class="rcpt-copyright">Copyrights 2023, Powered by The SATA POS</div>
+        <div class="rcpt-hr-thick-small"></div>
     </div>
-    
-    @if (transMode != "return")
-    {
-        <div class="rcpt-hr-thick"></div>
-        <div class="rcpt-bottom-flex">
-            <div class="rcpt-order-info">
-                <span class="rcpt-order-id">ORDER: @orderBillNo</span>
-                <span class="rcpt-order-date">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</span>
-            </div>
-            <div class="rcpt-barcode-wrap">
-                <svg id="rcptBarcodeSvg"></svg>
-                <div class="rcpt-barcode-text">@orderBillNo</div>
-            </div>
+
+    <div class="rcpt-bottom">
+        <div class="rcpt-bottom-left">
+            <div class="rcpt-order-id">ORDER: @orderBillNo</div>
+            <div class="rcpt-date">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
         </div>
-    }
+        <div class="rcpt-barcode-wrap">
+            <svg id="rcptBarcodeSvg"></svg>
+            <div class="rcpt-barcode-text">@orderBillNo</div>
+        </div>
+    </div>
 </div>
+
 
 @code {
     private List<ProductDisplay> allProducts = new();
