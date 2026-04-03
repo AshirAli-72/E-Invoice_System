@@ -128,91 +128,97 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         // Pie Chart for Status
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        const statusLabels = @Html.Raw(Json.Serialize(Model.StatusLabels));
-        const statusCounts = @Html.Raw(Json.Serialize(Model.StatusCounts));
-        
-        const statusColors = statusLabels.map(label => {
-            if (label === 'Paid') return '#10b981'; // Green
-            if (label === 'Pending') return '#ea580c'; // Orange
-            if (label === 'Cancelled') return '#3b82f6'; // Blue
-            return '#6b7280'; // Gray default
-        });
+        const statusChartEl = document.getElementById('statusChart');
+        if (statusChartEl) {
+            const statusCtx = statusChartEl.getContext('2d');
+            const statusLabels = @Html.Raw(Json.Serialize(Model.StatusLabels));
+            const statusCounts = @Html.Raw(Json.Serialize(Model.StatusCounts));
+            
+            const statusColors = statusLabels.map(label => {
+                if (label === 'Paid') return '#10b981'; // Green
+                if (label === 'Pending') return '#ea580c'; // Orange
+                if (label === 'Cancelled') return '#3b82f6'; // Blue
+                return '#6b7280'; // Gray default
+            });
 
-        new Chart(statusCtx, {
-            type: 'pie',
-            data: {
-                labels: statusLabels,
-                datasets: [{
-                    data: statusCounts,
-                    backgroundColor: statusColors,
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
+            new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusCounts,
+                        backgroundColor: statusColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Line Chart for Trend
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        
-        var gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(188, 24, 35, 0.2)');
-        gradient.addColorStop(1, 'rgba(188, 24, 35, 0.0)');
+        const trendChartEl = document.getElementById('trendChart');
+        if (trendChartEl) {
+            const trendCtx = trendChartEl.getContext('2d');
+            
+            var gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(188, 24, 35, 0.2)');
+            gradient.addColorStop(1, 'rgba(188, 24, 35, 0.0)');
 
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
-                datasets: [{
-                    label: 'Invoices Issued',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendData)),
-                    backgroundColor: gradient,
-                    borderColor: '#BC1823',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#BC1823',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
+                    datasets: [{
+                        label: 'Invoices Issued',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendData)),
+                        backgroundColor: gradient,
+                        borderColor: '#BC1823',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#BC1823',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { 
-                            borderDash: [2, 4],
-                            color: '#e5e7eb',
-                            drawBorder: false 
-                        },
-                        ticks: { font: { size: 11 } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { font: { size: 11 } }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-            }
-        });
-    });
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { 
+                                borderDash: [2, 4],
+                                color: '#e5e7eb',
+                                drawBorder: false 
+                            },
+                            ticks: { font: { size: 11 } }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                }
+            });
+        }
+    })();
 </script>

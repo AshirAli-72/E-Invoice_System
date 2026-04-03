@@ -38,21 +38,19 @@ namespace E_Invoice_system.Pages.Sale
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            // Temporary DB Fix for older 'RETURNED' / negative quantity records
-            var returnsToFix = await _context.returns.Where(r => r.Status == "RETURNED" || r.Status == "Returned" || (r.QtyUnitType != null && r.QtyUnitType.StartsWith("-")) || r.Amount < 0).ToListAsync();
-            foreach (var r in returnsToFix) {
-                if (r.Status == "RETURNED" || r.Status == "Returned") r.Status = "RETURN";
-                if (r.QtyUnitType != null && r.QtyUnitType.StartsWith("-")) r.QtyUnitType = r.QtyUnitType.Substring(1);
-                if (r.Amount < 0) r.Amount = Math.Abs(r.Amount);
-            }
-            if (returnsToFix.Any()) {
-                _context.returns.UpdateRange(returnsToFix);
-                await _context.SaveChangesAsync();
-            }
+            // Sequential fetching to avoid DbContext concurrency issues
+            var allSales = await _context.sales
+                .AsNoTracking()
+                .OrderByDescending(s => s.date)
+                .Take(100)
+                .ToListAsync();
 
-            // Fetch recent 200 items in memory, use AsNoTracking for speed
-            var allSales = await _context.sales.AsNoTracking().OrderByDescending(s => s.date).Take(200).ToListAsync();
-            
+            Returns = await _context.returns
+                .AsNoTracking()
+                .OrderByDescending(r => r.Date)
+                .Take(100)
+                .ToListAsync();
+
             Sales = allSales.Select(s => new SaleDisplayItem
             {
                 id = s.id,
@@ -65,18 +63,13 @@ namespace E_Invoice_system.Pages.Sale
                 PaymentMethod = s.payment_method,
                 Status = s.status,
                 IsReturned = s.is_returned
-            }).Where(s => {
-                // Keep the filter for non-zero qty if that's what was intended
-                // The previous Regex check was: match.Success && q > 0
+            }).Where(s =>
+            {
                 if (decimal.TryParse(s.DisplayQty, out decimal q))
-                {
                     return q > 0;
-                }
                 return true;
             }).ToList();
 
-            Returns = await _context.returns.AsNoTracking().OrderByDescending(r => r.Date).Take(200).ToListAsync();
-            
             return Page();
         }
 

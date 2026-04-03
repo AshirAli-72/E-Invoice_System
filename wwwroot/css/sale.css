@@ -1643,215 +1643,454 @@
     color: var(--text-muted);
 }
 
+/* ── Hide receipt on screen, only show on print ── */
 /* ============================================================
-   THERMAL RECEIPT — PRINT STYLES (Exact Match to Reference Image)
+   THERMAL RECEIPT STYLES (DESIGN REFRESH)
+   ============================================================ */
+#thermalReceipt {
+    display: none; /* Hidden on screen by default */
+    background: #ffffff;
+    width: 600px;
+    padding: 28px 32px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13.5pt;
+    color: #000000;
+    line-height: 1.45;
+    margin: 0 auto;
+}
+
+/* ── Header ── */
+.rcpt-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.rcpt-shop-name {
+    display: block;
+    font-size: 20pt;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+}
+.rcpt-address {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    margin-top: 1px;
+}
+.rcpt-phone {
+    display: block;
+    font-size: 13pt;
+    font-weight: 700;
+}
+
+/* ── Info lines ── */
+.rcpt-info {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+.rcpt-info-line {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.rcpt-info-line b {
+    font-weight: 900;
+}
+
+/* ── Table ── */
+.rcpt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+.rcpt-table thead tr th {
+    font-size: 13.5pt;
+    font-weight: 900;
+    padding: 5px 4px;
+    border-top: 2.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    text-align: left;
+    text-transform: uppercase;
+}
+.rcpt-table tbody tr td {
+    font-size: 13pt;
+    font-weight: 400;
+    padding: 5px 4px;
+}
+
+.col-prod  { text-align: left;   width: auto; }
+.col-qty   { text-align: center; width: 70px; }
+.col-price { text-align: right;  width: 100px; }
+.col-amt   { text-align: right;  width: 100px; }
+
+/* ── Totals ── */
+.rcpt-totals {
+    border-top: 1.5px solid #000;
+    padding-top: 4px;
+    margin-top: 2px;
+}
+.rcpt-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13pt;
+    font-weight: 900;
+    line-height: 1.75;
+}
+
+/* ── Footer ── */
+.rcpt-footer {
+    text-align: center;
+    margin-top: 0;
+}
+hr.rcpt-hr-thick {
+    border: none;
+    border-top: 2.5px solid #000;
+    margin: 7px 0;
+}
+hr.rcpt-hr-thin {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 5px 0;
+}
+
+.rcpt-thank-you {
+    display: block;
+    font-size: 18pt;
+    font-weight: 900;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 1px;
+}
+.rcpt-promo {
+    display: block;
+    font-size: 11pt;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px 0;
+}
+.rcpt-copyright {
+    display: block;
+    font-size: 10pt;
+    font-weight: 400;
+    text-align: center;
+    padding: 2px 0;
+    font-style: italic;
+}
+
+/* ── Bottom row ── */
+.rcpt-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+    margin-top: 0;
+}
+.rcpt-bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: flex-start;
+}
+.rcpt-order-id {
+    display: block;
+    font-size: 12pt;
+    font-weight: 900;
+}
+.rcpt-date {
+    display: block;
+    font-size: 12pt;
+    font-weight: 400;
+}
+
+.rcpt-barcode-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+#rcptBarcodeSvg {
+    display: block;
+    width: 220px;
+    height: 60px;
+}
+.rcpt-barcode-text {
+    display: block;
+    font-size: 10pt;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* ============================================================
+   THERMAL RECEIPT — MASTER PRINT ENGINE (USER DESIGN)
+   ============================================================ */
+#thermalReceipt {
+    display: none; /* Hidden on screen by default */
+    background: #ffffff;
+    width: 600px;
+    padding: 28px 32px 28px 32px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13.5pt;
+    color: #000000;
+    line-height: 1.45;
+    margin: 0 auto;
+}
+
+/* ── Header ── */
+.rcpt-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.rcpt-shop-name {
+    display: block;
+    font-size: 20pt;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+}
+.rcpt-address {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    margin-top: 1px;
+}
+.rcpt-phone {
+    display: block;
+    font-size: 13pt;
+    font-weight: 700;
+}
+
+/* ── Info lines ── */
+.rcpt-info {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+.rcpt-info-line {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.rcpt-info-line b {
+    font-weight: 900;
+}
+
+/* ── Table ── */
+.rcpt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+.rcpt-table thead tr th {
+    font-size: 13.5pt;
+    font-weight: 900;
+    padding: 5px 4px 5px 4px;
+    border-top: 2.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    text-align: left;
+    text-transform: uppercase;
+}
+.rcpt-table tbody tr td {
+    font-size: 13pt;
+    font-weight: 400;
+    padding: 5px 4px;
+}
+
+.col-prod  { text-align: left;   width: auto; }
+.col-qty   { text-align: center; width: 70px; }
+.col-price { text-align: right;  width: 100px; }
+.col-amt   { text-align: right;  width: 100px; }
+
+/* ── Totals ── */
+.rcpt-totals {
+    border-top: 1.5px solid #000;
+    padding-top: 4px;
+    margin-top: 2px;
+}
+.rcpt-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13pt;
+    font-weight: 900;
+    line-height: 1.75;
+}
+
+/* ── Footer ── */
+.rcpt-footer {
+    text-align: center;
+    margin-top: 0;
+}
+
+hr.rcpt-hr-thick {
+    border: none;
+    border-top: 2.5px solid #000;
+    margin: 7px 0;
+}
+hr.rcpt-hr-thin {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 5px 0;
+}
+
+.rcpt-thank-you {
+    display: block;
+    font-size: 18pt;
+    font-weight: 900;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 1px;
+}
+.rcpt-promo {
+    display: block;
+    font-size: 11pt;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px 0;
+}
+.rcpt-copyright {
+    display: block;
+    font-size: 10pt;
+    font-weight: 400;
+    text-align: center;
+    padding: 2px 0;
+    font-style: italic;
+}
+
+/* ── Bottom row ── */
+.rcpt-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+    margin-top: 0;
+}
+.rcpt-bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: flex-start;
+}
+.rcpt-order-id {
+    display: block;
+    font-size: 12pt;
+    font-weight: 900;
+}
+.rcpt-date {
+    display: block;
+    font-size: 12pt;
+    font-weight: 400;
+}
+
+.rcpt-barcode-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+#rcptBarcodeSvg {
+    display: block;
+    width: 220px;
+    height: 60px;
+}
+.rcpt-barcode-text {
+    display: block;
+    font-size: 10pt;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* ============================================================
+   PRINT STYLES
    ============================================================ */
 @media print {
-    /* Page: no margins, auto height to fit content exactly */
     @page {
         size: 80mm auto;
         margin: 0;
     }
 
-    /* Reset everything */
     html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 80mm !important;
+        height: auto !important;
+        overflow: visible !important;
         background: white !important;
-        color: #000 !important;
+        color: black !important;
     }
 
-    /* Hide ALL screen UI */
-    .sidebar, nav, .top-row, .top-bar,
-    .pos-container-v2, .modal-overlay,
-    .navbar, #toast-container, .no-print,
-    .page > header, .page > .sidebar,
-    .page, main article, .content {
+    body * {
+        visibility: hidden !important;
+    }
+
+    #thermalReceipt,
+    #thermalReceipt * {
+        visibility: visible !important;
+        display: block !important;
+        background: transparent !important;
+    }
+
+    /* Target the thermal receipt container for proper positioning and styling */
+    #thermalReceipt {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 80mm !important;
+        padding: 4mm 5mm !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        box-shadow: none !important;
+        border: none !important;
+        z-index: 99999 !important;
+        background: #fff !important;
+        color: #000 !important;
+        font-family: 'Courier New', Courier, monospace !important;
+        font-size: 14pt !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Hide non-ancestor containers */
+    nav, aside, header, footer,
+    .sidebar, .top-bar, .product-canvas, 
+    .modal-overlay, .quick-actions-v2,
+    .btn-pay-v2, #toast-container, .no-print {
         display: none !important;
     }
 
-    /* Reset layout wrappers so they don't add space */
-    body > *, #app, .page, main, article,
-    .blazor-error-boundary {
-        margin: 0 !important;
-        padding: 0 !important;
-        min-height: 0 !important;
-        height: auto !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        overflow: visible !important;
-    }
-    #thermalReceipt {
+    /* Ensure specific parent wrappers DO NOT have display: none */
+    .pos-container-v2, .checkout-center, 
+    .sale-layout-container, .sale-main-wrapper, 
+    .main-content, .customer-selector-v2 {
         display: block !important;
         visibility: visible !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 76mm !important;
-        background: #fff !important;
-        color: #000 !important;
-        padding: 4mm 2mm 2mm 2mm !important;
-        margin: 0 !important;
-        box-sizing: border-box !important;
-        font-family: 'Courier New', Courier, monospace !important;
-        font-size: 12pt !important;
-        line-height: 1.1 !important;
-    }
-
-    /* HEADER */
-    .rcpt-header {
-        text-align: center !important;
-        margin: 0 0 2px 0 !important;
-    }
-
-    .rcpt-shop-name {
-        font-size: 18pt !important;
-        font-weight: 900 !important;
-        letter-spacing: 1px !important;
-        margin: 0 !important;
-    }
-
-    .rcpt-address,
-    .rcpt-phone {
-        font-size: 11pt !important;
-        font-weight: 700 !important;
-        margin-top: -2px !important;
-    }
-
-    /* INFO */
-    .rcpt-info {
-        margin: 2px 0 0 0 !important;
-    }
-
-    .rcpt-info-line {
-        font-size: 11pt !important;
-        font-weight: 900 !important;
-    }
-
-    /* TABLE */
-    .rcpt-table {
         width: 100% !important;
-        border-collapse: collapse !important;
-        margin-top: 3px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
     }
 
-        .rcpt-table thead th {
-            font-size: 11pt !important;
-            font-weight: 900 !important;
-            padding: 2px !important;
-            border-top: 2px solid #000 !important;
-            border-bottom: 2px solid #000 !important;
-            text-align: left !important;
-        }
+    .rcpt-shop-name  { font-size: 22pt !important; }
+    .rcpt-address,
+    .rcpt-phone      { font-size: 13pt !important; }
+    .rcpt-info-line  { font-size: 13pt !important; }
 
-        .rcpt-table tbody td {
-            font-size: 11pt !important;
-            font-weight: 800 !important;
-            padding: 1px 2px !important;
-        }
+    .rcpt-table thead tr th { font-size: 13pt !important; padding: 5px 3px !important; }
+    .rcpt-table tbody tr td { font-size: 13pt !important; padding: 4px 3px !important; }
+    .rcpt-total-line         { font-size: 13pt !important; line-height: 1.7 !important; }
 
-    .col-prod {
-        text-align: left !important;
-    }
-
-    .col-qty {
-        text-align: center !important;
-        width: 28px !important;
-    }
-
-    .col-price {
-        text-align: right !important;
-        width: 54px !important;
-    }
-
-    .col-amt {
-        text-align: right !important;
-        width: 54px !important;
-    }
-
-    /* TOTALS */
-    .rcpt-totals {
-        border-top: 2px solid #000 !important;
-        margin-top: 2px !important;
-        padding-top: 2px !important;
-    }
-
-    .rcpt-total-line {
-        display: flex !important;
-        justify-content: space-between !important;
-        font-size: 11pt !important;
-        font-weight: 900 !important;
-        line-height: 1.2 !important;
-    }
-
-    /* FOOTER */
-    .rcpt-footer {
-        text-align: center !important;
-    }
-
-    .rcpt-hr-thick {
-        border-top: 2px solid #000 !important;
-        margin: 3px 0 !important;
-    }
-
-    .rcpt-hr-thin {
-        border-top: 1px solid #000 !important;
-        margin: 2px 0 !important;
-    }
-
-    .rcpt-thank-you {
-        font-size: 15pt !important;
-        font-weight: 900 !important;
-        letter-spacing: 1px !important;
-    }
-
-    .rcpt-promo {
-        font-size: 9pt !important;
-        font-weight: 800 !important;
-        text-align: center !important;
-        white-space: nowrap !important;
-    }
-
-    .rcpt-copyright {
-        font-size: 8pt !important;
-        font-weight: 700 !important;
-    }
-
-    /* BOTTOM */
-    .rcpt-bottom {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        border-top: 1px solid #000 !important;
-        margin-top: 2px !important;
-        padding-top: 2px !important;
-    }
-
-    .rcpt-order-id {
-        font-size: 11pt !important;
-        font-weight: 900 !important;
-    }
-
-    .rcpt-date {
-        font-size: 11pt !important;
-        font-weight: 700 !important;
-    }
-
-    .rcpt-barcode-wrap {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-    }
+    .rcpt-thank-you  { font-size: 20pt !important; }
+    .rcpt-promo      { font-size: 11pt !important; }
+    .rcpt-copyright  { font-size: 10pt !important; }
+    .rcpt-order-id   { font-size: 12pt !important; }
+    .rcpt-date       { font-size: 11pt !important; }
+    .rcpt-barcode-text { font-size: 10pt !important; }
 
     #rcptBarcodeSvg {
-        width: 140px !important;
-        height: 50px !important;
-    }
-
-    .rcpt-barcode-text {
-        font-size: 9pt !important;
-        font-weight: 700 !important;
+        width: 180px !important;
+        height: 55px !important;
     }
 }

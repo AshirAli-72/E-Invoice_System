@@ -83,6 +83,9 @@ namespace E_Invoice_system.Data
             modelBuilder.Entity<Sale>().HasIndex(s => s.billNo);
             modelBuilder.Entity<Sale>().HasIndex(s => s.date);
             modelBuilder.Entity<Sale>().HasIndex(s => s.total_price);
+
+            modelBuilder.Entity<ReturnDetail>().HasIndex(r => r.Date);
+            modelBuilder.Entity<ReturnDetail>().HasIndex(r => r.billNo);
         }
     }
 }

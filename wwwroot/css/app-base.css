@@ -356,29 +356,58 @@
     cursor: pointer;
 }
 
-.btn-primary, .btn-secondary, .btn-confirm-web, .btn-pay-v2 {
+.btn-primary, .btn-secondary, .btn-confirm-web, .btn-pay-v2, .btn-icon-sm, .btn-delete, .btn-edit {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
-.btn-primary:hover, .btn-confirm-web:hover:not(:disabled) {
+.btn-primary:hover, .btn-confirm-web:hover:not(:disabled), .btn-delete:hover:not(:disabled), .btn-edit:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     filter: brightness(1.05);
 }
 
-.btn-primary:active, .btn-confirm-web:active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
+.btn-primary:active, .btn-confirm-web:active:not(:disabled), .btn-delete:active, .btn-edit:active {
+    transform: translateY(0) scale(0.96);
     filter: brightness(0.95);
 }
 
-.btn-primary:disabled, .btn-confirm-web:disabled {
+.btn-primary:disabled, .btn-confirm-web:disabled, .processing {
     opacity: 0.6;
     cursor: not-allowed;
     filter: grayscale(0.5);
     transform: none !important;
+    pointer-events: none;
+}
+
+/* Processing spinner for buttons */
+.processing::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: calc(50% - 8px);
+    left: calc(50% - 8px);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.main-content {
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.main-content.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .form-icon-primary {

@@ -49,14 +49,82 @@ const NavProgress = (() => {
 })();
 
 // ─── Prefetch Cache ────────────────────────────────────────────────────────────
-const prefetched = new Set();
-function prefetchPage(url) {
+const prefetched = new Map();
+async function prefetchPage(url) {
     if (prefetched.has(url)) return;
-    prefetched.add(url);
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = url;
-    document.head.appendChild(link);
+    prefetched.set(url, null); // Mark as pending
+    try {
+        const res = await fetch(url, { priority: 'low' });
+        if (res.ok) prefetched.set(url, await res.text());
+    } catch { prefetched.delete(url); }
+}
+
+// ─── Fast Navigation (SPA Feel) ─────────────────────────────────────────────
+async function fastNavigate(url, pushState = true) {
+    if (!url || url.startsWith('#') || url.includes('/Account/Logout')) return false;
+
+    NavProgress.start();
+    try {
+        let html;
+        if (typeof prefetched === 'object' && prefetched instanceof Map && prefetched.has(url)) {
+            html = prefetched.get(url);
+        } else {
+            const res = await fetch(url);
+            if (!res.ok) { window.location.href = url; return; }
+            html = await res.text();
+        }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newMain = doc.querySelector('.main-content');
+        const oldMain = document.querySelector('.main-content');
+
+        if (newMain && oldMain) {
+            if (pushState) window.history.pushState({}, '', url);
+            
+            // OPTIMIZED: Delay 'loading' dimming to avoid flicker on fast pages
+            let showLoading = true;
+            const loadingTimer = setTimeout(() => { if (showLoading) oldMain.classList.add('loading'); }, 150);
+
+            setTimeout(() => {
+                showLoading = false; // Page is ready, don't show dimming if not already shown
+                clearTimeout(loadingTimer);
+
+                // Swap Title
+                document.title = doc.title;
+
+                // Swap Main Content
+                oldMain.innerHTML = newMain.innerHTML;
+
+                // Extract and execute scripts
+                const scripts = oldMain.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+
+                // Re-run animations and UI logic
+                requestAnimationFrame(() => {
+                    oldMain.classList.remove('loading');
+                    animatePageEntry();
+                    updateActiveNav(window.location.pathname);
+                    setupNavLinks(); 
+                    
+                    // Dispatch a custom event for pages that need to know navigation happened
+                    window.dispatchEvent(new CustomEvent('fastnav:success', { detail: { url } }));
+                    
+                    NavProgress.finish();
+                });
+            }, 50); // Keep minor delay for innerHTML swap consistency
+            return true;
+        }
+    } catch (err) {
+        console.error('Fast Navigation Error:', err);
+        window.location.href = url; // Fallback to full load
+    }
+    return false;
 }
 
 // ─── Active Nav ────────────────────────────────────────────────────────────────
@@ -82,27 +150,30 @@ function updateActiveNav(urlPath) {
 
 // ─── Sidebar Nav: Prefetch on hover + instant active + progress bar ────────────
 function setupNavLinks() {
-    const sidebarNav = document.querySelector('.sidebar-nav');
-    if (!sidebarNav) return;
+    // Select all internal links that aren't logout or external
+    const allLinks = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="http"]):not([href^="javascript"]):not([href^="#"]):not([href*="/Account/Logout"])');
 
-    sidebarNav.querySelectorAll('a.nav-item').forEach(link => {
+    allLinks.forEach(link => {
         const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+        if (!href) return;
 
-        // Prefetch on hover
+        // Prefetch on hover (using our new fetch-based prefetch)
         link.addEventListener('mouseenter', () => prefetchPage(href), { passive: true });
 
-        // Instant feedback on click
+        // Fast Navigate on click
         link.addEventListener('click', (e) => {
-            // Don't intercept if modifier key is held
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            
+            // Instantly update active state in sidebar
+            const sidebarNav = document.querySelector('.sidebar-nav');
+            if (sidebarNav) {
+                sidebarNav.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const navItem = link.closest('.nav-item');
+                if (navItem) navItem.classList.add('active');
+            }
 
-            // Instantly update active state
-            sidebarNav.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            link.classList.add('active');
-
-            // Start progress bar
-            NavProgress.start();
+            fastNavigate(href);
 
             // Close sidebar on mobile
             const sb = document.querySelector('.sidebar');
@@ -115,14 +186,14 @@ function setupNavLinks() {
 function animatePageEntry() {
     const main = document.querySelector('.main-content');
     if (!main) return;
-    main.style.opacity = '0';
-    main.style.transform = 'translateY(8px)';
-    main.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+    
+    // Smoothly lift and fade in from the .loading state
+    main.style.transform = 'translateY(6px)';
+    main.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    
     requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            main.style.opacity = '1';
-            main.style.transform = 'translateY(0)';
-        });
+        main.style.opacity = '1';
+        main.style.transform = 'translateY(0)';
     });
 }
 
@@ -146,6 +217,46 @@ document.addEventListener('click', (e) => {
     }
     if (window.innerWidth <= 768 && sb && sb.classList.contains('open')) {
         if (!sb.contains(e.target) && !e.target.closest('#sidebarToggle')) sb.classList.remove('open');
+    }
+});
+
+// ─── Form Interception (Fast Delete/Actions) ──────────────────────────────────
+document.addEventListener('submit', async (e) => {
+    const form = e.target;
+    const btn = e.submitter || form.querySelector('button[type="submit"]');
+
+    // Only intercept internal POST forms that aren't logout or external
+    if (form.method.toLowerCase() !== 'post' || form.action.includes('/Account/Logout') || form.getAttribute('data-turbo') === 'false') return;
+
+    e.preventDefault();
+    if (btn) btn.classList.add('processing');
+
+    // Show progress bar
+    NavProgress.start();
+    
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(form.action || window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '' }
+        });
+
+        if (response.ok) {
+            // Success! Refresh the current page content
+            await fastNavigate(window.location.pathname + window.location.search, false);
+            showToast('Success', 'Action completed successfully.', 'success');
+        } else {
+            // If failed (e.g. validation error), fallback
+            if (btn) btn.classList.remove('processing');
+            form.submit();
+        }
+    } catch (err) {
+        console.error('Form Submission Error:', err);
+        if (btn) btn.classList.remove('processing');
+        form.submit(); 
+    } finally {
+        NavProgress.finish();
     }
 });
 
@@ -188,14 +299,15 @@ window.addEventListener('offline', () => { document.body.classList.add('was-offl
 
 // ─── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-    NavProgress.finish();          // finish any leftover bar from previous page
+    NavProgress.finish();
     updateActiveNav(window.location.pathname);
     setupNavLinks();
     animatePageEntry();
     updateOnlineStatus();
 
-    // Success toast from server TempData (called from _Layout inline script)
-    // (kept as global so _Layout can call it)
+    window.addEventListener('popstate', () => {
+        fastNavigate(window.location.pathname, false);
+    });
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/js/sw.js', { scope: '/' })

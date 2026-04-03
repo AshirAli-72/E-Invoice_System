@@ -282,8 +282,8 @@
                     </p>
                     <div style="display:flex;gap:16px;">
                         <button type="button" class="btn-confirm-web cancel" style="flex:1;" @onclick="() => showPaymentModal = false">Cancel</button>
-                        <button type="button" class="btn-confirm-web confirm" style="flex:1;" @onclick="SubmitSale" disabled="@isSubmitting">
-                            @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> } else { @("Complete Order") } <i class="ph-check-circle"></i>
+                        <button type="button" class="btn-confirm-web confirm @(isSubmitting ? "processing" : "")" style="flex:1;" @onclick="SubmitSale" disabled="@isSubmitting">
+                            @if (!isSubmitting) { <span>Complete Order</span> <i class="ph-check-circle"></i> }
                         </button>
                     </div>
                 </div>
@@ -346,12 +346,13 @@
     </div>
 }
 
-<!-- THERMAL RECEIPT -->
+<!-- THERMAL RECEIPT (DESIGN REFRESH) -->
 <div id="thermalReceipt">
+
     <div class="rcpt-header">
-        <div class="rcpt-shop-name">THE SATA POS</div>
-        <div class="rcpt-address">Address</div>
-        <div class="rcpt-phone">0313-3879645</div>
+        <div class="rcpt-shop-name">@(currentSeller?.name ?? "THE SATA POS")</div>
+        <div class="rcpt-address">@(currentSeller?.address ?? "Address")</div>
+        <div class="rcpt-phone">@(currentSeller?.contact ?? "0313-3879645")</div>
     </div>
 
     <div class="rcpt-info">
@@ -390,13 +391,13 @@
     </div>
 
     <div class="rcpt-footer">
-        <div class="rcpt-hr-thick"></div>
+        <hr class="rcpt-hr-thick">
         <div class="rcpt-thank-you">THANK YOU!</div>
-        <div class="rcpt-hr-thick"></div>
+        <hr class="rcpt-hr-thick">
         <div class="rcpt-promo">*** Refer a Friend To Smoke Drop &amp; Get 5% off. ***</div>
-        <div class="rcpt-hr-thin"></div>
+        <hr class="rcpt-hr-thin">
         <div class="rcpt-copyright">Copyrights 2023, Powered by The SATA POS</div>
-        <div class="rcpt-hr-thin"></div>
+        <hr class="rcpt-hr-thin">
     </div>
 
     <div class="rcpt-bottom">
@@ -409,6 +410,7 @@
             <div class="rcpt-barcode-text">@orderBillNo</div>
         </div>
     </div>
+
 </div>
 
 
@@ -430,25 +432,31 @@
     private bool showAddCustomerModal = false;
     private string paymentMethod = "Cash";
     private decimal? tenderedAmount = null;
-    private string notes = "";
+    private string notes = "";  
     private bool shouldPrintReceipt = true;
     private string? stockAlert;
     private bool isSubmitting = false;
     private string orderBillNo = "";
     private customers newCustomer = new customers { status = "Active" };
+    private Sellers? currentSeller;
 
     [Parameter] public string? UserEmail { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        // ✅ Optimization: AsNoTracking and Limit for initial load
-        var prods = await DbContext.products_services
+        // OPTIMIZED: Fetch only required columns and reduce initial count for speed
+        var prodsData = await DbContext.products_services
             .AsNoTracking()
             .Where(p => p.status == "Available")
-            .Take(200) // Don't load everything at once if it's huge
+            .Select(p => new { 
+                p.id, p.prod_name_service, p.price, p.discount, 
+                p.expiry_date, p.qty_unit_type, p.image, p.barcode 
+            })
+            .OrderByDescending(p => p.id) // Get newest items first
+            .Take(50) 
             .ToListAsync();
 
-        allProducts = prods.Select(p => {
+        allProducts = prodsData.Select(p => {
             decimal stock = 999999;
             bool isSvc = true;
             if (!string.IsNullOrEmpty(p.qty_unit_type)) {
@@ -468,13 +476,15 @@
         
         filteredProducts = allProducts;
 
-        // ✅ Optimization: Limit initial customer list
+       
         allCustomersList = await DbContext.customers
             .AsNoTracking()
             .OrderBy(c => c.name)
             .Take(50) 
             .ToListAsync();
         filteredCustomersList = allCustomersList;
+
+        currentSeller = await DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
     }
 
     private void FilterByCategory(string cat)
@@ -629,38 +639,42 @@
 
         isSubmitting = true;
         try {
-                    var prefix = transMode == "return" ? "RETURN_" : "SALE_";
-                    
-                    List<string> maxBillNoList;
-                    if (transMode == "return") {
-                        maxBillNoList = await DbContext.returns
-                            .Where(r => r.billNo != null && r.billNo.StartsWith(prefix))
-                            .Select(r => r.billNo!)
-                            .ToListAsync();
-                    } else {
-                        maxBillNoList = await DbContext.sales
-                            .Where(s => s.billNo != null && s.billNo.StartsWith(prefix))
-                            .Select(s => s.billNo!)
-                            .ToListAsync();
-                    }
+            int nextIdNum = 1;
+            var prefix = transMode == "return" ? "RETURN_" : "SALE_";
+            
+            // OPTIMIZED: Fetch ONLY the most recent bill number instead of the entire list
+            string? lastBillNo = null;
+            if (transMode == "return") {
+                lastBillNo = await DbContext.returns
+                    .Where(r => r.billNo != null && r.billNo.StartsWith(prefix))
+                    .OrderByDescending(r => r.Id)
+                    .Select(r => r.billNo)
+                    .FirstOrDefaultAsync();
+            } else {
+                lastBillNo = await DbContext.sales
+                    .Where(s => s.billNo != null && s.billNo.StartsWith(prefix))
+                    .OrderByDescending(s => s.id)
+                    .Select(s => s.billNo)
+                    .FirstOrDefaultAsync();
+            }
 
-                    int nextIdNum = 1;
-                    if (maxBillNoList.Any())
-                    {
-                        nextIdNum = maxBillNoList
-                            .Select(b => {
-                                var parts = b.Split(new[] { '_', '-' });
-                                return parts.Length > 1 && int.TryParse(parts[1], out int n) ? n : 0;
-                            })
-                            .Max() + 1;
-                    }
-                    orderBillNo = $"{prefix}{nextIdNum}";
+            if (!string.IsNullOrEmpty(lastBillNo)) {
+                var parts = lastBillNo.Split(new[] { '_', '-' });
+                if (parts.Length > 1 && int.TryParse(parts[1], out int n)) nextIdNum = n + 1;
+            }
+            orderBillNo = $"{prefix}{nextIdNum}";
 
             
            
             string customerInfo = selectedCustomer != null ? $" [Customer: {selectedCustomer.name}]" : " [Walk-In]";
             string saleDescription = ((notes ?? "") + customerInfo);
             if (saleDescription.Length > 200) saleDescription = saleDescription.Substring(0, 200);
+
+            // OPTIMIZED: Batch fetch all products in the sale at once instead of N times in loop
+            var productNames = saleItems.Select(i => i.prod_name_service).Distinct().ToList();
+            var productsToUpdate = await DbContext.products_services
+                .Where(p => productNames.Contains(p.prod_name_service))
+                .ToListAsync();
 
             foreach (var item in saleItems) {
                 if (transMode == "return") {
@@ -695,9 +709,9 @@
                     DbContext.sales.Add(sale);
                 }
                 
-              
+                // OPTIMIZED: Use cached product lookup
                 try {
-                    var prod = await DbContext.products_services.FirstOrDefaultAsync(p => p.prod_name_service == item.prod_name_service);
+                    var prod = productsToUpdate.FirstOrDefault(p => p.prod_name_service == item.prod_name_service);
                     if (prod != null) {
                         var m = Regex.Match(prod.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
                         if (m.Success && decimal.TryParse(m.Groups[1].Value, out decimal currentStock)) {
@@ -710,14 +724,13 @@
                         }
                     }
                 } catch (Exception ex) { 
-                    Console.WriteLine("Stock Update Minor Error: " + ex.Message); 
+                    Console.WriteLine("Stock Update Error: " + ex.Message); 
                 }
             }
 
             await DbContext.SaveChangesAsync();
             
             if (shouldPrintReceipt) {
-                await Task.Delay(300);
                 try {
                     if (transMode != "return") {
                         await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", orderBillNo);
