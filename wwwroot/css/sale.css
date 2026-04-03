@@ -2014,83 +2014,73 @@ hr.rcpt-hr-thin {
         margin: 0;
     }
 
-    html, body {
+    /* 1. Force Page Height to Auto (Fixes 'Two Pages' issue) */
+    html, body, .main-content, .pos-container-v2, .checkout-center, 
+    .checkout-form, .sale-layout-container, .sale-main-wrapper {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: auto !important;
-        overflow: visible !important;
         background: white !important;
         color: black !important;
     }
 
+    /* 2. Global Visibility Hide */
     body * {
         visibility: hidden !important;
     }
 
-    #thermalReceipt,
-    #thermalReceipt * {
+    /* 3. Explicitly Hide non-receipt related UI containers */
+    nav, aside, header, footer,
+    .sidebar, .top-bar, .product-canvas, .modal-overlay,
+    .customer-selector-v2, .quick-actions-v2, .btn-pay-v2, 
+    .no-print, #toast-container {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 4. Restore the Receipt and its contents */
+    #thermalReceipt, #thermalReceipt * {
         visibility: visible !important;
         display: block !important;
         background: transparent !important;
+        position: static !important; /* Fixes alignment shift */
     }
 
-    /* Target the thermal receipt container for proper positioning and styling */
     #thermalReceipt {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
+        display: block !important;
         width: 80mm !important;
         padding: 4mm 5mm !important;
-        display: block !important;
+        margin: 0 !important;
         box-sizing: border-box !important;
-        box-shadow: none !important;
-        border: none !important;
-        z-index: 99999 !important;
         background: #fff !important;
         color: #000 !important;
         font-family: 'Courier New', Courier, monospace !important;
         font-size: 14pt !important;
         line-height: 1.4 !important;
-    }
-
-    /* Hide non-ancestor containers */
-    nav, aside, header, footer,
-    .sidebar, .top-bar, .product-canvas, 
-    .modal-overlay, .quick-actions-v2,
-    .btn-pay-v2, #toast-container, .no-print {
-        display: none !important;
-    }
-
-    /* Ensure specific parent wrappers DO NOT have display: none */
-    .pos-container-v2, .checkout-center, 
-    .sale-layout-container, .sale-main-wrapper, 
-    .main-content, .customer-selector-v2 {
-        display: block !important;
-        visibility: visible !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
         border: none !important;
+        box-shadow: none !important;
     }
 
-    .rcpt-shop-name  { font-size: 22pt !important; }
-    .rcpt-address,
-    .rcpt-phone      { font-size: 13pt !important; }
-    .rcpt-info-line  { font-size: 13pt !important; }
+    /* Table Fixes */
+    .rcpt-table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
+    .rcpt-table tr { display: table-row !important; }
+    .rcpt-table th, .rcpt-table td { display: table-cell !important; padding: 4px !important; }
+    .rcpt-total-line { display: flex !important; justify-content: space-between !important; }
 
-    .rcpt-table thead tr th { font-size: 13pt !important; padding: 5px 3px !important; }
-    .rcpt-table tbody tr td { font-size: 13pt !important; padding: 4px 3px !important; }
-    .rcpt-total-line         { font-size: 13pt !important; line-height: 1.7 !important; }
-
-    .rcpt-thank-you  { font-size: 20pt !important; }
-    .rcpt-promo      { font-size: 11pt !important; }
-    .rcpt-copyright  { font-size: 10pt !important; }
-    .rcpt-order-id   { font-size: 12pt !important; }
-    .rcpt-date       { font-size: 11pt !important; }
-    .rcpt-barcode-text { font-size: 10pt !important; }
-
+    /* Typography */
+    .rcpt-shop-name  { font-size: 22pt !important; font-weight: 900 !important; text-align: center !important; }
+    .rcpt-address, .rcpt-phone { font-size: 13pt !important; font-weight: 700 !important; text-align: center !important; }
+    .rcpt-thank-you  { font-size: 20pt !important; font-weight: 900 !important; text-align: center !important; margin: 5px 0 !important; }
+    
     #rcptBarcodeSvg {
         width: 180px !important;
         height: 55px !important;
+        margin: 5px auto !important;
+        display: block !important;
     }
 }
