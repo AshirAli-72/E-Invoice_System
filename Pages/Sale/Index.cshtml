@@ -10,20 +10,23 @@
             <div class="card-title" style="margin: 0;">Transaction Ledger</div>
             <p class="text-muted font-sm">A complete record of all sales transactions.</p>
         </div>
-        <a asp-page="./Create" class="btn-primary">
-            <i class="ph-plus-circle"></i> New Sale
-        </a>
+            <a asp-page="./Create" class="btn-primary">
+                <i class="ph-plus-circle"></i> New Sale
+            </a>
     </div>
+
 
     <!-- Toggle Buttons -->
     <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
-        <div class="index-toggle-pill">
-            <button id="btnShowSales" type="button" class="toggle-btn active" onclick="switchTable('sales')">
-                <i class="ph-shopping-bag"></i> Sales
-            </button>
-            <button id="btnShowReturns" type="button" class="toggle-btn" onclick="switchTable('returns')">
-                <i class="ph-arrow-counter-clockwise"></i>  Returns
-            </button>
+        <div class="index-header-row">
+            <div class="index-toggle-pill">
+                <button id="btnShowSales" type="button" class="toggle-btn active" onclick="switchTable('sales')">
+                    <i class="ph-shopping-bag"></i> Sales
+                </button>
+                <button id="btnShowReturns" type="button" class="toggle-btn" onclick="switchTable('returns')">
+                    <i class="ph-arrow-counter-clockwise"></i>  Returns
+                </button>
+            </div>
         </div>
     </div>
     
@@ -170,6 +173,43 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="pagination-footer">
+            <div class="pagination-info">
+                Showing <span>@((Model.PageNumber - 1) * Model.PageSize + 1)</span> to <span>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount))</span> of <span>@Model.TotalCount</span>
+            </div>
+            <div class="pagination-controls">
+                @if (Model.PageNumber > 1)
+                {
+                    <a asp-page="./Index" asp-route-PageNumber="@(Model.PageNumber - 1)" asp-route-SearchTerm="@Model.SearchTerm" class="page-link-btn">
+                        <i class="ph-caret-left"></i> Previous
+                    </a>
+                }
+                else
+                {
+                    <button class="page-link-btn disabled" disabled><i class="ph-caret-left"></i> Previous</button>
+                }
+
+                <div class="page-number-indicator">
+                    Page @Model.PageNumber of @Model.TotalPages
+                </div>
+
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <a asp-page="./Index" asp-route-PageNumber="@(Model.PageNumber + 1)" asp-route-SearchTerm="@Model.SearchTerm" class="page-link-btn">
+                        Next <i class="ph-caret-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <button class="page-link-btn disabled" disabled>Next <i class="ph-caret-right"></i></button>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 <style>
@@ -179,6 +219,165 @@
         padding: 4px;
         border-radius: 12px;
         width: fit-content;
+    }
+
+    .index-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    /* Search Styles */
+    .search-form-container {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        background: #ffffff;
+        padding: 0.75rem;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 12px 10px 42px;
+        border-radius: 10px;
+        border: 1px solid #f1f5f9;
+        background: #f8fafc;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    .search-input:focus {
+        background: #ffffff;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .btn-search {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.1s;
+    }
+
+    .btn-search:active { transform: scale(0.98); }
+
+    .btn-clear-all {
+        border: 1px solid #ef4444;
+        background: transparent;
+        color: #ef4444;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-clear-all:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-clear {
+        color: #ef4444;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px;
+    }
+
+    /* Pagination Styles */
+    .pagination-footer {
+        padding: 1.25rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .pagination-info span {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-link-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        color: #1e293b;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .page-link-btn:hover:not(.disabled) {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #f0f9ff;
+    }
+
+    .page-link-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-number-indicator {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
     }
 
     .toggle-btn {
@@ -214,6 +413,27 @@
             flex-direction: column;
             align-items: stretch !important;
             gap: 1.5rem;
+        }
+
+        .search-form-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-search {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pagination-footer {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .index-header-row {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .index-toggle-pill {

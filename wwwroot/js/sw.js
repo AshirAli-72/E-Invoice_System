@@ -88,3 +88,50 @@ self.addEventListener('fetch', event => {
         );
     }
 });
+
+<aside class="sidebar">
+    <div class="sidebar-header sidebar-logo-container">
+        <img src="/images/sata-logo.png" alt="SATA" class="sidebar-logo" />
+        <button id="sidebarClose" class="mobile-only mobile-close-btn">
+            <i class="ph-x"></i>
+        </button>
+    </div>
+    <nav class="sidebar-nav">
+
+        <a href="/" class="nav-item">
+            <i class="ph-house nav-icon"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/customer" class="nav-item">
+            <i class="ph-users nav-icon"></i>
+            <span>Customers</span>
+        </a>
+
+        <a href="/product" class="nav-item">
+            <i class="ph-package nav-icon"></i>
+            <span>Products/Services</span>
+        </a>
+
+        <a href="/sale" class="nav-item">
+            <i class="ph-shopping-cart nav-icon"></i>
+            <span>Sales</span>
+        </a>
+
+        <a href="/invoice" class="nav-item">
+            <i class="ph-file-text nav-icon"></i>
+            <span>Invoices</span>
+        </a>
+
+        <a href="/invoice/create" class="nav-item">
+            <i class="ph-file-plus nav-icon"></i>
+            <span>Create Invoice</span>
+        </a>
+
+        <a href="/seller" class="nav-item">
+            <i class="ph-storefront nav-icon"></i>
+            <span>Seller Profile</span>
+        </a>
+
+    </nav>
+</aside>
