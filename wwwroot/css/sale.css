@@ -12,9 +12,10 @@
 .pos-container-v2 {
     display: grid;
     grid-template-columns: 1fr 500px;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 80px); /* Adjusted for layout header */
     background: #ffffff;
     overflow: hidden;
+    position: relative;
 }
 
 @media (max-width: 1440px) {
@@ -463,7 +464,7 @@
     height: 100%;
     border-left: 1px solid #f1f5f9;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to avoid clipping the footer */
 }
 
 .customer-selector-v2 {
@@ -1830,17 +1831,14 @@ hr.rcpt-hr-thin {
    ============================================================ */
 @media print {
     @page {
-        size: 80mm auto;
-        margin: 0;
+        size: A4;
+        margin: 15mm;
     }
 
     /* 1. Global Reset */
     html, body {
         margin: 0 !important;
         padding: 0 !important;
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
         background: #fff !important;
     }
 
@@ -1852,8 +1850,6 @@ hr.rcpt-hr-thin {
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: auto !important;
-        width: auto !important;
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
@@ -1868,41 +1864,60 @@ hr.rcpt-hr-thin {
         display: none !important;
     }
 
-    /* 4. Display Receipt Designing */
+    /* 4. Display Receipt Designing (Converted to Simple Page) */
     #thermalReceipt {
         display: block !important;
         visibility: visible !important;
-        width: 80mm !important;
-        max-width: 80mm !important;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 auto !important;
-        padding: 4mm 5mm !important;
+        padding: 5mm !important;
         background: #fff !important;
         color: #000 !important;
-        font-family: 'Courier New', Courier, monospace !important;
-        font-size: 14pt !important;
-        line-height: 1.4 !important;
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
         box-sizing: border-box !important;
         break-inside: avoid !important;
         position: relative !important;
+        border: none !important;
     }
 
     /* Ensure children are visible */
     #thermalReceipt * {
         visibility: visible !important;
-        display: block !important;
     }
 
     /* Correct display for tables */
-    .rcpt-table { display: table !important; width: 100% !important; margin-top: 6px !important; }
+    .rcpt-table { 
+        display: table !important; 
+        width: 100% !important; 
+        margin-top: 20px !important; 
+        border-bottom: 2px solid #000 !important;
+    }
     .rcpt-table tr { display: table-row !important; }
-    .rcpt-table th, .rcpt-table td { display: table-cell !important; padding: 5px 4px !important; }
-    .rcpt-total-line { display: flex !important; justify-content: space-between !important; }
-    .rcpt-bottom { display: flex !important; justify-content: space-between !important; }
+    .rcpt-table th, .rcpt-table td { 
+        display: table-cell !important; 
+        padding: 10px 8px !important; 
+    }
+    
+    .rcpt-total-line { 
+        display: flex !important; 
+        justify-content: space-between !important; 
+        padding: 5px 0 !important;
+    }
+    
+    .rcpt-bottom { 
+        display: flex !important; 
+        justify-content: space-between !important; 
+        margin-top: 30px !important;
+        border-top: 1px solid #eee !important;
+        padding-top: 20px !important;
+    }
 
     #rcptBarcodeSvg {
-        width: 180px !important;
-        height: 55px !important;
+        width: 250px !important;
+        height: 80px !important;
         display: block !important;
-        margin: 0 auto !important;
     }
 }

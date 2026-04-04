@@ -363,10 +363,10 @@
     <table class="rcpt-table">
         <thead>
             <tr>
-                <th class="col-prod">PRODUCT</th>
-                <th class="col-qty">QTY</th>
-                <th class="col-price">PRICE</th>
-                <th class="col-amt">AMOUNT</th>
+                <th class="col-prod" style="text-align: left;">PRODUCT</th>
+                <th class="col-qty" style="text-align: center;">QTY</th>
+                <th class="col-price" style="text-align: right;">PRICE</th>
+                <th class="col-amt" style="text-align: right;">AMOUNT</th>
             </tr>
         </thead>
         <tbody>
@@ -376,7 +376,7 @@
                     <td class="col-prod">@item.prod_name_service</td>
                     <td class="col-qty">@Math.Abs(item.qty_unit_type)</td>
                     <td class="col-price">@item.price.ToString("N0")</td>
-                    <td class="col-amt">@Math.Abs(item.total_price).ToString("N0")</td>
+                    <td class="col-amt">@((item.price * Math.Abs(item.qty_unit_type)).ToString("N0"))</td>
                 </tr>
             }
         </tbody>
@@ -384,8 +384,12 @@
 
     <div class="rcpt-totals">
         <div class="rcpt-total-line"><span>SUB TOTAL</span><span>$@Math.Abs(totalSub).ToString("N0")</span></div>
-        <div class="rcpt-total-line"><span>TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
-        <div class="rcpt-total-line"><span>AMOUNT DUE</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
+        @if (totalDisc != 0)
+        {
+            <div class="rcpt-total-line"><span>DISCOUNT</span><span>-$@Math.Abs(totalDisc).ToString("N0")</span></div>
+        }
+        <hr class="rcpt-hr-thin">
+        <div class="rcpt-total-line"><span>GRAND TOTAL</span><span>$@Math.Abs(currentTotal).ToString("N0")</span></div>
         <div class="rcpt-total-line"><span>CASH SALE</span><span>$@(tenderedAmount?.ToString("N0") ?? Math.Abs(currentTotal).ToString("N0"))</span></div>
         <div class="rcpt-total-line"><span>PAY TYPE</span><span>@paymentMethod</span></div>
     </div>
@@ -402,8 +406,7 @@
 
     <div class="rcpt-bottom">
         <div class="rcpt-bottom-left">
-            <div class="rcpt-order-id">ORDER: @orderBillNo</div>
-            <div class="rcpt-date">@DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
+            <div class="rcpt-date">Generated on @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
         </div>
         <div class="rcpt-barcode-wrap">
             <svg id="rcptBarcodeSvg"></svg>
@@ -444,17 +447,32 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // OPTIMIZED: Fetch only required columns and reduce initial count for speed
-        var prodsData = await DbContext.products_services
+        // Parallel data fetching for maximum speed
+        var prodsTask = DbContext.products_services
             .AsNoTracking()
             .Where(p => p.status == "Available")
             .Select(p => new { 
                 p.id, p.prod_name_service, p.price, p.discount, 
                 p.expiry_date, p.qty_unit_type, p.image, p.barcode 
             })
-            .OrderByDescending(p => p.id) // Get newest items first
+            .OrderByDescending(p => p.id)
             .Take(50) 
             .ToListAsync();
+
+        var custsTask = DbContext.customers
+            .AsNoTracking()
+            .OrderBy(c => c.name)
+            .Take(50) 
+            .ToListAsync();
+
+        var sellerTask = DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
+
+        // Run all queries together
+        await Task.WhenAll(prodsTask, custsTask, sellerTask);
+
+        var prodsData = prodsTask.Result;
+        allCustomersList = custsTask.Result;
+        currentSeller = sellerTask.Result;
 
         allProducts = prodsData.Select(p => {
             decimal stock = 999999;
@@ -475,16 +493,7 @@
         }).ToList();
         
         filteredProducts = allProducts;
-
-       
-        allCustomersList = await DbContext.customers
-            .AsNoTracking()
-            .OrderBy(c => c.name)
-            .Take(50) 
-            .ToListAsync();
         filteredCustomersList = allCustomersList;
-
-        currentSeller = await DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
     }
 
     private void FilterByCategory(string cat)
