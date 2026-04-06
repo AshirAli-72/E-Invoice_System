@@ -55,6 +55,7 @@ const NavProgress = (() => {
 const prefetched = new Map();
 async function prefetchPage(url) {
     if (prefetched.has(url)) return prefetched.get(url);
+    if (!navigator.onLine) return null; // Skip prefetch when offline
     
     // Store the promise itself to handle concurrent requests
     const fetchPromise = (async () => {
@@ -83,9 +84,17 @@ async function fastNavigate(url, pushState = true) {
         }
         
         if (!html) {
-            const res = await fetch(url);
-            if (!res.ok) { window.location.href = url; return; }
-            html = await res.text();
+            // Immediate offline check: if offline and not in memory, let SW handle or fallback
+            if (!navigator.onLine) {
+                // If offline, we still try the fetch because the Service Worker 
+                // will catch it and serve the cache instantly.
+                const res = await fetch(url);
+                if (res.ok) html = await res.text();
+            } else {
+                const res = await fetch(url);
+                if (!res.ok) { window.location.href = url; return; }
+                html = await res.text();
+            }
         }
 
         const parser = new DOMParser();
