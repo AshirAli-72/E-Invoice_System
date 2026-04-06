@@ -55,9 +55,9 @@ namespace E_Invoice_system.Pages.Account
 
                 ModelState.AddModelError(string.Empty, "Invalid email or password.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "An error occurred. Please try again.");
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
             }
             
             return Page();

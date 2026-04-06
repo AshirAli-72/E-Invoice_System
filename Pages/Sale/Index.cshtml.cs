@@ -19,12 +19,22 @@ namespace E_Invoice_system.Pages.Sale
         public IList<SaleDisplayItem> Sales { get; set; } = new List<SaleDisplayItem>();
         public IList<ReturnDetail> Returns { get; set; } = new List<ReturnDetail>();
 
+        // --- Sales Pagination ---
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;
-
         public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
         public int TotalCount { get; set; }
+
+        // --- Returns Pagination ---
+        [BindProperty(SupportsGet = true)]
+        public int ReturnPageNumber { get; set; } = 1;
+        public int ReturnPageSize { get; set; } = 10;
+        public int ReturnTotalPages { get; set; }
+        public int ReturnTotalCount { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string Tab { get; set; } = "sales";
 
         public class SaleDisplayItem
         {
@@ -45,16 +55,15 @@ namespace E_Invoice_system.Pages.Sale
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
+            // ── Sales Pagination ──────────────────────────────────────────────
             IQueryable<E_Invoice_system.Models.Sale> salesQuery = _context.sales.AsNoTracking();
 
             TotalCount = await salesQuery.CountAsync();
             TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            // Ensure PageNumber is within bounds
             if (PageNumber < 1) PageNumber = 1;
             if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
 
-            // Fetch Sales with Projection
             var salesList = await salesQuery
                 .OrderByDescending(s => s.date)
                 .Skip((PageNumber - 1) * PageSize)
@@ -65,7 +74,7 @@ namespace E_Invoice_system.Pages.Sale
                     BillNo = s.billNo,
                     Date = s.date,
                     ProductName = s.prod_name_service,
-                    DisplayQty = s.qty_unit_type ?? "", // We will clean this in memory below if needed, but projecting first is faster
+                    DisplayQty = s.qty_unit_type ?? "",
                     Price = s.price,
                     TotalPrice = s.total_price,
                     PaymentMethod = s.payment_method,
@@ -74,24 +83,28 @@ namespace E_Invoice_system.Pages.Sale
                 })
                 .ToListAsync();
 
-            // Refine DisplayQty in memory (necessary due to Regex)
             foreach (var s in salesList)
-            {
                 s.DisplayQty = Regex.Replace(s.DisplayQty, @"[^0-9.-]", "");
-            }
 
             Sales = salesList.Where(s =>
             {
-                if (decimal.TryParse(s.DisplayQty, out decimal q))
-                    return q > 0;
+                if (decimal.TryParse(s.DisplayQty, out decimal q)) return q > 0;
                 return true;
             }).ToList();
 
-            // Fetch Returns (limited to latest 20 for speed, or could also paginate similarly)
-            Returns = await _context.returns
-                .AsNoTracking()
+            // ── Returns Pagination ────────────────────────────────────────────
+            IQueryable<ReturnDetail> returnsQuery = _context.returns.AsNoTracking();
+
+            ReturnTotalCount = await returnsQuery.CountAsync();
+            ReturnTotalPages = (int)Math.Ceiling(ReturnTotalCount / (double)ReturnPageSize);
+
+            if (ReturnPageNumber < 1) ReturnPageNumber = 1;
+            if (ReturnTotalPages > 0 && ReturnPageNumber > ReturnTotalPages) ReturnPageNumber = ReturnTotalPages;
+
+            Returns = await returnsQuery
                 .OrderByDescending(r => r.Date)
-                .Take(20)
+                .Skip((ReturnPageNumber - 1) * ReturnPageSize)
+                .Take(ReturnPageSize)
                 .ToListAsync();
 
             return Page();
