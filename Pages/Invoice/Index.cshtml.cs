@@ -16,6 +16,13 @@ namespace E_Invoice_system.Pages.Invoice
             _context = context;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        public int PageSize { get; set; } = 20;
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
+
         public IList<InvoiceDisplayItem> Invoices { get; set; } = new List<InvoiceDisplayItem>();
 
         public class InvoiceDisplayItem
@@ -38,10 +45,17 @@ namespace E_Invoice_system.Pages.Invoice
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            var rawInvoices = await _context.invoices
-                .AsNoTracking()
+            IQueryable<invoices> query = _context.invoices.AsNoTracking();
+            TotalCount = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+            
+            if (PageNumber < 1) PageNumber = 1;
+            if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
+
+            var rawInvoices = await query
                 .OrderByDescending(i => i.date)
-                .Take(200)
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
                 .ToListAsync();
 
             Invoices = rawInvoices.Select(item => {

@@ -15,6 +15,13 @@ namespace E_Invoice_system.Pages.Product
             _context = context;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        public int PageSize { get; set; } = 20;
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
+
         public IList<ProductService> Products { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync()
@@ -22,7 +29,18 @@ namespace E_Invoice_system.Pages.Product
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            Products = await _context.products_services.AsNoTracking().OrderBy(p => p.prod_name_service).Take(300).ToListAsync();
+            IQueryable<ProductService> query = _context.products_services.AsNoTracking();
+            TotalCount = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+            
+            if (PageNumber < 1) PageNumber = 1;
+            if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
+
+            Products = await query.OrderBy(p => p.prod_name_service)
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+                
             return Page();
         }
 

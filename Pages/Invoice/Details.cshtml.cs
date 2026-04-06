@@ -53,10 +53,7 @@ namespace E_Invoice_system.Pages.Invoice
                             }
                             
                             // Ensure 'name' key exists to avoid KeyNotFoundException if serialized differently
-                            if (!newItem.ContainsKey("name") && newItem.ContainsKey("Name")) newItem["name"] = newItem["Name"];
-                            if (!newItem.ContainsKey("qty") && newItem.ContainsKey("Qty")) newItem["qty"] = newItem["Qty"];
-                            if (!newItem.ContainsKey("price") && newItem.ContainsKey("Price")) newItem["price"] = newItem["Price"];
-                            if (!newItem.ContainsKey("total") && newItem.ContainsKey("Total")) newItem["total"] = newItem["Total"];
+
 
                             Items.Add(newItem);
                         }
