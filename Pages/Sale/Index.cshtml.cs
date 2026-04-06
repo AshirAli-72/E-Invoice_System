@@ -36,6 +36,8 @@ namespace E_Invoice_system.Pages.Sale
         [BindProperty(SupportsGet = true)]
         public string Tab { get; set; } = "sales";
 
+        public string? ErrorMessage { get; set; }
+
         public class SaleDisplayItem
         {
             public int id { get; set; }
@@ -55,57 +57,64 @@ namespace E_Invoice_system.Pages.Sale
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            // ── Sales Pagination ──────────────────────────────────────────────
-            IQueryable<E_Invoice_system.Models.Sale> salesQuery = _context.sales.AsNoTracking();
-
-            TotalCount = await salesQuery.CountAsync();
-            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
-
-            if (PageNumber < 1) PageNumber = 1;
-            if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
-
-            var salesList = await salesQuery
-                .OrderByDescending(s => s.date)
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .Select(s => new SaleDisplayItem
-                {
-                    id = s.id,
-                    BillNo = s.billNo,
-                    Date = s.date,
-                    ProductName = s.prod_name_service,
-                    DisplayQty = s.qty_unit_type ?? "",
-                    Price = s.price,
-                    TotalPrice = s.total_price,
-                    PaymentMethod = s.payment_method,
-                    Status = s.status,
-                    IsReturned = s.is_returned
-                })
-                .ToListAsync();
-
-            foreach (var s in salesList)
-                s.DisplayQty = Regex.Replace(s.DisplayQty, @"[^0-9.-]", "");
-
-            Sales = salesList.Where(s =>
+            try
             {
-                if (decimal.TryParse(s.DisplayQty, out decimal q)) return q > 0;
-                return true;
-            }).ToList();
+                // ── Sales Pagination ──────────────────────────────────────────────
+                IQueryable<E_Invoice_system.Models.Sale> salesQuery = _context.sales.AsNoTracking();
 
-            // ── Returns Pagination ────────────────────────────────────────────
-            IQueryable<ReturnDetail> returnsQuery = _context.returns.AsNoTracking();
+                TotalCount = await salesQuery.CountAsync();
+                TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            ReturnTotalCount = await returnsQuery.CountAsync();
-            ReturnTotalPages = (int)Math.Ceiling(ReturnTotalCount / (double)ReturnPageSize);
+                if (PageNumber < 1) PageNumber = 1;
+                if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
 
-            if (ReturnPageNumber < 1) ReturnPageNumber = 1;
-            if (ReturnTotalPages > 0 && ReturnPageNumber > ReturnTotalPages) ReturnPageNumber = ReturnTotalPages;
+                var salesList = await salesQuery
+                    .OrderByDescending(s => s.date)
+                    .Skip((PageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .Select(s => new SaleDisplayItem
+                    {
+                        id = s.id,
+                        BillNo = s.billNo,
+                        Date = s.date,
+                        ProductName = s.prod_name_service,
+                        DisplayQty = s.qty_unit_type ?? "",
+                        Price = s.price,
+                        TotalPrice = s.total_price,
+                        PaymentMethod = s.payment_method,
+                        Status = s.status,
+                        IsReturned = s.is_returned
+                    })
+                    .ToListAsync();
 
-            Returns = await returnsQuery
-                .OrderByDescending(r => r.Date)
-                .Skip((ReturnPageNumber - 1) * ReturnPageSize)
-                .Take(ReturnPageSize)
-                .ToListAsync();
+                foreach (var s in salesList)
+                    s.DisplayQty = Regex.Replace(s.DisplayQty, @"[^0-9.-]", "");
+
+                Sales = salesList.Where(s =>
+                {
+                    if (decimal.TryParse(s.DisplayQty, out decimal q)) return q > 0;
+                    return true;
+                }).ToList();
+
+                // ── Returns Pagination ────────────────────────────────────────────
+                IQueryable<ReturnDetail> returnsQuery = _context.returns.AsNoTracking();
+
+                ReturnTotalCount = await returnsQuery.CountAsync();
+                ReturnTotalPages = (int)Math.Ceiling(ReturnTotalCount / (double)ReturnPageSize);
+
+                if (ReturnPageNumber < 1) ReturnPageNumber = 1;
+                if (ReturnTotalPages > 0 && ReturnPageNumber > ReturnTotalPages) ReturnPageNumber = ReturnTotalPages;
+
+                Returns = await returnsQuery
+                    .OrderByDescending(r => r.Date)
+                    .Skip((ReturnPageNumber - 1) * ReturnPageSize)
+                    .Take(ReturnPageSize)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "The database is temporarily busy. Please refresh the page in a few seconds.";
+            }
 
             return Page();
         }

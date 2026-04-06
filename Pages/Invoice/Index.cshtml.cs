@@ -24,6 +24,7 @@ namespace E_Invoice_system.Pages.Invoice
         public int TotalCount { get; set; }
 
         public IList<InvoiceDisplayItem> Invoices { get; set; } = new List<InvoiceDisplayItem>();
+        public string? ErrorMessage { get; set; }
 
         public class InvoiceDisplayItem
         {
@@ -45,62 +46,69 @@ namespace E_Invoice_system.Pages.Invoice
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 
-            IQueryable<invoices> query = _context.invoices.AsNoTracking();
-            TotalCount = await query.CountAsync();
-            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
-            
-            if (PageNumber < 1) PageNumber = 1;
-            if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
+            try
+            {
+                IQueryable<invoices> query = _context.invoices.AsNoTracking();
+                TotalCount = await query.CountAsync();
+                TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+                
+                if (PageNumber < 1) PageNumber = 1;
+                if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
 
-            var rawInvoices = await query
-                .OrderByDescending(i => i.date)
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .ToListAsync();
+                var rawInvoices = await query
+                    .OrderByDescending(i => i.date)
+                    .Skip((PageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToListAsync();
 
-            Invoices = rawInvoices.Select(item => {
-                var display = new InvoiceDisplayItem
-                {
-                    id = item.id,
-                    InvoiceNo = item.invoice_no,
-                    CustomerName = item.customer_name,
-                    Date = item.date,
-                    DisplayName = item.prod_name_service ?? "",
-                    DisplayQty = item.qty_unit_type ?? "",
-                    DisplayExpiry = "N/A",
-                    Discount = item.discount,
-                    TotalPrice = item.total_price,
-                    Payment = item.payment,
-                    Status = item.status
-                };
-
-                try {
-                    if (!string.IsNullOrEmpty(display.DisplayName) && display.DisplayName.Trim().StartsWith("["))
+                Invoices = rawInvoices.Select(item => {
+                    var display = new InvoiceDisplayItem
                     {
-                        var items = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(display.DisplayName);
-                        if (items != null && items.Any())
+                        id = item.id,
+                        InvoiceNo = item.invoice_no,
+                        CustomerName = item.customer_name,
+                        Date = item.date,
+                        DisplayName = item.prod_name_service ?? "",
+                        DisplayQty = item.qty_unit_type ?? "",
+                        DisplayExpiry = "N/A",
+                        Discount = item.discount,
+                        TotalPrice = item.total_price,
+                        Payment = item.payment,
+                        Status = item.status
+                    };
+
+                    try {
+                        if (!string.IsNullOrEmpty(display.DisplayName) && display.DisplayName.Trim().StartsWith("["))
                         {
-                            var names = items.Select(i => i.ContainsKey("name") ? i["name"]?.ToString() : "").Where(n => !string.IsNullOrEmpty(n));
-                            display.DisplayName = string.Join(", ", names);
-                            
-                            var qtys = items.Select(i => i.ContainsKey("qty") ? i["qty"]?.ToString() : "").Where(q => !string.IsNullOrEmpty(q));
-                            display.DisplayQty = string.Join(", ", qtys);
+                            var items = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(display.DisplayName);
+                            if (items != null && items.Any())
+                            {
+                                var names = items.Select(i => i.ContainsKey("name") ? i["name"]?.ToString() : "").Where(n => !string.IsNullOrEmpty(n));
+                                display.DisplayName = string.Join(", ", names);
+                                
+                                var qtys = items.Select(i => i.ContainsKey("qty") ? i["qty"]?.ToString() : "").Where(q => !string.IsNullOrEmpty(q));
+                                display.DisplayQty = string.Join(", ", qtys);
 
-                            var dates = items.Select(i => i.ContainsKey("expiryDate") ? i["expiryDate"]?.ToString() : null)
-                                             .Where(d => !string.IsNullOrEmpty(d))
-                                             .Select(d => DateTime.TryParse(d, out var dt) ? dt.ToString("MMM dd, yyyy") : d);
-                            display.DisplayExpiry = string.Join(", ", dates);
+                                var dates = items.Select(i => i.ContainsKey("expiryDate") ? i["expiryDate"]?.ToString() : null)
+                                                 .Where(d => !string.IsNullOrEmpty(d))
+                                                 .Select(d => DateTime.TryParse(d, out var dt) ? dt.ToString("MMM dd, yyyy") : d);
+                                display.DisplayExpiry = string.Join(", ", dates);
 
-                            // Truncate if too long
-                            if (display.DisplayName.Length > 40) display.DisplayName = display.DisplayName.Substring(0, 37) + "...";
-                            if (display.DisplayQty.Length > 20) display.DisplayQty = display.DisplayQty.Substring(0, 17) + "...";
-                            if (display.DisplayExpiry.Length > 25) display.DisplayExpiry = display.DisplayExpiry.Substring(0, 22) + "...";
+                                // Truncate if too long
+                                if (display.DisplayName.Length > 40) display.DisplayName = display.DisplayName.Substring(0, 37) + "...";
+                                if (display.DisplayQty.Length > 20) display.DisplayQty = display.DisplayQty.Substring(0, 17) + "...";
+                                if (display.DisplayExpiry.Length > 25) display.DisplayExpiry = display.DisplayExpiry.Substring(0, 22) + "...";
+                            }
                         }
-                    }
-                } catch { }
+                    } catch { }
 
-                return display;
-            }).ToList();
+                    return display;
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "The database is temporarily busy. Please refresh the page in a few seconds.";
+            }
 
             return Page();
         }

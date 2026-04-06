@@ -42,7 +42,10 @@ const NavProgress = (() => {
         if (!bar) return;
         clearInterval(timer);
         bar.style.width = '100%';
-        setTimeout(() => { bar.style.opacity = '0'; setTimeout(() => { bar.style.width = '0%'; }, 400); }, 200);
+        setTimeout(() => { 
+            if (bar) bar.style.opacity = '0'; 
+            setTimeout(() => { if (bar) bar.style.width = '0%'; }, 200); 
+        }, 100);
     }
 
     return { start, finish };
@@ -51,12 +54,21 @@ const NavProgress = (() => {
 // ─── Prefetch Cache ────────────────────────────────────────────────────────────
 const prefetched = new Map();
 async function prefetchPage(url) {
-    if (prefetched.has(url)) return;
-    prefetched.set(url, null); // Mark as pending
-    try {
-        const res = await fetch(url, { priority: 'low' });
-        if (res.ok) prefetched.set(url, await res.text());
-    } catch { prefetched.delete(url); }
+    if (prefetched.has(url)) return prefetched.get(url);
+    
+    // Store the promise itself to handle concurrent requests
+    const fetchPromise = (async () => {
+        try {
+            const res = await fetch(url, { priority: 'low' });
+            if (res.ok) return await res.text();
+        } catch (err) {
+            console.warn('Prefetch failed:', url, err);
+        }
+        return null;
+    })();
+    
+    prefetched.set(url, fetchPromise);
+    return fetchPromise;
 }
 
 // ─── Fast Navigation (SPA Feel) ─────────────────────────────────────────────
@@ -65,10 +77,12 @@ async function fastNavigate(url, pushState = true) {
 
     NavProgress.start();
     try {
-        let html;
-        if (typeof prefetched === 'object' && prefetched instanceof Map && prefetched.has(url)) {
-            html = prefetched.get(url);
-        } else {
+        let html = null;
+        if (prefetched.has(url)) {
+            html = await prefetched.get(url);
+        }
+        
+        if (!html) {
             const res = await fetch(url);
             if (!res.ok) { window.location.href = url; return; }
             html = await res.text();
@@ -84,7 +98,7 @@ async function fastNavigate(url, pushState = true) {
             
             // OPTIMIZED: Delay 'loading' dimming to avoid flicker on fast pages
             let showLoading = true;
-            const loadingTimer = setTimeout(() => { if (showLoading) oldMain.classList.add('loading'); }, 150);
+            const loadingTimer = setTimeout(() => { if (showLoading) oldMain.classList.add('loading'); }, 50);
 
             setTimeout(() => {
                 showLoading = false; // Page is ready, don't show dimming if not already shown
@@ -112,96 +126,48 @@ async function fastNavigate(url, pushState = true) {
                     updateActiveNav(window.location.pathname);
                     setupNavLinks(); 
                     
-                    // Dispatch a custom event for pages that need to know navigation happened
                     window.dispatchEvent(new CustomEvent('fastnav:success', { detail: { url } }));
                     
                     NavProgress.finish();
                 });
-            }, 50); // Keep minor delay for innerHTML swap consistency
+            }, 50); 
             return true;
         } else {
-            window.location.href = url; // Fallback to full load if containers are missing
+            window.location.href = url;
             return false;
         }
     } catch (err) {
         console.error('Fast Navigation Error:', err);
-        window.location.href = url; // Fallback to full load
+        window.location.href = url;
     }
     return false;
 }
 
-// ─── Active Nav ────────────────────────────────────────────────────────────────
-function updateActiveNav(urlPath) {
-    const sidebarNav = document.querySelector('.sidebar-nav');
-    if (!sidebarNav) return;
-    const navItems = Array.from(sidebarNav.querySelectorAll('.nav-item'));
-    let bestMatch = null, maxLen = -1;
-
-    navItems.forEach(el => {
-        el.classList.remove('active');
-        const href = el.getAttribute('href');
-        if (!href) return;
-        const hrefPath = new URL(href, window.location.origin).pathname.toLowerCase();
-        const normUrl = urlPath.replace(/\/index$/, '') || '/';
-        const normHref = hrefPath.replace(/\/index$/, '') || '/';
-        if (normUrl === normHref || (normUrl.startsWith(normHref + '/') && normHref !== '/')) {
-            if (normHref.length > maxLen) { maxLen = normHref.length; bestMatch = el; }
-        }
-    });
-    if (bestMatch) bestMatch.classList.add('active');
-}
-
-// ─── Sidebar Nav: Prefetch on hover + instant active + progress bar ────────────
-function setupNavLinks() {
-    // Select all internal links that aren't logout or external
-    const allLinks = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="http"]):not([href^="javascript"]):not([href^="#"]):not([href*="/Account/Logout"])');
-
-    allLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        // Prefetch on hover (using our new fetch-based prefetch)
-        link.addEventListener('mouseenter', () => prefetchPage(href), { passive: true });
-
-        // Fast Navigate on click
-        link.addEventListener('click', (e) => {
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-            e.preventDefault();
-            
-            // Instantly update active state in sidebar
-            const sidebarNav = document.querySelector('.sidebar-nav');
-            if (sidebarNav) {
-                sidebarNav.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                const navItem = link.closest('.nav-item');
-                if (navItem) navItem.classList.add('active');
-            }
-
-            fastNavigate(href);
-
-            // Close sidebar on mobile
-            const sb = document.querySelector('.sidebar');
-            if (window.innerWidth <= 768 && sb) sb.classList.remove('open');
-        });
-    });
-}
-
-// ─── Page Entry Animation ──────────────────────────────────────────────────────
-function animatePageEntry() {
-    const main = document.querySelector('.main-content');
-    if (!main) return;
-    
-    // Smoothly lift and fade in from the .loading state
-    main.style.transform = 'translateY(6px)';
-    main.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    requestAnimationFrame(() => {
-        main.style.opacity = '1';
-        main.style.transform = 'translateY(0)';
-    });
-}
-
-// ─── Click Delegation (sidebar toggle, profile, etc.) ─────────────────────────
+// ─── Global Click Delegation (Navigation & UI) ────────────────────────────────
 document.addEventListener('click', (e) => {
+    // 1. Navigation Links (SPA Feel)
+    const navLink = e.target.closest('a[href]:not([target="_blank"]):not([href^="http"]):not([href^="javascript"]):not([href^="#"]):not([href*="/Account/Logout"])');
+    if (navLink && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        const href = navLink.getAttribute('href');
+        
+        // Instantly update active state in sidebar
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (sidebarNav) {
+            sidebarNav.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navItem = navLink.closest('.nav-item');
+            if (navItem) navItem.classList.add('active');
+        }
+
+        fastNavigate(href);
+
+        // Close sidebar on mobile
+        const sb = document.querySelector('.sidebar');
+        if (window.innerWidth <= 768 && sb) sb.classList.remove('open');
+        return;
+    }
+
+    // 2. Sidebar & UI Buttons
     const sidebarBtn = e.target.closest('#sidebarToggle');
     const closeBtn   = e.target.closest('#sidebarClose');
     const profileBtn = e.target.closest('#profileDropdownToggle');
@@ -299,6 +265,44 @@ function updateOnlineStatus() {
 }
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', () => { document.body.classList.add('was-offline'); updateOnlineStatus(); });
+
+// ─── Page Entry Animation ──────────────────────────────────────────────────────
+function animatePageEntry() {
+    const main = document.querySelector('.main-content');
+    if (!main) return;
+    main.style.transform = 'translateY(6px)';
+    main.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    requestAnimationFrame(() => { main.style.opacity = '1'; main.style.transform = 'translateY(0)'; });
+}
+
+// ─── Active Nav ────────────────────────────────────────────────────────────────
+function updateActiveNav(urlPath) {
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (!sidebarNav) return;
+    const navItems = Array.from(sidebarNav.querySelectorAll('.nav-item'));
+    let bestMatch = null, maxLen = -1;
+    navItems.forEach(el => {
+        el.classList.remove('active');
+        const href = el.getAttribute('href');
+        if (!href) return;
+        const hrefPath = new URL(href, window.location.origin).pathname.toLowerCase();
+        const normUrl = urlPath.replace(/\/index$/, '') || '/';
+        const normHref = hrefPath.replace(/\/index$/, '') || '/';
+        if (normUrl === normHref || (normUrl.startsWith(normHref + '/') && normHref !== '/')) {
+            if (normHref.length > maxLen) { maxLen = normHref.length; bestMatch = el; }
+        }
+    });
+    if (bestMatch) bestMatch.classList.add('active');
+}
+
+// ─── Sidebar Nav: Prefetch on hover only ────────────
+function setupNavLinks() {
+    const container = document.querySelector('.main-content');
+    const links = (container || document).querySelectorAll('a[href]:not([target="_blank"]):not([href^="http"]):not([href^="javascript"]):not([href^="#"]):not([href*="/Account/Logout"])');
+    links.forEach(link => {
+        link.addEventListener('mouseenter', () => prefetchPage(link.getAttribute('href')), { once: true, passive: true });
+    });
+}
 
 // ─── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
