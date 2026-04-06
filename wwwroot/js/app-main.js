@@ -119,6 +119,9 @@ async function fastNavigate(url, pushState = true) {
                 });
             }, 50); // Keep minor delay for innerHTML swap consistency
             return true;
+        } else {
+            window.location.href = url; // Fallback to full load if containers are missing
+            return false;
         }
     } catch (err) {
         console.error('Fast Navigation Error:', err);

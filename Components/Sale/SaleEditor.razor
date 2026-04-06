@@ -253,7 +253,7 @@
                 <div class="summary-box-web">
                     <div class="summary-web-line">
                         <span style="color:var(--text-muted);font-weight:600;">Total Amount Due</span>
-                        <span style="font-weight:700;">@FormatCurrency(Math.Abs(currentTotal))</span>
+                        <span style="font-weight:700;">@FormatCurrency(currentTotal)</span>
                     </div>
                     <div class="summary-web-line" style="margin-top:8px;">
                         <span style="color:var(--text-muted);font-weight:600;">Total Tendered</span>
@@ -356,6 +356,7 @@
     </div>
 
     <div class="rcpt-info">
+        <div class="rcpt-info-line"><b>Order:</b> @orderBillNo</div>
         <div class="rcpt-info-line"><b>Cashier:</b> @(UserEmail?.Split('@')[0] ?? "nill")</div>
         <div class="rcpt-info-line"><b>Customer:</b> @(selectedCustomer?.name ?? "Walk-In")</div>
     </div>
@@ -408,10 +409,12 @@
         <div class="rcpt-bottom-left">
             <div class="rcpt-date">Generated on @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
         </div>
-        <div class="rcpt-barcode-wrap">
-            <svg id="rcptBarcodeSvg"></svg>
-            <div class="rcpt-barcode-text">@orderBillNo</div>
-        </div>
+        @if (transMode != "return")
+        {
+            <div class="rcpt-barcode-wrap">
+                <svg id="rcptBarcodeSvg"></svg>
+            </div>
+        }
     </div>
 
 </div>
@@ -447,8 +450,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Parallel data fetching for maximum speed
-        var prodsTask = DbContext.products_services
+        // Sequential data fetching to avoid EF Core concurrency issues
+        var prodsData = await DbContext.products_services
             .AsNoTracking()
             .Where(p => p.status == "Available")
             .Select(p => new { 
@@ -459,20 +462,13 @@
             .Take(50) 
             .ToListAsync();
 
-        var custsTask = DbContext.customers
+        allCustomersList = await DbContext.customers
             .AsNoTracking()
             .OrderBy(c => c.name)
             .Take(50) 
             .ToListAsync();
 
-        var sellerTask = DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
-
-        // Run all queries together
-        await Task.WhenAll(prodsTask, custsTask, sellerTask);
-
-        var prodsData = prodsTask.Result;
-        allCustomersList = custsTask.Result;
-        currentSeller = sellerTask.Result;
+        currentSeller = await DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
 
         allProducts = prodsData.Select(p => {
             decimal stock = 999999;
@@ -687,6 +683,16 @@
 
             foreach (var item in saleItems) {
                 if (transMode == "return") {
+                    if (item.OriginalSaleId == 0) {
+                        var recentSale = await DbContext.sales
+                            .Where(s => s.prod_name_service == item.prod_name_service && s.billNo != null && s.billNo.StartsWith("SALE_"))
+                            .OrderByDescending(s => s.id)
+                            .FirstOrDefaultAsync();
+                        if (recentSale != null) {
+                            item.OriginalSaleId = recentSale.id;
+                        }
+                    }
+
                     var returnRec = new Models.ReturnDetail {
                         billNo = orderBillNo,
                         SaleId = item.OriginalSaleId,
@@ -738,6 +744,9 @@
             }
 
             await DbContext.SaveChangesAsync();
+
+            StateHasChanged();
+            await Task.Delay(100); // Allow DOM to render the orderBillNo
             
             if (shouldPrintReceipt) {
                 try {

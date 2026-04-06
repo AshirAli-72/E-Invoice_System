@@ -18,7 +18,7 @@ namespace E_Invoice_system.Pages.Seller
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;
 
-        public int PageSize { get; set; } = 20;
+        public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
         public int TotalCount { get; set; }
 
