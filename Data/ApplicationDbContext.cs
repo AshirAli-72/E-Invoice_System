@@ -68,24 +68,6 @@ namespace E_Invoice_system.Data
                 .Property(r => r.Amount)
                 .HasColumnType("decimal(18,2)");
 
-            // ✅ Performance Indexes
-            modelBuilder.Entity<invoices>().HasIndex(i => i.invoice_no);
-            modelBuilder.Entity<invoices>().HasIndex(i => i.date);
-            modelBuilder.Entity<invoices>().HasIndex(i => i.status);
-            
-            modelBuilder.Entity<ProductService>().HasIndex(p => p.barcode);
-            modelBuilder.Entity<ProductService>().HasIndex(p => p.prod_name_service);
-            
-            modelBuilder.Entity<customers>().HasIndex(c => c.name);
-
-            modelBuilder.Entity<users>().HasIndex(u => u.email).IsUnique();
-
-            modelBuilder.Entity<Sale>().HasIndex(s => s.billNo);
-            modelBuilder.Entity<Sale>().HasIndex(s => s.date);
-            modelBuilder.Entity<Sale>().HasIndex(s => s.total_price);
-
-            modelBuilder.Entity<ReturnDetail>().HasIndex(r => r.Date);
-            modelBuilder.Entity<ReturnDetail>().HasIndex(r => r.billNo);
         }
     }
 }
