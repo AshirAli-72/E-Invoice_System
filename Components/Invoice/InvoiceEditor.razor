@@ -65,11 +65,15 @@
             <div class="form-group">
                 <label class="form-label">Product / Service</label>
                 <div style="display: flex; gap: 1rem;">
-                    <select id="productSelect" class="form-control" @bind="selectedProductId" style="flex:1;">
+                    <select id="productSelect" class="form-control" @onchange="OnProductSelected" style="flex:1;">
                         <option value="0">-- Select Product --</option>
                         @foreach (var p in productsList)
                         {
-                            <option value="@p.id">@p.prod_name_service (@p.qty_unit_type) - $@p.price</option>
+                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name_service (@p.qty_unit_type) - $@p.price</option>
+                        }
+                        @if (productsList.Count == 0)
+                        {
+                            <option disabled>No available products found</option>
                         }
                     </select>
                     <button type="button" class="btn-primary" @onclick="AddItem">
@@ -104,17 +108,17 @@
                         @foreach (var item in invoiceItems)
                         {
                             <tr style="border-bottom: 1px solid #e2e8f0;">
-                                <td style="padding: 0.5rem 1rem;">
-                                    <input class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Name" />
+                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
+                                    @item.Name
                                 </td>
-                                <td style="padding: 0.5rem 1rem;">
-                                    <input type="number" step="0.01" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Qty" @onbind:after="() => CalculateItemTotal(item)" />
+                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
+                                    @item.Qty
                                 </td>
-                                <td style="padding: 0.5rem 1rem;">
-                                    <input type="date" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.ExpiryDate" />
+                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
+                                    @item.ExpiryDate?.ToString("yyyy-MM-dd")
                                 </td>
-                                <td style="padding: 0.5rem 1rem;">
-                                    <input type="number" step="0.01" class="form-control" style="font-size:0.85rem; height:32px;" @bind="item.Price" @onbind:after="() => CalculateItemTotal(item)" />
+                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
+                                    $@item.Price.ToString("F2")
                                 </td>
                                 <td style="padding: 0.5rem 1rem; font-weight: bold; font-size: 0.85rem; vertical-align: middle;">
                                     $@item.Total.ToString("F2")
@@ -206,7 +210,10 @@
     {
         sellersList = await DbContext.sellers.OrderBy(s => s.name).ToListAsync();
         customersList = await DbContext.customers.OrderBy(c => c.name).ToListAsync();
-        productsList = await DbContext.products_services.Where(p => p.status == "Available").ToListAsync();
+        
+        // Use a more resilient way to fetch Available products (handling potential status padding in DB)
+        var allProducts = await DbContext.products_services.ToListAsync();
+        productsList = allProducts.Where(p => !string.IsNullOrEmpty(p.status) && p.status.Trim().Equals("Available", StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     private void OnSellerChanged(ChangeEventArgs e)
@@ -219,6 +226,7 @@
         {
             selectedSeller = null;
         }
+        StateHasChanged();
     }
 
     private void OnCustomerChanged(ChangeEventArgs e)
@@ -231,13 +239,27 @@
         {
             selectedCustomer = null;
         }
+        StateHasChanged();
     }
 
-    private void AddItem()
+    private void OnProductSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            selectedProductId = id;
+        }
+        else
+        {
+            selectedProductId = 0;
+        }
+        StateHasChanged();
+    }
+
+    private async Task AddItem()
     {
         if (selectedProductId == 0) 
         {
-            errorMessage = "Please select a product first.";
+            errorMessage = "Please select a product from the list first.";
             return;
         }
 
@@ -252,9 +274,14 @@
                 ExpiryDate = product.expiry_date,
                 Total = product.price
             });
-            errorMessage = null; // Clear error on success
+            errorMessage = null; 
+            selectedProductId = 0; // Reset after success
+            await InvokeAsync(StateHasChanged);
         }
-        selectedProductId = 0;
+        else
+        {
+            errorMessage = "Selected product not found or no longer available.";
+        }
     }
 
     private void RemoveItem(InvoiceItem item)

@@ -52,10 +52,18 @@ const NavProgress = (() => {
 })();
 
 // ─── Prefetch Cache ────────────────────────────────────────────────────────────
+const EXCLUDED_PATHS = ['/invoice', '/sale', '/customer', '/product', '/seller'];
+
+function isPathExcluded(url) {
+    if (!url) return true;
+    const path = new URL(url, window.location.origin).pathname.toLowerCase();
+    return EXCLUDED_PATHS.some(p => path.startsWith(p.toLowerCase()));
+}
+
 const prefetched = new Map();
 async function prefetchPage(url) {
     if (prefetched.has(url)) return prefetched.get(url);
-    if (!navigator.onLine) return null; // Skip prefetch when offline
+    if (!navigator.onLine || isPathExcluded(url)) return null; 
     
     // Store the promise itself to handle concurrent requests
     const fetchPromise = (async () => {
@@ -74,7 +82,10 @@ async function prefetchPage(url) {
 
 // ─── Fast Navigation (SPA Feel) ─────────────────────────────────────────────
 async function fastNavigate(url, pushState = true) {
-    if (!url || url.startsWith('#') || url.includes('/Account/Logout')) return false;
+    if (!url || url.startsWith('#') || url.includes('/Account/Logout') || isPathExcluded(url)) {
+        if (pushState) window.location.href = url;
+        return false;
+    }
 
     NavProgress.start();
     try {
@@ -156,10 +167,10 @@ async function fastNavigate(url, pushState = true) {
 document.addEventListener('click', (e) => {
     // 1. Navigation Links (SPA Feel)
     const navLink = e.target.closest('a[href]:not([target="_blank"]):not([href^="http"]):not([href^="javascript"]):not([href^="#"]):not([href*="/Account/Logout"])');
-    if (navLink && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
-        e.preventDefault();
+    if (navLink && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !navLink.hasAttribute('data-no-fast-nav')) {
         const href = navLink.getAttribute('href');
         
+        // --- Professional SPA-Feedback for All Links ---
         // Instantly update active state in sidebar
         const sidebarNav = document.querySelector('.sidebar-nav');
         if (sidebarNav) {
@@ -168,11 +179,32 @@ document.addEventListener('click', (e) => {
             if (navItem) navItem.classList.add('active');
         }
 
-        fastNavigate(href);
+        // Start progress bar even for full-page navigations
+        NavProgress.start();
 
         // Close sidebar on mobile
         const sb = document.querySelector('.sidebar');
         if (window.innerWidth <= 768 && sb) sb.classList.remove('open');
+
+        // Check if we should use Fast Navigation or Seamless Redirect
+        if (isPathExcluded(href)) {
+            // "Professional Redirect": Seamlessly navigate with a UI flash-guard
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) mainContent.classList.add('loading');
+            
+            // Use View Transition if supported for a high-end feel
+            if (document.startViewTransition) {
+                document.startViewTransition(() => {
+                    window.location.href = href;
+                });
+            } else {
+                window.location.href = href;
+            }
+            return;
+        }
+
+        e.preventDefault();
+        fastNavigate(href);
         return;
     }
 
