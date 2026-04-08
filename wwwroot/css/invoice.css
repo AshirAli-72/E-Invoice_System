@@ -6,6 +6,8 @@
     --invoice-light-grey: #f3f4f6;
 }
 
+* { box-sizing: border-box; }
+
 #invoiceViewWrapper {
     background: #f8fafc;
     padding: 30px;
@@ -53,7 +55,7 @@
 .invoice-header {
     position: relative;
     z-index: 10;
-    padding: 40px 50px 20px 50px;
+    padding: 20px 50px 10px 50px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -86,7 +88,7 @@
 
 /* ADDRESSES */
 .invoice-addresses {
-    padding: 10px 50px 20px 50px;
+    padding: 10px 50px 10px 50px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
@@ -138,8 +140,7 @@
 
 /* TABLE */
 .invoice-table-container {
-    padding: 0 40px;
-    flex: 1;
+    padding: 0 40px 10px 40px;
 }
 
 .invoice-table {
@@ -170,7 +171,7 @@
 
 /* TOTALS & FOOTER */
 .invoice-footer {
-    padding: 30px 50px 80px 50px;
+    padding: 20px 50px 30px 50px;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 30px;
@@ -180,7 +181,7 @@
 .terms-section h3 { font-size: 15px; font-weight: 900; color: #111; margin-bottom: 8px; }
 .terms-section p { font-size: 11px; color: #666; line-height: 1.5; max-width: 350px; }
 
-.signature-section { margin-top: 30px; }
+.signature-section { margin-top: 15px; }
 .sig-line { border-top: 2px solid #000; width: 180px; margin-bottom: 8px; }
 .sig-label { font-size: 12px; font-weight: 900; text-transform: uppercase; }
 
@@ -192,12 +193,12 @@
 .grand-total-bar {
     background: var(--invoice-red);
     color: white;
-    padding: 12px 20px;
+    padding: 8px 20px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 30px;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 .grand-label { font-size: 16px; font-weight: 900; text-transform: uppercase; }
 .grand-val { font-size: 18px; font-weight: 900; width: 100px; text-align: right; }
@@ -242,27 +243,52 @@
     /* Hide everything by default using visibility */
     body * { visibility: hidden !important; }
     
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        width: 100% !important;
+    }
+
     /* Allow BOTH invoice-to-print and thermalReceipt to be visible */
     #invoice-to-print, #invoice-to-print *,
     #thermalReceipt, #thermalReceipt * { 
         visibility: visible !important; 
     }
     
-    /* Target whatever is being printed for positioning */
-    #invoice-to-print, #thermalReceipt {
+    /* A4 INVOICE SPECIFIC (EDGE-TO-EDGE) */
+    #invoice-to-print {
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
-        width: 100% !important;
+        width: 210mm !important; /* Fixed A4 width */
+        height: 297mm !important; /* Fixed A4 height */
         margin: 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         z-index: 9999 !important;
+        overflow: hidden !important;
+        page-break-after: avoid !important;
+    }
+
+    /* THERMAL RECEIPT SPECIFIC */
+    #thermalReceipt {
+        position: static !important;
+        width: 80mm !important; 
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+    
+    .invoice-footer {
+        padding-bottom: 30px !important;
+        page-break-inside: avoid !important;
     }
     
     .no-print { display: none !important; }
     
     @page {
-        size: A4;
-        margin: 0;
+        size: auto; /* Allow the browser to decide best fit based on margins */
+        margin: 0 !important;
     }
 }

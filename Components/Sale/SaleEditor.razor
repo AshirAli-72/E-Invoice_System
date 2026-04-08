@@ -1,7 +1,7 @@
 @namespace E_Invoice_system.Components.Sale
 @using Microsoft.EntityFrameworkCore
 @using System.Text.RegularExpressions
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
@@ -43,32 +43,51 @@
         </div>
 
         <div class="product-grid-v2">
-            @foreach (var p in filteredProducts)
+            @if (isLoading)
             {
-                <div class="product-card-v2" @onclick="() => AddToSale(p)">
-                    <div class="card-image">
-                        @if (!string.IsNullOrEmpty(p.Image))
-                        {
-                            <img src="/product-images/@System.IO.Path.GetFileName(p.Image)" alt="Product" />
-                        }
-                        else
-                        {
-                            <div class="image-placeholder">
-                                <i class="@(p.IsService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i>
-                            </div>
-                        }
+                <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); text-align: center;">
+                    <i class="ph-spinner-gap" style="font-size: 3.5rem; color: var(--primary); opacity: 0.8; animation: spin 1s linear infinite; margin-bottom: 16px;"></i>
+                    <h3 style="margin: 0; font-weight: 700; color: var(--text-main);">Loading Products...</h3>
+                    <p style="margin: 8px 0 0; font-size: 0.9rem;">Fetching real-time inventory and pricing</p>
+                    <style>@@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+                </div>
+            }
+            else
+            {
+                @if (!filteredProducts.Any())
+                {
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="ph-package" style="font-size: 3rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <h4>No products found</h4>
                     </div>
-                    <div class="card-info">
-                        <h4 class="card-name">@p.Name</h4>
-                        <div class="card-price-row">
-                            <span class="price-tag">$@p.Price.ToString("N2")</span>
-                            @if (p.Discount > 0)
+                }
+                @foreach (var p in filteredProducts)
+                {
+                    <div class="product-card-v2" @onclick="() => AddToSale(p)">
+                        <div class="card-image">
+                            @if (!string.IsNullOrEmpty(p.Image))
                             {
-                                <span class="discount-pill">$@p.Discount.ToString("N2")</span>
+                                <img src="/product-images/@System.IO.Path.GetFileName(p.Image)" alt="Product" />
+                            }
+                            else
+                            {
+                                <div class="image-placeholder">
+                                    <i class="@(p.IsService ? "ph-wrench" : "ph-cube-transparent")" style="font-size:3rem;color:#cbd5e1;"></i>
+                                </div>
                             }
                         </div>
+                        <div class="card-info">
+                            <h4 class="card-name">@p.Name</h4>
+                            <div class="card-price-row">
+                                <span class="price-tag">$@p.Price.ToString("N2")</span>
+                                @if (p.Discount > 0)
+                                {
+                                    <span class="discount-pill">$@p.Discount.ToString("N2")</span>
+                                }
+                            </div>
+                        </div>
                     </div>
-                </div>
+                }
             }
         </div>
     </div>
@@ -448,48 +467,76 @@
 
     [Parameter] public string? UserEmail { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private bool isLoading = true;
+
+    protected override Task OnInitializedAsync()
     {
-        // Sequential data fetching to avoid EF Core concurrency issues
-        var prodsData = await DbContext.products_services
-            .AsNoTracking()
-            .Where(p => p.status == "Available")
-            .Select(p => new { 
-                p.id, p.prod_name_service, p.price, p.discount, 
-                p.expiry_date, p.qty_unit_type, p.image, p.barcode 
-            })
-            .OrderByDescending(p => p.id)
-            .Take(50) 
-            .ToListAsync();
+        // Non-blocking initialization so the UI renders instantly
+        _ = LoadDataAsync();
+        return Task.CompletedTask;
+    }
 
-        allCustomersList = await DbContext.customers
-            .AsNoTracking()
-            .OrderBy(c => c.name)
-            .Take(50) 
-            .ToListAsync();
+    private async Task LoadDataAsync()
+    {
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
 
-        currentSeller = await DbContext.sellers.AsNoTracking().FirstOrDefaultAsync();
+        try 
+        {
+            using var context = DbFactory.CreateDbContext();
+            // Sequential data fetching to avoid EF Core concurrency issues
+            var prodsData = await context.products_services
+                .AsNoTracking()
+                .Where(p => p.status == "Available")
+                .Select(p => new { 
+                    p.id, p.prod_name_service, p.price, p.discount, 
+                    p.expiry_date, p.qty_unit_type, p.image, p.barcode 
+                })
+                .OrderByDescending(p => p.id)
+                .Take(50) 
+                .ToListAsync();
 
-        allProducts = prodsData.Select(p => {
-            decimal stock = 999999;
-            bool isSvc = true;
-            if (!string.IsNullOrEmpty(p.qty_unit_type)) {
-                var m = Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
-                if (m.Success) {
-                    decimal.TryParse(m.Groups[1].Value, out stock);
-                    var unit = m.Groups[2].Value.Trim();
-                    if (string.IsNullOrEmpty(unit)) isSvc = false;
+            allCustomersList = await context.customers
+                .AsNoTracking()
+                .OrderBy(c => c.name)
+                .Take(50) 
+                .ToListAsync();
+
+            currentSeller = await context.sellers.AsNoTracking().FirstOrDefaultAsync();
+
+            allProducts = prodsData.Select(p => {
+                decimal stock = 999999;
+                bool isSvc = true;
+                if (!string.IsNullOrEmpty(p.qty_unit_type)) {
+                    var m = Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
+                    if (m.Success) {
+                        decimal.TryParse(m.Groups[1].Value, out stock);
+                        var unit = m.Groups[2].Value.Trim();
+                        if (string.IsNullOrEmpty(unit)) isSvc = false;
+                    }
                 }
-            }
-            return new ProductDisplay { 
-                Id = p.id, Name = p.prod_name_service ?? "", Price = p.price, Discount = p.discount, 
-                Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.image, 
-                Category = isSvc ? "Beverages" : "Foods", Barcode = p.barcode 
-            };
-        }).ToList();
-        
-        filteredProducts = allProducts;
-        filteredCustomersList = allCustomersList;
+                return new ProductDisplay { 
+                    Id = p.id, Name = p.prod_name_service ?? "", Price = p.price, Discount = p.discount, 
+                    Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.image, 
+                    Category = isSvc ? "Beverages" : "Foods", Barcode = p.barcode 
+                };
+            }).ToList();
+            
+            filteredProducts = allProducts;
+            filteredCustomersList = allCustomersList;
+
+            // Optional: simulate network delay briefly for skeleton testing if desired
+            // await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading data: {ex.Message}");
+        }
+        finally 
+        {
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private void FilterByCategory(string cat)
@@ -528,7 +575,8 @@
 
     private async Task LoadFromReceipt(string billNo)
     {
-        var sales = await DbContext.sales.Where(s => s.billNo == billNo).ToListAsync();
+        using var context = DbFactory.CreateDbContext();
+        var sales = await context.sales.Where(s => s.billNo == billNo).ToListAsync();
         if (sales.Any()) {
             transMode = "return";
             saleItems = sales.Select(s => {
@@ -630,8 +678,9 @@
 
     private async Task SaveNewCustomer() {
         if (string.IsNullOrEmpty(newCustomer.name)) return;
-        DbContext.customers.Add(newCustomer);
-        await DbContext.SaveChangesAsync();
+        using var context = DbFactory.CreateDbContext();
+        context.customers.Add(newCustomer);
+        await context.SaveChangesAsync();
         allCustomersList.Add(newCustomer);
         SelectCustomer(newCustomer);
         newCustomer = new customers { status = "Active" };
@@ -644,19 +693,20 @@
 
         isSubmitting = true;
         try {
+            using var context = DbFactory.CreateDbContext();
             int nextIdNum = 1;
             var prefix = transMode == "return" ? "RETURN_" : "SALE_";
             
             // OPTIMIZED: Fetch ONLY the most recent bill number instead of the entire list
             string? lastBillNo = null;
             if (transMode == "return") {
-                lastBillNo = await DbContext.returns
+                lastBillNo = await context.returns
                     .Where(r => r.billNo != null && r.billNo.StartsWith(prefix))
                     .OrderByDescending(r => r.Id)
                     .Select(r => r.billNo)
                     .FirstOrDefaultAsync();
             } else {
-                lastBillNo = await DbContext.sales
+                lastBillNo = await context.sales
                     .Where(s => s.billNo != null && s.billNo.StartsWith(prefix))
                     .OrderByDescending(s => s.id)
                     .Select(s => s.billNo)
@@ -670,21 +720,20 @@
             orderBillNo = $"{prefix}{nextIdNum}";
 
             
-           
             string customerInfo = selectedCustomer != null ? $" [Customer: {selectedCustomer.name}]" : " [Walk-In]";
             string saleDescription = ((notes ?? "") + customerInfo);
             if (saleDescription.Length > 200) saleDescription = saleDescription.Substring(0, 200);
 
             // OPTIMIZED: Batch fetch all products in the sale at once instead of N times in loop
             var productNames = saleItems.Select(i => i.prod_name_service).Distinct().ToList();
-            var productsToUpdate = await DbContext.products_services
+            var productsToUpdate = await context.products_services
                 .Where(p => productNames.Contains(p.prod_name_service))
                 .ToListAsync();
 
             foreach (var item in saleItems) {
                 if (transMode == "return") {
                     if (item.OriginalSaleId == 0) {
-                        var recentSale = await DbContext.sales
+                        var recentSale = await context.sales
                             .Where(s => s.prod_name_service == item.prod_name_service && s.billNo != null && s.billNo.StartsWith("SALE_"))
                             .OrderByDescending(s => s.id)
                             .FirstOrDefaultAsync();
@@ -704,7 +753,7 @@
                         Method = paymentMethod,
                         Status = "RETURN"
                     };
-                    DbContext.returns.Add(returnRec);
+                    context.returns.Add(returnRec);
                 } else {
                     var sale = new Models.Sale {
                         billNo = orderBillNo, 
@@ -721,7 +770,7 @@
                         description = saleDescription,
                         expiry_date = item.expiry_date ?? DateTime.Now 
                     };
-                    DbContext.sales.Add(sale);
+                    context.sales.Add(sale);
                 }
                 
                 // OPTIMIZED: Use cached product lookup
@@ -735,7 +784,7 @@
                             var finalQtyStr = $"{newQty} {unit}".Trim();
                             if (finalQtyStr.Length > 50) finalQtyStr = finalQtyStr.Substring(0, 50);
                             prod.qty_unit_type = finalQtyStr;
-                            DbContext.products_services.Update(prod);
+                            context.products_services.Update(prod);
                         }
                     }
                 } catch (Exception ex) { 
@@ -743,7 +792,7 @@
                 }
             }
 
-            await DbContext.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             StateHasChanged();
             await Task.Delay(100); // Allow DOM to render the orderBillNo

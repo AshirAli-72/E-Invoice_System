@@ -44,7 +44,14 @@
 
         @@media print {
             .print-controls, .no-print { display: none !important; }
-            body { background: white !important; padding: 0 !important; visibility: visible !important; }
+            body { 
+                background: white !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                visibility: visible !important; 
+                display: block !important; 
+                width: 100% !important;
+            }
             body * { visibility: visible !important; }
             .invoice-paper { box-shadow: none !important; margin: 0 !important; visibility: visible !important; }
         }

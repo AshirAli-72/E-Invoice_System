@@ -1,7 +1,7 @@
 @namespace E_Invoice_system.Components.Product
 @using Microsoft.EntityFrameworkCore
 @using System.IO
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment Environment
 
@@ -22,52 +22,44 @@
         }
 
         <!-- Basic Info -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Name / Title</label>
-                <input class="form-control" @bind="product.prod_name_service" placeholder="Enter name" required />
-            </div>
+        <div class="form-group">
+            <label class="form-label">Name / Title</label>
+            <input class="form-control" @bind="product.prod_name_service" placeholder="Enter name" required />
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Price</label>
-                <input type="number" step="0.01" class="form-control" @bind="product.price" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Discount</label>
-                <input type="number" step="0.01" class="form-control" @bind="product.discount" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Tax (%)</label>
-                <input type="number" step="0.01" class="form-control" @bind="product.tax" placeholder="0.00" />
-            </div>
+        <div class="form-group">
+            <label class="form-label">Price</label>
+            <input type="number" step="0.01" class="form-control" @bind="product.price" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Discount</label>
+            <input type="number" step="0.01" class="form-control" @bind="product.discount" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tax (%)</label>
+            <input type="number" step="0.01" class="form-control" @bind="product.tax" placeholder="0.00" />
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Quantity / Unit (e.g. 10 kg / 0 Service)</label>
-                <input class="form-control" @bind="product.qty_unit_type" placeholder="10 / 0" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Barcode (Auto-generated if blank)</label>
-                <input class="form-control" @bind="product.barcode" placeholder="Enter or scan barcode" />
-            </div>
+        <div class="form-group">
+            <label class="form-label">Quantity / Unit (e.g. 10 kg / 0 Service)</label>
+            <input class="form-control" @bind="product.qty_unit_type" placeholder="10 / 0" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Barcode (Auto-generated if blank)</label>
+            <input class="form-control" @bind="product.barcode" placeholder="Enter or scan barcode" />
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Expiry Date</label>
-                <input type="date" class="form-control" @bind="product.expiry_date" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <select class="form-control" @bind="product.status">
-                    <option value="Available">Available</option>
-                    <option value="Out of Stock">Out of Stock</option>
-                    <option value="Discontinued">Discontinued</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label class="form-label">Expiry Date</label>
+            <input type="date" class="form-control" @bind="product.expiry_date" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-control" @bind="product.status">
+                <option value="Available">Available</option>
+                <option value="Out of Stock">Out of Stock</option>
+                <option value="Discontinued">Discontinued</option>
+            </select>
         </div>
 
         <div class="form-group">
@@ -91,7 +83,7 @@
                 </div>
                 <div style="flex:1;">
                     <InputFile OnChange="HandleFileSelected" class="form-control" accept="image/*" />
-                    <p style="font-size:.75rem; color:#64748b; margin-top:.5rem;">PNG, JPG or JPEG. Max 2MB recommended.</p>
+                    <p style="font-size:.75rem; color:#64748b; margin-top:.5rem;">PNG, JPG or JPEG. Max 5MB recommended.</p>
                 </div>
             </div>
         </div>
@@ -131,18 +123,41 @@
     {
         if (ProductId != 0)
         {
-            var existing = await DbContext.products_services.FindAsync(ProductId);
+            using var context = DbFactory.CreateDbContext();
+            var existing = await context.products_services.FindAsync(ProductId);
             if (existing != null) product = existing;
         }
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        selectedFile = e.File;
-        // Show preview
-        var buffer = new byte[selectedFile.Size];
-        await selectedFile.OpenReadStream(2048000).ReadAsync(buffer);
-        imgUrl = $"data:{selectedFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+        try 
+        {
+            selectedFile = e.File;
+            errorMessage = null;
+
+            if (selectedFile.Size > 5120000)
+            {
+                errorMessage = "Selected image is too large (max 5MB). Please choose a smaller file.";
+                selectedFile = null;
+                imgUrl = null;
+                return;
+            }
+
+            // Show preview using a memory stream for reliability
+            using var stream = selectedFile.OpenReadStream(5120000);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            imgUrl = $"data:{selectedFile.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Problem loading image preview: " + ex.Message;
+            selectedFile = null;
+            imgUrl = null;
+        }
     }
 
     private async Task SaveProduct()
@@ -154,29 +169,38 @@
         if (product.discount > product.price) { errorMessage = "Discount cannot exceed price."; return; }
 
         isSubmitting = true;
-        StateHasChanged(); // Force UI to show "Saving..."
+        StateHasChanged();
 
         try
         {
             // Handle Image Upload
             if (selectedFile != null)
             {
-                string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\images";
-                if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
-
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
-                string path = Path.Combine(storagePath, fileName);
-
-                // Delete old image if it exists and is different
-                if (!string.IsNullOrEmpty(product.image) && product.image != path)
+                try 
                 {
-                    if (File.Exists(product.image)) try { File.Delete(product.image); } catch {}
-                }
+                    string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\images";
+                    if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
 
-                await using var stream = selectedFile.OpenReadStream(2048000);
-                await using var fs = new FileStream(path, FileMode.Create);
-                await stream.CopyToAsync(fs);
-                product.image = path; 
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
+                    string path = Path.Combine(storagePath, fileName);
+
+                    // Delete old image if it exists and is different
+                    if (!string.IsNullOrEmpty(product.image) && product.image != path)
+                    {
+                        if (File.Exists(product.image)) try { File.Delete(product.image); } catch {}
+                    }
+
+                    await using var stream = selectedFile.OpenReadStream(5120000);
+                    await using var fs = new FileStream(path, FileMode.Create);
+                    await stream.CopyToAsync(fs);
+                    product.image = path; 
+                }
+                catch (Exception imgEx)
+                {
+                    errorMessage = "Failed to save image locally: " + imgEx.Message;
+                    isSubmitting = false;
+                    return;
+                }
             }
 
             // Auto-generate barcode
@@ -191,24 +215,18 @@
             }
 
             // ROBUST DB UPDATE LOGIC
+            using var context = DbFactory.CreateDbContext();
             if (ProductId == 0 || product.id == 0) 
             {
                 product.date = DateTime.Now;
-                DbContext.products_services.Add(product);
+                context.products_services.Add(product);
             }
             else 
             {
-                // Ensure no conflict with already tracked entities
-                var trackedEntity = DbContext.products_services.Local.FirstOrDefault(p => p.id == product.id);
-                if (trackedEntity != null)
-                {
-                    DbContext.Entry(trackedEntity).State = EntityState.Detached;
-                }
-                
-                DbContext.products_services.Update(product);
+                context.products_services.Update(product);
             }
 
-            await DbContext.SaveChangesAsync();
+            await context.SaveChangesAsync();
             
             // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Product/Index", true);
@@ -226,7 +244,8 @@
 
     private async Task<string> GenerateUniqueBarcode()
     {
-        var barcodes = await DbContext.products_services
+        using var context = DbFactory.CreateDbContext();
+        var barcodes = await context.products_services
             .AsNoTracking()
             .Where(p => p.barcode != null && p.barcode.StartsWith("P"))
             .Select(p => p.barcode)

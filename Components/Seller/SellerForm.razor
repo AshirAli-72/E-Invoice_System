@@ -1,6 +1,6 @@
 @namespace E_Invoice_system.Components.Seller
 @using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <div class="form-wrapper form-layout-left-wide">
@@ -77,7 +77,8 @@
     {
         if (SellerId != 0)
         {
-            var existing = await DbContext.sellers.FindAsync(SellerId);
+            using var context = DbFactory.CreateDbContext();
+            var existing = await context.sellers.FindAsync(SellerId);
             if (existing != null)
             {
                 seller = existing;
@@ -93,26 +94,27 @@
         isSubmitting = true;
         try
         {
+            using var context = DbFactory.CreateDbContext();
             if (SellerId == 0)
             {
-                DbContext.sellers.Add(seller);
+                context.sellers.Add(seller);
             }
             else
             {
                 // Handle name change logic for invoices
                 if (!string.IsNullOrEmpty(originalName) && originalName != seller.name)
                 {
-                    var associatedInvoices = await DbContext.invoices.Where(i => i.seller_name == originalName).ToListAsync();
+                    var associatedInvoices = await context.invoices.Where(i => i.seller_name == originalName).ToListAsync();
                     foreach (var inv in associatedInvoices)
                     {
                         inv.seller_name = seller.name;
-                        DbContext.invoices.Update(inv);
+                        context.invoices.Update(inv);
                     }
                 }
-                DbContext.sellers.Update(seller);
+                context.sellers.Update(seller);
             }
 
-            await DbContext.SaveChangesAsync();
+            await context.SaveChangesAsync();
             
             // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Seller/Index", true);

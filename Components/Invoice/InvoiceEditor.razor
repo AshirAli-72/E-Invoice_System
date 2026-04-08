@@ -1,6 +1,6 @@
 @namespace E_Invoice_system.Components.Invoice
 @using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <div class="form-wrapper form-layout-left-wide">
@@ -208,11 +208,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        sellersList = await DbContext.sellers.OrderBy(s => s.name).ToListAsync();
-        customersList = await DbContext.customers.OrderBy(c => c.name).ToListAsync();
+        using var context = DbFactory.CreateDbContext();
+        sellersList = await context.sellers.OrderBy(s => s.name).ToListAsync();
+        customersList = await context.customers.OrderBy(c => c.name).ToListAsync();
         
         // Use a more resilient way to fetch Available products (handling potential status padding in DB)
-        var allProducts = await DbContext.products_services.ToListAsync();
+        var allProducts = await context.products_services.ToListAsync();
         productsList = allProducts.Where(p => !string.IsNullOrEmpty(p.status) && p.status.Trim().Equals("Available", StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
@@ -325,8 +326,9 @@
                 status = status
             };
 
-            DbContext.invoices.Add(invoice);
-            await DbContext.SaveChangesAsync();
+            using var context = DbFactory.CreateDbContext();
+            context.invoices.Add(invoice);
+            await context.SaveChangesAsync();
 
             // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Invoice/Index", true);

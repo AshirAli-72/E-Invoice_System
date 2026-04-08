@@ -1,6 +1,6 @@
 @namespace E_Invoice_system.Components.Customer
 @using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <div class="form-wrapper form-layout-left-wide">
@@ -79,7 +79,8 @@
     {
         if (CustomerId != 0)
         {
-            var existing = await DbContext.customers.FindAsync(CustomerId);
+            using var context = DbFactory.CreateDbContext();
+            var existing = await context.customers.FindAsync(CustomerId);
             if (existing != null)
             {
                 customer = existing;
@@ -99,26 +100,27 @@
         isSubmitting = true;
         try
         {
+            using var context = DbFactory.CreateDbContext();
             if (CustomerId == 0)
             {
-                DbContext.customers.Add(customer);
+                context.customers.Add(customer);
             }
             else
             {
                 // Handle name change logic for invoices
                 if (!string.IsNullOrEmpty(originalName) && originalName != customer.name)
                 {
-                    var associatedInvoices = await DbContext.invoices.Where(i => i.customer_name == originalName).ToListAsync();
+                    var associatedInvoices = await context.invoices.Where(i => i.customer_name == originalName).ToListAsync();
                     foreach (var inv in associatedInvoices)
                     {
                         inv.customer_name = customer.name;
-                        DbContext.invoices.Update(inv);
+                        context.invoices.Update(inv);
                     }
                 }
-                DbContext.customers.Update(customer);
+                context.customers.Update(customer);
             }
 
-            await DbContext.SaveChangesAsync();
+            await context.SaveChangesAsync();
             
             // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Customer/Index", true);
