@@ -18,6 +18,8 @@ namespace E_Invoice_system.Data
        
         public DbSet<Sale> sales { get; set; }
         public DbSet<ReturnDetail> returns { get; set; }
+        public DbSet<AppSetting> app_settings { get; set; }
+        public DbSet<Currency> currencies { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -68,6 +70,9 @@ namespace E_Invoice_system.Data
                 .Property(r => r.Amount)
                 .HasColumnType("decimal(18,2)");
 
+            modelBuilder.Entity<Currency>()
+                .Property(c => c.exchange_rate)
+                .HasColumnType("decimal(18,2)");
         }
     }
 }

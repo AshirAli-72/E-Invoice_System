@@ -92,7 +92,16 @@ self.addEventListener('fetch', event => {
                     })
                     .catch(() => {
                         clearTimeout(timeoutId);
-                        caches.match(request).then(cached => resolve(cached));
+                        caches.match(request).then(cached => {
+                            if (cached) {
+                                resolve(cached);
+                            } else {
+                                resolve(new Response(
+                                    '<html><head><title>Offline</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="font-family:sans-serif;text-align:center;padding-top:50px;"><h2>You are offline</h2><p>This page is not cached.</p><button onclick="window.location.reload()">Retry</button></body></html>', 
+                                    { headers: { 'Content-Type': 'text/html' } }
+                                ));
+                            }
+                        });
                     });
             })
         );

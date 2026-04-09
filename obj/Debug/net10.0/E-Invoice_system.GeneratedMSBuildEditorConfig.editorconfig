@@ -50,98 +50,114 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZWxsZXJcU2VsbGVyRm9ybS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/netcore/E-Invoice_system/Components/Settings/CurrencyManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xDdXJyZW5jeU1hbmFnZW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/Components/Settings/SettingsHub.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xTZXR0aW5nc0h1Yi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/Components/Settings/UserManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xVc2VyTWFuYWdlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/netcore/E-Invoice_system/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Account/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEFjY291bnRcTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Account/Logout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Account/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEFjY291bnRcTG9nb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Customer/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcQ3JlYXRlLmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Customer/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEN1c3RvbWVyXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Customer/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcRWRpdC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Customer/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEN1c3RvbWVyXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Customer/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcSW5kZXguY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Customer/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEN1c3RvbWVyXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Invoice/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxDcmVhdGUuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Invoice/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEludm9pY2VcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Invoice/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxEZXRhaWxzLmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Invoice/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEludm9pY2VcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Invoice/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxJbmRleC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Invoice/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEludm9pY2VcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Invoice/Print.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxQcmludC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Invoice/Print.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXEludm9pY2VcUHJpbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Product/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxDcmVhdGUuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Product/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFByb2R1Y3RcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Product/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxFZGl0LmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Product/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFByb2R1Y3RcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Product/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxJbmRleC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Product/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFByb2R1Y3RcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Sale/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxDcmVhdGUuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Sale/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNhbGVcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Sale/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxJbmRleC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Sale/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNhbGVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Seller/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXENyZWF0ZS5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/Seller/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNlbGxlclxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Seller/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXEVkaXQuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Seller/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNlbGxlclxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Seller/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXEluZGV4LmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Seller/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNlbGxlclxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Shared/_Layout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Settings/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNldHRpbmdzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Shared/_SaleLayout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9TYWxlTGF5b3V0LmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNoYXJlZFxfTGF5b3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Shared/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+[D:/netcore/E-Invoice_system/tmp/Pages/Shared/_SaleLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNoYXJlZFxfU2FsZUxheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[D:/netcore/E-Invoice_system/tmp/Pages/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXFNoYXJlZFxfVmFsaWRhdGlvblNjcmlwdHNQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+[D:/netcore/E-Invoice_system/tmp/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXF9WaWV3SW1wb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/tmp/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dG1wXFBhZ2VzXF9WaWV3U3RhcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

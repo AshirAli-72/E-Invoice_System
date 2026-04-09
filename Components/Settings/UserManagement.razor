@@ -1,0 +1,149 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<div class="management-container">
+    <div class="management-header">
+        <h3>User Management</h3>
+        <button class="btn-primary-sm" @onclick="ShowAddForm">
+            <i class="ph-user-plus"></i> Add User
+        </button>
+    </div>
+
+    @if (showForm)
+    {
+        <div class="form-card animate-in">
+            <div class="form-header">
+                <h4>@(editingUser == null ? "Add New User" : "Edit User")</h4>
+                <button class="btn-close" @onclick="HideForm"><i class="ph-x"></i></button>
+            </div>
+            <EditForm Model="userModel" OnValidSubmit="SaveUser">
+                <DataAnnotationsValidator />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <InputText @bind-Value="userModel.email" class="form-input" placeholder="user@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <InputText @bind-Value="userModel.password" type="password" class="form-input" placeholder="••••••••" />
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select @bind="userModel.status" class="form-input">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions-row">
+                    <button type="button" class="btn-secondary-sm" @onclick="HideForm">Cancel</button>
+                    <button type="submit" class="btn-primary-sm">Save User</button>
+                </div>
+            </EditForm>
+        </div>
+    }
+
+    <div class="table-container shadow-sm">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in userList)
+                {
+                    <tr>
+                        <td class="font-bold">@user.id</td>
+                        <td>@user.email</td>
+                        <td>
+                            <span class="badge @(user.status == "Active" ? "badge-success" : "badge-danger")">
+                                @user.status
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <button class="btn-icon" @onclick="() => EditUser(user)"><i class="ph-pencil"></i></button>
+                            <button class="btn-icon btn-danger-icon" @onclick="() => DeleteUser(user.id)"><i class="ph-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<users> userList = new();
+    private users userModel = new();
+    private bool showForm = false;
+    private users? editingUser = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        using var context = DbFactory.CreateDbContext();
+        userList = await context.users.ToListAsync();
+    }
+
+    private void ShowAddForm()
+    {
+        userModel = new users { status = "Active" }; // Correctly instantiate users model
+        editingUser = null;
+        showForm = true;
+    }
+
+    private void EditUser(users user)
+    {
+        editingUser = user;
+        userModel = new users
+        {
+            id = user.id,
+            email = user.email,
+            password = user.password,
+            status = user.status
+        };
+        showForm = true;
+    }
+
+    private void HideForm()
+    {
+        showForm = false;
+    }
+
+    private async Task SaveUser()
+    {
+        using var context = DbFactory.CreateDbContext();
+        if (editingUser == null)
+        {
+            context.users.Add(userModel);
+        }
+        else
+        {
+            context.users.Update(userModel);
+        }
+        await context.SaveChangesAsync();
+        await LoadUsers();
+        HideForm();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var user = await context.users.FindAsync(id);
+        if (user != null)
+        {
+            context.users.Remove(user);
+            await context.SaveChangesAsync();
+            await LoadUsers();
+        }
+    }
+}

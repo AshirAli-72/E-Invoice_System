@@ -1,0 +1,149 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<div class="management-container">
+    <div class="management-header">
+        <h3>Currency Settings</h3>
+        <button class="btn-primary-sm" @onclick="ShowAddForm">
+            <i class="ph-plus-circle"></i> Add Currency
+        </button>
+    </div>
+
+    @if (showForm)
+    {
+        <div class="form-card animate-in">
+            <div class="form-header">
+                <h4>@(editingCurrency == null ? "Add New Currency" : "Edit Currency")</h4>
+                <button class="btn-close" @onclick="HideForm"><i class="ph-x"></i></button>
+            </div>
+            <EditForm Model="currencyModel" OnValidSubmit="SaveCurrency">
+                <DataAnnotationsValidator />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Currency Name</label>
+                        <InputText @bind-Value="currencyModel.name" class="form-input" placeholder="e.g. US Dollar" />
+                    </div>
+                    <div class="form-group">
+                        <label>ISO Code</label>
+                        <InputText @bind-Value="currencyModel.code" class="form-input" placeholder="e.g. USD" />
+                    </div>
+                    <div class="form-group">
+                        <label>Symbol</label>
+                        <InputText @bind-Value="currencyModel.symbol" class="form-input" placeholder="e.g. $" />
+                    </div>
+                    <div class="form-group">
+                        <label>Exchange Rate (to Base)</label>
+                        <InputNumber @bind-Value="currencyModel.exchange_rate" class="form-input" step="0.01" />
+                    </div>
+                </div>
+                <div class="form-actions-row">
+                    <button type="button" class="btn-secondary-sm" @onclick="HideForm">Cancel</button>
+                    <button type="submit" class="btn-primary-sm">Save Currency</button>
+                </div>
+            </EditForm>
+        </div>
+    }
+
+    <div class="table-container shadow-sm">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Symbol</th>
+                    <th>Rate</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var curr in currencyList)
+                {
+                    <tr>
+                        <td class="font-bold">@curr.name</td>
+                        <td><span class="currency-code">@curr.code</span></td>
+                        <td><span class="currency-symbol">@curr.symbol</span></td>
+                        <td><span class="exchange-rate">@curr.exchange_rate.ToString("N2")</span></td>
+                        <td class="text-right">
+                            <button class="btn-icon" @onclick="() => EditCurrency(curr)"><i class="ph-pencil"></i></button>
+                            <button class="btn-icon btn-danger-icon" @onclick="() => DeleteCurrency(curr.id)"><i class="ph-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<Currency> currencyList = new();
+    private Currency currencyModel = new();
+    private bool showForm = false;
+    private Currency? editingCurrency = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrencies();
+    }
+
+    private async Task LoadCurrencies()
+    {
+        using var context = DbFactory.CreateDbContext();
+        currencyList = await context.currencies.ToListAsync();
+    }
+
+    private void ShowAddForm()
+    {
+        currencyModel = new Currency { exchange_rate = 1.0m };
+        editingCurrency = null;
+        showForm = true;
+    }
+
+    private void EditCurrency(Currency curr)
+    {
+        editingCurrency = curr;
+        currencyModel = new Currency
+        {
+            id = curr.id,
+            name = curr.name,
+            code = curr.code,
+            symbol = curr.symbol,
+            exchange_rate = curr.exchange_rate
+        };
+        showForm = true;
+    }
+
+    private void HideForm()
+    {
+        showForm = false;
+    }
+
+    private async Task SaveCurrency()
+    {
+        using var context = DbFactory.CreateDbContext();
+        if (editingCurrency == null)
+        {
+            context.currencies.Add(currencyModel);
+        }
+        else
+        {
+            context.currencies.Update(currencyModel);
+        }
+        await context.SaveChangesAsync();
+        await LoadCurrencies();
+        HideForm();
+    }
+
+    private async Task DeleteCurrency(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var curr = await context.currencies.FindAsync(id);
+        if (curr != null)
+        {
+            context.currencies.Remove(curr);
+            await context.SaveChangesAsync();
+            await LoadCurrencies();
+        }
+    }
+}
