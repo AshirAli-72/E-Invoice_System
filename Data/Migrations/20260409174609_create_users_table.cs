@@ -1,9 +1,12 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace E_Invoice_system.Data.Migrations
 {
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260409174609_create_users_table")]
     public partial class create_users_table : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

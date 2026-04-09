@@ -2,85 +2,167 @@
 @using E_Invoice_system.Data
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager Nav
+@using Microsoft.AspNetCore.Components.Web
+@rendermode RenderMode.InteractiveServer
 
 <div class="management-container">
-    <div class="management-header">
-        <h3>Currency Settings</h3>
-        <button class="btn-primary-sm" @onclick="ShowAddForm">
-            <i class="ph-plus-circle"></i> Add Currency
-        </button>
-    </div>
-
-    @if (showForm)
+    @if (!showForm)
     {
-        <div class="form-card animate-in">
-            <div class="form-header">
-                <h4>@(editingCurrency == null ? "Add New Currency" : "Edit Currency")</h4>
-                <button class="btn-close" @onclick="HideForm"><i class="ph-x"></i></button>
+        <a href="/settings" class="btn-back-hub">
+            <i class="ph-arrow-left"></i> Back to Settings
+        </a>
+
+        @* Quick Search & Add Row *@
+        <div class="quick-action-row animate-in">
+            <div class="search-input-group">
+                <input type="text" list="currency-options" @bind="searchQuery" class="search-field" placeholder="Search country or currency code (e.g. Saudi Arabia, USD)..." />
+                <datalist id="currency-options">
+                    @foreach (var gc in globalCurrencies)
+                    {
+                        <option value="@($"{gc.name} ({gc.code})")">@gc.country</option>
+                    }
+                </datalist>
+                <button type="button" class="btn-select-add" @onclick="QuickAddCurrency">
+                    <i class="ph-check-square"></i> Select & Add
+                </button>
             </div>
-            <EditForm Model="currencyModel" OnValidSubmit="SaveCurrency">
-                <DataAnnotationsValidator />
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Currency Name</label>
-                        <InputText @bind-Value="currencyModel.name" class="form-input" placeholder="e.g. US Dollar" />
-                    </div>
-                    <div class="form-group">
-                        <label>ISO Code</label>
-                        <InputText @bind-Value="currencyModel.code" class="form-input" placeholder="e.g. USD" />
-                    </div>
-                    <div class="form-group">
-                        <label>Symbol</label>
-                        <InputText @bind-Value="currencyModel.symbol" class="form-input" placeholder="e.g. $" />
-                    </div>
-                    <div class="form-group">
-                        <label>Exchange Rate (to Base)</label>
-                        <InputNumber @bind-Value="currencyModel.exchange_rate" class="form-input" step="0.01" />
-                    </div>
-                </div>
-                <div class="form-actions-row">
-                    <button type="button" class="btn-secondary-sm" @onclick="HideForm">Cancel</button>
-                    <button type="submit" class="btn-primary-sm">Save Currency</button>
-                </div>
-            </EditForm>
+            <button type="button" class="btn-primary" @onclick="ShowAddForm" style="white-space: nowrap; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 700; cursor: pointer;">
+                <i class="ph-plus-circle"></i> Add Custom
+            </button>
+        </div>
+
+        <div class="card card-no-padding">
+            <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+                <div class="form-section-title" style="margin: 0; font-size: 1.25rem;">System Currencies</div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th style="padding-left: 1.5rem;">Status</th>
+                            <th>Name</th>
+                            <th>ISO Code</th>
+                            <th>Symbol</th>
+                            <th>Rate</th>
+                            <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var curr in currencyList)
+                        {
+                            <tr class="@(curr.is_active ? "active-currency-row" : "")">
+                                <td style="padding-left: 1.5rem;">
+                                    @if (curr.is_active)
+                                    {
+                                        <span class="status-badge status-active">Active Base</span>
+                                    }
+                                    else
+                                    {
+                                        <button class="status-badge" @onclick="() => SetActiveCurrency(curr.id)" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; cursor: pointer;">Select as Base</button>
+                                    }
+                                </td>
+                                <td class="font-bold">@curr.name</td>
+                                <td><span style="font-family: monospace; font-weight: 700; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">@curr.code</span></td>
+                                <td><span style="font-weight: 700; color: var(--primary);">@curr.symbol</span></td>
+                                <td class="font-medium">@curr.exchange_rate.ToString("N2")</td>
+                                <td class="text-right" style="padding-right: 1.5rem;">
+                                    <div class="actions-container actions-right">
+                                        <button class="btn-icon-sm btn-edit" @onclick="() => EditCurrency(curr)" title="Edit">
+                                            <i class="ph-pencil"></i>
+                                        </button>
+                                        <button class="btn-icon-sm btn-delete" @onclick="() => DeleteCurrency(curr.id)" title="Delete">
+                                            <i class="ph-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
-
-    <div class="table-container shadow-sm">
-        <table class="premium-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Symbol</th>
-                    <th>Rate</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var curr in currencyList)
-                {
-                    <tr>
-                        <td class="font-bold">@curr.name</td>
-                        <td><span class="currency-code">@curr.code</span></td>
-                        <td><span class="currency-symbol">@curr.symbol</span></td>
-                        <td><span class="exchange-rate">@curr.exchange_rate.ToString("N2")</span></td>
-                        <td class="text-right">
-                            <button class="btn-icon" @onclick="() => EditCurrency(curr)"><i class="ph-pencil"></i></button>
-                            <button class="btn-icon btn-danger-icon" @onclick="() => DeleteCurrency(curr.id)"><i class="ph-trash"></i></button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 </div>
+
+@if (showForm)
+{
+    @* Modal Pop-up for Custom/Edit *@
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="card" style="margin-bottom: 0; border: none;">
+                <div class="card-header card-header-flex">
+                    <div class="form-section-title">@(editingCurrency == null ? "Custom Currency" : "Edit Currency")</div>
+                    <button type="button" class="btn-icon-sm" @onclick="HideForm" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+                </div>
+                
+                <EditForm Model="currencyModel" OnValidSubmit="SaveCurrency">
+                    <DataAnnotationsValidator />
+                    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Currency Name</label>
+                            <InputText @bind-Value="currencyModel.name" class="form-control" placeholder="e.g. US Dollar" />
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">ISO Code</label>
+                                <InputText @bind-Value="currencyModel.code" class="form-control" placeholder="e.g. USD" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Symbol</label>
+                                <InputText @bind-Value="currencyModel.symbol" class="form-control" placeholder="e.g. $" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Exchange Rate (to Base)</label>
+                            <InputNumber @bind-Value="currencyModel.exchange_rate" class="form-control" step="0.01" />
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                            <button type="button" class="btn-icon-sm" @onclick="HideForm" style="background: #f1f5f9; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">Cancel</button>
+                            <button type="submit" class="btn-primary" style="padding: 0.6rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">Save Currency</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .active-currency-row {
+        background-color: #fdf2f2 !important;
+    }
+</style>
 
 @code {
     private List<Currency> currencyList = new();
     private Currency currencyModel = new();
     private bool showForm = false;
     private Currency? editingCurrency = null;
+    private string searchQuery = "";
+
+    private class GlobalCurrency { public string country; public string name; public string code; public string symbol; }
+    private List<GlobalCurrency> globalCurrencies = new()
+    {
+        new() { country = "United States", name = "US Dollar", code = "USD", symbol = "$" },
+        new() { country = "European Union", name = "Euro", code = "EUR", symbol = "€" },
+        new() { country = "United Kingdom", name = "British Pound", code = "GBP", symbol = "£" },
+        new() { country = "Saudi Arabia", name = "Saudi Riyal", code = "SAR", symbol = "SR" },
+        new() { country = "United Arab Emirates", name = "UAE Dirham", code = "AED", symbol = "DH" },
+        new() { country = "Pakistan", name = "Pakistani Rupee", code = "PKR", symbol = "Rs" },
+        new() { country = "India", name = "Indian Rupee", code = "INR", symbol = "₹" },
+        new() { country = "China", name = "Chinese Yuan", code = "CNY", symbol = "¥" },
+        new() { country = "Japan", name = "Japanese Yen", code = "JPY", symbol = "¥" },
+        new() { country = "Turkey", name = "Turkish Lira", code = "TRY", symbol = "₺" },
+        new() { country = "Canada", name = "Canadian Dollar", code = "CAD", symbol = "$" },
+        new() { country = "Australia", name = "Australian Dollar", code = "AUD", symbol = "$" },
+        new() { country = "Kuwait", name = "Kuwaiti Dinar", code = "KWD", symbol = "KD" },
+        new() { country = "Oman", name = "Omani Rial", code = "OMR", symbol = "RO" },
+        new() { country = "Qatar", name = "Qatari Rial", code = "QAR", symbol = "QR" },
+        new() { country = "Bahrain", name = "Bahraini Dinar", code = "BHD", symbol = "BD" }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,7 +172,7 @@
     private async Task LoadCurrencies()
     {
         using var context = DbFactory.CreateDbContext();
-        currencyList = await context.currencies.ToListAsync();
+        currencyList = await context.currencies.OrderByDescending(c => c.is_active).ThenBy(c => c.name).ToListAsync();
     }
 
     private void ShowAddForm()
@@ -98,6 +180,49 @@
         currencyModel = new Currency { exchange_rate = 1.0m };
         editingCurrency = null;
         showForm = true;
+    }
+
+    private async Task QuickAddCurrency()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery)) return;
+
+        // More robust matching: Check for (CODE) anywhere in the string
+        var match = globalCurrencies.FirstOrDefault(c => 
+            searchQuery.Contains($"({c.code})", StringComparison.OrdinalIgnoreCase) || 
+            searchQuery.Equals(c.name, StringComparison.OrdinalIgnoreCase) ||
+            searchQuery.Equals(c.code, StringComparison.OrdinalIgnoreCase));
+
+        if (match != null)
+        {
+            using var context = DbFactory.CreateDbContext();
+            if (!await context.currencies.AnyAsync(c => c.code == match.code))
+            {
+                context.currencies.Add(new Currency 
+                { 
+                    name = match.name, 
+                    code = match.code, 
+                    symbol = match.symbol, 
+                    exchange_rate = 1.0m,
+                    is_active = false
+                });
+                await context.SaveChangesAsync();
+                await LoadCurrencies();
+                searchQuery = "";
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task SetActiveCurrency(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var all = await context.currencies.ToListAsync();
+        foreach (var c in all)
+        {
+            c.is_active = (c.id == id);
+        }
+        await context.SaveChangesAsync();
+        await LoadCurrencies();
     }
 
     private void EditCurrency(Currency curr)
@@ -109,7 +234,8 @@
             name = curr.name,
             code = curr.code,
             symbol = curr.symbol,
-            exchange_rate = curr.exchange_rate
+            exchange_rate = curr.exchange_rate,
+            is_active = curr.is_active
         };
         showForm = true;
     }

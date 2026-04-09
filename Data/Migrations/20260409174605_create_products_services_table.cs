@@ -1,10 +1,12 @@
-using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace E_Invoice_system.Data.Migrations
 {
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260409174605_create_products_services_table")]
     public partial class create_products_services_table : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,10 +24,10 @@ namespace E_Invoice_system.Data.Migrations
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    expiry_date = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    expiry_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

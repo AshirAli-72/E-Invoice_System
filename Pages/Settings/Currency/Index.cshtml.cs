@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Http;
 
-namespace E_Invoice_system.Pages.Settings
+namespace E_Invoice_system.Pages.Settings.Currency
 {
     public class IndexModel : PageModel
     {
         public IActionResult OnGet()
         {
-            var userEmail = HttpContext.Session.GetString("UserEmail");
-            if (string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
             {
                 return RedirectToPage("/Account/Login");
             }
-
             return Page();
         }
     }

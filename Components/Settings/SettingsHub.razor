@@ -2,36 +2,31 @@
 @using E_Invoice_system.Data
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager Nav
 
 <div class="settings-hub">
-    <div class="settings-tabs">
-        <button class="tab-btn @(activeTab == "users" ? "active" : "")" @onclick='() => SwitchTab("users")'>
-            <i class="ph-users-three"></i>
-            <span>User Management</span>
-        </button>
-        <button class="tab-btn @(activeTab == "currency" ? "active" : "")" @onclick='() => SwitchTab("currency")'>
-            <i class="ph-currency-dollar"></i>
-            <span>Currency Settings</span>
-        </button>
-    </div>
-
-    <div class="tab-content">
-        @if (activeTab == "users")
-        {
-            <UserManagement />
-        }
-        else if (activeTab == "currency")
-        {
-            <CurrencyManagement />
-        }
+    @* Professional Dashboard Hub *@
+    <div class="settings-tabs animate-in">
+        <a href="/settings/user" class="tab-btn">
+            <div class="tab-btn-content">
+                <i class="ph-users-three"></i>
+                <div class="tab-btn-text">
+                    <span class="tab-title">User Management</span>
+                    <span class="tab-desc">Manage system accounts & access</span>
+                </div>
+            </div>
+        </a>
+        <a href="/settings/currency" class="tab-btn">
+            <div class="tab-btn-content">
+                <i class="ph-currency-dollar"></i>
+                <div class="tab-btn-text">
+                    <span class="tab-title">Currency Settings</span>
+                    <span class="tab-desc">Set exchange rates & symbols</span>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
 
 @code {
-    private string activeTab = "users";
-
-    private void SwitchTab(string tab)
-    {
-        activeTab = tab;
-    }
 }

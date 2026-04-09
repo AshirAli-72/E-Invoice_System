@@ -1,9 +1,12 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace E_Invoice_system.Data.Migrations
 {
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260409174602_create_currencies_table")]
     public partial class create_currencies_table : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +20,8 @@ namespace E_Invoice_system.Data.Migrations
                     name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     symbol = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    exchange_rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    exchange_rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                     status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
