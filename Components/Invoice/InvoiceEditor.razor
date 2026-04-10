@@ -208,6 +208,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await CurrencyService.GetSymbolAsync();
         using var context = DbFactory.CreateDbContext();
         sellersList = await context.sellers.OrderBy(s => s.name).ToListAsync();
         customersList = await context.customers.OrderBy(c => c.name).ToListAsync();

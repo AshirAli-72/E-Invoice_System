@@ -6,12 +6,10 @@
 @using Microsoft.AspNetCore.Components.Web
 @rendermode RenderMode.InteractiveServer
 
-<div class="management-container">
-    @if (!showForm)
-    {
-        <a href="/settings" class="btn-back-hub">
-            <i class="ph-arrow-left"></i> Back to Settings
-        </a>
+<div class="management-container @(showForm ? "modal-active" : "")">
+    <a href="/settings" class="btn-back-hub">
+        <i class="ph-arrow-left"></i> Back to Settings
+    </a>
 
         @* Quick Search & Add Row *@
         <div class="quick-action-row animate-in">
@@ -71,11 +69,11 @@
                                         }
                                     </td>
                                     <td style="text-align: center;">
-                                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                            <button class="action-btn" @onclick="() => EditCurrency(curr)" title="Edit">
-                                                <i class="ph-pencil-simple"></i>
+                                        <div class="actions-container actions-center">
+                                            <button class="btn-icon-sm btn-edit" @onclick="() => EditCurrency(curr)" title="Edit">
+                                                <i class="ph-pencil"></i>
                                             </button>
-                                            <button class="action-btn delete" @onclick="() => DeleteCurrency(curr.id)" title="Delete">
+                                            <button class="btn-icon-sm btn-delete" @onclick="() => DeleteCurrency(curr.id)" title="Delete">
                                                 <i class="ph-trash"></i>
                                             </button>
                                         </div>
@@ -108,8 +106,9 @@
                 </table>
             </div>
         </div>
-    }
-</div>
+  </div>
+
+
 
 @if (showForm)
 {
@@ -133,10 +132,12 @@
                             <div class="form-group">
                                 <label class="form-label">ISO Code</label>
                                 <InputText @bind-Value="currencyModel.code" class="form-control" placeholder="e.g. USD" />
+                                <ValidationMessage For="@(() => currencyModel.code)" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Symbol</label>
-                                <InputText @bind-Value="currencyModel.symbol" class="form-control" placeholder="e.g. $" />
+                                <InputText @bind-Value="currencyModel.symbol" class="form-control" placeholder="e.g. ₹" />
+                                <ValidationMessage For="@(() => currencyModel.symbol)" />
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -158,9 +159,57 @@
 }
 
 <style>
+    .modal-active .card, 
+    .modal-active .quick-action-row,
+    .modal-active .btn-back-hub {
+        filter: blur(4px) grayscale(0.2);
+        pointer-events: none;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: #f8fafc !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
     .active-currency-row {
         background-color: #fdf2f2 !important;
+        border-left: 4px solid var(--primary);
     }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: modalFadeIn 0.2s ease;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 0;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        animation: modalScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes modalScaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 </style>
 
 @code {
@@ -194,6 +243,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await CurrencyService.GetSymbolAsync();
         await LoadCurrencies();
     }
 
@@ -202,7 +252,9 @@
         try
         {
             using var context = DbFactory.CreateDbContext();
-            currencyList = await context.currencies.OrderByDescending(c => c.is_active).ThenBy(c => c.name).ToListAsync();
+            // Stable ordering by name only, so rows don't jump when toggling active status
+            currencyList = await context.currencies.OrderBy(c => c.name).ToListAsync();
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
         {
@@ -251,6 +303,9 @@
                 
                 if (existing == null)
                 {
+                    // FAST: Reset all other active flags in one query
+                    await context.Database.ExecuteSqlRawAsync("UPDATE currencies SET is_active = 0");
+
                     var newCurrency = new Currency 
                     { 
                         name = match.name, 
@@ -258,25 +313,19 @@
                         symbol = match.symbol, 
                         exchange_rate = 1.0m,
                         status = "Active",
-                        is_active = true // Auto select as active base
+                        is_active = true 
                     };
-                    
-                    // Set all others to Inactive Base
-                    var all = await context.currencies.ToListAsync();
-                    foreach (var c in all) c.is_active = false;
                     
                     context.currencies.Add(newCurrency);
                     await context.SaveChangesAsync();
                 }
                 else
                 {
-                    // If it already exists, just make it the active base
-                    var all = await context.currencies.ToListAsync();
-                    foreach (var c in all)
-                    {
-                        c.is_active = (c.id == existing.id);
-                        if (c.is_active) c.status = "Active";
-                    }
+                    // FAST: Reset current base and set the new one
+                    await context.Database.ExecuteSqlRawAsync("UPDATE currencies SET is_active = 0");
+                    existing.is_active = true;
+                    existing.status = "Active";
+                    context.currencies.Update(existing);
                     await context.SaveChangesAsync();
                 }
                 
@@ -291,21 +340,36 @@
         finally
         {
             isProcessing = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     private async Task SetActiveCurrency(int id)
     {
-        using var context = DbFactory.CreateDbContext();
-        var all = await context.currencies.ToListAsync();
-        foreach (var c in all)
+        if (isProcessing) return;
+        isProcessing = true;
+        try 
         {
-            c.is_active = (c.id == id);
-            if (c.is_active) c.status = "Active"; // Ensure base currency is always Active status
+            using var context = DbFactory.CreateDbContext();
+            // FAST: Reset all in one SQL command
+            await context.Database.ExecuteSqlRawAsync("UPDATE currencies SET is_active = 0");
+            
+            var curr = await context.currencies.FindAsync(id);
+            if (curr != null)
+            {
+                curr.is_active = true;
+                curr.status = "Active";
+                context.currencies.Update(curr);
+                await context.SaveChangesAsync();
+            }
+            await LoadCurrencies();
+            await CurrencyService.GetSymbolAsync(); // Refresh global symbol cache
         }
-        await context.SaveChangesAsync();
-        await LoadCurrencies();
+        finally 
+        {
+            isProcessing = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private void EditCurrency(Currency curr)
@@ -356,7 +420,7 @@
         finally
         {
             isProcessing = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -369,6 +433,7 @@
             context.currencies.Remove(curr);
             await context.SaveChangesAsync();
             await LoadCurrencies();
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

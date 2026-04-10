@@ -6,12 +6,10 @@
 @using Microsoft.AspNetCore.Components.Web
 @rendermode RenderMode.InteractiveServer
 
-<div class="management-container">
-    @if (!showForm)
-    {
-        <a href="/settings" class="btn-back-hub">
-            <i class="ph-arrow-left"></i> Back to Settings
-        </a>
+<div class="management-container @(showForm ? "modal-active" : "")">
+    <a href="/settings" class="btn-back-hub">
+        <i class="ph-arrow-left"></i> Back to Settings
+    </a>
 
         <div class="card card-no-padding">
             <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem;">
@@ -58,54 +56,105 @@
                 </table>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="form-wrapper">
-            <div class="form-section-header">
-                <h3 class="form-section-title">
-                    <i class="ph-user form-icon-primary"></i>
-                    @(editingUser == null ? "User Information" : "Edit User Account")
-                </h3>
+    </div>
+
+@if (showForm)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="card" style="margin-bottom: 0; border: none;">
+                <div class="card-header card-header-flex">
+                    <div class="form-section-title">
+                        <i class="ph-user @(editingUser == null ? "form-icon-primary" : "")"></i>
+                        @(editingUser == null ? "Add New User" : "Edit User Account")
+                    </div>
+                    <button type="button" class="btn-icon-sm" @onclick="HideForm" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+                </div>
+
+                <EditForm Model="userModel" OnValidSubmit="SaveUser">
+                    <DataAnnotationsValidator />
+                    
+                    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Email Address</label>
+                            <InputText @bind-Value="userModel.email" class="form-control" placeholder="Enter user's email address" />
+                            <ValidationMessage For="@(() => userModel.email)" />
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Account Password</label>
+                            <InputText @bind-Value="userModel.password" type="password" class="form-control" placeholder="••••••••" />
+                            <ValidationMessage For="@(() => userModel.password)" />
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Account Status</label>
+                            <select @bind="userModel.status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                            <button type="button" class="btn-icon-sm" @onclick="HideForm" style="background: #f1f5f9; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">Cancel</button>
+                            <button type="submit" class="btn-primary" style="padding: 0.6rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
+                                <i class="ph-check"></i> @(editingUser == null ? "Save User Account" : "Update User Account")
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
             </div>
-
-            <EditForm Model="userModel" OnValidSubmit="SaveUser">
-                <DataAnnotationsValidator />
-                
-                <div class="form-section">
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label class="form-label">Email Address</label>
-                        <InputText @bind-Value="userModel.email" class="form-control" placeholder="Enter user's email address" />
-                        <ValidationMessage For="@(() => userModel.email)" />
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label class="form-label">Account Password</label>
-                        <InputText @bind-Value="userModel.password" type="password" class="form-control" placeholder="••••••••" />
-                        <ValidationMessage For="@(() => userModel.password)" />
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Account Status</label>
-                        <select @bind="userModel.status" class="form-control">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-actions-sticky">
-                    <button type="button" class="btn-icon-sm" @onclick="HideForm" style="background: #f1f5f9; color: #475569; padding: 0.75rem 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn-primary" style="padding: 0.75rem 1.5rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
-                        <i class="ph-check"></i> @(editingUser == null ? "Save User Account" : "Update User Account")
-                    </button>
-                </div>
-            </EditForm>
         </div>
+    </div>
+}
+
+<style>
+    .modal-active .card, 
+    .modal-active .btn-back-hub {
+        filter: blur(4px) grayscale(0.2);
+        pointer-events: none;
+        opacity: 0.7;
+        transition: all 0.3s ease;
     }
-</div>
+
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: #f8fafc !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: modalFadeIn 0.2s ease;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 0;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        animation: modalScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes modalScaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+</style>
 
 @code {
     private List<users> userList = new();
@@ -122,6 +171,7 @@
     {
         using var context = DbFactory.CreateDbContext();
         userList = await context.users.ToListAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     private void ShowAddForm()
@@ -163,6 +213,7 @@
         await context.SaveChangesAsync();
         await LoadUsers();
         HideForm();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeleteUser(int id)

@@ -10,10 +10,12 @@ namespace E_Invoice_system.Pages.Invoice
     public class PrintModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly Services.CurrencyService _currencyService;
 
-        public PrintModel(ApplicationDbContext context)
+        public PrintModel(ApplicationDbContext context, Services.CurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
         }
 
         public invoices Invoice { get; set; } = default!;
@@ -24,6 +26,7 @@ namespace E_Invoice_system.Pages.Invoice
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            await _currencyService.GetSymbolAsync();
             var invoice = await _context.invoices.FirstOrDefaultAsync(i => i.id == id);
             if (invoice == null) return NotFound();
 

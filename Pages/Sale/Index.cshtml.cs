@@ -10,10 +10,12 @@ namespace E_Invoice_system.Pages.Sale
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly Services.CurrencyService _currencyService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, Services.CurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
         }
 
         public IList<SaleDisplayItem> Sales { get; set; } = new List<SaleDisplayItem>();
@@ -54,6 +56,7 @@ namespace E_Invoice_system.Pages.Sale
 
         public async Task<IActionResult> OnGetAsync()
         {
+            await _currencyService.GetSymbolAsync();
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 

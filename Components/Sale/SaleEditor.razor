@@ -469,11 +469,13 @@
 
     private bool isLoading = true;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
+        // Prime currency symbol before data loading
+        await CurrencyService.GetSymbolAsync();
+
         // Non-blocking initialization so the UI renders instantly
         _ = LoadDataAsync();
-        return Task.CompletedTask;
     }
 
     private async Task LoadDataAsync()

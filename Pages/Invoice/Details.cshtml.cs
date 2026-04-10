@@ -10,10 +10,12 @@ namespace E_Invoice_system.Pages.Invoice
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly Services.CurrencyService _currencyService;
 
-        public DetailsModel(ApplicationDbContext context)
+        public DetailsModel(ApplicationDbContext context, Services.CurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
         }
 
         public invoices Invoice { get; set; } = default!;
@@ -24,6 +26,7 @@ namespace E_Invoice_system.Pages.Invoice
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            await _currencyService.GetSymbolAsync();
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
                 return RedirectToPage("/Account/Login");
 

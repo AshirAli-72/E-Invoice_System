@@ -13,12 +13,14 @@ namespace E_Invoice_system.Pages
         private readonly ApplicationDbContext _context;
         private readonly ILogger<IndexModel> _logger;
         private readonly IMemoryCache _cache;
+        private readonly Services.CurrencyService _currencyService;
 
-        public IndexModel(ILogger<IndexModel> logger, ApplicationDbContext context, IMemoryCache cache)
+        public IndexModel(ILogger<IndexModel> logger, ApplicationDbContext context, IMemoryCache cache, Services.CurrencyService currencyService)
         {
             _logger = logger;
             _context = context;
             _cache = cache;
+            _currencyService = currencyService;
         }
 
         public class DashboardStats
@@ -46,6 +48,9 @@ namespace E_Invoice_system.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
+            // Prime currency symbol for the dashboard
+            await _currencyService.GetSymbolAsync();
+
             // Simple session check
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
             {
