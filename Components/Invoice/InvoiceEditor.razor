@@ -69,7 +69,7 @@
                         <option value="0">-- Select Product --</option>
                         @foreach (var p in productsList)
                         {
-                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name_service (@p.qty_unit_type) - $@p.price</option>
+                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name_service (@p.qty_unit_type) - @CurrencyService.GetSymbol()@p.price</option>
                         }
                         @if (productsList.Count == 0)
                         {
@@ -118,10 +118,10 @@
                                     @item.ExpiryDate?.ToString("yyyy-MM-dd")
                                 </td>
                                 <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
-                                    $@item.Price.ToString("F2")
+                                    @CurrencyService.GetSymbol()@item.Price.ToString("F2")
                                 </td>
                                 <td style="padding: 0.5rem 1rem; font-weight: bold; font-size: 0.85rem; vertical-align: middle;">
-                                    $@item.Total.ToString("F2")
+                                    @CurrencyService.GetSymbol()@item.Total.ToString("F2")
                                 </td>
                                 <td style="padding: 0.5rem 1rem; text-align: center; vertical-align: middle;">
                                     <button type="button" @onclick="() => RemoveItem(item)" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
@@ -157,7 +157,7 @@
         <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 2rem; max-width: 400px; margin-left: auto;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Subtotal:</span>
-                <span style="font-weight: 700; font-size: 0.9rem;">$@subtotal.ToString("F2")</span>
+                <span style="font-weight: 700; font-size: 0.9rem;">@CurrencyService.GetSymbol()@subtotal.ToString("F2")</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: center;">
                 <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Discount:</span>
@@ -166,7 +166,7 @@
             <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 1rem 0;" />
             <div style="display: flex; justify-content: space-between; font-size: 1.15rem;">
                 <span style="font-weight: 800; color: #0f172a;">Total:</span>
-                <span style="font-weight: 800; color: #BC1823;">$@total.ToString("F2")</span>
+                <span style="font-weight: 800; color: #BC1823;">@CurrencyService.GetSymbol()@total.ToString("F2")</span>
             </div>
         </div>
     </div>

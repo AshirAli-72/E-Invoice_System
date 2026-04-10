@@ -107,7 +107,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 25px; /* Consistent gap - adjusted for 'equal gap' */
+    margin-bottom: 1.5rem; /* Reduced for better flow with next elements */
     color: var(--text-muted);
     font-weight: 600;
     font-size: 0.9rem;
@@ -130,7 +130,8 @@
 }
 
 .search-input-group {
-    flex: 1;
+    max-width: 500px; /* Reduced width as requested */
+    width: 100%;
     display: flex;
     gap: 0;
 }

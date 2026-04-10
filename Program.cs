@@ -26,6 +26,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ApplicationDbContext>(p => 
     p.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext());
 
+builder.Services.AddScoped<E_Invoice_system.Services.CurrencyService>();
+
 
 builder.Services.AddResponseCompression(options =>
 {

@@ -22,6 +22,9 @@ namespace E_Invoice_system.Models
         [Column("exchange_rate")]
         public decimal exchange_rate { get; set; }
 
+        [Column("status")]
+        public string? status { get; set; }
+
         [Column("is_active")]
         public bool is_active { get; set; }
     }

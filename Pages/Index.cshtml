@@ -42,7 +42,7 @@
             <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="ph-currency-dollar"></i></div>
         </div>
         <div class="stat-label">Total Sale</div>
-        <div class="stat-value">$@(Model.TotalSales.ToString("N2"))</div>
+        <div class="stat-value">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
     </div>
 
     <div class="stat-card">
@@ -78,7 +78,7 @@
                         <td style="padding: 1rem 0.5rem; font-weight: 600;">#@(inv.invoice_no ?? inv.id.ToString())</td>
                         <td style="padding: 1rem 0.5rem;">@inv.customer_name</td>
                         <td style="padding: 1rem 0.5rem;">@inv.date.ToString("MMM dd, yyyy")</td>
-                        <td style="padding: 1rem 0.5rem; font-weight: 700;">$@(inv.total_price.ToString("N2"))</td>
+                        <td style="padding: 1rem 0.5rem; font-weight: 700;">@CurrencyService.GetSymbol()@(inv.total_price.ToString("N2"))</td>
 
                         <td style="padding: 1rem 0.5rem;">
                             @{

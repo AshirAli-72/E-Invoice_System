@@ -21,7 +21,8 @@ namespace E_Invoice_system.Data.Migrations
                     code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     symbol = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     exchange_rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                     status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    is_active = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

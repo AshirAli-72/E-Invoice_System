@@ -89,9 +89,9 @@
                                         <div style="font-size:11px; color:#ef4444; margin-top:3px;">Expiry: @item["expiryDate"]</div>
                                     }
                                 </td>
-                                <td class="col-center">$@(((decimal)item["price"]).ToString("N2"))</td>
+                                <td class="col-center">@CurrencyService.GetSymbol()@(((decimal)item["price"]).ToString("N2"))</td>
                                 <td class="col-center">@item["qty"]</td>
-                                <td class="col-right col-bold">$@(((decimal)item["total"]).ToString("N2"))</td>
+                                <td class="col-right col-bold">@CurrencyService.GetSymbol()@(((decimal)item["total"]).ToString("N2"))</td>
                             </tr>
                         }
                     }
@@ -105,9 +105,9 @@
                                     <div style="font-size:11px; color:#ef4444; margin-top:3px;">Expiry: @Model.SingleItemExpiry</div>
                                 }
                             </td>
-                            <td class="col-center">$@Model.Invoice.price.ToString("N2")</td>
+                            <td class="col-center">@CurrencyService.GetSymbol()@Model.Invoice.price.ToString("N2")</td>
                             <td class="col-center">@Model.Invoice.qty_unit_type</td>
-                            <td class="col-right col-bold">$@((Model.Invoice.price - Model.Invoice.discount).ToString("N2"))</td>
+                            <td class="col-right col-bold">@CurrencyService.GetSymbol()@((Model.Invoice.price - Model.Invoice.discount).ToString("N2"))</td>
                         </tr>
                     }
                 </tbody>
@@ -128,16 +128,16 @@
             <div class="totals-section">
                 <div class="total-row">
                     <span class="total-label">Sub Total</span>
-                    <span class="total-val">$@Model.Subtotal.ToString("N2")</span>
+                    <span class="total-val">@CurrencyService.GetSymbol()@Model.Subtotal.ToString("N2")</span>
                 </div>
                 <div class="total-row" style="color:var(--invoice-red);">
                     <span class="total-label" style="color:var(--invoice-red);">Discount</span>
-                    <span class="total-val">- $@Model.Invoice.discount.ToString("N2")</span>
+                    <span class="total-val">- @CurrencyService.GetSymbol()@Model.Invoice.discount.ToString("N2")</span>
                 </div>
                 
                 <div class="grand-total-bar">
                     <span class="grand-label">Grand Total</span>
-                    <span class="grand-val">$@Model.Invoice.total_price.ToString("N2")</span>
+                    <span class="grand-val">@CurrencyService.GetSymbol()@Model.Invoice.total_price.ToString("N2")</span>
                 </div>
             </div>
         </div>

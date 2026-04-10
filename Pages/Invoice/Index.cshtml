@@ -56,8 +56,8 @@
                         <td class="font-sm">@item.DisplayName</td>
                         <td class="font-sm">@item.DisplayQty</td>
                         <td class="font-sm text-muted">@item.DisplayExpiry</td>
-                        <td class="text-danger font-medium">$@(item.Discount.ToString("N2"))</td>
-                        <td class="font-bold text-primary">$@(item.TotalPrice.ToString("N2"))</td>
+                        <td class="text-danger font-medium">@CurrencyService.GetSymbol()@(item.Discount.ToString("N2"))</td>
+                        <td class="font-bold text-primary">@CurrencyService.GetSymbol()@(item.TotalPrice.ToString("N2"))</td>
                         <td class="font-sm" style="white-space: nowrap;">@item.Payment</td>
                         <td>
                             <span class="status-badge @(item.Status == "Paid" ? "status-paid" : (item.Status == "Pending" ? "status-pending" : "status-inactive"))">
