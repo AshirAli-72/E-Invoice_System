@@ -13,8 +13,14 @@ namespace E_Invoice_system.Models
         [Column("email")]
         public string? email { get; set; }
 
+        [Column("username")]
+        public string? username { get; set; }
+
         [Column("password")]
         public string? password { get; set; }
+
+        [Column("role")]
+        public string? role { get; set; }
 
         [Column("status")]
         public string? status { get; set; }

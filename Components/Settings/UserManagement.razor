@@ -24,8 +24,10 @@
                     <thead>
                         <tr>
                             <th style="padding-left: 1.5rem;">ID</th>
+                            <th>Full Name</th>
                             <th>Email Address</th>
-                            <th>Authentication Status</th>
+                            <th>Security Role</th>
+                            <th>Status</th>
                             <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
                         </tr>
                     </thead>
@@ -34,7 +36,11 @@
                         {
                             <tr>
                                 <td class="font-bold" style="padding-left: 1.5rem;">@user.id</td>
+                                <td>@user.username</td>
                                 <td>@user.email</td>
+                                <td>
+                                    <span class="badge badge-light">@user.role</span>
+                                </td>
                                 <td>
                                     <span class="status-badge @(user.status == "Active" ? "status-active" : "status-inactive")">
                                         @(user.status ?? "Inactive")
@@ -76,6 +82,12 @@
                     
                     <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
                         <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Full Name / Display Name</label>
+                            <InputText @bind-Value="userModel.username" class="form-control" placeholder="e.g. John Doe or Manager1" />
+                            <ValidationMessage For="@(() => userModel.username)" />
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
                             <label class="form-label">Email Address</label>
                             <InputText @bind-Value="userModel.email" class="form-control" placeholder="Enter user's email address" />
                             <ValidationMessage For="@(() => userModel.email)" />
@@ -87,17 +99,28 @@
                             <ValidationMessage For="@(() => userModel.password)" />
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 1.5rem;">
-                            <label class="form-label">Account Status</label>
-                            <select @bind="userModel.status" class="form-control">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label class="form-label">Security Role</label>
+                                <select @bind="userModel.role" class="form-control">
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="Seller">Seller</option>
+                                    <option value="Cashier">Cashier</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Account Status</label>
+                                <select @bind="userModel.status" class="form-control">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div style="display: flex; justify-content: flex-end; gap: 1rem;">
                             <button type="button" class="btn-icon-sm" @onclick="HideForm" style="background: #f1f5f9; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">Cancel</button>
-                            <button type="submit" class="btn-primary" style="padding: 0.6rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
+                            <button type="button" class="btn-primary" @onclick="SaveUser" style="padding: 0.6rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
                                 <i class="ph-check"></i> @(editingUser == null ? "Save User Account" : "Update User Account")
                             </button>
                         </div>
@@ -111,9 +134,8 @@
 <style>
     .modal-active .card, 
     .modal-active .btn-back-hub {
-        filter: blur(4px) grayscale(0.2);
         pointer-events: none;
-        opacity: 0.7;
+        opacity: 0.8;
         transition: all 0.3s ease;
     }
 
@@ -134,7 +156,6 @@
         width: 100%;
         height: 100%;
         background: rgba(15, 23, 42, 0.4);
-        backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -176,7 +197,7 @@
 
     private void ShowAddForm()
     {
-        userModel = new users { status = "Active" };
+        userModel = new users { status = "Active", role = "Seller" };
         editingUser = null;
         showForm = true;
     }
@@ -188,7 +209,9 @@
         {
             id = user.id,
             email = user.email,
+            username = user.username,
             password = user.password,
+            role = user.role,
             status = user.status
         };
         showForm = true;

@@ -415,9 +415,17 @@ namespace E_Invoice_system.Data.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("email");
 
+                    b.Property<string>("username")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("username");
+
                     b.Property<string>("password")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("password");
+
+                    b.Property<string>("role")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("role");
 
                     b.Property<string>("status")
                         .HasColumnType("nvarchar(max)")
