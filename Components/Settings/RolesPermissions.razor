@@ -1,0 +1,1135 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@using System.Text.Json
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject IJSRuntime JS
+@rendermode RenderMode.InteractiveServer
+
+<div class="rp-container">
+
+    <!-- Header with back button on the right -->
+    <div class="rp-header">
+        <div>
+            <h2 class="rp-title">
+                <i class="ph-shield-check rp-title-icon"></i>
+                Roles &amp; Permissions
+            </h2>
+            <p class="rp-subtitle">Control access and feature visibility per user role</p>
+        </div>
+        <a href="/settings" class="btn-back-settings">
+            <i class="ph-arrow-left"></i> Back to Settings
+        </a>
+    </div>
+
+    <!-- Top Role Selector Bar -->
+    <div class="rp-topbar">
+        <div class="rp-role-group">
+            <label class="rp-role-label">Select Role:</label>
+            <select class="rp-role-select" @onchange="OnRoleChangedInternal">
+                @foreach (var role in rolesList)
+                {
+                    <option value="@role.RoleTitle" selected="@(role.RoleTitle == selectedRole)">@role.RoleTitle</option>
+                }
+            </select>
+            
+            <div class="rp-role-controls">
+                <button class="rp-control-btn btn-add" @onclick="OpenAddRoleModal" title="Manage Roles">
+                    <i class="ph-plus" style="font-weight:bold; font-size: 1.2rem;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="rp-alert rp-alert-success">
+            <i class="ph-check-circle"></i> @successMessage
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="rp-alert rp-alert-error">
+            <i class="ph-warning-circle"></i> @errorMessage
+        </div>
+    }
+
+    <!-- SECTION 1: SYSTEM AUTHORITIES -->
+    <div class="rp-section">
+        <div class="rp-section-header">
+            <span class="rp-section-title">SYSTEM AUTHORITIES:</span>
+            <input type="checkbox" class="rp-check-all" title="Select/Deselect All"
+                   checked="@AllSystemChecked"
+                   @onchange="ToggleAllSystem" />
+        </div>
+        <div class="rp-check-grid">
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Dashboard" />
+                <span class="rp-check-box @(currentPermissions.Dashboard ? "checked" : "")">
+                    @if (currentPermissions.Dashboard) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Dashboard</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Customers" />
+                <span class="rp-check-box @(currentPermissions.Customers ? "checked" : "")">
+                    @if (currentPermissions.Customers) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Customers</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Products" />
+                <span class="rp-check-box @(currentPermissions.Products ? "checked" : "")">
+                    @if (currentPermissions.Products) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Products</span>
+            </label>
+             <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Sales" />
+                <span class="rp-check-box @(currentPermissions.Sales ? "checked" : "")">
+                    @if (currentPermissions.Sales) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Sales / POS</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Invoices" />
+                <span class="rp-check-box @(currentPermissions.Invoices ? "checked" : "")">
+                    @if (currentPermissions.Invoices) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Invoices</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Settings" />
+                <span class="rp-check-box @(currentPermissions.Settings ? "checked" : "")">
+                    @if (currentPermissions.Settings) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Settings</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- SECTION 2: REPORTS SHOW/HIDDEN -->
+    <div class="rp-section">
+        <div class="rp-section-header">
+            <span class="rp-section-title">REPORTS SHOW/HIDDEN:</span>
+            <input type="checkbox" class="rp-check-all" title="Select/Deselect All"
+                   checked="@AllReportsChecked"
+                   @onchange="ToggleAllReports" />
+        </div>
+        <div class="rp-check-grid">
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.CustomerReport" />
+                <span class="rp-check-box @(currentPermissions.CustomerReport ? "checked" : "")">
+                    @if (currentPermissions.CustomerReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Customer Report</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.SaleReport" />
+                <span class="rp-check-box @(currentPermissions.SaleReport ? "checked" : "")">
+                    @if (currentPermissions.SaleReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Sales Report</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.ProductReport" />
+                <span class="rp-check-box @(currentPermissions.ProductReport ? "checked" : "")">
+                    @if (currentPermissions.ProductReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Product Report</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.InvoiceReport" />
+                <span class="rp-check-box @(currentPermissions.InvoiceReport ? "checked" : "")">
+                    @if (currentPermissions.InvoiceReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Invoice Report</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.ReturnsReport" />
+                <span class="rp-check-box @(currentPermissions.ReturnsReport ? "checked" : "")">
+                    @if (currentPermissions.ReturnsReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Returns Report</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.DailySummary" />
+                <span class="rp-check-box @(currentPermissions.DailySummary ? "checked" : "")">
+                    @if (currentPermissions.DailySummary) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Daily Summary</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Bottom Save Button Container -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0;">
+        <button class="rp-btn rp-btn-primary" @onclick="SavePermissions" disabled="@isSaving" style="padding: 0.625rem 1.4rem;">
+            @if (isSaving)
+            {
+                <i class="ph-spinner ph-spin"></i> <span>Saving...</span>
+            }
+            else
+            {
+                <i class="ph-floppy-disk"></i> <span>Save Permissions</span>
+            }
+        </button>
+    </div>
+
+</div>
+
+<!-- Add Role Modal -->
+@if (showAddRoleModal)
+{
+    <div class="rp-modal-overlay" @onclick="CloseAddRoleModal"></div>
+    <div class="rp-modal">
+        <div class="rp-modal-header">
+            <div class="rp-modal-title">
+                <div class="rp-modal-icon-plus">+</div>
+                <span>Roles</span>
+            </div>
+            <button class="rp-modal-close" @onclick="CloseAddRoleModal">
+                <i class="ph-x"></i>
+            </button>
+        </div>
+        <div class="rp-modal-body">
+            <!-- 1. Selection Step -->
+            <div class="rp-modal-row" style="margin-bottom: 1rem;">
+                <label class="rp-modal-label">1. Select Role to Manage (for Update/Delete):</label>
+                <select class="rp-modal-input" @onchange="OnManageRoleSelected">
+                    <option value="">-- Select Existing Role --</option>
+                    @foreach (var role in rolesList)
+                    {
+                        <option value="@role.Id">@role.RoleTitle</option>
+                    }
+                </select>
+            </div>
+
+            <!-- 2. Text Input Step -->
+            <div class="rp-modal-row">
+                <label class="rp-modal-label">2. Enter Role Name (for Save/Update):</label>
+                <input type="text" class="rp-modal-input" 
+                       @bind="newRoleTitle" @bind:event="oninput"
+                       placeholder="e.g. Admins" autocomplete="off" />
+            </div>
+
+            <div class="rp-modal-actions">
+                <button class="modal-btn btn-del" @onclick="DeleteRole" 
+                        disabled="@isSubmitting">
+                    @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> }
+                    else { <span>Delete</span> <i class="ph-x"></i> }
+                </button>
+                <button class="modal-btn btn-upd" @onclick="UpdateRole" 
+                        disabled="@isSubmitting">
+                    @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> }
+                    else { <span>Update</span> <i class="ph-arrows-clockwise"></i> }
+                </button>
+                <button class="modal-btn btn-sav" @onclick="SaveNewRole" 
+                        disabled="@isSubmitting">
+                    @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> }
+                    else { <span>Save</span> <i class="ph-floppy-disk"></i> }
+                </button>
+            </div>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: #64748b; text-align: right;">
+                * To <strong>Rename</strong>: Select in (1), then type new name in (2) and click Update.
+            </p>
+        </div>
+    </div>
+}
+
+<style>
+    .rp-container {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    /* Header row with title left + back button right */
+    .rp-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    /* Back button — top right */
+    .btn-back-settings {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.45rem 1rem;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .btn-back-settings:hover {
+        background: var(--primary, #BC1823);
+        border-color: var(--primary, #BC1823);
+        color: white;
+    }
+
+    .rp-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rp-title-icon {
+        color: var(--primary, #BC1823);
+        font-size: 1.5rem;
+    }
+
+    .rp-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* Top bar */
+    .rp-topbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0.875rem 1rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
+
+    .rp-role-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .rp-role-label {
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #475569;
+        white-space: nowrap;
+    }
+
+    .rp-role-select {
+        width: 220px;
+        padding: 0.55rem 2.25rem 0.55rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        font-weight: 600;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1em;
+        appearance: none;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .rp-role-select:focus {
+        outline: none;
+        border-color: var(--primary, #BC1823);
+        box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
+    }
+
+    .rp-role-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rp-control-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
+
+    .rp-control-btn:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+        border-color: #cbd5e1;
+    }
+
+    .rp-control-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+
+    .btn-add {
+        background: var(--primary, #BC1823);
+        color: white;
+        border: none;
+    }
+
+    .btn-add:hover {
+        background: #a1141d;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+    .rp-divider-v {
+        width: 1px;
+        height: 24px;
+        background: #e2e8f0;
+        margin: 0 0.25rem;
+    }
+
+    .rp-save-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.35rem;
+        background: var(--primary, #BC1823);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .rp-save-btn:hover:not(:disabled) {
+        background: #9c141d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(188, 24, 35, 0.3);
+    }
+
+    .rp-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Alert */
+    .rp-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .rp-alert-success {
+        background: #dcfce7;
+        color: #15803d;
+        border-left: 3px solid #16a34a;
+    }
+
+    .rp-alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+        border-left: 3px solid var(--primary, #BC1823);
+    }
+
+    /* Section */
+    .rp-section {
+        margin-bottom: 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .rp-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        background: linear-gradient(135deg, #fff5f6 0%, #f8fafc 100%);
+        border-bottom: 2px solid #fecdd3;
+    }
+
+    .rp-section-title {
+        font-weight: 700;
+        font-size: 0.78rem;
+        color: var(--primary, #BC1823);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        flex: 1;
+    }
+
+    .rp-check-all {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: var(--primary, #BC1823);
+    }
+
+    /* Grid of checkboxes */
+    .rp-check-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        padding: 0.75rem 1rem;
+        background: white;
+    }
+
+    @@media (max-width: 900px) {
+        .rp-check-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @@media (max-width: 600px) {
+        .rp-check-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .rp-check-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.5rem;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s;
+        user-select: none;
+    }
+
+    .rp-check-item:hover { background: #fff5f6; }
+
+    /* Hide native checkbox, show custom */
+    .rp-check-item input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .rp-check-box {
+        width: 18px;
+        height: 18px;
+        min-width: 18px;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        transition: all 0.15s;
+    }
+
+    .rp-check-box.checked {
+        background: var(--primary, #BC1823);
+        border-color: var(--primary, #BC1823);
+        color: white;
+    }
+
+    .rp-check-label {
+        font-size: 0.82rem;
+        color: #374151;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Modal Styles */
+    .rp-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        z-index: 1000;
+        animation: rpFadeIn 0.2s ease;
+    }
+
+    @@keyframes rpFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes rpScaleIn { from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+    .rp-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid var(--primary, #BC1823); /* Use app theme maroon */
+        border-radius: 12px;      /* Standard rounded corners */
+        width: 450px;
+        max-width: 95vw;
+        z-index: 1001;
+        box-shadow: 0 15px 35px rgba(188, 24, 35, 0.15);
+        animation: rpScaleIn 0.2s ease-out;
+        overflow: hidden;
+    }
+
+    .rp-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #fff5f6;
+    }
+
+    .rp-modal-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .rp-modal-icon-plus {
+        background: var(--primary, #BC1823); /* Use app maroon */
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .rp-modal-close {
+        background: transparent;
+        border: none;
+        font-size: 1.25rem;
+        color: #64748b;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .rp-modal-close:hover { color: var(--primary, #BC1823); background: #fee2e2; }
+
+    .rp-modal-body {
+        padding: 1.5rem 1.25rem;
+    }
+
+    /* Modal Layout */
+    .rp-modal-row {
+        margin-bottom: 1.5rem;
+    }
+
+    .rp-modal-label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .rp-modal-select-wrapper {
+        position: relative;
+    }
+
+    .rp-modal-input {
+        width: 100%;
+        padding: 0.65rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .rp-modal-input:focus {
+        border-color: var(--primary, #BC1823);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
+    }
+
+    .rp-modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .modal-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0.65rem 1.25rem;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-btn:hover { opacity: 0.9; }
+    .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-del { background: #dc2626; }
+    .btn-upd { background: #2563eb; }
+    .btn-sav { background: #16a34a; }
+
+    .modal-btn i { font-size: 1.1rem; }
+
+
+    .rp-form-group { margin-bottom: 1rem; }
+
+    .rp-form-label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.5rem;
+    }
+
+    .rp-form-input {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        background: #f8fafc;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+    .rp-form-input:focus {
+        outline: none;
+        border-color: var(--primary, #BC1823);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
+    }
+
+    .rp-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .rp-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .rp-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .rp-btn-primary { background: var(--primary, #BC1823); color: white; }
+    .rp-btn-primary:hover:not(:disabled) { background: #9c141d; transform: translateY(-1px); }
+
+    .rp-btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .rp-btn-secondary:hover { background: #e2e8f0; }
+
+    .rp-btn-danger { background: #ef4444; color: white; }
+    .rp-btn-danger:hover:not(:disabled) { background: #dc2626; }
+</style>
+
+@code {
+    private string selectedRole = "";
+    private bool isSaving = false;
+    private bool isSubmitting = false;
+    private string? successMessage;
+    private string? errorMessage;
+
+    // Roles list from database
+    private List<Role> rolesList = new();
+    private bool showAddRoleModal = false;
+    private string newRoleTitle = "";
+    private Role? editingRole = null;
+
+    // Permission model
+    private RolePermission currentPermissions = new();
+
+    private bool AllSystemChecked => currentPermissions.Dashboard && currentPermissions.Customers && currentPermissions.Products && currentPermissions.Sales && currentPermissions.Invoices && currentPermissions.Settings;
+    private bool AllReportsChecked => currentPermissions.CustomerReport && currentPermissions.SaleReport && currentPermissions.ProductReport && currentPermissions.InvoiceReport && currentPermissions.ReturnsReport && currentPermissions.DailySummary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRoles();
+        await LoadPermissions();
+    }
+
+    private async Task LoadRoles()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            rolesList = await context.roles.OrderBy(r => r.Id).ToListAsync();
+
+            // Set default selected role if not already set to a valid role
+            if (string.IsNullOrEmpty(selectedRole) || !rolesList.Any(r => r.RoleTitle == selectedRole))
+            {
+                selectedRole = rolesList.FirstOrDefault()?.RoleTitle ?? "";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error loading roles: " + ex.Message;
+        }
+    }
+
+    private async Task OnRoleChanged(ChangeEventArgs e)
+    {
+        selectedRole = e.Value?.ToString() ?? "";
+        await LoadPermissions();
+    }
+
+    private async Task LoadPermissions()
+    {
+        successMessage = null;
+        errorMessage = null;
+        currentPermissions = new RolePermission(); // Reset to empty defaults
+
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var role = await context.roles.FirstOrDefaultAsync(r => r.RoleTitle == selectedRole);
+            if (role != null)
+            {
+                var perms = await context.create_roles_permissions_table.FirstOrDefaultAsync(p => p.RoleId == role.Id);
+                if (perms != null)
+                {
+                    currentPermissions = perms;
+                }
+                else if (selectedRole == "Admin")
+                {
+                    // Admin gets all by default if no record exists
+                    currentPermissions.Dashboard = true;
+                    currentPermissions.Customers = true;
+                    currentPermissions.Products = true;
+                    currentPermissions.Sales = true;
+                    currentPermissions.Invoices = true;
+                    currentPermissions.Settings = true;
+                    currentPermissions.CustomerReport = true;
+                    currentPermissions.SaleReport = true;
+                    currentPermissions.ProductReport = true;
+                    currentPermissions.InvoiceReport = true;
+                    currentPermissions.ReturnsReport = true;
+                    currentPermissions.DailySummary = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error loading permissions: " + ex.Message;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SavePermissions()
+    {
+        isSaving = true;
+        successMessage = null;
+        errorMessage = null;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var role = await context.roles.FirstOrDefaultAsync(r => r.RoleTitle == selectedRole);
+            if (role == null)
+            {
+                errorMessage = "Role not found.";
+                return;
+            }
+
+            var perms = await context.create_roles_permissions_table.FirstOrDefaultAsync(p => p.RoleId == role.Id);
+            if (perms == null)
+            {
+                perms = new RolePermission { RoleId = role.Id };
+                context.create_roles_permissions_table.Add(perms);
+            }
+
+            // Bind values from our currentPermissions object
+            perms.Dashboard = currentPermissions.Dashboard;
+            perms.Sales = currentPermissions.Sales;
+            perms.Invoices = currentPermissions.Invoices;
+            perms.Customers = currentPermissions.Customers;
+            perms.Products = currentPermissions.Products;
+            perms.Settings = currentPermissions.Settings;
+
+            perms.SaleReport = currentPermissions.SaleReport;
+            perms.InvoiceReport = currentPermissions.InvoiceReport;
+            perms.CustomerReport = currentPermissions.CustomerReport;
+            perms.ProductReport = currentPermissions.ProductReport;
+            perms.ReturnsReport = currentPermissions.ReturnsReport;
+            perms.DailySummary = currentPermissions.DailySummary;
+
+            await context.SaveChangesAsync();
+            successMessage = $"Permissions for '{selectedRole}' saved successfully!";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving: " + ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(3000);
+            successMessage = null;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ToggleAllSystem(ChangeEventArgs e)
+    {
+        var val = (bool)(e.Value ?? false);
+        currentPermissions.Dashboard = val;
+        currentPermissions.Customers = val;
+        currentPermissions.Products = val;
+        currentPermissions.Sales = val;
+        currentPermissions.Invoices = val;
+        currentPermissions.Settings = val;
+    }
+
+    private void ToggleAllReports(ChangeEventArgs e)
+    {
+        var val = (bool)(e.Value ?? false);
+        currentPermissions.CustomerReport = val;
+        currentPermissions.SaleReport = val;
+        currentPermissions.ProductReport = val;
+        currentPermissions.InvoiceReport = val;
+        currentPermissions.ReturnsReport = val;
+        currentPermissions.DailySummary = val;
+    }
+
+    // Role Management Methods
+    private void OpenAddRoleModal()
+    {
+        editingRole = null;
+        newRoleTitle = "";
+        showAddRoleModal = true;
+    }
+
+    private void OpenRenameModal()
+    {
+        if (selectedRole == "Admin") return;
+        editingRole = rolesList.FirstOrDefault(r => r.RoleTitle == selectedRole);
+        newRoleTitle = selectedRole;
+        showAddRoleModal = true;
+    }
+
+    private async Task OnRoleChangedInternal(ChangeEventArgs e)
+    {
+        selectedRole = e.Value?.ToString() ?? "";
+        await OnRoleChanged(e);
+    }
+
+    private async Task DeleteCurrentRole()
+    {
+        if (selectedRole == "Admin") return;
+        
+        var roleToDelete = rolesList.FirstOrDefault(r => r.RoleTitle == selectedRole);
+        if (roleToDelete == null) return;
+
+        if (!await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the role '{selectedRole}'? All permissions for this role will be removed."))
+            return;
+
+        editingRole = roleToDelete;
+        await DeleteRole();
+    }
+
+    private void CloseAddRoleModal()
+    {
+        showAddRoleModal = false;
+        newRoleTitle = "";
+        editingRole = null;
+    }
+
+    private void OnManageRoleSelected(ChangeEventArgs e)
+    {
+        var idStr = e.Value?.ToString();
+        if (int.TryParse(idStr, out int id))
+        {
+            editingRole = rolesList.FirstOrDefault(r => r.Id == id);
+            if (editingRole != null)
+            {
+                newRoleTitle = editingRole.RoleTitle; // Pre-fill with existing name for editing
+            }
+        }
+        else
+        {
+            editingRole = null;
+        }
+    }
+
+    private async Task SaveNewRole()
+    {
+        if (string.IsNullOrWhiteSpace(newRoleTitle))
+        {
+            errorMessage = "Please enter a role name first.";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null; 
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            
+            // Check if role already exists
+            if (await context.roles.AnyAsync(r => r.RoleTitle.ToLower() == newRoleTitle.ToLower()))
+            {
+                errorMessage = $"'{newRoleTitle}' already exists!";
+                isSubmitting = false;
+                return;
+            }
+
+            var newRole = new Role { RoleTitle = newRoleTitle.Trim() };
+            context.roles.Add(newRole);
+            await context.SaveChangesAsync();
+
+            await LoadRoles();
+            CloseAddRoleModal();
+            successMessage = $"Role '{newRoleTitle}' created successfully!";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error creating role: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task UpdateRole()
+    {
+        if (editingRole == null)
+        {
+            errorMessage = "Please select a role from step (1) to update.";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(newRoleTitle))
+        {
+            errorMessage = "Please enter the new name in step (2).";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null; 
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+
+            // Check if another role with same name exists
+            if (await context.roles.AnyAsync(r => r.Id != editingRole.Id && r.RoleTitle.ToLower() == newRoleTitle.ToLower()))
+            {
+                errorMessage = $"'{newRoleTitle}' already exists!";
+                isSubmitting = false;
+                return;
+            }
+
+            var role = await context.roles.FindAsync(editingRole.Id);
+            if (role != null)
+            {
+                string oldTitle = role.RoleTitle;
+                string newTitle = newRoleTitle.Trim();
+                
+                // If the name actually changed, update users too
+                if (!string.Equals(oldTitle, newTitle, StringComparison.OrdinalIgnoreCase))
+                {
+                    var usersWithOldRole = await context.users.Where(u => u.role == oldTitle).ToListAsync();
+                    foreach (var user in usersWithOldRole)
+                    {
+                        user.role = newTitle;
+                    }
+                }
+
+                role.RoleTitle = newTitle;
+                await context.SaveChangesAsync();
+            }
+
+            await LoadRoles();
+            CloseAddRoleModal();
+            successMessage = $"Role updated successfully!";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error updating role: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task DeleteRole()
+    {
+        if (editingRole == null)
+        {
+            errorMessage = "Please select a role from step (1) to delete.";
+            return;
+        }
+        
+        if (!await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the role '{editingRole.RoleTitle}'?"))
+            return;
+
+        isSubmitting = true;
+        errorMessage = null; 
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var role = await context.roles.FindAsync(editingRole.Id);
+            if (role != null)
+            {
+                context.roles.Remove(role);
+                await context.SaveChangesAsync();
+            }
+
+            await LoadRoles();
+            CloseAddRoleModal();
+            successMessage = "Role deleted successfully!";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error deleting role: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

@@ -1,7 +1,6 @@
 @page "/settings/user"
 @model E_Invoice_system.Pages.Settings.User.IndexModel
 @{
-    // Theme and Styles are preserved from the original overhaul
     ViewData["Title"] = "User Management";
 }
 
@@ -9,7 +8,6 @@
 <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
 
 <div class="dashboard-panel">
-
     <div id="settings-container">
         <component type="typeof(E_Invoice_system.Components.Settings.UserManagement)" render-mode="ServerPrerendered" />
     </div>

@@ -1,0 +1,594 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager Nav
+@rendermode RenderMode.InteractiveServer
+
+<div class="store-config-container">
+
+    <div class="store-header">
+        <div>
+            <h2 class="store-title">
+                <i class="ph-storefront store-title-icon"></i>
+                Store Configuration
+            </h2>
+            <p class="store-subtitle">Configure your store information for invoices and receipts</p>
+        </div>
+        <a href="/settings" class="btn-back-settings">
+            <i class="ph-arrow-left"></i> Back to Settings
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="store-alert store-alert-success">
+            <i class="ph-check-circle"></i> @successMessage
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="store-alert store-alert-error">
+            <i class="ph-warning-circle"></i> @errorMessage
+        </div>
+    }
+
+    <div class="store-form">
+        <div class="store-form-grid">
+            <!-- Logo Section -->
+            <div class="store-logo-section">
+                <div class="store-logo-preview">
+                    @if (!string.IsNullOrEmpty(storeConfig.LogoPath))
+                    {
+                        <img src="@storeConfig.LogoPath" alt="Store Logo" class="store-logo-img" />
+                    }
+                    else
+                    {
+                        <div class="store-logo-placeholder">
+                            <i class="ph-storefront"></i>
+                            <span>Store Logo</span>
+                        </div>
+                    }
+                </div>
+                <InputFile accept="image/*" OnChange="HandleLogoUploadAsync" class="store-upload-btn" />
+                @if (!string.IsNullOrEmpty(storeConfig.LogoPath))
+                {
+                    <button class="store-remove-logo" @onclick="RemoveLogo">
+                        <i class="ph-trash"></i> Remove Logo
+                    </button>
+                }
+            </div>
+
+            <!-- Form Fields -->
+            <div class="store-form-fields">
+                <div class="store-form-row">
+                    <div class="store-form-group">
+                        <label class="store-label">Shop Name</label>
+                        <input type="text" class="store-input" @bind="storeConfig.ShopName" placeholder="Enter shop name" />
+                    </div>
+                    <div class="store-form-group">
+                        <label class="store-label">Owner Name</label>
+                        <input type="text" class="store-input" @bind="storeConfig.OwnerName" placeholder="Enter owner name" />
+                    </div>
+                </div>
+
+                <div class="store-form-row">
+                    <div class="store-form-group">
+                        <label class="store-label">City</label>
+                        <input type="text" class="store-input" @bind="storeConfig.City" placeholder="Enter city" />
+                    </div>
+                    <div class="store-form-group">
+                        <label class="store-label">Branch</label>
+                        <input type="text" class="store-input" @bind="storeConfig.Branch" placeholder="Enter branch" />
+                    </div>
+                </div>
+
+                <div class="store-form-group full-width">
+                    <label class="store-label">Address</label>
+                    <textarea class="store-textarea" @bind="storeConfig.Address" placeholder="Enter full address" rows="2"></textarea>
+                </div>
+
+                <div class="store-form-row">
+                    <div class="store-form-group">
+                        <label class="store-label">Shop No</label>
+                        <input type="text" class="store-input" @bind="storeConfig.ShopNo" placeholder="Enter shop number" />
+                    </div>
+                    <div class="store-form-group">
+                        <label class="store-label">Business Nature</label>
+                        <input type="text" class="store-input" @bind="storeConfig.BusinessNature" placeholder="e.g., Retail, Wholesale" />
+                    </div>
+                </div>
+
+                <div class="store-form-row">
+                    <div class="store-form-group">
+                        <label class="store-label">Phone 1</label>
+                        <input type="tel" class="store-input" @bind="storeConfig.Phone1" placeholder="Primary phone number" />
+                    </div>
+                    <div class="store-form-group">
+                        <label class="store-label">Phone 2</label>
+                        <input type="tel" class="store-input" @bind="storeConfig.Phone2" placeholder="Secondary phone number" />
+                    </div>
+                </div>
+
+                <div class="store-form-group full-width">
+                    <label class="store-label">Comments</label>
+                    <textarea class="store-textarea" @bind="storeConfig.Comments" placeholder="Additional notes or comments" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="store-form-actions">
+            <button class="store-btn store-btn-secondary" @onclick="ResetForm">
+                <i class="ph-arrow-counter-clockwise"></i> Reset
+            </button>
+            <button class="store-btn store-btn-primary" @onclick="SaveConfiguration" disabled="@isSaving">
+                @if (isSaving)
+                {
+                    <i class="ph-spinner ph-spin"></i>
+                }
+                else
+                {
+                    <i class="ph-floppy-disk"></i>
+                }
+                <span>Save Configuration</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .store-config-container {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    /* Header row with title left + back button right */
+    .store-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    /* Back button — top right */
+    .btn-back-settings {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.45rem 1rem;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .btn-back-settings:hover {
+        background: var(--primary, #BC1823);
+        border-color: var(--primary, #BC1823);
+        color: white;
+    }
+
+    .store-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .store-title-icon {
+        color: var(--primary, #BC1823);
+        font-size: 1.5rem;
+    }
+
+    .store-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* Alert */
+    .store-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .store-alert-success {
+        background: #dcfce7;
+        color: #15803d;
+        border-left: 3px solid #16a34a;
+    }
+
+    .store-alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+        border-left: 3px solid var(--primary, #BC1823);
+    }
+
+    /* Form Grid */
+    .store-form-grid {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 2rem;
+    }
+
+    @@media (max-width: 768px) {
+        .store-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Logo Section */
+    .store-logo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .store-logo-preview {
+        width: 150px;
+        height: 150px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .store-logo-preview:hover {
+        border-color: var(--primary, #BC1823);
+        background: #fff5f6;
+    }
+
+    .store-logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+    }
+
+    .store-logo-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: #94a3b8;
+    }
+
+    .store-logo-placeholder i {
+        font-size: 2.5rem;
+        color: var(--primary, #BC1823);
+        opacity: 0.5;
+    }
+
+    .store-logo-placeholder span {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+
+    /* Upload button — styled file input */
+    .store-upload-btn {
+        width: 100%;
+        padding: 0.45rem 0;
+        background: var(--primary, #BC1823);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .store-upload-btn:hover {
+        background: #9c141d;
+    }
+
+    .store-upload-btn::file-selector-button {
+        display: none;
+    }
+
+    .store-remove-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        background: none;
+        border: 1px solid #ef4444;
+        border-radius: 6px;
+        color: #ef4444;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .store-remove-logo:hover {
+        background: #fef2f2;
+    }
+
+    /* Form Fields */
+    .store-form-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .store-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    @@media (max-width: 640px) {
+        .store-form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .store-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+
+    .store-form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .store-label {
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .store-input {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        background: #f8fafc;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .store-input:focus {
+        outline: none;
+        border-color: var(--primary, #BC1823);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
+    }
+
+    .store-textarea {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 60px;
+        background: #f8fafc;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .store-textarea:focus {
+        outline: none;
+        border-color: var(--primary, #BC1823);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
+    }
+
+    /* Actions */
+    .store-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .store-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.4rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .store-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .store-btn-primary {
+        background: var(--primary, #BC1823);
+        color: white;
+    }
+
+    .store-btn-primary:hover:not(:disabled) {
+        background: #9c141d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(188, 24, 35, 0.3);
+    }
+
+    .store-btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .store-btn-secondary:hover {
+        background: #e2e8f0;
+    }
+</style>
+
+@code {
+    private StoreConfiguration storeConfig = new();
+    private bool isSaving = false;
+    private string? successMessage;
+    private string? errorMessage;
+    private int? existingConfigId = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadConfiguration();
+    }
+
+    private async Task LoadConfiguration()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var config = await context.store_configurations.FirstOrDefaultAsync();
+
+            if (config != null)
+            {
+                storeConfig = config;
+                existingConfigId = config.Id;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error loading configuration: " + ex.Message;
+        }
+    }
+
+    private async Task HandleLogoUploadAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            try
+            {
+                var ext = Path.GetExtension(file.Name);
+                var fileName = $"store-logo-{Guid.NewGuid()}{ext}";
+                var savePath = Path.Combine("wwwroot", "savepic", fileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+                await using var fs = new FileStream(savePath, FileMode.Create);
+                await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(fs);
+                storeConfig.LogoPath = $"/savepic/{fileName}";
+            }
+            catch
+            {
+                storeConfig.LogoPath = $"/images/store-logo-{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            }
+        }
+    }
+
+    private void RemoveLogo()
+    {
+        storeConfig.LogoPath = null;
+    }
+
+    private async Task SaveConfiguration()
+    {
+        isSaving = true;
+        successMessage = null;
+        errorMessage = null;
+
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+
+            if (existingConfigId.HasValue)
+            {
+                var existing = await context.store_configurations.FindAsync(existingConfigId.Value);
+                if (existing != null)
+                {
+                    existing.ShopName = storeConfig.ShopName;
+                    existing.OwnerName = storeConfig.OwnerName;
+                    existing.City = storeConfig.City;
+                    existing.Address = storeConfig.Address;
+                    existing.BusinessNature = storeConfig.BusinessNature;
+                    existing.Branch = storeConfig.Branch;
+                    existing.ShopNo = storeConfig.ShopNo;
+                    existing.Phone1 = storeConfig.Phone1;
+                    existing.Phone2 = storeConfig.Phone2;
+                    existing.LogoPath = storeConfig.LogoPath;
+                    existing.Comments = storeConfig.Comments;
+                }
+            }
+            else
+            {
+                var newConfig = new StoreConfiguration
+                {
+                    ShopName = storeConfig.ShopName,
+                    OwnerName = storeConfig.OwnerName,
+                    City = storeConfig.City,
+                    Address = storeConfig.Address,
+                    BusinessNature = storeConfig.BusinessNature,
+                    Branch = storeConfig.Branch,
+                    ShopNo = storeConfig.ShopNo,
+                    Phone1 = storeConfig.Phone1,
+                    Phone2 = storeConfig.Phone2,
+                    LogoPath = storeConfig.LogoPath,
+                    Comments = storeConfig.Comments
+                };
+                context.store_configurations.Add(newConfig);
+            }
+
+            await context.SaveChangesAsync();
+            successMessage = "Store configuration saved successfully!";
+            await LoadConfiguration();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving configuration: " + ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ResetForm()
+    {
+        storeConfig = new StoreConfiguration();
+        existingConfigId = null;
+        successMessage = null;
+        errorMessage = null;
+    }
+}

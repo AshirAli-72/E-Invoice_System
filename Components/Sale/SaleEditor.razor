@@ -369,9 +369,9 @@
 <div id="thermalReceipt">
 
     <div class="rcpt-header">
-        <div class="rcpt-shop-name">@(currentSeller?.name ?? "THE SATA POS")</div>
-        <div class="rcpt-address">@(currentSeller?.address ?? "Address")</div>
-        <div class="rcpt-phone">@(currentSeller?.contact ?? "0313-3879645")</div>
+        <div class="rcpt-shop-name">@(currentStore?.ShopName ?? "THE SATA POS")</div>
+        <div class="rcpt-address">@(currentStore?.Address ?? "Address")</div>
+        <div class="rcpt-phone">@(currentStore?.Phone1 ?? "0313-3879645")</div>
     </div>
 
     <div class="rcpt-info">
@@ -463,7 +463,7 @@
     private bool isSubmitting = false;
     private string orderBillNo = "";
     private customers newCustomer = new customers { status = "Active" };
-    private Sellers? currentSeller;
+    private StoreConfiguration? currentStore;
 
     [Parameter] public string? UserEmail { get; set; }
 
@@ -504,7 +504,7 @@
                 .Take(50) 
                 .ToListAsync();
 
-            currentSeller = await context.sellers.AsNoTracking().FirstOrDefaultAsync();
+            currentStore = await context.store_configurations.AsNoTracking().FirstOrDefaultAsync();
 
             allProducts = prodsData.Select(p => {
                 decimal stock = 999999;

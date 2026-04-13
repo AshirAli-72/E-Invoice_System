@@ -64,6 +64,16 @@ app.UseRouting();
 
 app.UseSession();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<E_Invoice_system.Data.ApplicationDbContext>();
+    try { 
+   
+    } catch (Exception ex) { 
+        System.Console.WriteLine("DB Patch Error: " + ex.Message); 
+    }
+}
+
 app.UseAuthorization();
 
 app.MapRazorPages();

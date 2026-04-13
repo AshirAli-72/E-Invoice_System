@@ -43,12 +43,13 @@ namespace E_Invoice_system.Pages.Account
                 var user = await _context.users
                     .AsNoTracking()
                     .Where(u => u.email == Email && u.password == Password)
-                    .Select(u => new { u.email })
+                    .Select(u => new { u.email, u.role })
                     .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
                     HttpContext.Session.SetString("UserEmail", user.email);
+                    HttpContext.Session.SetString("UserRole", user.role ?? "User");
                     TempData["Success"] = "Welcome back! Login successful.";
                     return RedirectToPage("/Index");
                 }

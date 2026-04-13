@@ -46,12 +46,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTYWxlXFNhbGVFZGl0b3IucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Components/Seller/SellerForm.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZWxsZXJcU2VsbGVyRm9ybS5yYXpvcg==
+[D:/netcore/E-Invoice_system/Components/Settings/AboutStore.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xBYm91dFN0b3JlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Components/Settings/CurrencyManagement.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xDdXJyZW5jeU1hbmFnZW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/Components/Settings/RolesPermissions.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZXR0aW5nc1xSb2xlc1Blcm1pc3Npb25zLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Components/Settings/SettingsHub.razor]
@@ -126,16 +130,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/netcore/E-Invoice_system/Pages/Seller/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXENyZWF0ZS5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/netcore/E-Invoice_system/Pages/Seller/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXEVkaXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/netcore/E-Invoice_system/Pages/Seller/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXEluZGV4LmNzaHRtbA==
+[D:/netcore/E-Invoice_system/Pages/Settings/About/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcQWJvdXRcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Pages/Settings/Currency/Index.cshtml]
@@ -144,6 +140,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/netcore/E-Invoice_system/Pages/Settings/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/Pages/Settings/Roles/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcUm9sZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Pages/Settings/User/Index.cshtml]

@@ -20,17 +20,7 @@
             </div>
         }
 
-        <!-- Seller Info -->
-        <div class="form-group">
-            <label class="form-label">Company Name / Seller</label>
-            <select class="form-control" @onchange="OnSellerChanged">
-                <option value="">-- Select Seller --</option>
-                @foreach (var s in sellersList)
-                {
-                    <option value="@s.id">@s.name</option>
-                }
-            </select>
-        </div>
+        <!-- Invoice Date -->
         <div class="form-group">
             <label class="form-label">Invoice Date</label>
             <input class="form-control" type="date" @bind="invoiceDate" />
@@ -189,12 +179,10 @@
 
 
 @code {
-    private List<Sellers> sellersList = new();
     private List<customers> customersList = new();
     private List<ProductService> productsList = new();
     private List<InvoiceItem> invoiceItems = new();
 
-    private Sellers? selectedSeller;
     private customers? selectedCustomer;
     private string? invoiceNo;
     private DateTime invoiceDate = DateTime.Now;
@@ -210,25 +198,11 @@
     {
         await CurrencyService.GetSymbolAsync();
         using var context = DbFactory.CreateDbContext();
-        sellersList = await context.sellers.OrderBy(s => s.name).ToListAsync();
         customersList = await context.customers.OrderBy(c => c.name).ToListAsync();
         
         // Use a more resilient way to fetch Available products (handling potential status padding in DB)
         var allProducts = await context.products_services.ToListAsync();
         productsList = allProducts.Where(p => !string.IsNullOrEmpty(p.status) && p.status.Trim().Equals("Available", StringComparison.OrdinalIgnoreCase)).ToList();
-    }
-
-    private void OnSellerChanged(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out int id))
-        {
-            selectedSeller = sellersList.FirstOrDefault(s => s.id == id);
-        }
-        else
-        {
-            selectedSeller = null;
-        }
-        StateHasChanged();
     }
 
     private void OnCustomerChanged(ChangeEventArgs e)
@@ -301,20 +275,23 @@
 
     private async Task SubmitInvoice()
     {
-        if (selectedSeller == null) { errorMessage = "Please select a seller."; return; }
         if (selectedCustomer == null) { errorMessage = "Please select a customer."; return; }
         if (invoiceItems.Count == 0) { errorMessage = "Please add at least one item."; return; }
 
         isSubmitting = true;
         try
         {
+            // Get store configuration for seller info
+            using var configContext = DbFactory.CreateDbContext();
+            var storeConfig = await configContext.store_configurations.FirstOrDefaultAsync();
+
             var invoice = new invoices
             {
                 invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.ToString("yyMMddHHmm")}" : (invoiceNo.Length > 50 ? invoiceNo.Substring(0, 50) : invoiceNo),
                 date = invoiceDate,
-                seller_name = selectedSeller.name?.Length > 100 ? selectedSeller.name.Substring(0, 100) : selectedSeller.name,
-                seller_contact = selectedSeller.contact?.Length > 50 ? selectedSeller.contact.Substring(0, 50) : selectedSeller.contact,
-                seller_address = selectedSeller.address?.Length > 255 ? selectedSeller.address.Substring(0, 255) : selectedSeller.address,
+                seller_name = storeConfig?.ShopName?.Length > 100 ? storeConfig.ShopName.Substring(0, 100) : storeConfig?.ShopName,
+                seller_contact = storeConfig?.Phone1?.Length > 50 ? storeConfig.Phone1.Substring(0, 50) : storeConfig?.Phone1,
+                seller_address = storeConfig?.Address?.Length > 255 ? storeConfig.Address.Substring(0, 255) : storeConfig?.Address,
                 customer_name = selectedCustomer.name?.Length > 100 ? selectedCustomer.name.Substring(0, 100) : selectedCustomer.name,
                 customer_contact = selectedCustomer.contact?.Length > 50 ? selectedCustomer.contact.Substring(0, 50) : selectedCustomer.contact,
                 customer_address = selectedCustomer.address?.Length > 255 ? selectedCustomer.address.Substring(0, 255) : selectedCustomer.address,

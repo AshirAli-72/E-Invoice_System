@@ -1,7 +1,6 @@
 @page "/settings/currency"
 @model E_Invoice_system.Pages.Settings.Currency.IndexModel
 @{
-    // Theme and Styles are preserved from the original overhaul
     ViewData["Title"] = "Currency Settings";
 }
 
@@ -9,7 +8,6 @@
 <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
 
 <div class="dashboard-panel">
-
     <div id="settings-container">
         <component type="typeof(E_Invoice_system.Components.Settings.CurrencyManagement)" render-mode="ServerPrerendered" />
     </div>

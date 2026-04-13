@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace E_Invoice_system.Pages.Seller
+namespace E_Invoice_system.Pages.Settings.Roles
 {
-    public class CreateModel : PageModel
+    public class IndexModel : PageModel
     {
         public IActionResult OnGet()
         {

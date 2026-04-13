@@ -1,7 +1,7 @@
-@page
-@model E_Invoice_system.Pages.Product.IndexModel
+@page "/settings/roles"
+@model E_Invoice_system.Pages.Settings.Roles.IndexModel
 @{
-    ViewData["Title"] = "Manage Products & Services";
+    ViewData["Title"] = "Roles & Permissions";
 }
 
 <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
@@ -9,7 +9,7 @@
 
 <div class="dashboard-panel">
     <div id="settings-container">
-        <component type="typeof(E_Invoice_system.Components.Product.ProductForm)" render-mode="ServerPrerendered" />
+        <component type="typeof(E_Invoice_system.Components.Settings.RolesPermissions)" render-mode="ServerPrerendered" />
     </div>
 </div>
 

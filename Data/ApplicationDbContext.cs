@@ -10,7 +10,7 @@ namespace E_Invoice_system.Data
         {
         }
 
-        public DbSet<Sellers> sellers { get; set; }
+ 
         public DbSet<customers> customers { get; set; }
         public DbSet<ProductService> products_services { get; set; }
         public DbSet<users> users { get; set; }
@@ -18,8 +18,11 @@ namespace E_Invoice_system.Data
        
         public DbSet<Sale> sales { get; set; }
         public DbSet<ReturnDetail> returns { get; set; }
-        public DbSet<AppSetting> app_settings { get; set; }
+
         public DbSet<Currency> currencies { get; set; }
+        public DbSet<Role> roles { get; set; }
+        public DbSet<RolePermission> create_roles_permissions_table { get; set; }
+        public DbSet<StoreConfiguration> store_configurations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

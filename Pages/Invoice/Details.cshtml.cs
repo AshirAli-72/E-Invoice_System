@@ -73,12 +73,12 @@ namespace E_Invoice_system.Pages.Invoice
                 invoice.customer_contact = customer.contact;
             }
 
-            // Fetch latest seller info
-            var seller = await _context.sellers.FirstOrDefaultAsync(s => s.name == invoice.seller_name);
-            if (seller != null)
+            // Fetch latest store info for seller
+            var storeConfig = await _context.store_configurations.FirstOrDefaultAsync();
+            if (storeConfig != null)
             {
-                invoice.seller_address = seller.address;
-                invoice.seller_contact = seller.contact;
+                invoice.seller_address = storeConfig.Address;
+                invoice.seller_contact = storeConfig.Phone1;
             }
 
             // Fetch expiry date for single-item invoices

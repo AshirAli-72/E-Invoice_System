@@ -34,46 +34,71 @@
             </div>
 
             <nav class="sidebar-nav">
+                @using Microsoft.EntityFrameworkCore
+                @using E_Invoice_system.Data
+                @using E_Invoice_system.Models
+                @using Microsoft.AspNetCore.Http
+                @inject IDbContextFactory<ApplicationDbContext> DbFactory
 
-                <a href="/" class="nav-item">
-                    <i class="ph-house nav-icon"></i>
-                    <span>Dashboard</span>
-                </a>
+                @{
+                    var userRole = Context.Session.GetString("UserRole") ?? "";
+                    RolePermission? perms = null;
+                    bool isAdmin = userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
 
-                <a href="/customer" class="nav-item">
-                    <i class="ph-users nav-icon"></i>
-                    <span>Customers</span>
-                </a>
+                    if (!string.IsNullOrEmpty(userRole) && !isAdmin)
+                    {
+                        using var db = DbFactory.CreateDbContext();
+                        perms = db.create_roles_permissions_table.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
+                    }
+                }
 
-                <a href="/product" class="nav-item">
-                    <i class="ph-package nav-icon"></i>
-                    <span>Products/Services</span>
-                </a>
+                @if (isAdmin || (perms?.Dashboard ?? false))
+                {
+                    <a href="/" class="nav-item">
+                        <i class="ph-house nav-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                }
 
-                <a href="/sale" class="nav-item">
-                    <i class="ph-shopping-cart nav-icon"></i>
-                    <span>Sales</span>
-                </a>
+                @if (isAdmin || (perms?.Customers ?? false))
+                {
+                    <a href="/customer" class="nav-item">
+                        <i class="ph-users nav-icon"></i>
+                        <span>Customers</span>
+                    </a>
+                }
 
-                <a href="/invoice" class="nav-item">
-                    <i class="ph-file-text nav-icon"></i>
-                    <span>Invoices</span>
-                </a>
+                @if (isAdmin || (perms?.Products ?? false))
+                {
+                    <a href="/product" class="nav-item">
+                        <i class="ph-package nav-icon"></i>
+                        <span>Products/Services</span>
+                    </a>
+                }
 
-                <a href="/invoice/create" class="nav-item">
-                    <i class="ph-file-plus nav-icon"></i>
-                    <span>Create Invoice</span>
-                </a>
+                @if (isAdmin || (perms?.Sales ?? false))
+                {
+                    <a href="/sale" class="nav-item">
+                        <i class="ph-shopping-cart nav-icon"></i>
+                        <span>Sales</span>
+                    </a>
+                }
 
-                <a href="/seller" class="nav-item">
-                    <i class="ph-storefront nav-icon"></i>
-                    <span>Seller Profile</span>
-                </a>
+                @if (isAdmin || (perms?.Invoices ?? false))
+                {
+                    <a href="/invoice" class="nav-item">
+                        <i class="ph-file-text nav-icon"></i>
+                        <span>Invoices</span>
+                    </a>
+                }
 
-                <a href="/settings" class="nav-item">
-                    <i class="ph-gear nav-icon"></i>
-                    <span>Settings</span>
-                </a>
+                @if (isAdmin || (perms?.Settings ?? false))
+                {
+                    <a href="/settings" class="nav-item">
+                        <i class="ph-gear nav-icon"></i>
+                        <span>Settings</span>
+                    </a>
+                }
 
             </nav>
         </aside>
