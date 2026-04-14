@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,16 +7,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace E_Invoice_system.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260413143255_create_roles_permissions_table")]
-    /// <inheritdoc />
+    [Migration("20260414093426_create_roles_permissions_table")]
     public partial class create_roles_permissions_table : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("IF OBJECT_ID('create_roles_permissions_table', 'U') IS NOT NULL DROP TABLE create_roles_permissions_table;");
+            // Drop existing table if it exists
+            migrationBuilder.Sql("IF OBJECT_ID('roles_permissions', 'U') IS NOT NULL DROP TABLE roles_permissions;");
+
             migrationBuilder.CreateTable(
-                name: "create_roles_permissions_table",
+                name: "roles_permissions",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -36,9 +37,9 @@ namespace E_Invoice_system.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_create_roles_permissions_table", x => x.id);
+                    table.PrimaryKey("PK_roles_permissions", x => x.id);
                     table.ForeignKey(
-                        name: "FK_create_roles_permissions_table_roles_role_id",
+                        name: "FK_roles_permissions_roles_role_id",
                         column: x => x.role_id,
                         principalTable: "roles",
                         principalColumn: "id",
@@ -46,16 +47,15 @@ namespace E_Invoice_system.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_create_roles_permissions_table_role_id",
-                table: "create_roles_permissions_table",
+                name: "IX_roles_permissions_role_id",
+                table: "roles_permissions",
                 column: "role_id");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "create_roles_permissions_table");
+                name: "roles_permissions");
         }
     }
 }

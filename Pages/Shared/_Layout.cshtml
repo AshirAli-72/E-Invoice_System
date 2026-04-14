@@ -48,7 +48,7 @@
                     if (!string.IsNullOrEmpty(userRole) && !isAdmin)
                     {
                         using var db = DbFactory.CreateDbContext();
-                        perms = db.create_roles_permissions_table.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
+                        perms = db.roles_permissions.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
                     }
                 }
 

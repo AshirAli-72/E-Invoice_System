@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace E_Invoice_system.Models
 {
-    [Table("create_roles_permissions_table")]
+    [Table("roles_permissions")]
     public class RolePermission
     {
         [Key]
@@ -50,6 +50,6 @@ namespace E_Invoice_system.Models
         public bool DailySummary { get; set; }
 
         [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; } = null!;
+        public virtual Role? Role { get; set; }
     }
 }

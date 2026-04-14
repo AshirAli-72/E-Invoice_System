@@ -255,7 +255,7 @@ namespace E_Invoice_system.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("create_roles_permissions_table");
+                    b.ToTable("roles_permissions");
                 });
 
             modelBuilder.Entity("E_Invoice_system.Models.Sale", b =>

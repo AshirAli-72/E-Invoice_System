@@ -21,7 +21,7 @@ namespace E_Invoice_system.Data
 
         public DbSet<Currency> currencies { get; set; }
         public DbSet<Role> roles { get; set; }
-        public DbSet<RolePermission> create_roles_permissions_table { get; set; }
+        public DbSet<RolePermission> roles_permissions { get; set; }
         public DbSet<StoreConfiguration> store_configurations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

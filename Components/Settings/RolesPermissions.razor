@@ -193,31 +193,26 @@
             </button>
         </div>
         <div class="rp-modal-body">
-            <!-- 1. Selection Step -->
-            <div class="rp-modal-row" style="margin-bottom: 1rem;">
-                <label class="rp-modal-label">1. Select Role to Manage (for Update/Delete):</label>
-                <select class="rp-modal-input" @onchange="OnManageRoleSelected">
-                    <option value="">-- Select Existing Role --</option>
+            <!-- Consolidated Management Field -->
+            <div class="rp-modal-row">
+                <label class="rp-modal-label">Role Name (Select from list or Type New):</label>
+                <input type="text" class="rp-modal-input" 
+                       @bind="roleManagementInput" @bind:event="oninput"
+                       list="rolesDatalist"
+                       placeholder="e.g. Manager" autocomplete="off" />
+                <datalist id="rolesDatalist">
                     @foreach (var role in rolesList)
                     {
-                        <option value="@role.Id">@role.RoleTitle</option>
+                        <option value="@role.RoleTitle">@role.RoleTitle</option>
                     }
-                </select>
-            </div>
-
-            <!-- 2. Text Input Step -->
-            <div class="rp-modal-row">
-                <label class="rp-modal-label">2. Enter Role Name (for Save/Update):</label>
-                <input type="text" class="rp-modal-input" 
-                       @bind="newRoleTitle" @bind:event="oninput"
-                       placeholder="e.g. Admins" autocomplete="off" />
+                </datalist>
             </div>
 
             <div class="rp-modal-actions">
                 <button class="modal-btn btn-del" @onclick="DeleteRole" 
                         disabled="@isSubmitting">
                     @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> }
-                    else { <span>Delete</span> <i class="ph-x"></i> }
+                    else { <span>Delete</span> <i class="ph-trash"></i> }
                 </button>
                 <button class="modal-btn btn-upd" @onclick="UpdateRole" 
                         disabled="@isSubmitting">
@@ -230,9 +225,6 @@
                     else { <span>Save</span> <i class="ph-floppy-disk"></i> }
                 </button>
             </div>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: #64748b; text-align: right;">
-                * To <strong>Rename</strong>: Select in (1), then type new name in (2) and click Update.
-            </p>
         </div>
     </div>
 }
@@ -773,7 +765,7 @@
     // Roles list from database
     private List<Role> rolesList = new();
     private bool showAddRoleModal = false;
-    private string newRoleTitle = "";
+    private string roleManagementInput = "";
     private Role? editingRole = null;
 
     // Permission model
@@ -825,7 +817,7 @@
             var role = await context.roles.FirstOrDefaultAsync(r => r.RoleTitle == selectedRole);
             if (role != null)
             {
-                var perms = await context.create_roles_permissions_table.FirstOrDefaultAsync(p => p.RoleId == role.Id);
+                var perms = await context.roles_permissions.FirstOrDefaultAsync(p => p.RoleId == role.Id);
                 if (perms != null)
                 {
                     currentPermissions = perms;
@@ -869,38 +861,58 @@
             var role = await context.roles.FirstOrDefaultAsync(r => r.RoleTitle == selectedRole);
             if (role == null)
             {
-                errorMessage = "Role not found.";
-                return;
+                // Special case: if it's "Admin" and it's missing from roles table, create it
+                if (selectedRole == "Admin")
+                {
+                    role = new Role { RoleTitle = "Admin" };
+                    context.roles.Add(role);
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    errorMessage = "Role not found in the roles table.";
+                    return;
+                }
             }
 
-            var perms = await context.create_roles_permissions_table.FirstOrDefaultAsync(p => p.RoleId == role.Id);
+            var perms = await context.roles_permissions.FirstOrDefaultAsync(p => p.RoleId == role.Id);
+            bool isNew = false;
             if (perms == null)
             {
                 perms = new RolePermission { RoleId = role.Id };
-                context.create_roles_permissions_table.Add(perms);
+                isNew = true;
             }
 
-            // Bind values from our currentPermissions object
+            // Explicitly copy values from currentPermissions (which is bound to UI)
             perms.Dashboard = currentPermissions.Dashboard;
-            perms.Sales = currentPermissions.Sales;
-            perms.Invoices = currentPermissions.Invoices;
             perms.Customers = currentPermissions.Customers;
             perms.Products = currentPermissions.Products;
+            perms.Sales = currentPermissions.Sales;
+            perms.Invoices = currentPermissions.Invoices;
             perms.Settings = currentPermissions.Settings;
 
-            perms.SaleReport = currentPermissions.SaleReport;
-            perms.InvoiceReport = currentPermissions.InvoiceReport;
             perms.CustomerReport = currentPermissions.CustomerReport;
+            perms.SaleReport = currentPermissions.SaleReport;
             perms.ProductReport = currentPermissions.ProductReport;
+            perms.InvoiceReport = currentPermissions.InvoiceReport;
             perms.ReturnsReport = currentPermissions.ReturnsReport;
             perms.DailySummary = currentPermissions.DailySummary;
+
+            if (isNew)
+            {
+                context.roles_permissions.Add(perms);
+            }
+            else
+            {
+                context.roles_permissions.Update(perms);
+            }
 
             await context.SaveChangesAsync();
             successMessage = $"Permissions for '{selectedRole}' saved successfully!";
         }
         catch (Exception ex)
         {
-            errorMessage = "Error saving: " + ex.Message;
+            errorMessage = "Error saving: " + ex.InnerException?.Message ?? ex.Message;
         }
         finally
         {
@@ -938,7 +950,7 @@
     private void OpenAddRoleModal()
     {
         editingRole = null;
-        newRoleTitle = "";
+        roleManagementInput = "";
         showAddRoleModal = true;
     }
 
@@ -946,7 +958,7 @@
     {
         if (selectedRole == "Admin") return;
         editingRole = rolesList.FirstOrDefault(r => r.RoleTitle == selectedRole);
-        newRoleTitle = selectedRole;
+        roleManagementInput = selectedRole;
         showAddRoleModal = true;
     }
 
@@ -973,30 +985,15 @@
     private void CloseAddRoleModal()
     {
         showAddRoleModal = false;
-        newRoleTitle = "";
+        roleManagementInput = "";
         editingRole = null;
     }
 
-    private void OnManageRoleSelected(ChangeEventArgs e)
-    {
-        var idStr = e.Value?.ToString();
-        if (int.TryParse(idStr, out int id))
-        {
-            editingRole = rolesList.FirstOrDefault(r => r.Id == id);
-            if (editingRole != null)
-            {
-                newRoleTitle = editingRole.RoleTitle; // Pre-fill with existing name for editing
-            }
-        }
-        else
-        {
-            editingRole = null;
-        }
-    }
+    // Removed OnManageRoleSelected as we use a single field now
 
     private async Task SaveNewRole()
     {
-        if (string.IsNullOrWhiteSpace(newRoleTitle))
+        if (string.IsNullOrWhiteSpace(roleManagementInput))
         {
             errorMessage = "Please enter a role name first.";
             return;
@@ -1009,20 +1006,20 @@
             using var context = DbFactory.CreateDbContext();
             
             // Check if role already exists
-            if (await context.roles.AnyAsync(r => r.RoleTitle.ToLower() == newRoleTitle.ToLower()))
+            if (await context.roles.AnyAsync(r => r.RoleTitle.ToLower() == roleManagementInput.ToLower()))
             {
-                errorMessage = $"'{newRoleTitle}' already exists!";
+                errorMessage = $"'{roleManagementInput}' already exists!";
                 isSubmitting = false;
                 return;
             }
 
-            var newRole = new Role { RoleTitle = newRoleTitle.Trim() };
+            var newRole = new Role { RoleTitle = roleManagementInput.Trim() };
             context.roles.Add(newRole);
             await context.SaveChangesAsync();
 
             await LoadRoles();
             CloseAddRoleModal();
-            successMessage = $"Role '{newRoleTitle}' created successfully!";
+            successMessage = $"Role '{roleManagementInput}' created successfully!";
         }
         catch (Exception ex)
         {
@@ -1036,17 +1033,19 @@
 
     private async Task UpdateRole()
     {
-        if (editingRole == null)
-        {
-            errorMessage = "Please select a role from step (1) to update.";
-            return;
-        }
+        // Simple Logic: Find the role that matches whatever is currently in the list
+        // based on the name we are trying to update or a previously selected state.
+        // Actually, we'll search for the role that matches the name in the input.
         
-        if (string.IsNullOrWhiteSpace(newRoleTitle))
+        var role = rolesList.FirstOrDefault(r => r.RoleTitle.Equals(roleManagementInput, StringComparison.OrdinalIgnoreCase));
+        if (role == null)
         {
-            errorMessage = "Please enter the new name in step (2).";
+            errorMessage = "Please enter an existing role name from the list to update it.";
             return;
         }
+
+        string newName = await JS.InvokeAsync<string>("prompt", "Enter the new name for this role:", role.RoleTitle);
+        if (string.IsNullOrWhiteSpace(newName) || newName == role.RoleTitle) return;
 
         isSubmitting = true;
         errorMessage = null; 
@@ -1055,35 +1054,32 @@
             using var context = DbFactory.CreateDbContext();
 
             // Check if another role with same name exists
-            if (await context.roles.AnyAsync(r => r.Id != editingRole.Id && r.RoleTitle.ToLower() == newRoleTitle.ToLower()))
+            if (await context.roles.AnyAsync(r => r.Id != role.Id && r.RoleTitle.ToLower() == newName.ToLower()))
             {
-                errorMessage = $"'{newRoleTitle}' already exists!";
+                errorMessage = $"'{newName}' already exists!";
                 isSubmitting = false;
                 return;
             }
 
-            var role = await context.roles.FindAsync(editingRole.Id);
-            if (role != null)
+            var dbRole = await context.roles.FindAsync(role.Id);
+            if (dbRole != null)
             {
-                string oldTitle = role.RoleTitle;
-                string newTitle = newRoleTitle.Trim();
+                string oldTitle = dbRole.RoleTitle;
+                string newTitle = newName.Trim();
                 
-                // If the name actually changed, update users too
-                if (!string.Equals(oldTitle, newTitle, StringComparison.OrdinalIgnoreCase))
+                // Update users with old role string
+                var usersWithOldRole = await context.users.Where(u => u.role == oldTitle).ToListAsync();
+                foreach (var user in usersWithOldRole)
                 {
-                    var usersWithOldRole = await context.users.Where(u => u.role == oldTitle).ToListAsync();
-                    foreach (var user in usersWithOldRole)
-                    {
-                        user.role = newTitle;
-                    }
+                    user.role = newTitle;
                 }
 
-                role.RoleTitle = newTitle;
+                dbRole.RoleTitle = newTitle;
                 await context.SaveChangesAsync();
             }
 
             await LoadRoles();
-            CloseAddRoleModal();
+            roleManagementInput = newName; 
             successMessage = $"Role updated successfully!";
         }
         catch (Exception ex)
@@ -1098,13 +1094,14 @@
 
     private async Task DeleteRole()
     {
-        if (editingRole == null)
+        var role = rolesList.FirstOrDefault(r => r.RoleTitle.Equals(roleManagementInput, StringComparison.OrdinalIgnoreCase));
+        if (role == null)
         {
-            errorMessage = "Please select a role from step (1) to delete.";
+            errorMessage = "Please enter an existing role name to delete.";
             return;
         }
         
-        if (!await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the role '{editingRole.RoleTitle}'?"))
+        if (!await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the role '{role.RoleTitle}'?"))
             return;
 
         isSubmitting = true;
@@ -1112,15 +1109,15 @@
         try
         {
             using var context = DbFactory.CreateDbContext();
-            var role = await context.roles.FindAsync(editingRole.Id);
-            if (role != null)
+            var dbRole = await context.roles.FindAsync(role.Id);
+            if (dbRole != null)
             {
-                context.roles.Remove(role);
+                context.roles.Remove(dbRole);
                 await context.SaveChangesAsync();
             }
 
             await LoadRoles();
-            CloseAddRoleModal();
+            roleManagementInput = "";
             successMessage = "Role deleted successfully!";
         }
         catch (Exception ex)
