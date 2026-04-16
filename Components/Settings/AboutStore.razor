@@ -35,30 +35,6 @@
 
     <div class="store-form">
         <div class="store-form-grid">
-            <!-- Logo Section -->
-            <div class="store-logo-section">
-                <div class="store-logo-preview">
-                    @if (!string.IsNullOrEmpty(storeConfig.LogoPath))
-                    {
-                        <img src="@storeConfig.LogoPath" alt="Store Logo" class="store-logo-img" />
-                    }
-                    else
-                    {
-                        <div class="store-logo-placeholder">
-                            <i class="ph-storefront"></i>
-                            <span>Store Logo</span>
-                        </div>
-                    }
-                </div>
-                <InputFile accept="image/*" OnChange="HandleLogoUploadAsync" class="store-upload-btn" />
-                @if (!string.IsNullOrEmpty(storeConfig.LogoPath))
-                {
-                    <button class="store-remove-logo" @onclick="RemoveLogo">
-                        <i class="ph-trash"></i> Remove Logo
-                    </button>
-                }
-            </div>
-
             <!-- Form Fields -->
             <div class="store-form-fields">
                 <div class="store-form-row">
@@ -115,12 +91,58 @@
                     <textarea class="store-textarea" @bind="storeConfig.Comments" placeholder="Additional notes or comments" rows="3"></textarea>
                 </div>
             </div>
+
+            <!-- Logo Section (Right Side) -->
+            <div class="store-logo-section">
+                <div class="store-logo-preview">
+                    @{
+                        string logoPreviewSrc = "";
+                        if (!string.IsNullOrEmpty(storeConfig.LogoPath))
+                        {
+                            // If it's an absolute path, convert to URL for display
+                            if (storeConfig.LogoPath.Contains("D:\\") || storeConfig.LogoPath.Contains("\\"))
+                            {
+                                logoPreviewSrc = "/store-logo/" + System.IO.Path.GetFileName(storeConfig.LogoPath);
+                            }
+                            else
+                            {
+                                logoPreviewSrc = storeConfig.LogoPath;
+                            }
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(logoPreviewSrc))
+                    {
+                        <img src="@logoPreviewSrc" alt="Store Logo" class="store-logo-img" />
+                    }
+                    else
+                    {
+                        <div class="store-logo-placeholder">
+                            <i class="ph-storefront"></i>
+                            <span>Store Logo</span>
+                        </div>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(storeConfig.LogoPath))
+                {
+                    <button class="store-remove-logo" @onclick="RemoveLogo">
+                        <i class="ph-trash"></i> Remove Logo
+                    </button>
+                    <label class="store-upload-btn-store">
+                        <i class="ph-upload-simple"></i> Upload
+                        <InputFile accept="image/*" OnChange="HandleLogoUploadAsync" class="store-file-hidden" />
+                    </label>
+                }
+                else
+                {
+                    <label class="store-upload-btn">
+                        <i class="ph-upload-simple"></i> Upload
+                        <InputFile accept="image/*" OnChange="HandleLogoUploadAsync" class="store-file-hidden" />
+                    </label>
+                }
+            </div>
         </div>
 
         <div class="store-form-actions">
-            <button class="store-btn store-btn-secondary" @onclick="ResetForm">
-                <i class="ph-arrow-counter-clockwise"></i> Reset
-            </button>
             <button class="store-btn store-btn-primary" @onclick="SaveConfiguration" disabled="@isSaving">
                 @if (isSaving)
                 {
@@ -227,7 +249,7 @@
     /* Form Grid */
     .store-form-grid {
         display: grid;
-        grid-template-columns: 180px 1fr;
+        grid-template-columns: 1fr 200px;
         gap: 2rem;
     }
 
@@ -290,28 +312,62 @@
         text-align: center;
     }
 
-    /* Upload button — styled file input */
+    /* Hidden file input */
+    .store-file-hidden {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    /* Upload button — styled as a red label wrapping hidden InputFile */
     .store-upload-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
         width: 100%;
-        padding: 0.45rem 0;
+        padding: 0.5rem 0;
         background: var(--primary, #BC1823);
         color: white;
         border: none;
         border-radius: 6px;
         font-weight: 600;
-        font-size: 0.82rem;
+        font-size: 0.85rem;
         cursor: pointer;
         transition: all 0.2s;
         box-sizing: border-box;
-        text-align: center;
+        position: relative;
     }
 
     .store-upload-btn:hover {
         background: #9c141d;
     }
 
-    .store-upload-btn::file-selector-button {
-        display: none;
+    /* Upload button when logo already exists (outlined style) */
+    .store-upload-btn-store {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        width: 100%;
+        padding: 0.4rem 0;
+        background: none;
+        color: var(--primary, #BC1823);
+        border: 1px solid var(--primary, #BC1823);
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    .store-upload-btn-store:hover {
+        background: #fff5f6;
     }
 
     .store-remove-logo {
@@ -343,7 +399,7 @@
 
     .store-form-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
 
@@ -504,15 +560,24 @@
             {
                 var ext = Path.GetExtension(file.Name);
                 var fileName = $"store-logo-{Guid.NewGuid()}{ext}";
-                var savePath = Path.Combine("wwwroot", "savepic", fileName);
-                Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+                
+                // Saving to the specific requested path
+                var logoFolder = @"D:\netcore\E-Invoice_system\bin\Debug\Logo";
+                var savePath = Path.Combine(logoFolder, fileName);
+                
+                if (!Directory.Exists(logoFolder))
+                {
+                    Directory.CreateDirectory(logoFolder);
+                }
+
                 await using var fs = new FileStream(savePath, FileMode.Create);
                 await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(fs);
-                storeConfig.LogoPath = $"/savepic/{fileName}";
+                
+                storeConfig.LogoPath = savePath; // Save the absolute path as requested
             }
-            catch
+            catch (Exception ex)
             {
-                storeConfig.LogoPath = $"/images/store-logo-{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+                errorMessage = "Error uploading logo: " + ex.Message;
             }
         }
     }
@@ -532,41 +597,26 @@
         {
             using var context = DbFactory.CreateDbContext();
 
-            if (existingConfigId.HasValue)
+            // Always look for the first record instead of relying solely on local ID
+            var existing = await context.store_configurations.FirstOrDefaultAsync();
+            
+            if (existing != null)
             {
-                var existing = await context.store_configurations.FindAsync(existingConfigId.Value);
-                if (existing != null)
-                {
-                    existing.ShopName = storeConfig.ShopName;
-                    existing.OwnerName = storeConfig.OwnerName;
-                    existing.City = storeConfig.City;
-                    existing.Address = storeConfig.Address;
-                    existing.BusinessNature = storeConfig.BusinessNature;
-                    existing.Branch = storeConfig.Branch;
-                    existing.ShopNo = storeConfig.ShopNo;
-                    existing.Phone1 = storeConfig.Phone1;
-                    existing.Phone2 = storeConfig.Phone2;
-                    existing.LogoPath = storeConfig.LogoPath;
-                    existing.Comments = storeConfig.Comments;
-                }
+                existing.ShopName = storeConfig.ShopName;
+                existing.OwnerName = storeConfig.OwnerName;
+                existing.City = storeConfig.City;
+                existing.Address = storeConfig.Address;
+                existing.BusinessNature = storeConfig.BusinessNature;
+                existing.Branch = storeConfig.Branch;
+                existing.ShopNo = storeConfig.ShopNo;
+                existing.Phone1 = storeConfig.Phone1;
+                existing.Phone2 = storeConfig.Phone2;
+                existing.LogoPath = storeConfig.LogoPath;
+                existing.Comments = storeConfig.Comments;
             }
             else
             {
-                var newConfig = new StoreConfiguration
-                {
-                    ShopName = storeConfig.ShopName,
-                    OwnerName = storeConfig.OwnerName,
-                    City = storeConfig.City,
-                    Address = storeConfig.Address,
-                    BusinessNature = storeConfig.BusinessNature,
-                    Branch = storeConfig.Branch,
-                    ShopNo = storeConfig.ShopNo,
-                    Phone1 = storeConfig.Phone1,
-                    Phone2 = storeConfig.Phone2,
-                    LogoPath = storeConfig.LogoPath,
-                    Comments = storeConfig.Comments
-                };
-                context.store_configurations.Add(newConfig);
+                context.store_configurations.Add(storeConfig);
             }
 
             await context.SaveChangesAsync();
@@ -584,11 +634,4 @@
         }
     }
 
-    private void ResetForm()
-    {
-        storeConfig = new StoreConfiguration();
-        existingConfigId = null;
-        successMessage = null;
-        errorMessage = null;
-    }
 }

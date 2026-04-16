@@ -49,6 +49,9 @@ namespace E_Invoice_system.Models
         [Column("daily_summary")]
         public bool DailySummary { get; set; }
 
+        [Column("inventory")]
+        public bool Inventory { get; set; }
+
         [ForeignKey("RoleId")]
         public virtual Role? Role { get; set; }
     }

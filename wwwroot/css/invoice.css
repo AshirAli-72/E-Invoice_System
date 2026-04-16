@@ -88,10 +88,12 @@
 
 /* ADDRESSES */
 .invoice-addresses {
-    padding: 10px 50px 10px 50px;
+    padding: 30px 50px 10px 50px; /* Increased top padding */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
+    position: relative;
+    z-index: 10; /* Ensure it stays above background patterns */
 }
 
 .address-box { position: relative; }
@@ -100,12 +102,17 @@
 .address-label {
     background: var(--invoice-red);
     color: white;
-    padding: 4px 12px;
+    padding: 6px 15px;
     font-size: 11px;
     font-weight: 900;
-    display: inline-block;
+    display: block; /* Changed to block for better stacking */
+    width: fit-content;
     margin-bottom: 12px;
     text-transform: uppercase;
+}
+
+.address-box.right .address-label {
+    margin-left: auto; /* Align to right for seller info */
 }
 
 .address-name { font-size: 18px; font-weight: 900; margin-bottom: 5px; color: #111; }

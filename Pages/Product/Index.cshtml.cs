@@ -53,10 +53,10 @@ namespace E_Invoice_system.Pages.Product
             if (product != null)
             {
                 // Optionally delete image file
-                if (!string.IsNullOrEmpty(product.image))
+                if (!string.IsNullOrEmpty(product.pic))
                 {
                     string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\images";
-                    string filePath = Path.Combine(storagePath, product.image);
+                    string filePath = Path.Combine(storagePath, product.pic);
                     if (System.IO.File.Exists(filePath))
                     {
                         System.IO.File.Delete(filePath);

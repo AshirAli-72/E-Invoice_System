@@ -190,7 +190,7 @@
                             <div class="qty-stepper">
                                 <button type="button" @onclick="() => DecreaseQty(item)">-</button>
                                 <input type="number" class="manual-qty-input" 
-                                       value="@item.qty_unit_type" 
+                                       value="@item.qty" 
                                        @onchange="(e) => UpdateItemQty(item, e.Value?.ToString())" />
                                 <button type="button" @onclick="() => IncreaseQty(item)">+</button>
                             </div>
@@ -394,9 +394,9 @@
             {
                 <tr>
                     <td class="col-prod">@item.prod_name_service</td>
-                    <td class="col-qty">@Math.Abs(item.qty_unit_type)</td>
+                    <td class="col-qty">@Math.Abs(item.qty)</td>
                     <td class="col-price">@item.price.ToString("N0")</td>
-                    <td class="col-amt">@((item.price * Math.Abs(item.qty_unit_type)).ToString("N0"))</td>
+                    <td class="col-amt">@((item.price * Math.Abs(item.qty)).ToString("N0"))</td>
                 </tr>
             }
         </tbody>
@@ -489,10 +489,11 @@
             // Sequential data fetching to avoid EF Core concurrency issues
             var prodsData = await context.products_services
                 .AsNoTracking()
-                .Where(p => p.status == "Available")
+                .Where(p => p.status == "Enable")
                 .Select(p => new { 
-                    p.id, p.prod_name_service, p.price, p.discount, 
-                    p.expiry_date, p.qty_unit_type, p.image, p.barcode 
+                    p.id, p.prod_name, p.pic, p.barcode,
+                    p.expiry_date, p.prod_state, p.unit, p.size, p.item_type,
+                    p.category_id, p.brand_id
                 })
                 .OrderByDescending(p => p.id)
                 .Take(50) 
@@ -507,19 +508,11 @@
             currentStore = await context.store_configurations.AsNoTracking().FirstOrDefaultAsync();
 
             allProducts = prodsData.Select(p => {
-                decimal stock = 999999;
-                bool isSvc = true;
-                if (!string.IsNullOrEmpty(p.qty_unit_type)) {
-                    var m = Regex.Match(p.qty_unit_type.Trim(), @"^([0-9.-]+)\s*(.*)$");
-                    if (m.Success) {
-                        decimal.TryParse(m.Groups[1].Value, out stock);
-                        var unit = m.Groups[2].Value.Trim();
-                        if (string.IsNullOrEmpty(unit)) isSvc = false;
-                    }
-                }
+                decimal stock = p.size ?? 999999;
+                bool isSvc = p.item_type == "Service";
                 return new ProductDisplay { 
-                    Id = p.id, Name = p.prod_name_service ?? "", Price = p.price, Discount = p.discount, 
-                    Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.image, 
+                    Id = p.id, Name = p.prod_name ?? "", Price = 0, Discount = 0, 
+                    Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.pic, 
                     Category = isSvc ? "Beverages" : "Foods", Barcode = p.barcode 
                 };
             }).ToList();
@@ -582,18 +575,14 @@
         if (sales.Any()) {
             transMode = "return";
             saleItems = sales.Select(s => {
-                var qtyMatch = Regex.Match(s.qty_unit_type ?? "0", @"^([0-9.-]+)");
-                decimal qtyInDb = qtyMatch.Success ? decimal.Parse(qtyMatch.Groups[1].Value) : 0;
-                
                 return new SaleItem {
-                    prod_name_service = s.prod_name_service,
-                    barcode = s.barcode,
-                    qty_unit_type = -qtyInDb,
+                    prod_name_service = "Item #" + s.id,
+                    qty = -s.qty,
                     price = s.price,
-                    discount = qtyInDb != 0 ? s.discount / qtyInDb : 0,
+                    discount = s.qty != 0 ? s.discount / s.qty : 0,
                     expiry_date = s.expiry_date,
-                    maxStock = qtyInDb,
-                    total_price = (s.price * -qtyInDb),
+                    maxStock = (decimal)s.qty,
+                    total_price = Math.Abs(s.total_price),
                     OriginalSaleId = s.id
                 };
             }).ToList();
@@ -606,14 +595,14 @@
         decimal qty = transMode == "return" ? -1 : 1;
         var existing = saleItems.FirstOrDefault(i => i.prod_name_service == p.Name);
         if (existing != null) {
-            if (transMode == "sale" && (existing.qty_unit_type + 1) > p.Stock) { ShowAlert("Insufficient stock."); return; }
-            existing.qty_unit_type += qty;
-            if (existing.qty_unit_type == 0) saleItems.Remove(existing);
-            else existing.total_price = (existing.price * existing.qty_unit_type) - (existing.discount * existing.qty_unit_type);
+            if (transMode == "sale" && (existing.qty + 1) > p.Stock) { ShowAlert("Insufficient stock."); return; }
+            existing.qty += qty;
+            if (existing.qty == 0) saleItems.Remove(existing);
+            else existing.total_price = (existing.price * existing.qty) - (existing.discount * existing.qty);
         } else {
             if (transMode == "sale" && p.Stock < 1) { ShowAlert("Out of stock."); return; }
             saleItems.Add(new SaleItem {
-                prod_name_service = p.Name, barcode = p.Barcode, qty_unit_type = qty, 
+                prod_name_service = p.Name, qty = qty, 
                 price = p.Price, discount = p.Discount, expiry_date = p.Expiry, 
                 maxStock = p.Stock, image = p.Image, total_price = (p.Price * qty) - (p.Discount * qty)
             });
@@ -629,9 +618,9 @@
     private void SetTransMode(string mode) {
         transMode = mode;
         foreach (var item in saleItems) {
-            decimal abs = Math.Abs(item.qty_unit_type);
-            item.qty_unit_type = mode == "return" ? -abs : abs;
-            item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+            decimal abs = Math.Abs(item.qty);
+            item.qty = mode == "return" ? -abs : abs;
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         }
     }
 
@@ -656,20 +645,20 @@
             if (transMode == "return") q = -q;
             if (q == 0) { saleItems.Remove(item); return; }
             if (transMode == "sale" && q > item.maxStock) { ShowAlert("Stock limit reached."); q = item.maxStock; }
-            item.qty_unit_type = q;
-            item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+            item.qty = q;
+            item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         }
     }
 
     private void CalculateSaleItemTotal(SaleItem item) {
-        item.total_price = (item.price * item.qty_unit_type) - (item.discount * item.qty_unit_type);
+        item.total_price = (item.price * item.qty) - (item.discount * item.qty);
     }
 
-    private void IncreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty_unit_type) + 1).ToString());
-    private void DecreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty_unit_type) - 1).ToString());
+    private void IncreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty) + 1).ToString());
+    private void DecreaseQty(SaleItem i) => UpdateItemQty(i, (Math.Abs(i.qty) - 1).ToString());
 
-    private decimal totalSub => saleItems.Sum(i => i.price * i.qty_unit_type);
-    private decimal totalDisc => saleItems.Sum(i => i.discount * i.qty_unit_type);
+    private decimal totalSub => saleItems.Sum(i => i.price * i.qty);
+    private decimal totalDisc => saleItems.Sum(i => i.discount * i.qty);
     private decimal currentTotal => totalSub - totalDisc;
 
     private void OpenPaymentModal() { if (!saleItems.Any()) return; showPaymentModal = true; tenderedAmount = null; }
@@ -729,14 +718,14 @@
             // OPTIMIZED: Batch fetch all products in the sale at once instead of N times in loop
             var productNames = saleItems.Select(i => i.prod_name_service).Distinct().ToList();
             var productsToUpdate = await context.products_services
-                .Where(p => productNames.Contains(p.prod_name_service))
+                .Where(p => productNames.Contains(p.prod_name))
                 .ToListAsync();
 
             foreach (var item in saleItems) {
                 if (transMode == "return") {
                     if (item.OriginalSaleId == 0) {
                         var recentSale = await context.sales
-                            .Where(s => s.prod_name_service == item.prod_name_service && s.billNo != null && s.billNo.StartsWith("SALE_"))
+                            .Where(s => s.billNo != null && s.billNo.StartsWith("SALE_"))
                             .OrderByDescending(s => s.id)
                             .FirstOrDefaultAsync();
                         if (recentSale != null) {
@@ -748,9 +737,9 @@
                         billNo = orderBillNo,
                         SaleId = item.OriginalSaleId,
                         Date = DateTime.Now,
-                        ProdNameService = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
-                        Barcode = item.barcode,
-                        QtyUnitType = $"{Math.Abs(item.qty_unit_type)}".Length > 50 ? $"{Math.Abs(item.qty_unit_type)}".Substring(0, 50) : $"{Math.Abs(item.qty_unit_type)}",
+                        no_of_items = saleItems.Count,
+                        qty = Math.Abs(item.qty),
+                        total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
                         Amount = Math.Abs(item.total_price),
                         Method = paymentMethod,
                         Status = "RETURN"
@@ -759,10 +748,10 @@
                 } else {
                     var sale = new Models.Sale {
                         billNo = orderBillNo, 
-                        date = DateTime.Now, 
-                        prod_name_service = item.prod_name_service?.Length > 150 ? item.prod_name_service.Substring(0, 150) : item.prod_name_service,
-                        barcode = item.barcode, 
-                        qty_unit_type = $"{item.qty_unit_type}".Length > 50 ? $"{item.qty_unit_type}".Substring(0, 50) : $"{item.qty_unit_type}", 
+                        date = DateTime.Now.ToString("MM-dd-yyyy h:mm tt"), 
+                        no_of_items = saleItems.Count,
+                        qty = item.qty,
+                        total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
                         price = item.price,
                         discount = item.discount, 
                         total_price = item.total_price, 
@@ -777,15 +766,12 @@
                 
                 // OPTIMIZED: Use cached product lookup
                 try {
-                    var prod = productsToUpdate.FirstOrDefault(p => p.prod_name_service == item.prod_name_service);
+                    var prod = productsToUpdate.FirstOrDefault(p => p.prod_name == item.prod_name_service);
                     if (prod != null) {
-                        var m = Regex.Match(prod.qty_unit_type ?? "", @"^([0-9.-]+)\s*(.*)$");
-                        if (m.Success && decimal.TryParse(m.Groups[1].Value, out decimal currentStock)) {
-                            var newQty = (currentStock - item.qty_unit_type).ToString("0.####");
-                            var unit = m.Groups[2].Value.Trim();
-                            var finalQtyStr = $"{newQty} {unit}".Trim();
-                            if (finalQtyStr.Length > 50) finalQtyStr = finalQtyStr.Substring(0, 50);
-                            prod.qty_unit_type = finalQtyStr;
+                        if (prod.size.HasValue) {
+                            var newQty = (int)(prod.size.Value - item.qty);
+                            prod.size = newQty;
+                            if (newQty <= 0) prod.status = "Disabled";
                             context.products_services.Update(prod);
                         }
                     }
@@ -855,9 +841,8 @@
     }
 
     public class SaleItem {
-        public string prod_name_service { get; set; }
-        public string? barcode { get; set; }
-        public decimal qty_unit_type { get; set; }
+        public string prod_name_service { get; set; } = "";
+        public decimal qty { get; set; }
         public decimal price { get; set; }
         public decimal discount { get; set; }
         public DateTime? expiry_date { get; set; }

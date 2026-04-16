@@ -44,9 +44,10 @@ namespace E_Invoice_system.Pages.Sale
         {
             public int id { get; set; }
             public string? BillNo { get; set; }
-            public DateTime Date { get; set; }
-            public string? ProductName { get; set; }
-            public string DisplayQty { get; set; } = "";
+            public string? Date { get; set; }
+            public int no_of_items { get; set; }
+            public decimal qty { get; set; }
+            public decimal total_qty { get; set; }
             public decimal Price { get; set; }
             public decimal TotalPrice { get; set; }
             public string? PaymentMethod { get; set; }
@@ -72,7 +73,7 @@ namespace E_Invoice_system.Pages.Sale
                 if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
 
                 var salesList = await salesQuery
-                    .OrderByDescending(s => s.date)
+                    .OrderByDescending(s => s.id)
                     .Skip((PageNumber - 1) * PageSize)
                     .Take(PageSize)
                     .Select(s => new SaleDisplayItem
@@ -80,8 +81,9 @@ namespace E_Invoice_system.Pages.Sale
                         id = s.id,
                         BillNo = s.billNo,
                         Date = s.date,
-                        ProductName = s.prod_name_service,
-                        DisplayQty = s.qty_unit_type ?? "",
+                        no_of_items = s.no_of_items,
+                        qty = s.qty,
+                        total_qty = s.total_qty,
                         Price = s.price,
                         TotalPrice = s.total_price,
                         PaymentMethod = s.payment_method,
@@ -90,14 +92,7 @@ namespace E_Invoice_system.Pages.Sale
                     })
                     .ToListAsync();
 
-                foreach (var s in salesList)
-                    s.DisplayQty = Regex.Replace(s.DisplayQty, @"[^0-9.-]", "");
-
-                Sales = salesList.Where(s =>
-                {
-                    if (decimal.TryParse(s.DisplayQty, out decimal q)) return q > 0;
-                    return true;
-                }).ToList();
+                Sales = salesList.Where(s => s.qty > 0).ToList();
 
                 // ── Returns Pagination ────────────────────────────────────────────
                 IQueryable<ReturnDetail> returnsQuery = _context.returns.AsNoTracking();

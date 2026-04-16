@@ -19,15 +19,18 @@
             <table class="styled-table">
                 <thead>
                     <tr>
-                        <th style="padding-left: 1.5rem; width: 60px;">ID</th>
-                        <th style="width: 80px;">Image</th>
-                        <th>Item/Service Name</th>
+                        <th style="padding-left: 1.5rem;">ID</th>
+                        <th>Pic</th>
+                        <th>Product Name</th>
                         <th>Barcode</th>
-                        <th style="width: 140px;">QTY / UNIT</th>
-                        <th style="width: 120px;">Price</th>
-                        <th style="width: 100px;">Discount</th>
-                        <th style="width: 120px;">Status</th>
-                        <th class="text-right" style="padding-right: 1.5rem; width: 120px;">Actions</th>
+                        <th>State</th>
+                        <th>Unit</th>
+                        <th>Item Type</th>
+                        <th>Size</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Status</th>
+                        <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,9 +39,9 @@
                         <tr>
                             <td class="font-bold" style="padding-left: 1.5rem;">@item.id</td>
                             <td>
-                                @if (!string.IsNullOrEmpty(item.image))
+                                @if (!string.IsNullOrEmpty(item.pic))
                                 {
-                                    <img src="/product-images/@System.IO.Path.GetFileName(item.image)" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" />
+                                    <img src="/product-images/@System.IO.Path.GetFileName(item.pic)" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" />
                                 }
                                 else
                                 {
@@ -47,17 +50,16 @@
                                     </div>
                                 }
                             </td>
-                            <td class="font-medium">@item.prod_name_service</td>
+                            <td class="font-medium">@item.prod_name</td>
                             <td>@(item.barcode ?? "-")</td>
-                            <td>@item.qty_unit_type</td>
-                            <td class="font-bold">@CurrencySymbol@item.price.ToString("F2")</td>
-                            <td class="text-danger font-medium">
-                                <div style="display: flex; align-items: center; height: 40px;">
-                                    @CurrencySymbol@item.discount.ToString("F2")
-                                </div>
-                            </td>
+                            <td>@(item.prod_state ?? "-")</td>
+                            <td>@(item.unit ?? "-")</td>
+                            <td>@(item.item_type ?? "-")</td>
+                            <td>@(item.size?.ToString() ?? "-")</td>
+                            <td>@GetCategoryName(item.category_id)</td>
+                            <td>@GetBrandName(item.brand_id)</td>
                             <td>
-                                <span class="status-badge @(item.status == "Available" ? "status-available" : "status-out-of-stock")">
+                                <span class="status-badge @(item.status == "Enable" ? "status-enabled" : (item.status == "Disable" ? "status-discontinued" : "status-out-of-stock"))">
                                     @(item.status ?? "N/A")
                                 </span>
                             </td>
@@ -76,7 +78,7 @@
                     @if (!productList.Any())
                     {
                         <tr>
-                            <td colspan="9" class="empty-state">
+                            <td colspan="12" class="empty-state">
                                 <i class="ph-package empty-state-icon"></i>
                                 <p>No products found. Click "Add New Item" to get started.</p>
                             </td>
@@ -109,57 +111,132 @@
                         </div>
                     }
 
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label">Name / Title</label>
-                            <input type="text" @bind="productModel.prod_name_service" class="form-control" placeholder="Enter name" required />
-                        </div>
-                        
+                    <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div class="form-group">
-                            <label class="form-label">Price</label>
-                            <input type="number" step="0.01" @bind="productModel.price" class="form-control" />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Discount</label>
-                            <input type="number" step="0.01" @bind="productModel.discount" class="form-control" />
+                            <label class="form-label">Product Name</label>
+                            <input type="text" @bind="productModel.prod_name" class="form-control" placeholder="Enter product name" required />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Tax (%)</label>
-                            <input type="number" step="0.01" @bind="productModel.tax" class="form-control" placeholder="0.00" />
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Quantity / Unit</label>
-                            <input type="text" @bind="productModel.qty_unit_type" class="form-control" placeholder="e.g. 10 kg / 0 Service" />
-                        </div>
-
-                        <div class="form-group" style="grid-column: span 2;">
                             <label class="form-label">Barcode (Auto-generated if blank)</label>
                             <input type="text" @bind="productModel.barcode" class="form-control" placeholder="Enter or scan barcode" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select @bind="productModel.category_id" class="form-control" style="flex: 1;">
+                                    <option value="">-- Select Category --</option>
+                                    @foreach (var cat in categoryList)
+                                    {
+                                        <option value="@cat.id">@cat.category_title</option>
+                                    }
+                                </select>
+                                <button type="button" class="btn-primary" @onclick="OpenCategoryModal" style="padding: 0.6rem 0.8rem; flex-shrink: 0;">
+                                    <i class="ph-plus" style="font-size: 1.2rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Brand</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select @bind="productModel.brand_id" class="form-control" style="flex: 1;">
+                                    <option value="">-- Select Brand --</option>
+                                    @foreach (var br in brandList)
+                                    {
+                                        <option value="@br.id">@br.brand_title</option>
+                                    }
+                                </select>
+                                <button type="button" class="btn-primary" @onclick="OpenBrandModal" style="padding: 0.6rem 0.8rem; flex-shrink: 0;">
+                                    <i class="ph-plus" style="font-size: 1.2rem;"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Item State</label>
+                            <select @bind="productModel.prod_state" class="form-control">
+                                <option value="pieces">pieces</option>
+                                <option value="pack">pack</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Size</label>
+                            <input type="number" @bind="productModel.size" @bind:after="SyncStatus" class="form-control" placeholder="e.g. 100" />
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Manufacture Date</label>
+                            <input type="date" @bind="productModel.manufacture_date" class="form-control" />
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Expiry Date</label>
                             <input type="date" @bind="productModel.expiry_date" class="form-control" />
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select @bind="productModel.status" class="form-control">
-                                <option value="Available">Available</option>
-                                <option value="Out of Stock">Out of Stock</option>
-                                <option value="Discontinued">Discontinued</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="2" @bind="productModel.description" placeholder="Optional description"></textarea>
+                        <label class="form-label">Status</label>
+                        <select @bind="productModel.status" @bind:after="SyncStatus" class="form-control">
+                            <option value="Enable">Enable</option>
+                            <option value="Disable">Disable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label">Remarks</label>
+                        <textarea class="form-control" rows="2" @bind="productModel.remarks" placeholder="Optional remarks"></textarea>
+                    </div>
+
+                    <div style="margin: 1.5rem 0; padding-top: 1.5rem; border-top: 2px dashed #e2e8f0;">
+                        <div class="form-section-title" style="margin-bottom: 1.5rem;">
+                            <i class="ph-stack form-icon-primary"></i> Stock & Pricing Details
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" step="0.01" @bind="stockModel.quantity" @bind:after="CalculateTotalPurPrice" class="form-control" placeholder="0.00" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Purchase Price</label>
+                                <input type="number" step="0.01" @bind="stockModel.pur_price" @bind:after="CalculateTotalPurPrice" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Sale Price</label>
+                                <input type="number" step="0.01" @bind="stockModel.sale_price" class="form-control" placeholder="0.00" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Wholesale Price</label>
+                                <input type="number" step="0.01" @bind="stockModel.whole_sale_price" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Stock Manufacture Date</label>
+                                <input type="date" @bind="stockModel.date_of_manafacture" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stock Expiry Date</label>
+                                <input type="date" @bind="stockModel.date_of_expiry" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Total Purchase Value</label>
+                            <input type="number" step="0.01" @bind="stockModel.total_pur_price" class="form-control" placeholder="0.00" readonly />
+                        </div>
                     </div>
 
                     <!-- Image Upload inside Modal -->
@@ -202,12 +279,82 @@
     </div>
 }
 
+<!-- Category Modal -->
+@if (showCategoryModal)
+{
+    <div class="modal-overlay" @onclick="CloseCategoryModal">
+        <div class="modal-content" style="max-width: 400px;" @onclick:stopPropagation>
+            <div class="card" style="margin-bottom: 0; border: none;">
+                <div class="card-header card-header-flex">
+                    <div class="form-section-title">
+                        <i class="ph-tag form-icon-primary"></i>
+                        Add New Category
+                    </div>
+                    <button type="button" class="btn-icon-sm" @onclick="CloseCategoryModal" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+                </div>
+                <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Category Title</label>
+                        <input type="text" @bind="newCategoryTitle" class="form-control" placeholder="Enter category title" />
+                    </div>
+                    @if (!string.IsNullOrEmpty(categoryErrorMessage))
+                    {
+                        <div class="alert alert-danger" style="margin-top: 1rem; padding: 0.75rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; font-size: 0.85rem;">
+                            <i class="ph-warning"></i> @categoryErrorMessage
+                        </div>
+                    }
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn-icon-sm" @onclick="CloseCategoryModal" style="background: #f1f5f9; color: #475569; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">Cancel</button>
+                        <button type="button" class="btn-primary" @onclick="SaveCategory" style="padding: 0.5rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600;">
+                            <i class="ph-check"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Brand Modal -->
+@if (showBrandModal)
+{
+    <div class="modal-overlay" @onclick="CloseBrandModal">
+        <div class="modal-content" style="max-width: 400px;" @onclick:stopPropagation>
+            <div class="card" style="margin-bottom: 0; border: none;">
+                <div class="card-header card-header-flex">
+                    <div class="form-section-title">
+                        <i class="ph-award form-icon-primary"></i>
+                        Add New Brand
+                    </div>
+                    <button type="button" class="btn-icon-sm" @onclick="CloseBrandModal" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+                </div>
+                <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Brand Title</label>
+                        <input type="text" @bind="newBrandTitle" class="form-control" placeholder="Enter brand title" />
+                    </div>
+                    @if (!string.IsNullOrEmpty(brandErrorMessage))
+                    {
+                        <div class="alert alert-danger" style="margin-top: 1rem; padding: 0.75rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; font-size: 0.85rem;">
+                            <i class="ph-warning"></i> @brandErrorMessage
+                        </div>
+                    }
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn-icon-sm" @onclick="CloseBrandModal" style="background: #f1f5f9; color: #475569; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">Cancel</button>
+                        <button type="button" class="btn-primary" @onclick="SaveBrand" style="padding: 0.5rem 1.25rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600;">
+                            <i class="ph-check"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 <style>
     .modal-active .card { pointer-events: none; opacity: 0.8; transition: all 0.3s ease; }
     .styled-table tbody tr { transition: all 0.2s ease; }
     .styled-table tbody tr:hover { background-color: #f8fafc !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .status-available { background-color: #dcfce7; color: #15803d; }
-    .status-out-of-stock { background-color: #fee2e2; color: #b91c1c; }
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.4); display: flex; align-items: center; justify-content: center;
@@ -224,14 +371,26 @@
 
 @code {
     private List<ProductService> productList = new();
+    private List<Category> categoryList = new();
+    private List<Brand> brandList = new();
     private ProductService productModel = new();
+    private StockDetail stockModel = new();
     private bool showForm = false;
     private ProductService? editingProduct = null;
     private bool isSubmitting = false;
     private string? errorMessage;
-    private string CurrencySymbol = "$";
     private IBrowserFile? selectedFile;
     private string? imgUrl;
+
+    // Category modal fields
+    private bool showCategoryModal = false;
+    private string newCategoryTitle = "";
+    private string? categoryErrorMessage;
+
+    // Brand modal fields
+    private bool showBrandModal = false;
+    private string newBrandTitle = "";
+    private string? brandErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -241,20 +400,36 @@
     private async Task LoadProducts()
     {
         using var context = DbFactory.CreateDbContext();
-        var baseCurrency = await context.currencies.FirstOrDefaultAsync(c => c.is_active);
-        if (baseCurrency != null) CurrencySymbol = baseCurrency.symbol;
-        
         productList = await context.products_services.ToListAsync();
+        categoryList = await context.categories.ToListAsync();
+        brandList = await context.brands.ToListAsync();
         await InvokeAsync(StateHasChanged);
+    }
+
+    private string GetCategoryName(int? categoryId)
+    {
+        if (categoryId == null) return "-";
+        var cat = categoryList.FirstOrDefault(c => c.id == categoryId);
+        return cat?.category_title ?? "-";
+    }
+
+    private string GetBrandName(int? brandId)
+    {
+        if (brandId == null) return "-";
+        var br = brandList.FirstOrDefault(b => b.id == brandId);
+        return br?.brand_title ?? "-";
     }
 
     private void ShowAddForm()
     {
-        productModel = new ProductService { 
-            status = "Available",
-            price = 0,
-            discount = 0
+        productModel = new ProductService {
+            status = "Enable",
+            item_type = "Inventory",
+            unit = "kg",
+            prod_state = "pieces",
+            size = 0
         };
+        stockModel = new StockDetail();
         editingProduct = null;
         errorMessage = null;
         selectedFile = null;
@@ -262,24 +437,32 @@
         showForm = true;
     }
 
-    private void EditProduct(ProductService item)
+    private async Task EditProduct(ProductService item)
     {
         editingProduct = item;
         productModel = new ProductService
         {
             id = item.id,
-            prod_name_service = item.prod_name_service,
-            price = item.price,
-            discount = item.discount,
-            tax = item.tax,
-            qty_unit_type = item.qty_unit_type,
+            prod_name = item.prod_name,
             barcode = item.barcode,
+            manufacture_date = item.manufacture_date,
             expiry_date = item.expiry_date,
+            prod_state = item.prod_state,
+            unit = item.unit,
+            item_type = item.item_type,
+            size = item.size,
+            pic = item.pic,
             status = item.status,
-            description = item.description,
-            image = item.image,
-            date = item.date
+            remarks = item.remarks,
+            category_id = item.category_id,
+            brand_id = item.brand_id
         };
+
+        // Load stock details
+        using var context = DbFactory.CreateDbContext();
+        var stock = await context.stock_details.FirstOrDefaultAsync(s => s.item_barcode == item.barcode);
+        stockModel = stock ?? new StockDetail { item_barcode = item.barcode };
+
         errorMessage = null;
         selectedFile = null;
         imgUrl = null;
@@ -293,7 +476,7 @@
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        try 
+        try
         {
             selectedFile = e.File;
             errorMessage = null;
@@ -319,18 +502,17 @@
     private string GetImageUrl()
     {
         if (!string.IsNullOrEmpty(imgUrl)) return imgUrl;
-        if (!string.IsNullOrEmpty(productModel.image))
+        if (!string.IsNullOrEmpty(productModel.pic))
         {
-            try { return "/product-images/" + Path.GetFileName(productModel.image); }
-            catch { return "/product-images/" + productModel.image; }
+            try { return "/product-images/" + Path.GetFileName(productModel.pic); }
+            catch { return "/product-images/" + productModel.pic; }
         }
         return "";
     }
 
     private async Task SaveProduct()
     {
-        if (string.IsNullOrWhiteSpace(productModel.prod_name_service)) { errorMessage = "Name is required."; return; }
-        if (productModel.discount > productModel.price) { errorMessage = "Discount cannot exceed price."; return; }
+        if (string.IsNullOrWhiteSpace(productModel.prod_name)) { errorMessage = "Product name is required."; return; }
 
         isSubmitting = true;
         try
@@ -341,29 +523,21 @@
                 if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
                 string path = Path.Combine(storagePath, fileName);
-                
-                if (!string.IsNullOrEmpty(productModel.image) && productModel.image != path)
-                    if (File.Exists(productModel.image)) try { File.Delete(productModel.image); } catch {}
+
+                if (!string.IsNullOrEmpty(productModel.pic) && productModel.pic != path)
+                    if (File.Exists(productModel.pic)) try { File.Delete(productModel.pic); } catch {}
 
                 await using var stream = selectedFile.OpenReadStream(5120000);
                 await using var fs = new FileStream(path, FileMode.Create);
                 await stream.CopyToAsync(fs);
-                productModel.image = path; 
+                productModel.pic = path;
             }
 
             if (string.IsNullOrWhiteSpace(productModel.barcode)) productModel.barcode = await GenerateUniqueBarcode();
 
-            if (!string.IsNullOrEmpty(productModel.qty_unit_type))
-            {
-                var val = productModel.qty_unit_type.Trim();
-                if (val == "0" || val.StartsWith("0 ")) productModel.status = "Out of Stock";
-                else if (productModel.status == "Out of Stock") productModel.status = "Available";
-            }
-
             using var context = DbFactory.CreateDbContext();
             if (editingProduct == null)
             {
-                productModel.date = DateTime.Now;
                 context.products_services.Add(productModel);
             }
             else
@@ -372,6 +546,28 @@
             }
 
             await context.SaveChangesAsync();
+
+            // Save/Update stock details
+            stockModel.item_barcode = productModel.barcode;
+            var existingStock = await context.stock_details.FirstOrDefaultAsync(s => s.item_barcode == productModel.barcode);
+            if (existingStock == null)
+            {
+                context.stock_details.Add(stockModel);
+            }
+            else
+            {
+                // Update properties
+                existingStock.quantity = stockModel.quantity;
+                existingStock.pur_price = stockModel.pur_price;
+                existingStock.sale_price = stockModel.sale_price;
+                existingStock.whole_sale_price = stockModel.whole_sale_price;
+                existingStock.date_of_manafacture = stockModel.date_of_manafacture;
+                existingStock.date_of_expiry = stockModel.date_of_expiry;
+                existingStock.total_pur_price = stockModel.total_pur_price;
+                context.stock_details.Update(existingStock);
+            }
+            await context.SaveChangesAsync();
+
             await LoadProducts();
             HideForm();
         }
@@ -406,9 +602,93 @@
         var prod = await context.products_services.FindAsync(id);
         if (prod != null)
         {
+            var stock = await context.stock_details.FirstOrDefaultAsync(s => s.item_barcode == prod.barcode);
+            if (stock != null) context.stock_details.Remove(stock);
+
             context.products_services.Remove(prod);
             await context.SaveChangesAsync();
             await LoadProducts();
         }
+    }
+
+    // Category Modal Methods
+    private void OpenCategoryModal()
+    {
+        newCategoryTitle = "";
+        categoryErrorMessage = null;
+        showCategoryModal = true;
+    }
+
+    private void CloseCategoryModal()
+    {
+        showCategoryModal = false;
+    }
+
+    private async Task SaveCategory()
+    {
+        if (string.IsNullOrWhiteSpace(newCategoryTitle))
+        {
+            categoryErrorMessage = "Category title is required.";
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+        var category = new Category { category_title = newCategoryTitle };
+        context.categories.Add(category);
+        await context.SaveChangesAsync();
+        categoryList = await context.categories.ToListAsync();
+        productModel.category_id = category.id;
+        CloseCategoryModal();
+        StateHasChanged();
+    }
+
+    // Brand Modal Methods
+    private void OpenBrandModal()
+    {
+        newBrandTitle = "";
+        brandErrorMessage = null;
+        showBrandModal = true;
+    }
+
+    private void CloseBrandModal()
+    {
+        showBrandModal = false;
+    }
+
+    private async Task SaveBrand()
+    {
+        if (string.IsNullOrWhiteSpace(newBrandTitle))
+        {
+            brandErrorMessage = "Brand title is required.";
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+        var brand = new Brand { brand_title = newBrandTitle };
+        context.brands.Add(brand);
+        await context.SaveChangesAsync();
+        brandList = await context.brands.ToListAsync();
+        productModel.brand_id = brand.id;
+        CloseBrandModal();
+        StateHasChanged();
+    }
+
+    private void SyncStatus()
+    {
+        if (productModel.size == 0)
+        {
+            productModel.status = "Disable";
+        }
+        else if (productModel.size > 0)
+        {
+            productModel.status = "Enable";
+        }
+        StateHasChanged();
+    }
+
+    private void CalculateTotalPurPrice()
+    {
+        stockModel.total_pur_price = stockModel.quantity * stockModel.pur_price;
+        StateHasChanged();
     }
 }

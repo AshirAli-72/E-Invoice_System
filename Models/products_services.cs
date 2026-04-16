@@ -10,37 +10,43 @@ namespace E_Invoice_system.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("prod_name/service")]
-        public string? prod_name_service { get; set; }
+        [Column("prod_name")]
+        public string? prod_name { get; set; }
 
         [Column("barcode")]
         public string? barcode { get; set; }
 
-        [Column("qty/unit_type")]
-        public string? qty_unit_type { get; set; }
+        [Column("manufacture_date")]
+        public DateTime? manufacture_date { get; set; }
 
-        [Column("price")]
-        public decimal price { get; set; }
+        [Column("expiry_date")]
+        public DateTime? expiry_date { get; set; }
 
-        [Column("description")]
-        public string? description { get; set; }
+        [Column("prod_state")]
+        public string? prod_state { get; set; }
 
-        [Column("discount")]
-        public decimal discount { get; set; }
+        [Column("unit")]
+        public string? unit { get; set; }
 
-        [Column("tax")]
-        public decimal tax { get; set; }
+        [Column("item_type")]
+        public string? item_type { get; set; }
 
-        [Column("image")]
-        public string? image { get; set; }
+        [Column("size")]
+        public int? size { get; set; }
+
+        [Column("pic")]
+        public string? pic { get; set; }
 
         [Column("status")]
         public string? status { get; set; }
 
-        [Column("date")]
-        public DateTime date { get; set; }
+        [Column("remarks")]
+        public string? remarks { get; set; }
 
-        [Column("expiry_date")]
-        public DateTime? expiry_date { get; set; }
+        [Column("category_id")]
+        public int? category_id { get; set; }
+
+        [Column("brand_id")]
+        public int? brand_id { get; set; }
     }
 }

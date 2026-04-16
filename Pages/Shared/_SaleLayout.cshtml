@@ -388,7 +388,20 @@
             <header class="top-bar">
 
                 <div class="top-bar-left">
-                    <img src="/images/sata-logo.png" alt="SATA" class="top-bar-logo" />
+                    @using Microsoft.EntityFrameworkCore
+                    @using E_Invoice_system.Data
+                    @inject IDbContextFactory<ApplicationDbContext> DbFactory
+                    @{
+                        using var context = DbFactory.CreateDbContext();
+                        var store = context.store_configurations.FirstOrDefault();
+                        string logoSrc = "/images/sata-logo.png";
+                        if (store != null && !string.IsNullOrEmpty(store.LogoPath))
+                        {
+                            try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(store.LogoPath); }
+                            catch { }
+                        }
+                    }
+                    <img src="@logoSrc" alt="Logo" class="top-bar-logo" />
                     <span class="welcome-msg">Welcome back!</span>
                 </div>
 

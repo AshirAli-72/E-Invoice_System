@@ -14,16 +14,16 @@ namespace E_Invoice_system.Models
         public string? billNo { get; set; }
 
         [Column("date")]
-        public DateTime date { get; set; }
+        public string? date { get; set; }
    
-        [Column("prod_name/service")]
-        public string? prod_name_service { get; set; }
+        [Column("no_of_items")]
+        public int no_of_items { get; set; }
 
-        [Column("barcode")]
-        public string? barcode { get; set; }
+        [Column("qty")]
+        public decimal qty { get; set; }
 
-        [Column("qty/unit_type")]
-        public string? qty_unit_type { get; set; }
+        [Column("total_qty")]
+        public decimal total_qty { get; set; }
 
         [Column("price")]
         public decimal price { get; set; }

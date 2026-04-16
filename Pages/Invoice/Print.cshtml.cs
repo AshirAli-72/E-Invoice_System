@@ -83,7 +83,7 @@ namespace E_Invoice_system.Pages.Invoice
             // Fetch expiry date for single-item invoices
             if (!IsMultiItem && !string.IsNullOrEmpty(invoice.prod_name_service))
             {
-                var product = await _context.products_services.FirstOrDefaultAsync(p => p.prod_name_service == invoice.prod_name_service);
+                var product = await _context.products_services.FirstOrDefaultAsync(p => p.prod_name == invoice.prod_name_service);
                 SingleItemExpiry = product?.expiry_date?.ToString("yyyy-MM-dd") ?? "N/A";
             }
 

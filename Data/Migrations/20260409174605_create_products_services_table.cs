@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Infrastructure;
+    using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -17,22 +17,44 @@ namespace E_Invoice_system.Data.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    prod_nameservice = table.Column<string>(name: "prod_name/service", type: "nvarchar(max)", nullable: true),
+                    prod_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    qtyunit_type = table.Column<string>(name: "qty/unit_type", type: "nvarchar(max)", nullable: true),
-                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    manufacture_date = table.Column<DateTime>(type: "datetime2", nullable: true),
                     expiry_date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    prod_state = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    unit = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    item_type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    size = table.Column<int>(type: "int", nullable: true),
+                    pic = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    category_id = table.Column<int>(type: "int", nullable: true),
+                    brand_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_products_services", x => x.id);
+                    table.ForeignKey("FK_products_services_categories_category_id",
+                        x => x.category_id,
+                        "categories",
+                        "id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey("FK_products_services_brands_brand_id",
+                        x => x.brand_id,
+                        "brands",
+                        "id",
+                        onDelete: ReferentialAction.SetNull);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_services_category_id",
+                table: "products_services",
+                column: "category_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_services_brand_id",
+                table: "products_services",
+                column: "brand_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

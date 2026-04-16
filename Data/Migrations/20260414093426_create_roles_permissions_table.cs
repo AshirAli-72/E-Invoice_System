@@ -12,9 +12,7 @@ namespace E_Invoice_system.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Drop existing table if it exists
-            migrationBuilder.Sql("IF OBJECT_ID('roles_permissions', 'U') IS NOT NULL DROP TABLE roles_permissions;");
-
+            
             migrationBuilder.CreateTable(
                 name: "roles_permissions",
                 columns: table => new
@@ -33,7 +31,8 @@ namespace E_Invoice_system.Data.Migrations
                     product_report = table.Column<bool>(type: "bit", nullable: false),
                     invoice_report = table.Column<bool>(type: "bit", nullable: false),
                     returns_report = table.Column<bool>(type: "bit", nullable: false),
-                    daily_summary = table.Column<bool>(type: "bit", nullable: false)
+                    daily_summary = table.Column<bool>(type: "bit", nullable: false),
+                    inventory = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -13,6 +13,8 @@ namespace E_Invoice_system.Data
  
         public DbSet<customers> customers { get; set; }
         public DbSet<ProductService> products_services { get; set; }
+        public DbSet<Category> categories { get; set; }
+        public DbSet<Brand> brands { get; set; }
         public DbSet<users> users { get; set; }
         public DbSet<invoices> invoices { get; set; }
        
@@ -23,6 +25,8 @@ namespace E_Invoice_system.Data
         public DbSet<Role> roles { get; set; }
         public DbSet<RolePermission> roles_permissions { get; set; }
         public DbSet<StoreConfiguration> store_configurations { get; set; }
+        public DbSet<StockDetail> stock_details { get; set; }
+        public DbSet<Employee> employees { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,17 +37,7 @@ namespace E_Invoice_system.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProductService>()
-                .Property(p => p.price)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<ProductService>()
-                .Property(p => p.discount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<ProductService>()
-                .Property(p => p.tax)
-                .HasColumnType("decimal(18,2)");
+            // Product decimal columns removed - no price/discount/tax in new schema
 
             modelBuilder.Entity<Sale>()
                 .Property(s => s.price)
@@ -76,6 +70,20 @@ namespace E_Invoice_system.Data
             modelBuilder.Entity<Currency>()
                 .Property(c => c.exchange_rate)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StockDetail>(entity =>
+            {
+                entity.Property(e => e.quantity).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.pur_price).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.sale_price).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.whole_sale_price).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.total_pur_price).HasColumnType("decimal(18,2)");
+            });
+
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.Property(e => e.salary).HasColumnType("decimal(18,2)");
+            });
         }
     }
 }

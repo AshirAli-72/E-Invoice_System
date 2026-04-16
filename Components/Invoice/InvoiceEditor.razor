@@ -26,6 +26,17 @@
             <input class="form-control" type="date" @bind="invoiceDate" />
         </div>
 
+        <div class="form-row" style="display:grid; grid-template-columns: 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label class="form-label">Seller Company Name</label>
+                <input class="form-control" @bind="companyName" placeholder="Store Name" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Seller Phone</label>
+                <input class="form-control" @bind="companyPhone" placeholder="Store Phone" />
+            </div>
+        </div>
+
         <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
 
         <div class="form-group">
@@ -59,7 +70,7 @@
                         <option value="0">-- Select Product --</option>
                         @foreach (var p in productsList)
                         {
-                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name_service (@p.qty_unit_type) - @CurrencyService.GetSymbol()@p.price</option>
+                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name (@(p.item_type ?? "N/A"))</option>
                         }
                         @if (productsList.Count == 0)
                         {
@@ -190,6 +201,8 @@
     private string paymentMethod = "Cash";
     private decimal discount = 0;
     private int selectedProductId;
+    private string? companyName;
+    private string? companyPhone;
     private bool isSubmitting = false;
     private string? errorMessage;
 
@@ -202,7 +215,15 @@
         
         // Use a more resilient way to fetch Available products (handling potential status padding in DB)
         var allProducts = await context.products_services.ToListAsync();
-        productsList = allProducts.Where(p => !string.IsNullOrEmpty(p.status) && p.status.Trim().Equals("Available", StringComparison.OrdinalIgnoreCase)).ToList();
+        productsList = allProducts.Where(p => !string.IsNullOrEmpty(p.status) && p.status.Trim().Equals("Enable", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        // Load store configuration for defaults
+        var storeConfig = await context.store_configurations.FirstOrDefaultAsync();
+        if (storeConfig != null)
+        {
+            companyName = storeConfig.ShopName;
+            companyPhone = storeConfig.Phone1;
+        }
     }
 
     private void OnCustomerChanged(ChangeEventArgs e)
@@ -244,11 +265,11 @@
         {
             invoiceItems.Add(new InvoiceItem
             {
-                Name = product.prod_name_service,
+                Name = product.prod_name,
                 Qty = 1,
-                Price = product.price,
+                Price = 0,
                 ExpiryDate = product.expiry_date,
-                Total = product.price
+                Total = 0
             });
             errorMessage = null; 
             selectedProductId = 0; // Reset after success
@@ -289,8 +310,8 @@
             {
                 invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.ToString("yyMMddHHmm")}" : (invoiceNo.Length > 50 ? invoiceNo.Substring(0, 50) : invoiceNo),
                 date = invoiceDate,
-                seller_name = storeConfig?.ShopName?.Length > 100 ? storeConfig.ShopName.Substring(0, 100) : storeConfig?.ShopName,
-                seller_contact = storeConfig?.Phone1?.Length > 50 ? storeConfig.Phone1.Substring(0, 50) : storeConfig?.Phone1,
+                seller_name = companyName?.Length > 100 ? companyName.Substring(0, 100) : companyName,
+                seller_contact = companyPhone?.Length > 50 ? companyPhone.Substring(0, 50) : companyPhone,
                 seller_address = storeConfig?.Address?.Length > 255 ? storeConfig.Address.Substring(0, 255) : storeConfig?.Address,
                 customer_name = selectedCustomer.name?.Length > 100 ? selectedCustomer.name.Substring(0, 100) : selectedCustomer.name,
                 customer_contact = selectedCustomer.contact?.Length > 50 ? selectedCustomer.contact.Substring(0, 50) : selectedCustomer.contact,

@@ -56,8 +56,8 @@
                 <tr>
                     <th style="padding-left: 1.5rem;">Bill No</th>
                     <th>Date</th>
-                    <th>Product / Service</th>
-                    <th>QTY/Unit Type</th>
+                    <th>No. of Items</th>
+                    <th>Total Qty</th>
                     <th>Price</th>
                     <th>Total</th>
                     <th class="text-center">Method</th>
@@ -75,16 +75,15 @@
                                 <div class="font-bold font-sm font-monospace">@sale.BillNo</div>
                             </td>
                             <td>
-                                <div class="font-bold font-sm">@sale.Date.ToString("MMM dd, yyyy")</div>
-                                <div class="text-muted font-xs">@sale.Date.ToString("hh:mm tt")</div>
+                                <div class="font-bold font-sm">@sale.Date</div>
                             </td>
                             <td>
-                                <div class="font-bold">@sale.ProductName</div>
+                                <div class="font-bold">@sale.no_of_items</div>
                             </td>
-                            <td>@sale.DisplayQty</td>
+                            <td>@sale.total_qty.ToString("N2")</td>
                             <td class="text-muted">@CurrencyService.GetSymbol()@sale.Price.ToString("N2")</td>
                             <td>
-                                <div class="font-bold text-primary" style="font-size: 1rem;">@CurrencyService.GetSymbol()@sale.TotalPrice.ToString("N2")</div>
+                                <div class="font-bold text-primary">@CurrencyService.GetSymbol()@sale.TotalPrice.ToString("N2")</div>
                             </td>
                             <td class="text-center">
                                 <span class="font-medium font-sm">@sale.PaymentMethod</span>
@@ -164,8 +163,8 @@
                 <tr>
                     <th style="padding-left: 1.5rem;">Bill No</th>
                     <th>Date</th>
-                    <th>Product / Service</th>
-                    <th>QTY/Unit Type</th>
+                    <th>No. of Items</th>
+                    <th>Total Qty</th>
                     <th>Amount</th>
                     <th class="text-center">Method</th>
                     <th class="text-center">Status</th>
@@ -182,16 +181,15 @@
                                 <div class="font-bold font-sm font-monospace">@ret.billNo</div>
                             </td>
                             <td>
-                                <div class="font-bold font-sm">@ret.Date.ToString("MMM dd, yyyy")</div>
-                                <div class="text-muted font-xs">@ret.Date.ToString("hh:mm tt")</div>
+                                <div class="font-bold font-sm">@ret.Date.ToString("yyyy-MM-dd")</div>
+                                <div class="text-muted font-xs">@ret.Date.ToString("hh:mm:ss tt")</div>
                             </td>
                             <td>
-                                <div class="font-bold">@ret.ProdNameService</div>
-                                <div class="text-muted font-xs">@ret.Barcode</div>
+                                <div class="font-bold">@ret.no_of_items</div>
                             </td>
-                            <td class="text-danger font-bold">@ret.QtyUnitType</td>
+                            <td>@ret.total_qty.ToString("N2")</td>
                             <td>
-                                <div class="font-bold text-danger" style="font-size: 1rem;">@CurrencyService.GetSymbol()@Math.Abs(ret.Amount).ToString("N2")</div>
+                                <div class="font-bold text-danger">@CurrencyService.GetSymbol()@Math.Abs(ret.Amount).ToString("N2")</div>
                             </td>
                             <td class="text-center">
                                 <span class="font-medium font-sm">@ret.Method</span>

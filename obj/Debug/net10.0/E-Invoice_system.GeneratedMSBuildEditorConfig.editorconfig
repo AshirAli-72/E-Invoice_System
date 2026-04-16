@@ -34,6 +34,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDdXN0b21lclxDdXN0b21lckZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/netcore/E-Invoice_system/Components/Employee/EmployeeForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xFbXBsb3llZVxFbXBsb3llZUZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/netcore/E-Invoice_system/Components/Invoice/InvoiceEditor.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbnZvaWNlXEludm9pY2VFZGl0b3IucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -92,6 +96,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/netcore/E-Invoice_system/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/netcore/E-Invoice_system/Pages/Inventory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3J5XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/netcore/E-Invoice_system/Pages/Invoice/Create.cshtml]

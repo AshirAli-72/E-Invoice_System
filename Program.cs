@@ -50,14 +50,19 @@ app.UseResponseCompression();
 app.UseStaticFiles();
 
 string imagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\images";
-if (!System.IO.Directory.Exists(imagesDir))
-{
-    System.IO.Directory.CreateDirectory(imagesDir);
-}
+if (!System.IO.Directory.Exists(imagesDir)) System.IO.Directory.CreateDirectory(imagesDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imagesDir),
     RequestPath = "/product-images"
+});
+
+string logoDir = @"D:\netcore\E-Invoice_system\bin\Debug\Logo";
+if (!System.IO.Directory.Exists(logoDir)) System.IO.Directory.CreateDirectory(logoDir);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(logoDir),
+    RequestPath = "/store-logo"
 });
 app.UseRouting();
 
