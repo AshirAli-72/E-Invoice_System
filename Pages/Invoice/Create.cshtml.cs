@@ -12,7 +12,7 @@ namespace E_Invoice_system.Pages.Invoice
     {
         public IActionResult OnGet()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             return Page();

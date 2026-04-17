@@ -1,0 +1,18 @@
+@page
+@model E_Invoice_system.Pages.Employee.IndexModel
+@{
+    ViewData["Title"] = "Employee Management";
+}
+
+<link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
+
+<div class="dashboard-panel">
+    <div id="settings-container">
+        <component type="typeof(E_Invoice_system.Components.Employee.EmployeeForm)" render-mode="ServerPrerendered" />
+    </div>
+</div>
+
+@section Scripts {
+    @* Additional scripts if needed *@
+}

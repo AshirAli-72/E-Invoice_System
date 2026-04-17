@@ -25,7 +25,7 @@ namespace E_Invoice_system.Pages.Customer
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             IQueryable<customers> query = _context.customers.AsNoTracking();

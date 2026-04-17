@@ -412,15 +412,15 @@
                 <div class="top-bar-right">
                     <div class="user-profile">
                         @{
-                            var userEmail = Context.Session.GetString("UserEmail") ?? "User";
-                            var initial = userEmail.Length > 0 ? userEmail.Substring(0, 1).ToUpper() : "U";
+                            var UserName = Context.Session.GetString("UserName") ?? "User";
+                            var initial = UserName.Length > 0 ? UserName.Substring(0, 1).ToUpper() : "U";
                         }
                         <div class="user-avatar-initial" id="profileDropdownToggle">
                             @initial
                         </div>
 
                         <div class="profile-dropdown" id="profileDropdown">
-                            <div class="dropdown-email">@userEmail</div>
+                            <div class="dropdown-email">@UserName</div>
                             <div class="dropdown-divider"></div>
                             <form asp-controller="Account" asp-action="Logout" method="post">
                                 <button type="submit" class="btn-logout">

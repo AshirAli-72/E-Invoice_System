@@ -20,7 +20,8 @@ namespace E_Invoice_system.Data.Migrations
                     email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     username = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    role_id = table.Column<int>(type: "int", nullable: false),
+                    emp_id = table.Column<int>(type: "int", nullable: false),
                     status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>

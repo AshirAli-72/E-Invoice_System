@@ -14,7 +14,7 @@ namespace E_Invoice_system.Pages.Customer
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             var customer = await _context.customers.FindAsync(id);

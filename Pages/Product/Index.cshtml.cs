@@ -29,7 +29,7 @@ namespace E_Invoice_system.Pages.Product
         public async Task<IActionResult> OnGetAsync()
         {
             await _currencyService.GetSymbolAsync();
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             IQueryable<ProductService> query = _context.products_services.AsNoTracking();

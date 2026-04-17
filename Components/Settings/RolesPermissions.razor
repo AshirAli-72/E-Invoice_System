@@ -1155,14 +1155,6 @@
             {
                 string oldTitle = dbRole.RoleTitle;
                 string newTitle = newName;
-                
-                // Update users with old role string
-                var usersWithOldRole = await context.users.Where(u => u.role == oldTitle).ToListAsync();
-                foreach (var user in usersWithOldRole)
-                {
-                    user.role = newTitle;
-                }
-
                 dbRole.RoleTitle = newTitle;
                 await context.SaveChangesAsync();
                 

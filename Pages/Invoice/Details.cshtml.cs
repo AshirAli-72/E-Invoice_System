@@ -27,7 +27,7 @@ namespace E_Invoice_system.Pages.Invoice
         public async Task<IActionResult> OnGetAsync(int id)
         {
             await _currencyService.GetSymbolAsync();
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             var invoice = await _context.invoices.FirstOrDefaultAsync(i => i.id == id);

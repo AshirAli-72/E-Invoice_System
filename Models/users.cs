@@ -19,10 +19,19 @@ namespace E_Invoice_system.Models
         [Column("password")]
         public string? password { get; set; }
 
-        [Column("role")]
-        public string? role { get; set; }
+        [Column("role_id")]
+        public int role_id { get; set; }
+
+        [Column("emp_id")]
+        public int emp_id { get; set; }
 
         [Column("status")]
         public string? status { get; set; }
+
+        [ForeignKey("role_id")]
+        public virtual Role? Role { get; set; }
+
+        [ForeignKey("emp_id")]
+        public virtual Employee? Employee { get; set; }
     }
 }

@@ -52,7 +52,7 @@ namespace E_Invoice_system.Pages
             await _currencyService.GetSymbolAsync();
 
             // Simple session check
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
             {
                 return RedirectToPage("/Account/Login");
             }

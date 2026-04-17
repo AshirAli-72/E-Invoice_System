@@ -58,7 +58,7 @@ namespace E_Invoice_system.Pages.Sale
         public async Task<IActionResult> OnGetAsync()
         {
             await _currencyService.GetSymbolAsync();
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
             try

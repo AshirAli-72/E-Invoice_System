@@ -23,7 +23,7 @@ namespace E_Invoice_system.Pages.Account
 
         public IActionResult OnGet()
         {
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
             {
                 return RedirectToPage("/Index");
             }
@@ -41,15 +41,16 @@ namespace E_Invoice_system.Pages.Account
             try
             {
                 var user = await _context.users
+                    .Include(u => u.Role)
                     .AsNoTracking()
                     .Where(u => u.email == Email && u.password == Password)
-                    .Select(u => new { u.email, u.role })
+                    .Select(u => new { u.email, RoleTitle = u.Role != null ? u.Role.RoleTitle : "User" })
                     .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
-                    HttpContext.Session.SetString("UserEmail", user.email);
-                    HttpContext.Session.SetString("UserRole", user.role ?? "User");
+                    HttpContext.Session.SetString("UserName", user.email ?? "User");
+                    HttpContext.Session.SetString("UserRole", user.RoleTitle);
                     TempData["Success"] = "Welcome back! Login successful.";
                     return RedirectToPage("/Index");
                 }

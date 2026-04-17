@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
 
-namespace E_Invoice_system.Pages.Settings
+namespace E_Invoice_system.Pages.Employee
 {
     public class IndexModel : PageModel
     {

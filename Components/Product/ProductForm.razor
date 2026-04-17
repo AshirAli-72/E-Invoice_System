@@ -155,7 +155,7 @@
                         </div>
                     </div>
 
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Item State</label>
                             <select @bind="productModel.prod_state" class="form-control">
@@ -170,7 +170,7 @@
                         </div>
                     </div>
 
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Manufacture Date</label>
                             <input type="date" @bind="productModel.manufacture_date" class="form-control" />
@@ -200,18 +200,14 @@
                             <i class="ph-stack form-icon-primary"></i> Stock & Pricing Details
                         </div>
 
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Quantity</label>
-                                <input type="number" step="0.01" @bind="stockModel.quantity" @bind:after="CalculateTotalPurPrice" class="form-control" placeholder="0.00" />
-                            </div>
+                        <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label class="form-label">Purchase Price</label>
                                 <input type="number" step="0.01" @bind="stockModel.pur_price" @bind:after="CalculateTotalPurPrice" class="form-control" placeholder="0.00" />
                             </div>
                         </div>
 
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label class="form-label">Sale Price</label>
                                 <input type="number" step="0.01" @bind="stockModel.sale_price" class="form-control" placeholder="0.00" />
@@ -222,7 +218,7 @@
                             </div>
                         </div>
 
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label class="form-label">Stock Manufacture Date</label>
                                 <input type="date" @bind="stockModel.date_of_manafacture" class="form-control" />
@@ -233,10 +229,6 @@
                             </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Total Purchase Value</label>
-                            <input type="number" step="0.01" @bind="stockModel.total_pur_price" class="form-control" placeholder="0.00" readonly />
-                        </div>
                     </div>
 
                     <!-- Image Upload inside Modal -->
@@ -683,6 +675,11 @@
         {
             productModel.status = "Enable";
         }
+        
+        // Sync Quantity with Size
+        stockModel.quantity = productModel.size ?? 0;
+        CalculateTotalPurPrice();
+        
         StateHasChanged();
     }
 

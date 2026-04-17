@@ -651,6 +651,10 @@ namespace E_Invoice_system.Data.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("salary");
 
+                    b.Property<string>("status")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
+
                     b.HasKey("id");
 
                     b.HasIndex("emp_code");
@@ -671,13 +675,17 @@ namespace E_Invoice_system.Data.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("email");
 
+                    b.Property<int>("emp_id")
+                        .HasColumnType("int")
+                        .HasColumnName("emp_id");
+
                     b.Property<string>("password")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("password");
 
-                    b.Property<string>("role")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("role");
+                    b.Property<int>("role_id")
+                        .HasColumnType("int")
+                        .HasColumnName("role_id");
 
                     b.Property<string>("status")
                         .HasColumnType("nvarchar(max)")
@@ -688,6 +696,10 @@ namespace E_Invoice_system.Data.Migrations
                         .HasColumnName("username");
 
                     b.HasKey("id");
+
+                    b.HasIndex("emp_id");
+
+                    b.HasIndex("role_id");
 
                     b.ToTable("users");
                 });

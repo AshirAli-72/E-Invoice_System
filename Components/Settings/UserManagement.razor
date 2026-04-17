@@ -32,8 +32,8 @@
                 <thead>
                     <tr>
                         <th style="padding-left: 1.5rem;">ID</th>
-                        <th>Full Name</th>
-                        <th>Email Address</th>
+                        <th>User / Employee</th>
+                        <th>Email</th>
                         <th>Security Role</th>
                         <th>Status</th>
                         <th class="text-right" style="padding-right: 1.5rem;">Actions</th>
@@ -53,15 +53,18 @@
                     {
                         <tr>
                             <td class="font-bold" style="padding-left: 1.5rem;">#@user.id</td>
-                            <td>
+                             <td>
                                 <div style="display:flex; align-items:center; gap:0.5rem;">
                                     <span class="user-avatar-chip">@(user.username?.Length > 0 ? user.username[0].ToString().ToUpper() : "?")</span>
-                                    @user.username
+                                    <div>
+                                        <div class="font-bold">@user.username</div>
+                                        <div class="text-muted" style="font-size:0.75rem;">@user.Employee?.full_name</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td class="text-muted" style="font-size:0.9rem;">@user.email</td>
+                            <td class="text-muted" style="font-size:0.85rem;">@user.email</td>
                             <td>
-                                <span class="role-badge">@user.role</span>
+                                <span class="role-badge">@user.Role?.RoleTitle</span>
                             </td>
                             <td>
                                 <span class="status-badge @(user.status == "Active" ? "status-active" : "status-inactive")">
@@ -104,15 +107,26 @@
                     
                     <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Full Name / Display Name</label>
-                            <InputText @bind-Value="userModel.username" class="form-control" placeholder="e.g. John Doe or Manager1" />
+                            <label class="form-label">Username</label>
+                            <InputText @bind-Value="userModel.username" class="form-control" placeholder="e.g. john_doe" />
                             <ValidationMessage For="@(() => userModel.username)" />
                         </div>
 
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Email Address</label>
-                            <InputText @bind-Value="userModel.email" class="form-control" placeholder="Enter user's email address" />
+                            <label class="form-label">Login Email</label>
+                            <InputText @bind-Value="userModel.email" class="form-control" placeholder="user@example.com" />
                             <ValidationMessage For="@(() => userModel.email)" />
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Link Employee</label>
+                            <select @bind="userModel.emp_id" class="form-control">
+                                <option value="0">-- Select Employee --</option>
+                                @foreach (var emp in employeeList)
+                                {
+                                    <option value="@emp.id">@emp.full_name (@emp.emp_code)</option>
+                                }
+                            </select>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 1rem;">
@@ -121,24 +135,22 @@
                             <ValidationMessage For="@(() => userModel.password)" />
                         </div>
 
-                        <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="form-group">
-                                <label class="form-label">Role</label>
-                                <select @bind="userModel.role" class="form-control">
-                                    <option value="" disabled selected hidden>-- Select Role --</option>
-                                    @foreach (var role in rolesList)
-                                    {
-                                        <option value="@role.RoleTitle">@role.RoleTitle</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Account Status</label>
-                                <select @bind="userModel.status" class="form-control">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label">Role</label>
+                            <select @bind="userModel.role_id" class="form-control">
+                                <option value="0" disabled selected hidden>-- Select Role --</option>
+                                @foreach (var role in rolesList)
+                                {
+                                    <option value="@role.Id">@role.RoleTitle</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Account Status</label>
+                            <select @bind="userModel.status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
 
                         <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f1f5f9;">
@@ -278,6 +290,7 @@
     private bool showForm = false;
     private users? editingUser = null;
     private List<Role> rolesList = new();
+    private List<Employee> employeeList = new();
     private bool isSubmitting = false;
 
     protected override async Task OnInitializedAsync()
@@ -299,14 +312,28 @@
     private async Task LoadUsers()
     {
         using var context = DbFactory.CreateDbContext();
-        userList = await context.users.ToListAsync();
+        userList = await context.users
+            .Include(u => u.Role)
+            .Include(u => u.Employee)
+            .ToListAsync();
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadEmployees()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            employeeList = await context.employees.OrderBy(e => e.full_name).ToListAsync();
+        }
+        catch { }
     }
 
     private async Task ShowAddForm()
     {
         await LoadRoles();
-        userModel = new users { status = "Active", role = rolesList.FirstOrDefault()?.RoleTitle ?? "" };
+        await LoadEmployees();
+        userModel = new users { status = "Active", role_id = rolesList.FirstOrDefault()?.Id ?? 0 };
         editingUser = null;
         showForm = true;
     }
@@ -314,6 +341,7 @@
     private async Task EditUser(users user)
     {
         await LoadRoles();
+        await LoadEmployees();
         editingUser = user;
         userModel = new users
         {
@@ -321,7 +349,8 @@
             email = user.email,
             username = user.username,
             password = user.password,
-            role = user.role,
+            role_id = user.role_id,
+            emp_id = user.emp_id,
             status = user.status
         };
         showForm = true;

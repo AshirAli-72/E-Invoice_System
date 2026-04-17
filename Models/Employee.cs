@@ -13,6 +13,7 @@ namespace E_Invoice_system.Models
         [Column("date")]
         public DateTime date { get; set; }
 
+        [Required(ErrorMessage = "Full Name is required")]
         [Column("full_name")]
         public string? full_name { get; set; }
 
@@ -22,12 +23,15 @@ namespace E_Invoice_system.Models
         [Column("cnic")]
         public string? cnic { get; set; }
 
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         [Column("email")]
         public string? email { get; set; }
 
+        [Required(ErrorMessage = "Mobile Number is required")]
         [Column("mobile_no")]
         public string? mobile_no { get; set; }
 
+        [Required(ErrorMessage = "Residential Address is required")]
         [Column("address")]
         public string? address { get; set; }
 
@@ -36,5 +40,8 @@ namespace E_Invoice_system.Models
 
         [Column("salary")]
         public decimal salary { get; set; }
+
+        [Column("status")]
+        public string? status { get; set; }
     }
 }

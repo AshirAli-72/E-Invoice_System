@@ -77,6 +77,11 @@
                     </a>
                 }
 
+                <a href="/employee" class="nav-item">
+                    <i class="ph-users-three nav-icon"></i>
+                    <span>Employees</span>
+                </a>
+
                 @if (isAdmin || (perms?.Products ?? false))
                 {
                     <a href="/product" class="nav-item">
@@ -132,8 +137,8 @@
 
                 <div class="user-profile">
                     @{
-                        var userEmail = Context.Session.GetString("UserEmail") ?? "User";
-                        var initial = userEmail.Length > 0 ? userEmail.Substring(0, 1).ToUpper() : "U";
+                        var userName = Context.Session.GetString("UserName") ?? "User";
+                        var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
                     }
 
                     <div class="user-avatar-initial" id="profileDropdownToggle">
@@ -142,7 +147,7 @@
 
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="dropdown-header">
-                            <p class="user-email">@userEmail</p>
+                            <p class="user-email">@userName</p>
                         </div>
 
                         <div class="dropdown-divider"></div>

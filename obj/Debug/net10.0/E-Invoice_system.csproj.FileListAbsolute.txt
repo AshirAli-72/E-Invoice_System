@@ -238,3 +238,4 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\r9gxhi9lnv-{0}-qo2c7f9z
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\q0d5wq4o0r-{0}-0q7mf5bemw-0q7mf5bemw.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\e5ers0z3f0-{0}-35yy07qpfe-35yy07qpfe.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\9jq73j8bch-{0}-ltz7za1tjf-ltz7za1tjf.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

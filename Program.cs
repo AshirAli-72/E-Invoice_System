@@ -64,6 +64,14 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(logoDir),
     RequestPath = "/store-logo"
 });
+
+string empImagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\emp_image";
+if (!System.IO.Directory.Exists(empImagesDir)) System.IO.Directory.CreateDirectory(empImagesDir);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(empImagesDir),
+    RequestPath = "/emp-image"
+});
 app.UseRouting();
 
 

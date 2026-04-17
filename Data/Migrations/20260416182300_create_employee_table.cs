@@ -23,9 +23,10 @@ namespace E_Invoice_system.Data.Migrations
                     mobile_no = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     image_path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
+                constraints: table =>       
                 {
                     table.PrimaryKey("PK_employee", x => x.id);
                 });
