@@ -17,6 +17,11 @@ namespace E_Invoice_system.Pages.Inventory
 
         public List<InventoryItem> Products { get; set; } = new();
 
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
+
         public class InventoryItem
         {
             public int id { get; set; }
@@ -34,12 +39,24 @@ namespace E_Invoice_system.Pages.Inventory
             public string BrandName { get; set; } = "-";
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int pageNumber = 1)
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
 
-            var products = await _context.products_services.AsNoTracking().ToListAsync();
+            PageNumber = pageNumber;
+
+            IQueryable<ProductService> query = _context.products_services.AsNoTracking();
+
+            TotalCount = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+
+            var products = await query
+                .OrderByDescending(p => p.id)
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+
             var categories = await _context.categories.AsNoTracking().ToListAsync();
             var brands = await _context.brands.AsNoTracking().ToListAsync();
 

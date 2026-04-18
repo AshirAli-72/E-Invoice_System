@@ -737,7 +737,7 @@
                     var returnRec = new Models.ReturnDetail {
                         billNo = orderBillNo,
                         SaleId = item.OriginalSaleId,
-                        Date = DateTime.Now,
+                        Date = DateTime.Now.Date,
                         no_of_items = saleItems.Count,
                         qty = Math.Abs(item.qty),
                         total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
@@ -749,7 +749,7 @@
                 } else {
                     var sale = new Models.Sale {
                         billNo = orderBillNo, 
-                        date = DateTime.Now.ToString("MM-dd-yyyy h:mm tt"), 
+                        date = DateTime.Now.Date, 
                         no_of_items = saleItems.Count,
                         qty = item.qty,
                         total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
@@ -760,7 +760,7 @@
                         status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
                         is_returned = false, 
                         description = saleDescription,
-                        expiry_date = item.expiry_date ?? DateTime.Now 
+                        expiry_date = item.expiry_date ?? DateTime.Now.Date 
                     };
                     context.sales.Add(sale);
                 }

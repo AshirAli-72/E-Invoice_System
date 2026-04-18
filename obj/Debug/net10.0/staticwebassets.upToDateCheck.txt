@@ -1,8 +1,3 @@
-wwwroot\css\app-base.css
-wwwroot\css\customer.css
-wwwroot\css\dashboard.css
-wwwroot\css\invoice.css
-wwwroot\css\login.css
 wwwroot\css\product.css
 wwwroot\css\sale.css
 wwwroot\css\settings.css
@@ -59,6 +54,11 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 wwwroot\lib\bootstrap\LICENSE
 wwwroot\lib\chartjs\chart.js
+wwwroot\lib\inter-font\inter-500.ttf
+wwwroot\lib\inter-font\inter-600.ttf
+wwwroot\lib\inter-font\inter-700.ttf
+wwwroot\lib\inter-font\inter-800.ttf
+wwwroot\lib\inter-font\inter-regular.ttf
 wwwroot\lib\inter-font\inter.css
 wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
 wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
@@ -79,6 +79,11 @@ wwwroot\lib\jsbarcode\JsBarcode.all.min.js
 wwwroot\lib\phosphor\icons.css
 wwwroot\manifest.json
 wwwroot\savepic\bac7a766-3665-4267-96ab-868ef05fdc77.png
+wwwroot\css\login.css
+wwwroot\css\invoice.css
+wwwroot\css\dashboard.css
+wwwroot\css\customer.css
+wwwroot\css\app-base.css
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.web.js
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.server.js
 D:\netcore\E-Invoice_system\wwwroot\lib\phosphor\icons.css

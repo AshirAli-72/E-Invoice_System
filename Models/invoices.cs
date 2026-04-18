@@ -13,7 +13,7 @@ namespace E_Invoice_system.Models
         [Column("invoice_no")]
         public string? invoice_no { get; set; }
 
-        [Column("date")]
+        [Column("date", TypeName = "date")]
         public DateTime date { get; set; }
 
         [Column("seller_name")]

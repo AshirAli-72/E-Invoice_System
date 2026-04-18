@@ -20,7 +20,11 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure();
+        }));
 
 // Bridge for Razor Pages and other services that inject ApplicationDbContext directly
 builder.Services.AddScoped<ApplicationDbContext>(p => 
@@ -77,15 +81,7 @@ app.UseRouting();
 
 app.UseSession();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<E_Invoice_system.Data.ApplicationDbContext>();
-    try { 
-   
-    } catch (Exception ex) { 
-        System.Console.WriteLine("DB Patch Error: " + ex.Message); 
-    }
-}
+// app.UseAuthorization(); removed duplicate or check order
 
 app.UseAuthorization();
 

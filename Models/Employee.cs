@@ -10,7 +10,7 @@ namespace E_Invoice_system.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("date")]
+        [Column("date", TypeName = "date")]
         public DateTime date { get; set; }
 
         [Required(ErrorMessage = "Full Name is required")]

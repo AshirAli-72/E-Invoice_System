@@ -13,8 +13,8 @@ namespace E_Invoice_system.Models
         [Column("billNo", Order = 1)]
         public string? billNo { get; set; }
 
-        [Column("date")]
-        public string? date { get; set; }
+        [Column("date", TypeName = "date")]
+        public DateTime date { get; set; }
    
         [Column("no_of_items")]
         public int no_of_items { get; set; }
@@ -30,7 +30,7 @@ namespace E_Invoice_system.Models
 
         [Column("discount")]
         public decimal discount { get; set; }
-        [Column("expiry_date")]
+        [Column("expiry_date", TypeName = "date")]
         public DateTime? expiry_date { get; set; }
 
         [Column("total_price")]

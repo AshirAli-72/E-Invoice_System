@@ -20,11 +20,20 @@ namespace E_Invoice_system.Services
             // If already fetched in this request scope, return it
             if (_cachedSymbol != null) return _cachedSymbol;
 
-            using var context = _dbFactory.CreateDbContext();
-            var activeCurrency = await context.currencies
-                .FirstOrDefaultAsync(c => c.is_active);
+            try
+            {
+                using var context = _dbFactory.CreateDbContext();
+                var activeCurrency = await context.currencies
+                    .FirstOrDefaultAsync(c => c.is_active);
 
-            _cachedSymbol = activeCurrency?.symbol ?? "$";
+                _cachedSymbol = activeCurrency?.symbol ?? "$";
+            }
+            catch
+            {
+                // Fallback to default if DB fails
+                _cachedSymbol = "$";
+            }
+            
             return _cachedSymbol;
         }
 

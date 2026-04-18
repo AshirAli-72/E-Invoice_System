@@ -80,7 +80,7 @@ namespace E_Invoice_system.Pages.Sale
                     {
                         id = s.id,
                         BillNo = s.billNo,
-                        Date = s.date,
+                        Date = s.date.ToString("yyyy-MM-dd"),
                         no_of_items = s.no_of_items,
                         qty = s.qty,
                         total_qty = s.total_qty,

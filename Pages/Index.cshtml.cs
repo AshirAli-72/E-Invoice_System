@@ -48,14 +48,14 @@ namespace E_Invoice_system.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Prime currency symbol for the dashboard
-            await _currencyService.GetSymbolAsync();
-
-            // Simple session check
+            // Simple session check - MUST BE FIRST to allow redirection even if DB is slow
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
             {
                 return RedirectToPage("/Account/Login");
             }
+
+            // Prime currency symbol for the dashboard
+            await _currencyService.GetSymbolAsync();
 
             try
             {

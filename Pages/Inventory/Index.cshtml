@@ -79,4 +79,48 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model.Products.Any())
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Showing <b>@((Model.PageNumber - 1) * Model.PageSize + 1)</b> to <b>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount))</b> of <b>@Model.TotalCount</b> entries
+            </div>
+            <div class="pagination-controls">
+                <a class="btn-pagination @(Model.PageNumber == 1 ? "disabled" : "")" 
+                   href="@(Model.PageNumber == 1 ? "#" : Url.Page("./Index", new { pageNumber = Model.PageNumber - 1 }))">
+                    <i class="ph-caret-left"></i>
+                </a>
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || (i >= Model.PageNumber - 2 && i <= Model.PageNumber + 2))
+                    {
+                        <a class="btn-pagination @(Model.PageNumber == i ? "active" : "")" 
+                           href="@Url.Page("./Index", new { pageNumber = i })">
+                            @i
+                        </a>
+                    }
+                    else if (i == Model.PageNumber - 3 || i == Model.PageNumber + 3)
+                    {
+                        <span class="pagination-ellipsis">...</span>
+                    }
+                }
+
+                <a class="btn-pagination @(Model.PageNumber == Model.TotalPages ? "disabled" : "")" 
+                   href="@(Model.PageNumber == Model.TotalPages ? "#" : Url.Page("./Index", new { pageNumber = Model.PageNumber + 1 }))">
+                    <i class="ph-caret-right"></i>
+                </a>
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+    .btn-pagination.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        background: #f1f5f9;
+        color: #94a3b8;
+    }
+</style>

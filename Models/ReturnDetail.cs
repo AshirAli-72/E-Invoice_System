@@ -16,7 +16,7 @@ namespace E_Invoice_system.Models
         [Column("sale_id")]
         public int SaleId { get; set; }
 
-        [Column("date")]
+        [Column("date", TypeName = "date")]
         public DateTime Date { get; set; }
 
         [Column("no_of_items")]
