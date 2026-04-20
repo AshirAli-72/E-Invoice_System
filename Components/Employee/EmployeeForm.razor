@@ -72,7 +72,7 @@
             </table>
         </div>
         
-        @if (employeeList.Any())
+        @if (totalCount > pageSize)
         {
             <div class="pagination-container">
                 <div class="pagination-info">
@@ -251,13 +251,7 @@
     </div>
 }
 
-<style>
-    .modal-active .card { pointer-events: none; opacity: 0.8; transition: all 0.3s ease; }
-    .styled-table tbody tr:hover { background-color: #f8fafc !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-    .badge-success { background: #dcfce7; color: #15803d; }
-    .badge-danger { background: #fee2e2; color: #b91c1c; }
-</style>
+
 
 @code {
     private List<Employee> employeeList = new();

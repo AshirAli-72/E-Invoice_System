@@ -1,11 +1,11 @@
-wwwroot\css\product.css
-wwwroot\css\sale.css
-wwwroot\css\settings.css
+wwwroot\css\Invoice\invoice.css
+wwwroot\css\Sale\sale-receipt.css
+wwwroot\css\Customer\customer.css
 wwwroot\favicon.ico
 wwwroot\images\invoice-illustration.png
 wwwroot\images\login-bg.jpg
 wwwroot\images\sata-logo.png
-wwwroot\js\app-main.js
+wwwroot\css\Settings\settings.css
 wwwroot\js\site.js
 wwwroot\js\sw.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -80,16 +80,24 @@ wwwroot\lib\phosphor\icons.css
 wwwroot\manifest.json
 wwwroot\savepic\bac7a766-3665-4267-96ab-868ef05fdc77.png
 wwwroot\css\login.css
-wwwroot\css\invoice.css
-wwwroot\css\dashboard.css
-wwwroot\css\customer.css
+wwwroot\css\Product\product.css
+wwwroot\css\dashboard-main.css
+wwwroot\js\app-main.js
 wwwroot\css\app-base.css
+wwwroot\css\Sale\sale-layout.css
+wwwroot\css\Sale\sale-layout-base.css
+wwwroot\css\Sale\sale-checkout-main.css
+wwwroot\css\Sale\sale-product.css
+wwwroot\css\dashboard-widgets.css
+wwwroot\css\Sale\sale-payment.css
+wwwroot\css\Sale\sale-checkout-cart.css
+wwwroot\css\settings.css.old
+wwwroot\css\dashboard.css.old
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.web.js
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.server.js
 D:\netcore\E-Invoice_system\wwwroot\lib\phosphor\icons.css
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.web.js
 D:\netcore\E-Invoice_system\wwwroot\manifest.json
-D:\netcore\E-Invoice_system\wwwroot\css\dashboard.css
 D:\netcore\E-Invoice_system\wwwroot\lib\jsbarcode\JsBarcode.all.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.server.js
@@ -154,13 +162,21 @@ D:\netcore\E-Invoice_system\wwwroot\js\sw.js
 D:\netcore\E-Invoice_system\wwwroot\js\site.js
 D:\netcore\E-Invoice_system\wwwroot\js\app-main.js
 D:\netcore\E-Invoice_system\wwwroot\favicon.ico
-D:\netcore\E-Invoice_system\wwwroot\css\sale.css
-D:\netcore\E-Invoice_system\wwwroot\css\product.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-checkout-cart.css
 D:\netcore\E-Invoice_system\wwwroot\css\login.css
-D:\netcore\E-Invoice_system\wwwroot\css\customer.css
-D:\netcore\E-Invoice_system\wwwroot\css\app-base.css
+D:\netcore\E-Invoice_system\wwwroot\css\Settings\settings.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-layout-base.css
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.js
-D:\netcore\E-Invoice_system\wwwroot\css\invoice.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-receipt.css
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\chartjs\chart.js
-D:\netcore\E-Invoice_system\wwwroot\css\settings.css
+D:\netcore\E-Invoice_system\wwwroot\css\Customer\customer.css
+D:\netcore\E-Invoice_system\wwwroot\css\dashboard-main.css
+D:\netcore\E-Invoice_system\wwwroot\css\dashboard-widgets.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-payment.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-layout.css
+D:\netcore\E-Invoice_system\wwwroot\css\app-base.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-checkout-main.css
+D:\netcore\E-Invoice_system\wwwroot\css\Sale\sale-product.css
+D:\netcore\E-Invoice_system\wwwroot\css\Product\product.css
+D:\netcore\E-Invoice_system\wwwroot\css\Invoice\invoice.css

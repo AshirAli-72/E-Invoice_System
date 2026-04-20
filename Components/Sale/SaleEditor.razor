@@ -49,7 +49,7 @@
                     <i class="ph-spinner-gap" style="font-size: 3.5rem; color: var(--primary); opacity: 0.8; animation: spin 1s linear infinite; margin-bottom: 16px;"></i>
                     <h3 style="margin: 0; font-weight: 700; color: var(--text-main);">Loading Products...</h3>
                     <p style="margin: 8px 0 0; font-size: 0.9rem;">Fetching real-time inventory and pricing</p>
-                    <style>@@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+                    
                 </div>
             }
             else
@@ -491,10 +491,17 @@
             var prodsData = await context.products_services
                 .AsNoTracking()
                 .Where(p => p.status == "Enable")
-                .Select(p => new { 
-                    p.id, p.prod_name, p.pic, p.barcode,
-                    p.expiry_date, p.prod_state, p.unit, p.size, p.item_type,
-                    p.category_id, p.brand_id
+                .GroupJoin(
+                    context.stock_details.AsNoTracking(),
+                    p => p.barcode,
+                    s => s.item_barcode,
+                    (p, s) => new { p, stock = s.OrderByDescending(x => x.id).FirstOrDefault() }
+                )
+                .Select(x => new { 
+                    x.p.id, x.p.prod_name, x.p.pic, x.p.barcode,
+                    x.p.expiry_date, x.p.prod_state, x.p.unit, x.p.size, x.p.item_type,
+                    x.p.category_id, x.p.brand_id,
+                    sale_price = x.stock != null ? x.stock.sale_price : 0
                 })
                 .OrderByDescending(p => p.id)
                 .Take(50) 
@@ -512,7 +519,7 @@
                 decimal stock = p.size ?? 999999;
                 bool isSvc = p.item_type == "Service";
                 return new ProductDisplay { 
-                    Id = p.id, Name = p.prod_name ?? "", Price = 0, Discount = 0, 
+                    Id = p.id, Name = p.prod_name ?? "", Price = p.sale_price, Discount = 0, 
                     Expiry = p.expiry_date, Stock = stock, IsService = isSvc, Image = p.pic, 
                     Category = isSvc ? "Beverages" : "Foods", Barcode = p.barcode 
                 };
@@ -645,7 +652,7 @@
             q = Math.Abs(q);
             if (transMode == "return") q = -q;
             if (q == 0) { saleItems.Remove(item); return; }
-            if (transMode == "sale" && q > item.maxStock) { ShowAlert("Stock limit reached."); q = item.maxStock; }
+            if (transMode == "sale" && q > item.maxStock) { ShowAlert("Stock limit reached."); return; }
             item.qty = q;
             item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         }

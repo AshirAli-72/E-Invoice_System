@@ -482,3 +482,4 @@
     color: var(--text-muted);
     padding: 0 0.25rem;
 }
+@keyframes spin { 100% { transform: rotate(360deg); } }

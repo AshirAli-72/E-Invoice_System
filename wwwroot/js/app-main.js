@@ -52,7 +52,7 @@ const NavProgress = (() => {
 })();
 
 // ─── Prefetch Cache ────────────────────────────────────────────────────────────
-const EXCLUDED_PATHS = ['/invoice', '/sale', '/customer', '/product', '/settings'];
+const EXCLUDED_PATHS = ['/invoice', '/sale', '/customer', '/product', '/settings', '/employee', '/inventory'];
 
 function isPathExcluded(url) {
     if (!url) return true;

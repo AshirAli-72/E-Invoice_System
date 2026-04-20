@@ -40,26 +40,43 @@ namespace E_Invoice_system.Pages.Account
 
             try
             {
+                var inputEmail = Email.Trim();
+                var inputPass = Password.Trim();
+
                 var user = await _context.users
-                    .Include(u => u.Role)
                     .AsNoTracking()
-                    .Where(u => u.email == Email && u.password == Password)
-                    .Select(u => new { u.email, RoleTitle = u.Role != null ? u.Role.RoleTitle : "User" })
+                    .Where(u => u.email != null && u.email.ToLower() == inputEmail.ToLower() && u.password == inputPass)
                     .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
+                    string roleTitle = "User";
+                    if (user.role_id > 0)
+                    {
+                        var role = await _context.roles.FindAsync(user.role_id);
+                        if (role != null)
+                        {
+                            roleTitle = role.RoleTitle;
+                        }
+                    }
+
                     HttpContext.Session.SetString("UserName", user.email ?? "User");
-                    HttpContext.Session.SetString("UserRole", user.RoleTitle);
+                    HttpContext.Session.SetString("UserRole", roleTitle);
                     TempData["Success"] = "Welcome back! Login successful.";
                     return RedirectToPage("/Index");
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid email or password.");
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex.Message.Contains("Timeout", StringComparison.OrdinalIgnoreCase) ||
+                                         ex.Message.Contains("Connection", StringComparison.OrdinalIgnoreCase) ||
+                                         ex.InnerException?.Message?.Contains("Timeout", StringComparison.OrdinalIgnoreCase) == true)
             {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "The server is temporarily busy. Please try again in a few seconds.");
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to connect. Please check your internet connection and try again.");
             }
             
             return Page();

@@ -1,0 +1,220 @@
+/* 1. Base Container & Theme Revert */
+:root {
+    --primary: #BC1823;
+    /* Dashboard Red */
+    --primary-hover: #9c141d;
+    --primary-glow: rgba(188, 24, 35, 0.1);
+    --bg-app: #f1f5f9;
+    --surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.04);
+}
+
+.pos-container-v2 {
+    display: grid;
+    grid-template-columns: 1fr 500px;
+    height: calc(100vh - 80px); /* Adjusted for layout header */
+    background: #ffffff;
+    overflow: hidden;
+    position: relative;
+}
+
+@media (max-width: 1440px) {
+    .pos-container-v2 {
+        grid-template-columns: 1fr 450px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .pos-container-v2 {
+        grid-template-columns: 1fr 400px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .pos-container-v2 {
+        display: block;
+        height: auto;
+        overflow: visible;
+        padding-bottom: 0px;
+        /* Reset padding as footer is now sticky */
+    }
+}
+
+/* 2. Main Discovery Area */
+.product-canvas {
+    display: flex;
+    flex-direction: column;
+    padding: 32px;
+    overflow-y: auto;
+    background: #ffffff;
+    border-right: 1px solid #f1f5f9;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.product-canvas::-webkit-scrollbar {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .product-canvas {
+        padding: 16px;
+        overflow: visible;
+        border-right: none;
+        height: auto;
+    }
+}
+
+
+
+/* Improved card name wrapping for small screens */
+.card-name {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    /* Standard property for compatibility */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    /* Allow 2 lines */
+    min-height: 2.4em;
+}
+
+/* Ensure price tags don't overflow */
+.price-tag {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    white-space: nowrap;
+}
+
+/* Category tabs scroll refinement */
+.category-tabs-v2 {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.category-tabs-v2::-webkit-scrollbar {
+    display: none;
+}
+
+/* 4. Responsive Design */
+
+
+/* Entry Animations */
+.reveal-fade {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.reveal-up {
+    opacity: 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1280px) {
+    /* Removed redundant block, merged above */
+}
+
+@media (max-width: 1100px) {
+    .canvas-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-bar-v2 {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .quick-actions-v2 {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 1024px) {
+    .pos-container-v2 {
+        display: block;
+        /* Use block on mobile for natural flow */
+        height: auto;
+        overflow: visible;
+    }
+
+    .product-canvas {
+        flex: 1;
+        /* Grow to fill available space */
+        padding: 12px;
+        overflow-y: visible;
+        /* Disable internal scroll on mobile */
+        border-right: none;
+        background: #ffffff;
+    }
+
+    .checkout-center {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        /* Flow naturally on mobile */
+        min-height: 300px;
+        border-left: none;
+        border-top: 2px solid var(--primary-glow);
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+        overflow: visible;
+    }
+
+    .checkout-form {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .checkout-items-v2 {
+        flex: 1;
+        overflow-y: auto;
+        background: #ffffff;
+    }
+
+    .checkout-footer-v2 {
+        position: relative;
+        /* No longer sticky since container is fixed */
+        bottom: 0;
+        z-index: 100;
+        background: #ffffff;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        border-top: 1px solid var(--border);
+        padding: 16px 20px;
+    }
+}
+

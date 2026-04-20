@@ -11,52 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - @(Model.Invoice.invoice_no ?? Model.Invoice.id.ToString())</title>
     <link rel="stylesheet" href="/lib/inter-font/inter.css" />
-    <link rel="stylesheet" href="/css/invoice.css">
-    <style>
-        body { background: #f1f5f9; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        .print-controls {
-            width: 100%;
-            max-width: 210mm;
-            padding: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .btn {
-            padding: 10px 24px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.2s;
-            border: none;
-            text-transform: uppercase;
-        }
-        .btn-print { background: #9B111E; color: white; }
-        .btn-close { background: #1f2937; color: white; }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        @@media print {
-            .print-controls, .no-print { display: none !important; }
-            body { 
-                background: white !important; 
-                padding: 0 !important; 
-                margin: 0 !important;
-                visibility: visible !important; 
-                display: block !important; 
-                width: 100% !important;
-            }
-            body * { visibility: visible !important; }
-            .invoice-paper { box-shadow: none !important; margin: 0 !important; visibility: visible !important; }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/Invoice/invoice.css">
+    
 </head>
 <body>
     <div class="print-controls no-print">

@@ -1,0 +1,277 @@
+/* ============================================================
+   THERMAL RECEIPT DESIGN (USER PROVIDED)
+   ============================================================ */
+
+#thermalReceipt {
+    background: #ffffff !important;
+    width: 600px;
+    padding: 28px 32px;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 13.5pt !important;
+    color: #000000 !important;
+    line-height: 1.45 !important;
+    margin: 0 auto;
+    display: none; /* Hidden on screen by default in POS */
+}
+
+/* ── Header ── */
+.rcpt-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.rcpt-shop-name {
+    display: block;
+    font-size: 20pt;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+}
+.rcpt-address {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    margin-top: 1px;
+}
+.rcpt-phone {
+    display: block;
+    font-size: 13pt;
+    font-weight: 700;
+}
+
+/* ── Info lines ── */
+.rcpt-info {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+.rcpt-info-line {
+    display: block;
+    font-size: 13pt;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.rcpt-info-line b {
+    font-weight: 900;
+}
+
+/* ── Table ── */
+.rcpt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+.rcpt-table thead tr th {
+    font-size: 13.5pt;
+    font-weight: 900;
+    padding: 5px 4px;
+    border-top: 2.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    text-align: left;
+    text-transform: uppercase;
+}
+.rcpt-table tbody tr td {
+    font-size: 13pt;
+    font-weight: 400;
+    padding: 5px 4px;
+}
+
+.col-prod  { text-align: left;   width: auto; }
+.col-qty   { text-align: center; width: 70px; }
+.col-price { text-align: right;  width: 100px; }
+.col-amt   { text-align: right;  width: 100px; }
+
+/* ── Totals ── */
+.rcpt-totals {
+    border-top: 1.5px solid #000;
+    padding-top: 4px;
+    margin-top: 2px;
+}
+.rcpt-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13pt;
+    font-weight: 900;
+    line-height: 1.75;
+}
+
+/* ── Footer ── */
+.rcpt-footer {
+    text-align: center;
+    margin-top: 0;
+}
+
+hr.rcpt-hr-thick {
+    border: none;
+    border-top: 2.5px solid #000;
+    margin: 7px 0;
+}
+hr.rcpt-hr-thin {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 5px 0;
+}
+
+.rcpt-thank-you {
+    display: block;
+    font-size: 18pt;
+    font-weight: 900;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 1px;
+}
+.rcpt-promo {
+    display: block;
+    font-size: 11pt;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px 0;
+}
+.rcpt-copyright {
+    display: block;
+    font-size: 10pt;
+    font-weight: 400;
+    text-align: center;
+    padding: 2px 0;
+    font-style: italic;
+}
+
+/* ── Bottom row ── */
+.rcpt-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+    margin-top: 0;
+}
+.rcpt-bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: flex-start;
+}
+.rcpt-order-id {
+    display: block;
+    font-size: 12pt;
+    font-weight: 900;
+}
+.rcpt-date {
+    display: block;
+    font-size: 12pt;
+    font-weight: 400;
+}
+
+.rcpt-barcode-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+#rcptBarcodeSvg {
+    display: block;
+    width: 220px;
+    height: 60px;
+}
+.rcpt-barcode-text {
+    display: block;
+    font-size: 10pt;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+
+    /* 1. Global Reset */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    /* 2. Keeping parents visible to avoid hiding the child */
+    .sale-layout-container, 
+    .sale-main-wrapper, 
+    .sale-content-body {
+        display: block !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* 3. Aggressive Hiding of UI Components */
+    nav, aside, header, footer, .sidebar, .top-bar, 
+    .modal-overlay, #toast-container, .no-print,
+    .sale-layout-container > *:not(.sale-main-wrapper),
+    .sale-main-wrapper > *:not(.sale-content-body),
+    .sale-content-body > *:not(#thermalReceipt) {
+        display: none !important;
+    }
+
+    /* 4. Display Receipt Designing (Converted to Simple Page) */
+    #thermalReceipt {
+        display: block !important;
+        visibility: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 5mm !important;
+        background: #fff !important;
+        color: #000 !important;
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        box-sizing: border-box !important;
+        break-inside: avoid !important;
+        position: relative !important;
+        border: none !important;
+    }
+
+    /* Ensure children are visible */
+    #thermalReceipt * {
+        visibility: visible !important;
+    }
+
+    /* Correct display for tables */
+    .rcpt-table { 
+        display: table !important; 
+        width: 100% !important; 
+        margin-top: 20px !important; 
+        border-bottom: 2px solid #000 !important;
+    }
+    .rcpt-table tr { display: table-row !important; }
+    .rcpt-table th, .rcpt-table td { 
+        display: table-cell !important; 
+        padding: 10px 8px !important; 
+    }
+    
+    .rcpt-total-line { 
+        display: flex !important; 
+        justify-content: space-between !important; 
+        padding: 5px 0 !important;
+    }
+    
+    .rcpt-bottom { 
+        display: flex !important; 
+        justify-content: space-between !important; 
+        margin-top: 30px !important;
+        border-top: 1px solid #eee !important;
+        padding-top: 20px !important;
+    }
+
+    #rcptBarcodeSvg {
+        width: 250px !important;
+        height: 80px !important;
+        display: block !important;
+    }
+}
