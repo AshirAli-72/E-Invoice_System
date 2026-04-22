@@ -5,19 +5,24 @@
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @rendermode RenderMode.InteractiveServer
 
-<div class="card card-no-padding" style="border: 1px solid #e2e8f0; background: #fff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-    <div class="card-header card-header-flex" style="padding: 1.5rem; border-bottom: 1px solid #f1f5f9;">
-        <div style="display:flex; align-items:center; gap:0.6rem;">
-            <i class="ph-shield-check" style="font-size:1.3rem; color: var(--primary);"></i>
-            <div class="card-title" style="margin: 0;">Roles &amp; Permissions</div>
+<div class="management-container">
+    <div class="card card-no-padding">
+        <div class="page-header">
+            <div class="page-header-left">
+                <i class="ph-shield-check page-header-icon"></i>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <h2 class="page-header-title">Roles & Permissions</h2>
+                    <p class="text-muted font-sm" style="margin: 0;">Control system access and feature visibility per user role</p>
+                </div>
+            </div>
+            <div class="page-header-actions">
+                <a href="/settings" class="btn-back-hub">
+                    <i class="ph-arrow-left"></i> Back to Settings
+                </a>
+            </div>
         </div>
-        <a href="/settings" class="btn-back-hub" style="margin: 0;">
-            <i class="ph-arrow-left"></i> Back to Settings
-        </a>
-    </div>
 
-    <div style="padding: 1.5rem;">
-        <p class="rp-subtitle" style="margin-bottom: 1.5rem;">Control access and feature visibility per user role</p>
+        <div style="padding: 1.5rem;">
 
     <!-- Top Role Selector Bar -->
     <div class="rp-topbar">
@@ -42,14 +47,20 @@
 
     @if (!string.IsNullOrEmpty(successMessage))
     {
-        <div class="rp-alert rp-alert-success">
-            <i class="ph-check-circle"></i> @successMessage
+        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+            </div>
+            <span style="flex: 1;">@successMessage</span>
         </div>
     }
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="rp-alert rp-alert-error">
-            <i class="ph-warning-circle"></i> @errorMessage
+        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="ph-warning" style="font-size: 1.25rem;"></i>
+            </div>
+            <span style="flex: 1;">@errorMessage</span>
         </div>
     }
 
@@ -179,6 +190,7 @@
                     <i class="ph-floppy-disk"></i> <span>Save Permissions</span>
                 }
             </button>
+        </div>
         </div>
     </div>
 </div>

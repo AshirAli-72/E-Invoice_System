@@ -1,7 +1,19 @@
 @page
 @model E_Invoice_system.Pages.Account.LoginModel
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @{
     Layout = null;
+    
+    using var context = DbFactory.CreateDbContext();
+    var store = context.store_configurations.FirstOrDefault();
+    string logoSrc = "/images/sata-logo.png";
+    if (store != null && !string.IsNullOrEmpty(store.LogoPath))
+    {
+        try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(store.LogoPath); }
+        catch { }
+    }
 }
 
 <!DOCTYPE html>
@@ -24,7 +36,7 @@
         <div class="right-panel">
             <div class="login-card">
                 <div class="logo-section">
-                    <img src="/images/sata-logo.png" alt="SATA Technologies" class="logo" />
+                    <img src="@logoSrc" alt="SATA Technologies" class="logo" />
                 </div>
 
                 <div class="welcome-section">

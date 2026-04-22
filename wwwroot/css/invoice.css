@@ -1,6 +1,6 @@
 /* --- Premium Invoice Styling --- */
 :root {
-    --invoice-red: #9B111E; /* Darker, more premium red */
+    --invoice-red: var(--primary); /* Darker, more premium red */
     --invoice-black: #111827;
     --invoice-grey: #374151;
     --invoice-light-grey: #f3f4f6;
@@ -299,3 +299,4 @@
         margin: 0 !important;
     }
 }
+

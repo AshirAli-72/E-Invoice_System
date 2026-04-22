@@ -12,16 +12,8 @@
     <!-- Phosphor Icons -->
     <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
     
-    <link rel="stylesheet" href="~/css/dashboard-main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dashboard-widgets.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/app-base.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-layout-base.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-checkout-main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-checkout-cart.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-product.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-payment.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Sale/sale-receipt.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sale.css" asp-append-version="true" />
     
     <!-- jQuery -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -409,7 +401,9 @@
                         }
                     }
                     <img src="@logoSrc" alt="Logo" class="top-bar-logo" />
-                    <span class="welcome-msg">Welcome back!</span>
+                    <a href="/Sale/Index" class="btn-back-hub" style="margin-left: 1rem; text-decoration: none;">
+                        <i class="ph-arrow-left"></i> Back to Ledger
+                    </a>
                 </div>
 
                 <div class="top-bar-center">

@@ -3,148 +3,135 @@
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<div class="form-wrapper form-layout-left-wide">
-    <!-- Invoice Details Section -->
-    <div class="form-section">
-        <div class="form-section-header">
-            <h3 class="form-section-title">
-                <i class="ph-file-plus form-icon-primary"></i>
-                Invoice Details
-            </h3>
+<div class="form-panel-body">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div style="padding: 1rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <i class="ph-warning" style="font-size: 1.1rem;"></i> @errorMessage
         </div>
+    }
 
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="alert alert-danger" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;">
-                @errorMessage
+    <!-- Invoice Header Details -->
+    <div class="form-group">
+        <label class="form-label">Invoice Date</label>
+        <input class="form-control" type="date" @bind="invoiceDate" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Seller Company Name</label>
+        <input class="form-control" @bind="companyName" placeholder="Enter store name" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Seller Phone</label>
+        <input class="form-control" @bind="companyPhone" placeholder="Enter store phone" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Select Customer</label>
+        <select class="form-control" @onchange="OnCustomerChanged">
+            <option value="">-- Choose Customer --</option>
+            @foreach (var c in customersList)
+            {
+                <option value="@c.id" selected="@(selectedCustomer?.id == c.id)">@c.name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Invoice Number</label>
+        <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
+    </div>
+
+    <hr style="margin: 0.5rem 0; border: none; border-top: 2px dashed #e2e8f0;" />
+
+    <div class="form-panel-title" style="margin-bottom: 1rem;">
+        <i class="ph-shopping-cart form-icon-primary"></i>
+        Line Items
+    </div>
+
+    <!-- Add Item Form -->
+    <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Add Product / Service</label>
+            <div style="display: flex; gap: 0.75rem;">
+                <select id="productSelect" class="form-control" @onchange="OnProductSelected" style="flex:1;">
+                    <option value="0">-- Select Product --</option>
+                    @foreach (var p in productsList)
+                    {
+                        <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name (@(p.item_type ?? "N/A"))</option>
+                    }
+                </select>
+                <button type="button" class="btn-primary" @onclick="AddItem" style="flex-shrink: 0;">
+                    <i class="ph-plus"></i> Add
+                </button>
             </div>
-        }
-
-        <!-- Invoice Date -->
-        <div class="form-group">
-            <label class="form-label">Invoice Date</label>
-            <input class="form-control" type="date" @bind="invoiceDate" />
         </div>
+    </div>
 
-        <div class="form-row" style="display:grid; grid-template-columns: 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label class="form-label">Seller Company Name</label>
-                <input class="form-control" @bind="companyName" placeholder="Store Name" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Seller Phone</label>
-                <input class="form-control" @bind="companyPhone" placeholder="Store Phone" />
-            </div>
-        </div>
-
-        <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
-
-        <div class="form-group">
-            <label class="form-label">Select Customer</label>
-            <select class="form-control" @onchange="OnCustomerChanged">
-                <option value="">-- Choose Customer --</option>
-                @foreach (var c in customersList)
+    <!-- Items Table -->
+    <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 12px; max-height: 300px; overflow-y: auto; margin-bottom: 1.25rem;">
+        <table class="styled-table" style="margin: 0; box-shadow: none;">
+            <thead>
+                <tr>
+                    <th style="padding-left: 1.5rem;">Product/Service</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th class="text-right" style="padding-right: 1.5rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (invoiceItems.Count == 0)
                 {
-                    <option value="@c.id" selected="@(selectedCustomer?.id == c.id)">@c.name</option>
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Invoice Number</label>
-            <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
-        </div>
-
-        <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 1.5rem 0;">
-
-        <!-- Line Items Header -->
-        <h4 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Line Items</h4>
-
-        <!-- Add Item Form -->
-        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
-            <h5 style="margin-top: 0; margin-bottom: 1rem; color: #334155; font-size: 0.9rem;">Add New Item</h5>
-            <div class="form-group">
-                <label class="form-label">Product / Service</label>
-                <div style="display: flex; gap: 1rem;">
-                    <select id="productSelect" class="form-control" @onchange="OnProductSelected" style="flex:1;">
-                        <option value="0">-- Select Product --</option>
-                        @foreach (var p in productsList)
-                        {
-                            <option value="@p.id" selected="@(selectedProductId == p.id)">@p.prod_name (@(p.item_type ?? "N/A"))</option>
-                        }
-                        @if (productsList.Count == 0)
-                        {
-                            <option disabled>No available products found</option>
-                        }
-                    </select>
-                    <button type="button" class="btn-primary" @onclick="AddItem">
-                        <i class="ph-plus"></i> Add Item
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Items Table -->
-        <div style="overflow-x: auto; max-height: 400px; margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 12px;">
-            <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
-                <thead>
-                    <tr style="background: #f1f5f9; text-align: left;">
-                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 35%;">Product/Service</th>
-                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 15%;">Qty</th>
-                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 16%;">Expiry</th>
-                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 11%;">Price</th>
-                        <th style="padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #475569; width: 11%;">Total</th>
-                        <th style="padding: 1rem; width: 60px;"></th>
+                    <tr>
+                        <td colspan="5" class="empty-state" style="padding: 2.5rem;">
+                            <i class="ph-shopping-cart empty-state-icon"></i>
+                            <p>No items added yet. Select a product above to get started.</p>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (invoiceItems.Count == 0)
+                }
+                else
+                {
+                    @foreach (var item in invoiceItems)
                     {
                         <tr>
-                            <td colspan="6" style="padding: 2rem; text-align: center; color: #64748b; font-size: 0.85rem;">No items added yet.</td>
+                            <td style="padding-left: 1.5rem;">
+                                <div class="font-medium">@item.Name</div>
+                                <div class="font-sm text-muted">Exp: @(item.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</div>
+                            </td>
+                            <td>
+                                <input type="number" @bind="item.Qty" @bind:after="() => CalculateItemTotal(item)" class="form-control" style="width: 80px; height: 36px; padding: 0.35rem 0.6rem;" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" @bind="item.Price" @bind:after="() => CalculateItemTotal(item)" class="form-control" style="width: 100px; height: 36px; padding: 0.35rem 0.6rem;" />
+                            </td>
+                            <td class="font-bold" style="color: var(--primary);">
+                                @CurrencyService.GetSymbol()@item.Total.ToString("F2")
+                            </td>
+                            <td class="text-right" style="padding-right: 1.5rem;">
+                                <button type="button" @onclick="() => RemoveItem(item)" class="btn-icon-sm btn-delete">
+                                    <i class="ph-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     }
-                    else
-                    {
-                        @foreach (var item in invoiceItems)
-                        {
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
-                                    @item.Name
-                                </td>
-                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
-                                    @item.Qty
-                                </td>
-                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
-                                    @item.ExpiryDate?.ToString("yyyy-MM-dd")
-                                </td>
-                                <td style="padding: 0.5rem 1rem; vertical-align: middle; font-size: 0.85rem;">
-                                    @CurrencyService.GetSymbol()@item.Price.ToString("F2")
-                                </td>
-                                <td style="padding: 0.5rem 1rem; font-weight: bold; font-size: 0.85rem; vertical-align: middle;">
-                                    @CurrencyService.GetSymbol()@item.Total.ToString("F2")
-                                </td>
-                                <td style="padding: 0.5rem 1rem; text-align: center; vertical-align: middle;">
-                                    <button type="button" @onclick="() => RemoveItem(item)" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
-                                        <i class="ph-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Summary & Payment -->
+    <!-- Summary Section -->
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
         <div class="form-group">
             <label class="form-label">Invoice Status</label>
             <select class="form-control" @bind="status">
-                <option value="Pending">Pending</option>
                 <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
                 <option value="Cancelled">Cancelled</option>
             </select>
         </div>
+        
         <div class="form-group">
             <label class="form-label">Payment Method</label>
             <select class="form-control" @bind="paymentMethod">
@@ -155,37 +142,35 @@
             </select>
         </div>
 
-        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 2rem; max-width: 400px; margin-left: auto;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Subtotal:</span>
-                <span style="font-weight: 700; font-size: 0.9rem;">@CurrencyService.GetSymbol()@subtotal.ToString("F2")</span>
+        <div style="padding-top: 1rem; border-top: 1px solid #e2e8f0; margin-top: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span class="text-muted font-medium">Subtotal:</span>
+                <span class="font-bold">@CurrencyService.GetSymbol()@subtotal.ToString("F2")</span>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: center;">
-                <span style="color: #64748b; font-weight: 600; font-size: 0.85rem;">Discount:</span>
-                <input type="number" step="0.01" style="width: 100px; text-align: right; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem;" @bind="discount" />
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; align-items: center;">
+                <span class="text-muted font-medium">Discount:</span>
+                <input type="number" step="0.01" @bind="discount" class="form-control" style="width: 120px; text-align: right; height: 38px;" />
             </div>
-            <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 1rem 0;" />
-            <div style="display: flex; justify-content: space-between; font-size: 1.15rem;">
-                <span style="font-weight: 800; color: #0f172a;">Total:</span>
-                <span style="font-weight: 800; color: #BC1823;">@CurrencyService.GetSymbol()@total.ToString("F2")</span>
+            <hr style="margin: 1rem 0; border: none; border-top: 2px solid #e2e8f0;" />
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="font-bold" style="font-size: 1.15rem; color: #1e293b;">Total Amount:</span>
+                <span class="font-bold" style="font-size: 1.35rem; color: var(--primary);">@CurrencyService.GetSymbol()@total.ToString("F2")</span>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="form-actions-sticky">
-        <button type="button" class="btn-primary" @onclick="SubmitInvoice" disabled="@isSubmitting">
-            <span>
-                @if (isSubmitting)
-                {
-                    <i class="ph-spinner ph-spin"></i> @("Saving...")
-                }
-                else
-                {
-                    <i class="ph-check-circle"></i> @("Generate Invoice")
-                }
-            </span>
-        </button>
-    </div>
+<div class="form-panel-footer">
+    <button type="button" class="btn-save" style="width: 100%; justify-content: center;" @onclick="SubmitInvoice" disabled="@isSubmitting">
+        @if (isSubmitting)
+        {
+            <i class="ph-spinner ph-spin"></i> @("Generating Invoice...")
+        }
+        else
+        {
+            <i class="ph-check-circle"></i> @("Generate & Save Invoice")
+        }
+    </button>
 </div>
 
 

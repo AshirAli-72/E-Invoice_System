@@ -8,27 +8,45 @@
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
-
     <div class="card card-no-padding">
-        <div class="card-header card-header-flex" style="padding: 1.25rem 1.5rem;">
-            <!-- Title -->
-            <div style="display:flex; align-items:center; gap:0.6rem;">
-                <i class="ph-users-three" style="font-size:1.3rem; color: var(--primary);"></i>
-                <div class="card-title" style="margin: 0;">User Management</div>
+        <div class="page-header">
+            <div class="page-header-left">
+                <i class="ph-users-three page-header-icon"></i>
+                <h2 class="page-header-title">User Management</h2>
             </div>
-            <!-- Right: back + add buttons -->
-            <div style="display:flex; align-items:center; gap:0.6rem;">
-                <a href="/settings" class="btn-back-hub">
+            <div class="page-header-actions">
+                <a href="/settings" class="btn-secondary">
                     <i class="ph-arrow-left"></i> Back to Settings
                 </a>
-                <button class="btn-primary" @onclick="ShowAddForm" style="display: flex; align-items: center; gap: 8px; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                <button class="btn-primary" @onclick="ShowAddForm">
                     <i class="ph-user-plus"></i> Add New User
                 </button>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="styled-table">
+        <!-- Modern Flasher Notification -->
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@successMessage</span>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-warning" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@errorMessage</span>
+            </div>
+        }
+
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="styled-table" style="margin-bottom: 0;">
                 <thead>
                     <tr>
                         <th style="padding-left: 1.5rem;">ID</th>
@@ -121,93 +139,92 @@
         }
     </div>
 </div>
+</div>
 
 @if (showForm)
 {
     <div class="modal-overlay">
-        <div class="modal-content">
-            <div class="card" style="margin-bottom: 0; border: none;">
-                <div class="card-header card-header-flex">
-                    <div class="form-section-title">
-                        <i class="ph-user @(editingUser == null ? "form-icon-primary" : "")"></i>
-                        @(editingUser == null ? "Add New User" : "Edit User Account")
-                    </div>
-                    <button type="button" class="btn-icon-sm" @onclick="HideForm" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="form-panel-header">
+                <div class="form-panel-title">
+                    <i class="ph-user @(editingUser == null ? "form-icon-primary" : "")"></i>
+                    @(editingUser == null ? "Add New User" : "Edit User Account")
                 </div>
+                <button type="button" class="form-panel-close" @onclick="HideForm"><i class="ph-x"></i></button>
+            </div>
 
+            <div class="form-panel-body">
                 <EditForm Model="userModel" OnValidSubmit="SaveUser">
                     <DataAnnotationsValidator />
                     
-                    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Username</label>
-                            <InputText @bind-Value="userModel.username" class="form-control" placeholder="e.g. john_doe" />
-                            <ValidationMessage For="@(() => userModel.username)" />
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <InputText @bind-Value="userModel.username" class="form-control" placeholder="e.g. john_doe" />
+                        <ValidationMessage For="@(() => userModel.username)" />
+                    </div>
 
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Login Email</label>
-                            <InputText @bind-Value="userModel.email" class="form-control" placeholder="user@example.com" />
-                            <ValidationMessage For="@(() => userModel.email)" />
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Login Email</label>
+                        <InputText @bind-Value="userModel.email" class="form-control" placeholder="user@example.com" />
+                        <ValidationMessage For="@(() => userModel.email)" />
+                    </div>
 
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Link Employee</label>
-                            <select @bind="userModel.emp_id" class="form-control">
-                                <option value="0">-- Select Employee --</option>
-                                @foreach (var emp in employeeList)
-                                {
-                                    <option value="@emp.id">@emp.full_name (@emp.emp_code)</option>
-                                }
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Account Password</label>
-                            <InputText @bind-Value="userModel.password" type="password" class="form-control" placeholder="••••••••" />
-                            <ValidationMessage For="@(() => userModel.password)" />
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Role</label>
-                            <select @bind="userModel.role_id" class="form-control">
-                                <option value="0" disabled selected hidden>-- Select Role --</option>
-                                @foreach (var role in rolesList)
-                                {
-                                    <option value="@role.Id">@role.RoleTitle</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 1.5rem;">
-                            <label class="form-label">Account Status</label>
-                            <select @bind="userModel.status" class="form-control">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f1f5f9;">
-                            @if (editingUser != null)
+                    <div class="form-group">
+                        <label class="form-label">Link Employee</label>
+                        <select @bind="userModel.emp_id" class="form-control">
+                            <option value="0">-- Select Employee --</option>
+                            @foreach (var emp in employeeList)
                             {
-                                <button type="button" @onclick="() => DeleteUser(editingUser.id)" class="btn-delete" style="display:inline-flex; align-items:center; gap:0.4rem; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #fee2e2; color: #dc2626; font-weight: 600; cursor:pointer; font-size:0.9rem;" disabled="@isSubmitting">
-                                    <i class="ph-trash"></i> Delete
-                                </button>
+                                <option value="@emp.id">@emp.full_name (@emp.emp_code)</option>
                             }
-                            <button type="button" @onclick="HideForm" style="display:inline-flex; align-items:center; gap:0.4rem; background: #f1f5f9; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600; cursor:pointer; font-size:0.9rem;" disabled="@isSubmitting"><i class="ph-x"></i> Cancel</button>
-                            <button type="button" @onclick="SaveUser" style="display:inline-flex; align-items:center; gap:0.4rem; padding: 0.6rem 1.4rem; border: none; border-radius: 8px; background: var(--primary, #BC1823); color: white; font-weight: 600; cursor: pointer; font-size:0.9rem; transition:all 0.2s;" disabled="@isSubmitting">
-                                @if (isSubmitting)
-                                {
-                                    <i class="ph-spinner ph-spin"></i>
-                                }
-                                else
-                                {
-                                    <i class="ph-check"></i>
-                                }
-                                <span>@(editingUser == null ? "Save User" : "Update User")</span>
-                            </button>
-                        </div>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Account Password</label>
+                        <InputText @bind-Value="userModel.password" type="password" class="form-control" placeholder="••••••••" />
+                        <ValidationMessage For="@(() => userModel.password)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select @bind="userModel.role_id" class="form-control">
+                            <option value="0" disabled selected hidden>-- Select Role --</option>
+                            @foreach (var role in rolesList)
+                            {
+                                <option value="@role.Id">@role.RoleTitle</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Account Status</label>
+                        <select @bind="userModel.status" class="form-control">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
                     </div>
                 </EditForm>
+            </div>
+
+            <div class="form-panel-footer">
+                @if (editingUser != null)
+                {
+                    <button type="button" @onclick="() => DeleteUser(editingUser.id)" class="btn-delete" style="margin-right: auto;" disabled="@isSubmitting">
+                        <i class="ph-trash"></i> Delete
+                    </button>
+                }
+                <button type="button" class="btn-cancel" @onclick="HideForm" disabled="@isSubmitting">Cancel</button>
+                <button type="button" class="btn-save" @onclick="SaveUser" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <i class="ph-spinner ph-spin"></i> @("Saving...")
+                    }
+                    else
+                    {
+                        <i class="ph-check"></i> @(editingUser == null ? "Save User" : "Update User")
+                    }
+                </button>
             </div>
         </div>
     </div>
@@ -223,6 +240,8 @@
     private List<Role> rolesList = new();
     private List<Employee> employeeList = new();
     private bool isSubmitting = false;
+    private string? successMessage;
+    private string? errorMessage;
 
     // Pagination state
     private int currentPage = 1;
@@ -326,12 +345,14 @@
     private void HideForm()
     {
         showForm = false;
+        errorMessage = null;
     }
 
     private async Task SaveUser()
     {
         if (isSubmitting) return;
         isSubmitting = true;
+        errorMessage = null;
         try {
             using var context = DbFactory.CreateDbContext();
             if (editingUser == null)
@@ -343,8 +364,18 @@
                 context.users.Update(userModel);
             }
             await context.SaveChangesAsync();
+            successMessage = editingUser == null ? "User created successfully!" : "User updated successfully!";
             await LoadUsers();
             HideForm();
+            
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(4000);
+                successMessage = null;
+                await InvokeAsync(StateHasChanged);
+            });
+        } catch (Exception ex) {
+            errorMessage = "Error saving user: " + ex.Message;
         } finally {
             isSubmitting = false;
             await InvokeAsync(StateHasChanged);

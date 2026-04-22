@@ -4,13 +4,9 @@
     ViewData["Title"] = "About Store";
 }
 
-<link rel="stylesheet" href="~/css/Settings/settings.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
 
 <div class="dashboard-panel">
-    <div id="settings-container">
-        <component type="typeof(E_Invoice_system.Components.Settings.AboutStore)" render-mode="ServerPrerendered" />
-    </div>
+    <component type="typeof(E_Invoice_system.Components.Settings.AboutStore)" render-mode="ServerPrerendered" />
 </div>
 
 @section Scripts {

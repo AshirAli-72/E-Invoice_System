@@ -23,117 +23,137 @@
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon"><i class="ph-file-text"></i></div>
+            <div class="stat-icon" style="background: #fff1f2; color: #be123c;"><i class="ph-file-text"></i></div>
+            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">+12% <i class="ph-trend-up"></i></span>
         </div>
-        <div class="stat-label">Total Invoices</div>
-        <div class="stat-value">@Model.TotalInvoices</div>
+        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Invoices</div>
+        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalInvoices</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;"><i class="ph-users"></i></div>
+            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">Active</span>
         </div>
-        <div class="stat-label">Total Customers</div>
-        <div class="stat-value">@Model.TotalCustomers</div>
+        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Customers</div>
+        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalCustomers</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="ph-money"></i></div>
+            <div class="stat-icon" style="background: #ecfdf5; color: #059669;"><i class="ph-money"></i></div>
+            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">Growth <i class="ph-chart-line-up"></i></span>
         </div>
-        <div class="stat-label">Total Sale</div>
-        <div class="stat-value">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
+        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Sale</div>
+        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #fffbeb; color: #d97706;"><i class="ph-clock"></i></div>
+            <div class="stat-icon" style="background: #fffbeb; color: #d97706;"><i class="ph-package"></i></div>
+            <span class="stat-trend" style="color: #64748b; font-size: 0.75rem; font-weight: 600;">Items</span>
         </div>
-        <div class="stat-label">Active Products</div>
-        <div class="stat-value">@Model.TotalProducts</div>
+        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Active Products</div>
+        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalProducts</div>
     </div>
 </div>
 
-<div class="content-grid">
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">Recent Invoices</div>
-            <a asp-page="/Invoice/Index" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: #BC1823; border: none; color: white;">View All</a>
+<div class="content-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px;">
+        <div class="card-header" style="padding: 1.5rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Recent Invoices</h3>
+            <a asp-page="/Invoice/Index" class="btn-view-all">
+                View All <i class="ph-arrow-right"></i>
+            </a>
         </div>
         
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="text-align: left; border-bottom: 2px solid var(--border);">
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Invoice ID</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Customer</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Date</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Amount</th>
-                    <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.8rem;">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var inv in Model.RecentInvoices)
-                {
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 1rem 0.5rem; font-weight: 600;">#@(inv.invoice_no ?? inv.id.ToString())</td>
-                        <td style="padding: 1rem 0.5rem;">@inv.customer_name</td>
-                        <td style="padding: 1rem 0.5rem;">@inv.date.ToString("MMM dd, yyyy")</td>
-                        <td style="padding: 1rem 0.5rem; font-weight: 700;">@CurrencyService.GetSymbol()@(inv.total_price.ToString("N2"))</td>
-
-                        <td style="padding: 1rem 0.5rem;">
-                            @{
-                                var statusColor = inv.status == "Paid" ? "#10b981" : (inv.status == "Pending" ? "#ea580c" : "#6b7280");
-                                var statusBg = inv.status == "Paid" ? "#ecfdf5" : (inv.status == "Pending" ? "#fff7ed" : "#f3f4f6");
-                            }
-                            <span style="background: @statusBg; color: @statusColor; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">@inv.status</span>
-                        </td>
-                    </tr>
-                }
-                @if (!Model.RecentInvoices.Any())
-                {
+        <div class="table-responsive" style="margin: 0; border: none; border-radius: 0;">
+            <table class="styled-table" style="margin-bottom: 0;">
+                <thead>
                     <tr>
-                        <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">No recent invoices found.</td>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th class="text-right">Status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var inv in Model.RecentInvoices)
+                    {
+                        <tr>
+                            <td style="font-weight: 700; color: var(--primary);">#@(inv.invoice_no ?? inv.id.ToString())</td>
+                            <td style="font-weight: 500;">@inv.customer_name</td>
+                            <td style="color: #64748b;">@inv.date.ToString("MMM dd, yyyy")</td>
+                            <td style="font-weight: 700;">@CurrencyService.GetSymbol()@(inv.total_price.ToString("N2"))</td>
+                            <td class="text-right">
+                                @{
+                                    var statusClass = inv.status == "Paid" ? "status-enabled" : (inv.status == "Pending" ? "status-warning" : "status-discontinued");
+                                    // Mapping simplified for dashboard
+                                    var statusColor = inv.status == "Paid" ? "#10b981" : (inv.status == "Pending" ? "#f59e0b" : "#64748b");
+                                    var statusBg = inv.status == "Paid" ? "#ecfdf5" : (inv.status == "Pending" ? "#fffbeb" : "#f8fafc");
+                                }
+                                <span style="background: @statusBg; color: @statusColor; padding: 0.35rem 0.8rem; border-radius: 30px; font-size: 0.75rem; font-weight: 700;">@inv.status</span>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.RecentInvoices.Any())
+                    {
+                        <tr>
+                            <td colspan="5" style="padding: 3rem; text-align: center; color: #94a3b8;">
+                                <i class="ph-folder-open" style="font-size: 2.5rem; display: block; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                No recent invoices found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">Quick Actions</div>
+    <div class="card" style="padding: 1.5rem; border-radius: 20px;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Quick Actions</h3>
         </div>
         
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <a asp-page="/Invoice/Create" class="btn-primary" style="justify-content: center;">
-                <i class="ph-file-plus"></i> New Invoice
+        <div style="display: grid; gap: 1rem;">
+            <a asp-page="/Invoice/Create" class="btn-primary" style="justify-content: center; padding: 1rem; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(188, 24, 35, 0.2);">
+                <i class="ph-file-plus" style="font-size: 1.25rem;"></i> Generate Invoice
             </a>
-            <a asp-page="/Customer/Create" class="btn-primary" style="justify-content: center; background: #fff; color: var(--text); border: 1px solid var(--border);">
-                <i class="ph-user-plus"></i> Add New Customer
+            <a asp-page="/Customer/Create" class="btn-secondary" style="justify-content: center; padding: 1rem; border-radius: 12px;">
+                <i class="ph-user-plus" style="font-size: 1.25rem;"></i> Add Customer
             </a>
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
-                <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 0.5rem;">System Health</div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #10b981;">
-                    <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
-                    All systems operational
+            <a asp-page="/Product/Index" class="btn-secondary" style="justify-content: center; padding: 1rem; border-radius: 12px;">
+                <i class="ph-package" style="font-size: 1.25rem;"></i> Manage Products
+            </a>
+            
+            <div style="background: #fdf2f2; padding: 1.25rem; border-radius: 16px; margin-top: 1rem; border: 1px solid #fee2e2;">
+                <div style="font-weight: 800; font-size: 0.8rem; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">System Health</div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: #065f46; font-weight: 600;">
+                    <span style="display: flex; position: relative; width: 10px; height: 10px;">
+                        <span style="position: absolute; display: inline-flex; height: 100%; width: 100%; border-radius: 50%; background: #10b981; opacity: 0.75; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+                        <span style="position: relative; display: inline-flex; border-radius: 50%; height: 10px; width: 10px; background: #10b981;"></span>
+                    </span>
+                    All systems online
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="content-grid" style="grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">Invoices Trend</div>
+<div class="content-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+    <div class="card" style="padding: 1.5rem; border-radius: 20px;">
+        <div class="card-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Invoices Trend</h3>
+            <div style="font-size: 0.8rem; color: #64748b; font-weight: 500;">Last 7 Days</div>
         </div>
         <div style="height: 300px;">
             <canvas id="trendChart"></canvas>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">Invoices Status</div>
+    <div class="card" style="padding: 1.5rem; border-radius: 20px;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Invoice Status</h3>
         </div>
         <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
             <canvas id="statusChart"></canvas>
@@ -142,7 +162,14 @@
 </div>
 
 <script>
-    (function() {
+    // Wait for DOM and Chart.js to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+
         // Line Chart for Trend
         const trendChartEl = document.getElementById('trendChart');
         if (trendChartEl) {
@@ -212,8 +239,8 @@
             if (existingStatus) existingStatus.destroy();
 
             const statusCtx = statusChartEl.getContext('2d');
-            const statusLabels = @Html.Raw(Json.Serialize(Model.StatusLabels));
-            const statusCounts = @Html.Raw(Json.Serialize(Model.StatusCounts));
+            const statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels));
+            const statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts));
             
             const statusColors = statusLabels.map(label => {
                 if (label === 'Paid') return '#10b981'; // Green
@@ -242,5 +269,5 @@
                 }
             });
         }
-    })();
+    });
 </script>

@@ -8,102 +8,113 @@
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
+    <div class="card card-no-padding">
+        <div class="page-header">
+            <div class="page-header-left">
+                <i class="ph-currency-circle-dollar page-header-icon"></i>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <h2 class="page-header-title">System Currencies</h2>
+                    <p class="text-muted font-sm" style="margin: 0;">Manage global currencies and exchange rates</p>
+                </div>
+            </div>
+            <div class="page-header-actions">
+                <a href="/settings" class="btn-back-hub">
+                    <i class="ph-arrow-left"></i> Back to Settings
+                </a>
+            </div>
+        </div>
 
         @* Quick Search & Add Row *@
-        <div class="quick-action-row animate-in">
-            <div class="search-input-group">
-                <input type="text" list="currency-options" @bind="searchQuery" @bind:event="oninput" class="search-field" placeholder="Search country or currency code (e.g. Saudi Arabia, USD)..." @onkeydown="@(e => { if (e.Key == "Enter") QuickAddCurrency(); })" />
+        <div class="quick-action-row" style="padding: 1.5rem; background: #f8fafc; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1rem; flex: 1; max-width: 600px;">
+                <i class="ph-magnifying-glass" style="font-size: 1.25rem; color: var(--primary);"></i>
+                <input type="text" list="currency-options" @bind="searchQuery" @bind:event="oninput" class="search-field" placeholder="Search country or currency code..." @onkeydown="@(e => { if (e.Key == "Enter") QuickAddCurrency(); })" style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white;" />
                 <datalist id="currency-options">
                     @foreach (var gc in globalCurrencies)
                     {
                         <option value="@($"{gc.name} ({gc.code})")">@gc.country</option>
                     }
                 </datalist>
-                <button type="button" class="btn-select-add" @onclick="QuickAddCurrency" disabled="@isProcessing">
-                    <i class="ph-check-square"></i> Select & Add
+                <button type="button" class="btn-primary" @onclick="QuickAddCurrency" disabled="@isProcessing" style="white-space: nowrap;">
+                    <i class="ph-check-circle"></i> Select & Add
                 </button>
             </div>
-            <button type="button" class="btn-primary" @onclick="ShowAddForm" disabled="@isProcessing" style="white-space: nowrap; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 700; cursor: pointer;">
+            <button type="button" class="btn-primary" @onclick="ShowAddForm" disabled="@isProcessing">
                 <i class="ph-plus-circle"></i> Add Custom
             </button>
         </div>
 
-        <div class="card card-no-padding">
-            <div class="card-header card-header-flex" style="padding: 1.5rem 1.5rem 0 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <div class="card-title" style="margin: 0;">System Currencies</div>
-                <a href="/settings" class="btn-back-hub">
-                    <i class="ph-arrow-left"></i> Back to Settings
-                </a>
-            </div>
-
+        <div class="table-container">
             <div class="table-responsive">
-                <table class="styled-table" style="table-layout: fixed;">
-                        <thead>
-                            <tr>
-                                <th style="padding-left: 1.5rem; width: 14.28%;">Name</th>
-                                <th style="width: 14.28%;">ISO Code</th>
-                                <th style="width: 14.28%;">Symbol</th>
-                                <th style="width: 14.28%;">Rate</th>
-                                <th style="width: 14.28%;">Status</th>
-                                <th style="text-align: center; width: 14.28%;">Action</th>
-                                <th style="text-align: right; padding-right: 1.5rem; width: 14.28%;">Is Active</th>
+                <table class="styled-table" style="table-layout: fixed; margin-bottom: 0;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
+                            <th style="padding-left: 1.5rem; width: 14.28%;">Name</th>
+                            <th style="width: 14.28%;">ISO Code</th>
+                            <th style="width: 14.28%;">Symbol</th>
+                            <th style="width: 14.28%;">Rate</th>
+                            <th style="width: 14.28%;">Status</th>
+                            <th style="text-align: center; width: 14.28%;">Action</th>
+                            <th style="text-align: right; padding-right: 1.5rem; width: 14.28%;">Is Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var curr in currencyList)
+                        {
+                            <tr class="@(curr.is_active ? "active-currency-row" : "")" style="transition: all 0.2s;">
+                                <td style="padding-left: 1.5rem;" class="font-bold">@curr.name</td>
+                                <td>
+                                    <span class="badge badge-light" style="background: #f1f5f9; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">@curr.code</span>
+                                </td>
+                                <td style="color: #BC1823; font-weight: 700; font-size: 1.1rem;">@curr.symbol</td>
+                                <td class="text-muted">@curr.exchange_rate.ToString("F2")</td>
+                                <td>
+                                    @if (curr.status == "Active")
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive" style="background: #f1f5f9; color: #64748b;">Inactive</span>
+                                    }
+                                </td>
+                                <td style="text-align: center;">
+                                    <div class="actions-container actions-center">
+                                        <button class="btn-icon-sm btn-edit" @onclick="() => EditCurrency(curr)" title="Edit">
+                                            <i class="ph-pencil"></i>
+                                        </button>
+                                        <button class="btn-icon-sm btn-delete" @onclick="() => DeleteCurrency(curr.id)" title="Delete">
+                                            <i class="ph-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td style="text-align: right; padding-right: 1.5rem;">
+                                    @if (curr.is_active)
+                                    {
+                                        <span class="status-badge" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; font-weight: 700; padding: 0.5rem 1rem; border-radius: 8px;">
+                                            <i class="ph-check-circle"></i> Active Base
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <button class="status-badge" @onclick="() => SetActiveCurrency(curr.id)" 
+                                                style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border: none; color: #ffffff; cursor: pointer; font-weight: 700; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s;">
+                                            <i class="ph-star"></i> Select as Base
+                                        </button>
+                                    }
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var curr in currencyList)
-                            {
-                                <tr class="@(curr.is_active ? "active-currency-row" : "")">
-                                    <td style="padding-left: 1.5rem;" class="font-bold">@curr.name</td>
-                                    <td>
-                                        <span class="badge badge-light">@curr.code</span>
-                                    </td>
-                                    <td style="color: #BC1823; font-weight: 700;">@curr.symbol</td>
-                                    <td class="text-muted">@curr.exchange_rate.ToString("F2")</td>
-                                    <td>
-                                        @if (curr.status == "Active")
-                                        {
-                                            <span class="status-badge status-active">Active</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="status-badge status-inactive" style="background: #f1f5f9; color: #64748b;">Inactive</span>
-                                        }
-                                    </td>
-                                    <td style="text-align: center;">
-                                        <div class="actions-container actions-center">
-                                            <button class="btn-icon-sm btn-edit" @onclick="() => EditCurrency(curr)" title="Edit">
-                                                <i class="ph-pencil"></i>
-                                            </button>
-                                            <button class="btn-icon-sm btn-delete" @onclick="() => DeleteCurrency(curr.id)" title="Delete">
-                                                <i class="ph-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td style="text-align: right; padding-right: 1.5rem;">
-                                        @if (curr.is_active)
-                                        {
-                                            <span class="status-badge" style="background: #059669; color: #ffffff; font-weight: 700;">Active Base</span>
-                                        }
-                                        else
-                                        {
-                                            <button class="status-badge" @onclick="() => SetActiveCurrency(curr.id)" 
-                                                    style="background: #1e1b4b; border: 1px solid #1e1b4b; color: #ffffff; cursor: pointer; font-weight: 700; padding: 0.4rem 0.8rem;">
-                                                Select as Base
-                                            </button>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                            @if (!currencyList.Any())
-                            {
-                                <tr>
-                                    <td colspan="7" style="padding: 3rem; text-align: center; color: #64748b;">
-                                        <i class="ph-currency-circle-dollar" style="font-size: 2.5rem; display: block; margin-bottom: 1rem; opacity: 0.2;"></i>
-                                        <p style="font-weight: 600;">No currencies found. Search and select above to add.</p>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
+                        }
+                        @if (!currencyList.Any())
+                        {
+                            <tr>
+                                <td colspan="7" style="padding: 3rem; text-align: center; color: #64748b;">
+                                    <i class="ph-currency-circle-dollar" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.2;"></i>
+                                    <p style="font-weight: 600; font-size: 1rem;">No currencies found. Search and select above to add.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
                 </table>
             </div>
             
@@ -141,65 +152,65 @@
             }
         </div>
     </div>
+</div>
 
 
 
 
 @if (showForm)
 {
-    @* Modal Pop-up for Custom/Edit *@
     <div class="modal-overlay">
-        <div class="modal-content">
-            <div class="card" style="margin-bottom: 0; border: none;">
-                <div class="card-header card-header-flex">
-                    <div class="form-section-title">@(editingCurrency == null ? "Custom Currency" : "Edit Currency")</div>
-                    <button type="button" class="btn-icon-sm" @onclick="HideForm" style="border: none; background: transparent;"><i class="ph-x" style="font-size: 1.25rem;"></i></button>
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="form-panel-header">
+                <div class="form-panel-title">
+                    <i class="ph-currency-circle-dollar @(editingCurrency == null ? "form-icon-primary" : "")"></i>
+                    @(editingCurrency == null ? "Custom Currency" : "Edit Currency")
                 </div>
-                
+                <button type="button" class="form-panel-close" @onclick="HideForm"><i class="ph-x"></i></button>
+            </div>
+            
+            <div class="form-panel-body" style="display: flex; flex-direction: column; gap: 1.25rem;">
                 <EditForm Model="currencyModel" OnValidSubmit="SaveCurrency">
                     <DataAnnotationsValidator />
-                    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Currency Name</label>
-                            <InputText @bind-Value="currencyModel.name" class="form-control" placeholder="e.g. US Dollar" />
-                        </div>
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">ISO Code</label>
-                            <InputText @bind-Value="currencyModel.code" class="form-control" placeholder="e.g. USD" />
-                            <ValidationMessage For="@(() => currencyModel.code)" />
-                        </div>
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label class="form-label">Symbol</label>
-                            <InputText @bind-Value="currencyModel.symbol" class="form-control" placeholder="e.g. ₹" />
-                            <ValidationMessage For="@(() => currencyModel.symbol)" />
-                        </div>
-                        <div class="form-group" style="margin-bottom: 1.5rem;">
-                            <label class="form-label">Exchange Rate (to Base)</label>
-                            <InputNumber @bind-Value="currencyModel.exchange_rate" class="form-control" step="0.01" />
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                            @if (editingCurrency != null)
-                            {
-                                <button type="button" @onclick="() => DeleteCurrency(editingCurrency.id)" style="display:inline-flex; align-items:center; gap:0.4rem; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #fee2e2; color: #dc2626; font-weight: 600; cursor:pointer; font-size:0.9rem;" disabled="@isProcessing">
-                                    <i class="ph-trash"></i> Delete
-                                </button>
-                            }
-                            <button type="button" @onclick="HideForm" style="display:inline-flex; align-items:center; gap:0.4rem; background: #f1f5f9; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600; cursor:pointer; font-size:0.9rem;" disabled="@isProcessing"><i class="ph-x"></i> Cancel</button>
-                            <button type="button" @onclick="SaveCurrency" style="display:inline-flex; align-items:center; gap:0.4rem; padding: 0.6rem 1.4rem; border: none; border-radius: 8px; background: var(--primary, #BC1823); color: white; font-weight: 600; cursor: pointer; font-size:0.9rem; transition:all 0.2s;" disabled="@isProcessing">
-                                @if (isProcessing)
-                                {
-                                    <i class="ph-spinner ph-spin"></i>
-                                }
-                                else
-                                {
-                                    <i class="ph-check"></i>
-                                }
-                                <span>@(editingCurrency == null ? "Save Currency" : "Update Currency")</span>
-                            </button>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Currency Name</label>
+                        <InputText @bind-Value="currencyModel.name" class="form-control" placeholder="e.g. US Dollar" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">ISO Code</label>
+                        <InputText @bind-Value="currencyModel.code" class="form-control" placeholder="e.g. USD" />
+                        <ValidationMessage For="@(() => currencyModel.code)" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Symbol</label>
+                        <InputText @bind-Value="currencyModel.symbol" class="form-control" placeholder="e.g. $" />
+                        <ValidationMessage For="@(() => currencyModel.symbol)" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Exchange Rate (to Base)</label>
+                        <InputNumber @bind-Value="currencyModel.exchange_rate" class="form-control" step="0.01" />
                     </div>
                 </EditForm>
+            </div>
+
+            <div class="form-panel-footer">
+                @if (editingCurrency != null)
+                {
+                    <button type="button" @onclick="() => DeleteCurrency(editingCurrency.id)" class="btn-delete" style="margin-right: auto;" disabled="@isProcessing">
+                        <i class="ph-trash"></i> Delete
+                    </button>
+                }
+                <button type="button" class="btn-cancel" @onclick="HideForm" disabled="@isProcessing">Cancel</button>
+                <button type="button" class="btn-save" @onclick="SaveCurrency" disabled="@isProcessing">
+                    @if (isProcessing)
+                    {
+                        <i class="ph-spinner ph-spin"></i> @("Saving...")
+                    }
+                    else
+                    {
+                        <i class="ph-check"></i> @(editingCurrency == null ? "Save Currency" : "Update Currency")
+                    }
+                </button>
             </div>
         </div>
     </div>
