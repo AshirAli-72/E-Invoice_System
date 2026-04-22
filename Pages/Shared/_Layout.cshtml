@@ -171,25 +171,50 @@
     <div id="toast-container"></div>
 
     <script>
-        // Sidebar Toggle Logic
+        // Sidebar Toggle Logic with Overlay
         document.addEventListener("DOMContentLoaded", function () {
-
             const sidebar = document.getElementById("sidebar");
             const openBtn = document.getElementById("sidebarToggle");
             const closeBtn = document.getElementById("sidebarClose");
 
+            // Create overlay element
+            let overlay = document.getElementById('sidebar-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'sidebar-overlay';
+                overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;';
+                document.body.appendChild(overlay);
+            }
+
+            function openSidebar() {
+                sidebar.classList.add("open");
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove("open");
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+
             if (openBtn) {
-                openBtn.addEventListener("click", () => {
-                    sidebar.classList.add("open");
-                });
+                openBtn.addEventListener("click", openSidebar);
             }
 
             if (closeBtn) {
-                closeBtn.addEventListener("click", () => {
-                    sidebar.classList.remove("open");
-                });
+                closeBtn.addEventListener("click", closeSidebar);
             }
 
+            // Close sidebar when clicking overlay
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar when pressing Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            });
         });
 
         // Toast message
