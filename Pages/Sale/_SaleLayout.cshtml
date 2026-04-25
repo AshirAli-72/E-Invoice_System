@@ -20,17 +20,17 @@
     
     <style>
         :root {
-            --primary: #BC1823; /* Dashboard Red */
-            --primary-light: #ffebed;
+            --primary: #BC1823;
+            --primary-light: rgba(188, 24, 35, 0.1);
             --primary-dark: #9c141d;
-            --primary-glow: rgba(188, 24, 35, 0.1);
-            --bg-app: #f1f5f9;
-            --sidebar-bg: #ffffff;
-            --surface: #ffffff;
-            --surface-hover: #f8fafc;
-            --border: rgba(0, 0, 0, 0.04);
-            --text-main: #1C2120;
-            --text-muted: #64748b;
+            --primary-glow: rgba(188, 24, 35, 0.2);
+            --bg-app: var(--bg-light);
+            --sidebar-bg: var(--sidebar-bg);
+            --surface: var(--card-bg);
+            --surface-hover: var(--table-row-hover);
+            --border: var(--border);
+            --text-main: var(--text);
+            --text-muted: var(--text-muted);
         }
 
         * {
@@ -51,7 +51,7 @@
             display: flex;
             height: 100vh;
             width: 100vw;
-            background: #f4f7fa;
+            background: var(--bg-app);
             overflow: hidden;
         }
 
@@ -115,14 +115,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: #f4f7fa;
+            background: var(--bg-app);
         }
 
 
         /* Top Bar - Sleeker match to SupaPOS */
         .top-bar {
             height: 60px;
-            background: white;
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -175,12 +175,22 @@
             transform: translateX(-50%);
         }
 
-        .user-profile {
+        .user-profile-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
             position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-profile-container:hover {
+            border-color: var(--primary);
+            background: var(--card-bg);
         }
 
         .user-avatar-initial {
@@ -193,13 +203,30 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(188, 24, 35, 0.2);
-            transition: transform 0.2s;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .user-avatar-initial:hover {
-            transform: scale(1.05);
+        .user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         /* Profile Dropdown */
@@ -208,11 +235,11 @@
             top: calc(100% + 12px);
             right: 0;
             width: 240px;
-            background: white;
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             display: none;
             z-index: 2000;
             animation: slideDown 0.3s ease;
@@ -408,28 +435,49 @@
                 </div>
 
                 <div class="top-bar-right">
-                    <div class="user-profile">
-                        @{
-                            var UserName = Context.Session.GetString("UserName") ?? "User";
-                            var initial = UserName.Length > 0 ? UserName.Substring(0, 1).ToUpper() : "U";
-                        }
-                        <div class="user-avatar-initial" id="profileDropdownToggle">
+                    @{
+                        var userName = Context.Session.GetString("UserName") ?? "User";
+                        var userRole = Context.Session.GetString("UserRole") ?? "Staff";
+                        var userEmail = Context.Session.GetString("UserEmail") ?? (userName + "@system.com");
+                        var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+                    }
+                    <div class="user-profile-wrapper" style="position: relative;">
+                        <div class="user-avatar-initial" id="profileDropdownToggle" style="cursor: pointer;">
                             @initial
                         </div>
 
                         <div class="profile-dropdown" id="profileDropdown">
-                            <div class="dropdown-email">@UserName</div>
+                            <div style="padding: 12px; border-bottom: 1px solid var(--border);">
+                                <div class="user-name" style="font-size: 1rem; font-weight: 800;">@userName</div>
+                                <div class="user-role-label" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">@userRole</div>
+                                @{
+                                    var displayEmail = Context.Session.GetString("UserEmail");
+                                    if (string.IsNullOrEmpty(displayEmail)) {
+                                        displayEmail = userName.Contains("@") ? userName : userName + "@system.com";
+                                    }
+                                }
+                                @if (displayEmail != userName)
+                                {
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; word-break: break-all;">@displayEmail</div>
+                                }
+                            </div>
+
+                            <a href="javascript:void(0)" id="theme-toggle-btn" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 12px; color: var(--text-main); text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                                <i class="ph-moon"></i>
+                                <span>Switch Theme</span>
+                            </a>
+
                             <div class="dropdown-divider"></div>
-                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="btn-logout">
+                            
+                            <form asp-page="/Account/Logout" asp-area="" method="post" style="padding: 0; margin: 0;">
+                                <button type="submit" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; background: transparent; color: #ef4444; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-align: left;">
                                     <i class="ph-sign-out"></i>
                                     Logout
                                 </button>
                             </form>
                         </div>
                     </div>
-                </div>
-            </header>
+                </header>
 
             <main class="sale-content-body">
                 @RenderBody()
@@ -440,6 +488,46 @@
     <div id="toast-container"></div>
 
     <script>
+        // Theme Sync (Inline to prevent flash)
+        const THEME_KEY = 'sata-invoice-theme';
+        const THEME_DARK = 'dark';
+        const THEME_LIGHT = 'light';
+        
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+            updateToggleIcon(theme);
+            window.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
+        }
+
+        function updateToggleIcon(theme) {
+            const btn = document.querySelector('#theme-toggle-btn');
+            if (!btn) return;
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('span');
+            
+            if (theme === THEME_DARK) {
+                if (icon) icon.className = 'ph-sun';
+                if (text) text.innerText = 'Switch to Light';
+            } else {
+                if (icon) icon.className = 'ph-moon';
+                if (text) text.innerText = 'Switch to Dark';
+            }
+        }
+
+        const savedTheme = localStorage.getItem(THEME_KEY) || THEME_LIGHT;
+        applyTheme(savedTheme);
+
+        // Listen for toggle clicks
+        document.addEventListener('click', (e) => {
+            const toggle = e.target.closest('#theme-toggle-btn');
+            if (toggle) {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
+                applyTheme(next);
+            }
+        });
+
         function updateClock() {
             const now = new Date();
             const isSmall = window.innerWidth < 480;
@@ -508,6 +596,22 @@
 
             profileDropdown.addEventListener('click', (e) => {
                 e.stopPropagation();
+            });
+        }
+
+        // Theme Toggle Support
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                if (typeof window.ThemeManager !== 'undefined') {
+                    window.ThemeManager.toggle();
+                } else {
+                    // Fallback if ThemeManager isn't loaded (e.g. initial load)
+                    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('sata-invoice-theme', next);
+                }
             });
         }
     </script>

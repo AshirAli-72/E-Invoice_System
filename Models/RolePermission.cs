@@ -28,6 +28,12 @@ namespace E_Invoice_system.Models
         [Column("invoices")]
         public bool Invoices { get; set; }
 
+        [Column("employees")]
+        public bool Employees { get; set; }
+
+        [Column("Reports")]
+        public bool Reports { get; set; }
+
         [Column("settings")]
         public bool Settings { get; set; }
 
@@ -42,6 +48,9 @@ namespace E_Invoice_system.Models
 
         [Column("invoice_report")]
         public bool InvoiceReport { get; set; }
+
+        [Column("employee_report")]
+        public bool EmployeeReport { get; set; }
 
         [Column("returns_report")]
         public bool ReturnsReport { get; set; }

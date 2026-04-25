@@ -16,11 +16,11 @@ namespace E_Invoice_system.Models
         [Column("barcode")]
         public string? barcode { get; set; }
 
-        [Column("manufacture_date", TypeName = "date")]
-        public DateTime? manufacture_date { get; set; }
+        [Column("manufacture_date")]
+        public string? manufacture_date { get; set; }
 
-        [Column("expiry_date", TypeName = "date")]
-        public DateTime? expiry_date { get; set; }
+        [Column("expiry_date")]
+        public string? expiry_date { get; set; }
 
         [Column("prod_state")]
         public string? prod_state { get; set; }

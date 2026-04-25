@@ -9,11 +9,11 @@ body {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     height: 100vh;
     overflow: hidden;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/images/login-bg.jpg');
+    background: #050605;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('/images/login-bg.jpg');
     background-position: center;
     background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    transition: all 0.4s ease;
     
     display: flex;
     align-items: center;
@@ -26,28 +26,43 @@ body {
     width: 100%;
     max-width: 1100px;
     min-height: 600px;
-    background: rgba(255, 255, 255, 0.92);
-    /* Semi-transparent background */
-    backdrop-filter: blur(10px);
-    /* Glass effect */
-    border-radius: 4px;
+    background: rgba(11, 14, 13, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] body {
+    background: #f8fafc;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url('/images/login-bg.jpg');
+}
+
+[data-theme="light"] .login-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
 }
 
 /* Left Panel with Background */
 .left-panel {
     flex: 1;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url('/images/login-bg.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/images/login-bg.jpg');
     background-position: center;
     background-size: cover;
-    background-repeat: no-repeat;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-bottom: 0;
     overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+[data-theme="light"] .left-panel {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url('/images/login-bg.jpg');
 }
 
 .left-panel::before {
@@ -57,7 +72,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(188, 24, 35, 0.1);
     z-index: 1;
 }
 
@@ -68,6 +83,11 @@ body {
     margin-top: 80%;
     color: white;
     padding: 2rem;
+    transition: color 0.3s ease;
+}
+
+[data-theme="light"] .overlay-content {
+    color: #1e293b;
 }
 
 .overlay-content h2 {
@@ -75,76 +95,101 @@ body {
     font-weight: 400;
     line-height: 1.6;
     letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 /* Right Panel */
 .right-panel {
     flex: 1;
-    background: white;
+    background: #0b0e0d;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem;
+    position: relative;
 }
 
-/* Login Card - Simplified as it's now part of the right-panel layout */
-.login-card {
-    width: 100%;
-    max-width: 400px;
+[data-theme="light"] .right-panel {
+    background: #ffffff;
 }
 
-/* Logo Section */
+.login-header-actions {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+}
+
+.login-theme-toggle {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.2s;
+}
+
+[data-theme="light"] .login-theme-toggle {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+.login-theme-toggle:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
 .logo-section {
-    text-align: center;
-    margin-top: 1rem;
     margin-bottom: 2rem;
+    text-align: center;
 }
 
 .logo {
-    max-width: 150px;
-    height: auto;
+    max-height: 55px;
+    width: auto;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    transition: filter 0.3s ease;
 }
 
-/* Welcome Section */
-.welcome-section {
-    text-align: center;
-    margin-bottom: 2.5rem;
+[data-theme="dark"] .logo {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)) brightness(1.2);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
 .welcome-section h1 {
     font-size: 1.75rem;
     font-weight: 600;
-    color: #2d3436;
+    color: #ffffff;
     margin-bottom: 0.5rem;
 }
 
+[data-theme="light"] .welcome-section h1 {
+    color: #1e293b;
+}
+
 .welcome-section p {
-    color: #636e72;
+    color: #6b7280;
     font-size: 0.95rem;
 }
 
-/* Form Styles */
-/* External Footer */
-.login-footer-external {
-    position: fixed;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    text-align: center;
-    color: black;
-    font-size: 0.75rem;
-    font-weight: 400;
-    z-index: 10;
-    white-space: nowrap;
-}
-
-.login-footer-external p {
-    margin: 0;
-}
-
 .login-form {
-    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+    width: 100%;
 }
 
 .form-group {
@@ -155,14 +200,20 @@ body {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #2d3436;
+    color: #d1d5db;
     margin-bottom: 0.5rem;
+}
+
+[data-theme="light"] .form-group label {
+    color: #475569;
 }
 
 .form-group input {
     width: 100%;
     padding: 0.875rem 1rem;
-    border: 1.5px solid #e0e0e0;
+    border: 1.5px solid #BC1823;
+    background: #141817;
+    color: #ffffff;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.2s;
@@ -170,13 +221,40 @@ body {
     font-family: inherit;
 }
 
+[data-theme="light"] .form-control,
+[data-theme="light"] .form-group input {
+    background: #ffffff;
+    border-color: #BC1823;
+    color: #1e293b;
+}
+
 .form-group input:focus {
     border-color: #BC1823;
+    background: #1a1e1d;
     box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1);
 }
 
+[data-theme="light"] .form-group input:focus {
+    background: #ffffff;
+    border-color: #BC1823;
+}
+
 .form-group input::placeholder {
-    color: #b2bec3;
+    color: #4b5563;
+}
+
+.login-footer-external {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 400;
+    z-index: 10;
+    white-space: nowrap;
 }
 
 /* Form Options */

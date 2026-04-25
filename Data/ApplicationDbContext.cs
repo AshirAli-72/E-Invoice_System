@@ -84,6 +84,67 @@ namespace E_Invoice_system.Data
             {
                 entity.Property(e => e.salary).HasColumnType("decimal(18,2)");
             });
+
+            // Seed Roles
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, RoleTitle = "Admin" }
+            );
+
+            // Seed RolePermissions
+            modelBuilder.Entity<RolePermission>().HasData(
+                new RolePermission
+                {
+                    Id = 1,
+                    RoleId = 1,
+                    Dashboard = true,
+                    Customers = true,
+                    Products = true,
+                    Sales = true,
+                    Invoices = true,
+                    Employees = true,
+                    Reports = true,
+                    Settings = true,
+                    CustomerReport = true,
+                    SaleReport = true,
+                    ProductReport = true,
+                    InvoiceReport = true,
+                    EmployeeReport = true,
+                    ReturnsReport = true,
+                    DailySummary = true,
+                    Inventory = true
+                }
+            );
+
+            // Seed Employee
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    id = 1,
+                    date = "1-1-2024",
+                    full_name = "Admin",
+                    emp_code = "EMP-001",
+                    cnic = "00000-0000000-0",
+                    email = "admin@pos.com",
+                    mobile_no = "0000-0000000",
+                    address = "Admin Address",
+                    salary = 0,
+                    status = "Active"
+                }
+            );
+
+            // Seed Users
+            modelBuilder.Entity<users>().HasData(
+                new users
+                {
+                    id = 1,
+                    username = "admin",
+                    password = "admin123",
+                    email = "admin@pos.com",
+                    role_id = 1,
+                    emp_id = 1,
+                    status = "Active"
+                }
+            );
         }
     }
 }

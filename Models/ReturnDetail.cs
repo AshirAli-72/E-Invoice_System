@@ -16,8 +16,8 @@ namespace E_Invoice_system.Models
         [Column("sale_id")]
         public int SaleId { get; set; }
 
-        [Column("date", TypeName = "date")]
-        public DateTime Date { get; set; }
+        [Column("date")]
+        public string date { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
 
         [Column("no_of_items")]
         public int no_of_items { get; set; }

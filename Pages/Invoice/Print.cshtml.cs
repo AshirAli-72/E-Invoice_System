@@ -84,7 +84,7 @@ namespace E_Invoice_system.Pages.Invoice
             if (!IsMultiItem && !string.IsNullOrEmpty(invoice.prod_name_service))
             {
                 var product = await _context.products_services.FirstOrDefaultAsync(p => p.prod_name == invoice.prod_name_service);
-                SingleItemExpiry = product?.expiry_date?.ToString("yyyy-MM-dd") ?? "N/A";
+                SingleItemExpiry = product?.expiry_date ?? "N/A";
             }
 
             Invoice = invoice;

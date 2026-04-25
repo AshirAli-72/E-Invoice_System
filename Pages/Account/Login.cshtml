@@ -23,6 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - E-Invoice System</title>
     <link rel="stylesheet" href="~/lib/inter-font/inter.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
 </head>
 <body>
@@ -34,6 +35,11 @@
         </div>
 
         <div class="right-panel">
+            <div class="login-header-actions">
+                <button type="button" id="theme-toggle-btn" class="login-theme-toggle" title="Toggle Theme">
+                    <i class="ph-moon"></i>
+                </button>
+            </div>
             <div class="login-card">
                 <div class="logo-section">
                     <img src="@logoSrc" alt="SATA Technologies" class="logo" />
@@ -43,6 +49,25 @@
                     <h1>Welcome Back !</h1>
                     <p>Sign in to continue</p>
                 </div>
+
+                <!-- Unified Premium Notification -->
+                @if (TempData["Success"] != null || TempData["Error"] != null)
+                {
+                    var isError = TempData["Error"] != null;
+                    var msg = TempData["Success"] ?? TempData["Error"];
+                    var bg = isError ? "rgba(239, 68, 68, 0.9)" : "rgba(16, 185, 129, 0.9)";
+                    var icon = isError ? "ph-warning-circle" : "ph-check-circle";
+
+                    <div id="loginFlasher" style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 14px; background: @bg; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 1rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2); animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="@icon" style="font-size: 1.25rem;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 0.95rem;">@(isError ? "Error" : "Success")</div>
+                            <div style="font-weight: 500; opacity: 0.9; font-size: 0.85rem;">@msg</div>
+                        </div>
+                    </div>
+                }
 
                 <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; text-align: center; list-style: none; padding: 0;"></div>
 
@@ -68,8 +93,36 @@
     </div>
 
     <script>
+        // Inline Theme Logic for Login (Layout is null)
+        const THEME_KEY = 'sata-invoice-theme';
+        const applyTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+            const icon = document.querySelector('#theme-toggle-btn i');
+            if (icon) icon.className = theme === 'dark' ? 'ph-sun' : 'ph-moon';
+        };
+
+        const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+        applyTheme(savedTheme);
+
+        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('Email').focus();
+
+            // Auto-hide login flasher after 3 seconds
+            const flasher = document.getElementById('loginFlasher');
+            if (flasher) {
+                setTimeout(() => {
+                    flasher.style.transition = 'all 0.4s ease-out';
+                    flasher.style.opacity = '0';
+                    flasher.style.transform = 'translateX(100px)';
+                    setTimeout(() => flasher.remove(), 400);
+                }, 3000);
+            }
 
             const loginForm = document.querySelector('.login-form');
             const loginBtn = document.querySelector('.btn-login');

@@ -6,15 +6,15 @@
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div style="margin-bottom: 2rem; padding: 1.5rem; background: #fff5f5; border-left: 4px solid #ef4444; border-radius: 12px; display: flex; align-items: center; gap: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-        <div style="background: #fee2e2; color: #ef4444; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+    <div style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-light); border-left: 4px solid var(--primary); border-radius: 12px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--border);">
+        <div style="background: var(--primary-glow); color: var(--primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <i class="ph-warning-circle" style="font-size: 1.5rem;"></i>
         </div>
         <div style="flex: 1;">
-            <div style="font-weight: 700; color: #991b1b; margin-bottom: 0.25rem;">Database Delay</div>
-            <p style="margin: 0; color: #b91c1c; font-size: 0.9rem;">@Model.ErrorMessage</p>
+            <div style="font-weight: 700; color: var(--text); margin-bottom: 0.25rem;">Database Delay</div>
+            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">@Model.ErrorMessage</p>
         </div>
-        <button onclick="window.location.reload()" style="background: white; border: 1px solid #fecaca; color: #b91c1c; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        <button onclick="window.location.reload()" style="background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
             <i class="ph-arrows-clockwise"></i> Retry
         </button>
     </div>
@@ -23,45 +23,45 @@
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #fff1f2; color: #be123c;"><i class="ph-file-text"></i></div>
-            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">+12% <i class="ph-trend-up"></i></span>
+            <div class="stat-icon" style="background: var(--primary-glow); color: var(--primary);"><i class="ph-file-text"></i></div>
+            <span class="stat-trend" style="color: var(--success); font-size: 0.75rem; font-weight: 600;">+12% <i class="ph-trend-up"></i></span>
         </div>
-        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Invoices</div>
-        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalInvoices</div>
+        <div class="stat-label">Total Invoices</div>
+        <div class="stat-value">@Model.TotalInvoices</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;"><i class="ph-users"></i></div>
-            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">Active</span>
+            <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;"><i class="ph-users"></i></div>
+            <span class="stat-trend" style="color: var(--success); font-size: 0.75rem; font-weight: 600;">Active</span>
         </div>
-        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Customers</div>
-        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalCustomers</div>
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value">@Model.TotalCustomers</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #ecfdf5; color: #059669;"><i class="ph-money"></i></div>
-            <span class="stat-trend" style="color: #10b981; font-size: 0.75rem; font-weight: 600;">Growth <i class="ph-chart-line-up"></i></span>
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #059669;"><i class="ph-money"></i></div>
+            <span class="stat-trend" style="color: var(--success); font-size: 0.75rem; font-weight: 600;">Growth <i class="ph-chart-line-up"></i></span>
         </div>
-        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Total Sale</div>
-        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
+        <div class="stat-label">Total Sale</div>
+        <div class="stat-value">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-icon" style="background: #fffbeb; color: #d97706;"><i class="ph-package"></i></div>
-            <span class="stat-trend" style="color: #64748b; font-size: 0.75rem; font-weight: 600;">Items</span>
+            <div class="stat-icon" style="background: rgba(217, 119, 6, 0.1); color: #d97706;"><i class="ph-package"></i></div>
+            <span class="stat-trend" style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">Items</span>
         </div>
-        <div class="stat-label" style="color: #64748b; font-size: 0.85rem; font-weight: 500;">Active Products</div>
-        <div class="stat-value" style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;">@Model.TotalProducts</div>
+        <div class="stat-label">Active Products</div>
+        <div class="stat-value">@Model.TotalProducts</div>
     </div>
 </div>
 
 <div class="content-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-    <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px;">
-        <div class="card-header" style="padding: 1.5rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
-            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Recent Invoices</h3>
+    <div class="card card-no-padding" style="overflow: hidden; border-radius: 20px;">
+        <div class="card-header" style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700;">Recent Invoices</h3>
             <a asp-page="/Invoice/Index" class="btn-view-all">
                 View All <i class="ph-arrow-right"></i>
             </a>
@@ -84,14 +84,12 @@
                         <tr>
                             <td style="font-weight: 700; color: var(--primary);">#@(inv.invoice_no ?? inv.id.ToString())</td>
                             <td style="font-weight: 500;">@inv.customer_name</td>
-                            <td style="color: #64748b;">@inv.date.ToString("MMM dd, yyyy")</td>
+                            <td style="color: var(--text-muted);">@inv.date</td>
                             <td style="font-weight: 700;">@CurrencyService.GetSymbol()@(inv.total_price.ToString("N2"))</td>
                             <td class="text-right">
                                 @{
-                                    var statusClass = inv.status == "Paid" ? "status-enabled" : (inv.status == "Pending" ? "status-warning" : "status-discontinued");
-                                    // Mapping simplified for dashboard
-                                    var statusColor = inv.status == "Paid" ? "#10b981" : (inv.status == "Pending" ? "#f59e0b" : "#64748b");
-                                    var statusBg = inv.status == "Paid" ? "#ecfdf5" : (inv.status == "Pending" ? "#fffbeb" : "#f8fafc");
+                                    var statusColor = inv.status == "Paid" ? "#10b981" : (inv.status == "Pending" ? "#f59e0b" : "#6b7280");
+                                    var statusBg = inv.status == "Paid" ? "rgba(16, 185, 129, 0.1)" : (inv.status == "Pending" ? "rgba(245, 158, 11, 0.1)" : "rgba(107, 114, 128, 0.1)");
                                 }
                                 <span style="background: @statusBg; color: @statusColor; padding: 0.35rem 0.8rem; border-radius: 30px; font-size: 0.75rem; font-weight: 700;">@inv.status</span>
                             </td>
@@ -100,7 +98,7 @@
                     @if (!Model.RecentInvoices.Any())
                     {
                         <tr>
-                            <td colspan="5" style="padding: 3rem; text-align: center; color: #94a3b8;">
+                            <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
                                 <i class="ph-folder-open" style="font-size: 2.5rem; display: block; margin-bottom: 1rem; opacity: 0.5;"></i>
                                 No recent invoices found.
                             </td>
@@ -113,7 +111,7 @@
 
     <div class="card" style="padding: 1.5rem; border-radius: 20px;">
         <div class="card-header" style="margin-bottom: 1.5rem;">
-            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Quick Actions</h3>
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700;">Quick Actions</h3>
         </div>
         
         <div style="display: grid; gap: 1rem;">
@@ -127,9 +125,9 @@
                 <i class="ph-package" style="font-size: 1.25rem;"></i> Manage Products
             </a>
             
-            <div style="background: #fdf2f2; padding: 1.25rem; border-radius: 16px; margin-top: 1rem; border: 1px solid #fee2e2;">
-                <div style="font-weight: 800; font-size: 0.8rem; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">System Health</div>
-                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: #065f46; font-weight: 600;">
+            <div style="background: var(--primary-glow); padding: 1.25rem; border-radius: 16px; margin-top: 1rem; border: 1px solid var(--border);">
+                <div style="font-weight: 800; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">System Health</div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--success); font-weight: 600;">
                     <span style="display: flex; position: relative; width: 10px; height: 10px;">
                         <span style="position: absolute; display: inline-flex; height: 100%; width: 100%; border-radius: 50%; background: #10b981; opacity: 0.75; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
                         <span style="position: relative; display: inline-flex; border-radius: 50%; height: 10px; width: 10px; background: #10b981;"></span>
@@ -144,8 +142,8 @@
 <div class="content-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
     <div class="card" style="padding: 1.5rem; border-radius: 20px;">
         <div class="card-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Invoices Trend</h3>
-            <div style="font-size: 0.8rem; color: #64748b; font-weight: 500;">Last 7 Days</div>
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700;">Invoices Trend</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Last 7 Days</div>
         </div>
         <div style="height: 300px;">
             <canvas id="trendChart"></canvas>
@@ -153,7 +151,7 @@
     </div>
     <div class="card" style="padding: 1.5rem; border-radius: 20px;">
         <div class="card-header" style="margin-bottom: 1.5rem;">
-            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Invoice Status</h3>
+            <h3 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 700;">Invoice Status</h3>
         </div>
         <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
             <canvas id="statusChart"></canvas>
@@ -162,112 +160,136 @@
 </div>
 
 <script>
-    // Wait for DOM and Chart.js to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check if Chart.js is loaded
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js is not loaded!');
-            return;
-        }
+    // Self-executing initialization for charts
+    // Works with both full page loads and Fast Navigation swaps
+    (function() {
+        const initCharts = () => {
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                setTimeout(initCharts, 100);
+                return;
+            }
 
-        // Line Chart for Trend
-        const trendChartEl = document.getElementById('trendChart');
-        if (trendChartEl) {
-            // Cleanup existing instance
-            const existingTrend = Chart.getChart(trendChartEl);
-            if (existingTrend) existingTrend.destroy();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const labelColor = currentTheme === 'dark' ? '#ffffff' : '#1e293b';
+            const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
 
-            const trendCtx = trendChartEl.getContext('2d');
-            
-            var gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(188, 24, 35, 0.2)');
-            gradient.addColorStop(1, 'rgba(188, 24, 35, 0.0)');
+            // Line Chart for Trend
+            const trendChartEl = document.getElementById('trendChart');
+            if (trendChartEl) {
+                // Cleanup existing instance
+                const existingTrend = Chart.getChart(trendChartEl);
+                if (existingTrend) existingTrend.destroy();
 
-            new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
-                    datasets: [{
-                        label: 'Invoices Issued',
-                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendData)),
-                        backgroundColor: gradient,
-                        borderColor: '#BC1823',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#BC1823',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+                const trendCtx = trendChartEl.getContext('2d');
+                
+                var gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(188, 24, 35, 0.2)');
+                gradient.addColorStop(1, 'rgba(188, 24, 35, 0.0)');
+
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
+                        datasets: [{
+                            label: 'Invoices Issued',
+                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendData)),
+                            backgroundColor: gradient,
+                            borderColor: '#BC1823',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#BC1823',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }]
                     },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { 
-                                borderDash: [2, 4],
-                                color: '#e5e7eb',
-                                drawBorder: false 
-                            },
-                            ticks: { font: { size: 11 } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
                         },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { font: { size: 11 } }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index',
-                    },
-                }
-            });
-        }
-
-        // Pie Chart for Status
-        const statusChartEl = document.getElementById('statusChart');
-        if (statusChartEl) {
-            // Cleanup existing instance
-            const existingStatus = Chart.getChart(statusChartEl);
-            if (existingStatus) existingStatus.destroy();
-
-            const statusCtx = statusChartEl.getContext('2d');
-            const statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels));
-            const statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts));
-            
-            const statusColors = statusLabels.map(label => {
-                if (label === 'Paid') return '#10b981'; // Green
-                if (label === 'Pending') return '#ea580c'; // Orange
-                if (label === 'Cancelled') return '#3b82f6'; // Blue
-                return '#6b7280'; // Gray default
-            });
-
-            new Chart(statusCtx, {
-                type: 'pie',
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        data: statusCounts,
-                        backgroundColor: statusColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                grid: { 
+                                    borderDash: [2, 4],
+                                    color: gridColor,
+                                    drawBorder: false 
+                                },
+                                ticks: { 
+                                    font: { size: 11 },
+                                    color: labelColor
+                                }
+                            },
+                            x: { 
+                                grid: { display: false },
+                                ticks: { 
+                                    font: { size: 11 },
+                                    color: labelColor
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+
+            // Pie Chart for Status
+            const statusChartEl = document.getElementById('statusChart');
+            if (statusChartEl) {
+                // Cleanup existing instance
+                const existingStatus = Chart.getChart(statusChartEl);
+                if (existingStatus) existingStatus.destroy();
+
+                const statusCtx = statusChartEl.getContext('2d');
+                const statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels));
+                const statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts));
+                
+                const statusColors = statusLabels.map(label => {
+                    if (label === 'Paid') return '#10b981'; // Green
+                    if (label === 'Pending') return '#ea580c'; // Orange
+                    if (label === 'Cancelled') return '#3b82f6'; // Blue
+                    return '#6b7280'; // Gray default
+                });
+
+                new Chart(statusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: statusCounts,
+                            backgroundColor: statusColors,
+                            borderWidth: 2,
+                            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                position: 'bottom',
+                                labels: {
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        // Run immediately as this script is executed after content swap
+        initCharts();
+        window.addEventListener('theme:changed', () => {
+            setTimeout(initCharts, 50);
+        });
+    })();
 </script>

@@ -62,63 +62,48 @@ namespace E_Invoice_system.Pages
                 _context.Database.SetCommandTimeout(60); 
                 var sw = System.Diagnostics.Stopwatch.StartNew();
 
-                // CACHED: Heavy Statistics (5-minute cache)
-                var stats = await _cache.GetOrCreateAsync("DashboardStats", async entry => {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-                    _logger.LogInformation("Recalculating Dashboard Statistics...");
-                    
-                    var newStats = new DashboardStats();
-                    newStats.TotalInvoices = await _context.invoices.AsNoTracking().CountAsync();
-                    newStats.TotalCustomers = await _context.customers.AsNoTracking().CountAsync();
-                    newStats.TotalProducts = await _context.products_services.AsNoTracking().CountAsync();
-                    newStats.TotalSales = await _context.sales.AsNoTracking()
-                        .Where(s => s.total_price > 0)
-                        .SumAsync(s => (decimal?)s.total_price) ?? 0;
+                // LIVE: Statistics (Fetched fresh as requested)
+                TotalInvoices = await _context.invoices.AsNoTracking().CountAsync();
+                TotalCustomers = await _context.customers.AsNoTracking().CountAsync();
+                TotalProducts = await _context.products_services.AsNoTracking().CountAsync();
+                TotalSales = await _context.sales.AsNoTracking()
+                    .Where(s => s.total_price > 0)
+                    .SumAsync(s => (decimal?)s.total_price) ?? 0;
 
-                    var invoiceStatusData = await _context.invoices
-                        .AsNoTracking()
-                        .GroupBy(i => i.status ?? "Pending")
-                        .Select(g => new { Status = g.Key, Count = g.Count() })
-                        .ToListAsync();
+                var invoiceStatusData = await _context.invoices
+                    .AsNoTracking()
+                    .GroupBy(i => i.status ?? "Pending")
+                    .Select(g => new { Status = g.Key, Count = g.Count() })
+                    .ToListAsync();
 
-                    newStats.StatusLabels = invoiceStatusData.Select(x => x.Status).ToArray();
-                    newStats.StatusCounts = invoiceStatusData.Select(x => x.Count).ToArray();
+                StatusLabels = invoiceStatusData.Select(x => x.Status).ToArray();
+                StatusCounts = invoiceStatusData.Select(x => x.Count).ToArray();
 
-                    var startDate = DateTime.Today.AddDays(-6);
-                    var trendResults = await _context.invoices
-                        .AsNoTracking()
-                        .Where(inv => inv.date >= startDate)
-                        .GroupBy(inv => inv.date.Date)
-                        .Select(g => new { Date = g.Key, Count = g.Count() })
-                        .ToListAsync();
+                var startDate = DateTime.Today.AddDays(-6);
+                var allInvoices = await _context.invoices.AsNoTracking().ToListAsync();
+                var trendResults = allInvoices
+                    .Where(inv => {
+                        if (DateTime.TryParseExact(inv.date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
+                            return dt >= startDate;
+                        return false;
+                    })
+                    .GroupBy(inv => DateTime.ParseExact(inv.date, "yyyy-MM-dd", null).Date)
+                    .Select(g => new { Date = g.Key, Count = g.Count() })
+                    .ToList();
 
-                    var trendLabelsList = new List<string>();
-                    var trendDataList = new List<int>();
+                var trendLabelsList = new List<string>();
+                var trendDataList = new List<int>();
 
-                    for (int i = 6; i >= 0; i--)
-                    {
-                        var targetDate = DateTime.Today.AddDays(-i);
-                        trendLabelsList.Add(targetDate.ToString("MMM dd"));
-                        var countEntry = trendResults.FirstOrDefault(r => r.Date == targetDate);
-                        trendDataList.Add(countEntry?.Count ?? 0);
-                    }
-
-                    newStats.TrendLabels = trendLabelsList.ToArray();
-                    newStats.TrendData = trendDataList.ToArray();
-                    return newStats;
-                });
-
-                if (stats != null)
+                for (int i = 6; i >= 0; i--)
                 {
-                    TotalInvoices = stats.TotalInvoices;
-                    TotalCustomers = stats.TotalCustomers;
-                    TotalProducts = stats.TotalProducts;
-                    TotalSales = stats.TotalSales;
-                    StatusLabels = stats.StatusLabels;
-                    StatusCounts = stats.StatusCounts;
-                    TrendLabels = stats.TrendLabels;
-                    TrendData = stats.TrendData;
+                    var targetDate = DateTime.Today.AddDays(-i);
+                    trendLabelsList.Add(targetDate.ToString("MMM dd"));
+                    var countEntry = trendResults.FirstOrDefault(r => r.Date == targetDate);
+                    trendDataList.Add(countEntry?.Count ?? 0);
                 }
+
+                TrendLabels = trendLabelsList.ToArray();
+                TrendData = trendDataList.ToArray();
 
                 // LIVE: Recent Invoices (Fast query, stay fresh)
                 RecentInvoices = await _context.invoices

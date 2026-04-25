@@ -4,6 +4,7 @@
 @using System.IO
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
+@inject IJSRuntime JSRuntime
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
@@ -17,6 +18,26 @@
                 <i class="ph-user-plus"></i> Add New Employee
             </button>
         </div>
+
+        <!-- Modern Flasher Notification -->
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@successMessage</span>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-warning" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@errorMessage</span>
+            </div>
+        }
 
         <div class="table-container">
             <div class="table-responsive">
@@ -183,7 +204,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Joining Date</label>
-                        <InputDate @bind-Value="employeeModel.date" class="form-control" />
+                        <input type="date" value="@FormatDateForInput(employeeModel.date)" @onchange="@(e => employeeModel.date = FormatDateFromInput(e.Value?.ToString()))" class="form-control" />
                         <ValidationMessage For="@(() => employeeModel.date)" />
                     </div>
 
@@ -224,12 +245,7 @@
                 </div>
 
                 <div class="form-panel-footer">
-                    @if (editingEmployee != null)
-                    {
-                        <button type="button" @onclick="() => DeleteEmployee(editingEmployee.id)" class="btn-cancel" style="color: #dc2626; border-color: #fecaca; background: #fff5f5; margin-right: auto;" disabled="@isSubmitting">
-                            <i class="ph-trash"></i> Delete Account
-                        </button>
-                    }
+                    @* Removed Delete Account button from form as requested *@
                     <button type="button" class="btn-cancel" @onclick="HideForm" disabled="@isSubmitting">Cancel</button>
                     <button type="submit" class="btn-save" disabled="@isSubmitting">
                         @if (isSubmitting)
@@ -257,6 +273,7 @@
     private bool isSubmitting = false;
     private bool isLoadingCode = false;
     private string? errorMessage;
+    private string? successMessage;
     private IBrowserFile? selectedFile;
     private string? imgUrl;
 
@@ -327,7 +344,7 @@
         
         employeeModel = new Employee 
         { 
-            date = DateTime.Now.Date,
+            date = DateTime.Now.ToString("d-M-yyyy"),
             status = "Active",
             emp_code = "Generating..."
         };
@@ -436,12 +453,17 @@
             }
 
             await context.SaveChangesAsync();
+            await JSRuntime.InvokeVoidAsync("clearNavCache");
             await LoadEmployees();
             HideForm();
+            successMessage = editingEmployee == null ? "Employee created successfully!" : "Employee updated successfully!";
+            errorMessage = null;
+            _ = Task.Delay(3000).ContinueWith(_ => InvokeAsync(() => { successMessage = null; StateHasChanged(); }));
         }
         catch (Exception ex)
         {
             errorMessage = "Error saving employee: " + ex.Message;
+            successMessage = null;
         }
         finally
         {
@@ -480,5 +502,18 @@
             await context.SaveChangesAsync();
             await LoadEmployees();
         }
+    }
+    private string? FormatDateForInput(string? dateStr)
+    {
+        if (string.IsNullOrEmpty(dateStr)) return null;
+        if (DateTime.TryParse(dateStr, out var dt)) return dt.ToString("yyyy-MM-dd");
+        return null;
+    }
+
+    private string? FormatDateFromInput(string? dateStr)
+    {
+        if (string.IsNullOrEmpty(dateStr)) return null;
+        if (DateTime.TryParse(dateStr, out var dt)) return dt.ToString("yyyy-MM-dd");
+        return dateStr;
     }
 }

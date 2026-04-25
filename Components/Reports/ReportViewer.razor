@@ -1,0 +1,393 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject IJSRuntime JSRuntime
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="reports-container">
+    <!-- Clean Header -->
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="ph-file-text" style="font-size: 1.75rem; color: var(--primary);"></i>
+            <h2 class="page-header-title" style="margin: 0; font-size: 1.5rem; font-weight: 800;">Detailed Reports</h2>
+        </div>
+    </div>
+
+    <!-- Simplified Filter Bar -->
+    <div class="report-filter-bar" style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Select Report Type</label>
+            <select class="report-select" @bind="selectedReportType" style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-light); color: var(--text); font-weight: 600;">
+                @foreach (var opt in availableReports)
+                {
+                    <option value="@opt.Value">@opt.Label</option>
+                }
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">From Date</label>
+            <input type="date" class="report-input" @bind="fromDate" style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-light); color: var(--text);" />
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">To Date</label>
+            <input type="date" class="report-input" @bind="toDate" style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-light); color: var(--text);" />
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <button @onclick="GenerateReport" class="btn-primary" style="padding: 0.6rem 1.5rem; border-radius: 8px; height: 42px;" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <i class="ph-spinner ph-spin"></i>
+                }
+                else
+                {
+                    <i class="ph-lightning"></i>
+                    <span>Generate Report</span>
+                }
+            </button>
+            <button @onclick="ResetFilters" class="btn-icon" style="height: 42px; width: 42px; border-radius: 8px;">
+                <i class="ph-arrow-counter-clockwise"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Report Table Section -->
+    @if (reportGenerated)
+    {
+        <div class="report-results" style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text);">
+                    @GetReportTitle()
+                    <span style="font-size: 0.875rem; color: var(--text-muted); margin-left: 1rem; font-weight: 500;">
+                        (@reportData?.Count records found)
+                    </span>
+                </h3>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button @onclick="PrintReport" class="btn-icon" title="Print"><i class="ph-printer"></i></button>
+                    <button @onclick="ExportToCSV" class="btn-icon" title="Export CSV"><i class="ph-file-xls"></i></button>
+                </div>
+            </div>
+
+            @if (reportData != null && reportData.Any())
+            {
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table id="resultsTable" class="styled-table" style="width: 100%;">
+                        <thead style="position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                @foreach (var col in GetColumns())
+                                {
+                                    <th>@col</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in reportData)
+                            {
+                                <tr>
+                                    @foreach (var col in GetColumns())
+                                    {
+                                        <td>@row[col]</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; border: 1px solid var(--border);">
+                    <span>Total Records: @reportData.Count</span>
+                    <span>Report Period: @fromDate?.ToString("dd-MM-yyyy") - @toDate?.ToString("dd-MM-yyyy")</span>
+                </div>
+            }
+            else
+            {
+                <div style="padding: 4rem; text-align: center; color: var(--text-muted);">
+                    <i class="ph-folder-open" style="font-size: 3rem; opacity: 0.2; display: block; margin-bottom: 1rem;"></i>
+                    <p style="font-weight: 600;">No data found for this period.</p>
+                </div>
+            }
+        </div>
+    }
+    else if (!isLoading)
+    {
+        <div style="padding: 6rem; text-align: center; background: var(--card-bg); border-radius: 12px; border: 2px dashed var(--border);">
+            <i class="ph-chart-bar" style="font-size: 4rem; color: var(--border); display: block; margin-bottom: 1.5rem;"></i>
+            <h3 style="color: var(--text-muted); margin-bottom: 0.5rem;">Ready to Analyze</h3>
+            <p style="color: var(--text-muted); margin: 0; opacity: 0.8;">Select a report type and date range above to view details.</p>
+        </div>
+    }
+</div>
+
+@code {
+    private string selectedReportType = "";
+    private DateTime? fromDate = DateTime.Now.AddDays(-30);
+    private DateTime? toDate = DateTime.Now;
+    private bool isLoading = false;
+    private bool reportGenerated = false;
+    private string currencySymbol = "$";
+    
+    private class ReportOption { public string Value { get; set; } = ""; public string Label { get; set; } = ""; }
+    private List<ReportOption> availableReports = new();
+    
+    private List<Dictionary<string, string>>? reportData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrency();
+        await LoadPermissions();
+    }
+
+    private async Task LoadPermissions()
+    {
+        try
+        {
+            var httpContext = HttpContextAccessor.HttpContext;
+            if (httpContext == null) return;
+
+            var userRole = httpContext.Session.GetString("UserRole") ?? "";
+            bool isAdmin = userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+            availableReports = new List<ReportOption>();
+            
+            if (isAdmin)
+            {
+                availableReports.Add(new ReportOption { Value = "sales", Label = "Sale Wise" });
+                availableReports.Add(new ReportOption { Value = "returns", Label = "Return Wise" });
+                availableReports.Add(new ReportOption { Value = "customers", Label = "Customer Wise" });
+                availableReports.Add(new ReportOption { Value = "inventory", Label = "Inventory Wise" });
+                availableReports.Add(new ReportOption { Value = "products", Label = "Product Wise" });
+                availableReports.Add(new ReportOption { Value = "employees", Label = "Employee Wise" });
+                availableReports.Add(new ReportOption { Value = "users", Label = "User Wise" });
+            }
+            else
+            {
+                using var context = DbFactory.CreateDbContext();
+                var perms = await context.roles_permissions.Include(p => p.Role)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.Role.RoleTitle == userRole);
+
+                if (perms != null)
+                {
+                    if (perms.SaleReport) availableReports.Add(new ReportOption { Value = "sales", Label = "Sale Wise" });
+                    if (perms.ReturnsReport) availableReports.Add(new ReportOption { Value = "returns", Label = "Return Wise" });
+                    if (perms.CustomerReport) availableReports.Add(new ReportOption { Value = "customers", Label = "Customer Wise" });
+                    if (perms.Inventory) availableReports.Add(new ReportOption { Value = "inventory", Label = "Inventory Wise" });
+                    if (perms.ProductReport) availableReports.Add(new ReportOption { Value = "products", Label = "Product Wise" });
+                    if (perms.EmployeeReport) availableReports.Add(new ReportOption { Value = "employees", Label = "Employee Wise" });
+                    
+                    // Allow User Wise report if they have general reports access
+                    if (perms.Reports) availableReports.Add(new ReportOption { Value = "users", Label = "User Wise" });
+                }
+            }
+            
+            if (availableReports.Any())
+            {
+                selectedReportType = availableReports.First().Value;
+            }
+        }
+        catch { }
+    }
+
+    private async Task LoadCurrency()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var activeCurrency = await context.currencies.FirstOrDefaultAsync(c => c.is_active);
+            if (activeCurrency != null) currencySymbol = activeCurrency.symbol ?? "$";
+        }
+        catch { }
+    }
+
+    private async Task ResetFilters()
+    {
+        fromDate = DateTime.Now.AddDays(-30);
+        toDate = DateTime.Now;
+        if (availableReports.Any())
+            selectedReportType = availableReports.First().Value;
+        reportGenerated = false;
+        reportData = null;
+    }
+
+    private async Task ExportToCSV()
+    {
+        var fileName = $"{GetReportTitle().Replace(" ", "_")}_{DateTime.Now:yyyyMMdd}.csv";
+        await JSRuntime.InvokeVoidAsync("exportTableToCSV", "resultsTable", fileName);
+    }
+
+    private async Task PrintReport()
+    {
+        await JSRuntime.InvokeVoidAsync("printElement", "resultsTable");
+    }
+
+    private async Task GenerateReport()
+    {
+        if (!fromDate.HasValue || !toDate.HasValue)
+        {
+            await JSRuntime.InvokeVoidAsync("showToast", "Required", "Please select both dates.", "warning");
+            return;
+        }
+
+        isLoading = true;
+        reportGenerated = false;
+        StateHasChanged();
+
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+
+            switch (selectedReportType)
+            {
+                case "sales": await GenerateSalesReport(context); break;
+                case "returns": await GenerateReturnsReport(context); break;
+                case "customers": await GenerateCustomerReport(context); break;
+                case "inventory": await GenerateInventoryReport(context); break;
+                case "products": await GenerateProductReport(context); break;
+                case "employees": await GenerateEmployeeReport(context); break;
+                case "users": await GenerateUserReport(context); break;
+            }
+
+            reportGenerated = true;
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("showToast", "Error", ex.Message, "error");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task GenerateSalesReport(ApplicationDbContext context)
+    {
+        var allSales = await context.sales.ToListAsync();
+        var data = allSales.Where(s => {
+            if (DateTime.TryParseExact(s.date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
+                return dt >= fromDate && dt <= toDate;
+            return false;
+        }).OrderByDescending(s => s.id).ToList();
+        reportData = data.Select(s => new Dictionary<string, string>
+        {
+            ["Bill #"] = s.billNo ?? "",
+            ["Date"] = s.date,
+            ["Items"] = s.no_of_items.ToString(),
+            ["Qty"] = s.qty.ToString("N2"),
+            ["Price"] = FormatCurrency(s.price),
+            ["Disc"] = FormatCurrency(s.discount),
+            ["Total"] = FormatCurrency(s.total_price),
+            ["Payment"] = s.payment_method ?? "",
+            ["Status"] = s.status ?? ""
+        }).ToList();
+    }
+
+    private async Task GenerateReturnsReport(ApplicationDbContext context)
+    {
+        var allReturns = await context.returns.ToListAsync();
+        var data = allReturns.Where(r => {
+            if (DateTime.TryParseExact(r.date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
+                return dt >= fromDate && dt <= toDate;
+            return false;
+        }).OrderByDescending(r => r.Id).ToList();
+        reportData = data.Select(r => new Dictionary<string, string>
+        {
+            ["Bill #"] = r.billNo ?? "",
+            ["Date"] = r.date,
+            ["Qty"] = r.qty.ToString("N2"),
+            ["Amount"] = FormatCurrency(r.Amount),
+            ["Method"] = r.Method ?? "",
+            ["Status"] = r.Status ?? ""
+        }).ToList();
+    }
+
+    private async Task GenerateCustomerReport(ApplicationDbContext context)
+    {
+        var data = await context.customers.OrderBy(c => c.name).ToListAsync();
+        reportData = data.Select(c => new Dictionary<string, string>
+        {
+            ["ID"] = c.id.ToString(),
+            ["Customer Name"] = c.name ?? "",
+            ["Contact"] = c.contact ?? "",
+            ["Email"] = c.email ?? "",
+            ["Address"] = c.address ?? "",
+            ["Status"] = c.status ?? ""
+        }).ToList();
+    }
+
+    private async Task GenerateInventoryReport(ApplicationDbContext context)
+    {
+        var data = await context.stock_details.OrderByDescending(s => s.id).ToListAsync();
+        reportData = data.Select(s => new Dictionary<string, string>
+        {
+            ["Barcode"] = s.item_barcode ?? "",
+            ["Stock Qty"] = s.quantity.ToString("N2"),
+            ["Pur. Price"] = FormatCurrency(s.pur_price),
+            ["Sale Price"] = FormatCurrency(s.sale_price),
+            ["Wholesale"] = FormatCurrency(s.whole_sale_price),
+            ["Total Pur. Value"] = FormatCurrency(s.total_pur_price),
+            ["Mfg Date"] = s.date_of_manafacture ?? "N/A",
+            ["Expiry"] = s.date_of_expiry ?? "N/A"
+        }).ToList();
+    }
+
+    private async Task GenerateProductReport(ApplicationDbContext context)
+    {
+        var data = await context.products_services.OrderBy(p => p.prod_name).ToListAsync();
+        reportData = data.Select(p => new Dictionary<string, string>
+        {
+            ["Product Name"] = p.prod_name ?? "",
+            ["Barcode"] = p.barcode ?? "",
+            ["Type"] = p.item_type ?? "",
+            ["Unit"] = p.unit ?? "",
+            ["Status"] = p.status ?? "",
+            ["Remarks"] = p.remarks ?? ""
+        }).ToList();
+    }
+
+    private async Task GenerateEmployeeReport(ApplicationDbContext context)
+    {
+        var data = await context.employees.OrderBy(e => e.full_name).ToListAsync();
+        reportData = data.Select(e => new Dictionary<string, string>
+        {
+            ["Emp Code"] = e.emp_code ?? "",
+            ["Full Name"] = e.full_name ?? "",
+            ["CNIC"] = e.cnic ?? "",
+            ["Mobile"] = e.mobile_no ?? "",
+            ["Email"] = e.email ?? "",
+            ["Salary"] = FormatCurrency(e.salary),
+            ["Status"] = e.status ?? ""
+        }).ToList();
+    }
+
+    private async Task GenerateUserReport(ApplicationDbContext context)
+    {
+        var data = await context.users.Include(u => u.Role).Include(u => u.Employee).OrderBy(u => u.username).ToListAsync();
+        reportData = data.Select(u => new Dictionary<string, string>
+        {
+            ["Username"] = u.username ?? "",
+            ["Email"] = u.email ?? "",
+            ["Role"] = u.Role?.RoleTitle ?? "N/A",
+            ["Employee"] = u.Employee?.full_name ?? "N/A",
+            ["Status"] = u.status ?? ""
+        }).ToList();
+    }
+
+    private List<string> GetColumns() { if (reportData == null || !reportData.Any()) return new List<string>(); return reportData.First().Keys.ToList(); }
+
+    private string GetReportTitle()
+    {
+        return selectedReportType switch
+        {
+            "sales" => "Sale Wise Report", "returns" => "Return Wise Report", "customers" => "Customer Wise Report",
+            "inventory" => "Inventory Wise Report", "products" => "Product Wise Report", "employees" => "Employee Wise Report",
+            "users" => "User Wise Report", _ => "Report"
+        };
+    }
+
+    private string FormatCurrency(decimal amount) { return $"{currencySymbol}{amount:N2}"; }
+}

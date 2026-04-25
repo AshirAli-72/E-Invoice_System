@@ -52,7 +52,7 @@ const NavProgress = (() => {
 })();
 
 // ─── Prefetch Cache ────────────────────────────────────────────────────────────
-const EXCLUDED_PATHS = ['/invoice', '/sale', '/customer', '/product', '/settings', '/employee', '/inventory'];
+const EXCLUDED_PATHS = ['/invoice', '/sale', '/customer', '/product', '/settings', '/employee', '/inventory', '/reports'];
 
 function isPathExcluded(url) {
     if (!url) return true;
@@ -102,7 +102,7 @@ async function fastNavigate(url, pushState = true) {
                 const res = await fetch(url);
                 if (res.ok) html = await res.text();
             } else {
-                const res = await fetch(url);
+                const res = await fetch(url, { cache: 'no-cache' });
                 if (!res.ok) { window.location.href = url; return; }
                 html = await res.text();
             }
@@ -230,13 +230,40 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Expose cache clearing for Blazor/JS Interop
+window.clearNavCache = async () => {
+    prefetched.clear();
+    if ('caches' in window) {
+        try {
+            const cache = await caches.open('sata-pos-v2');
+            const keys = await cache.keys();
+            // Clear all HTML pages from cache, keep assets (css, js, etc)
+            for (const request of keys) {
+                if (!request.url.match(/\.(css|js|png|jpg|jpeg|svg|ico|woff2?)$/)) {
+                    await cache.delete(request);
+                }
+            }
+            console.log('HTML Navigation cache cleared.');
+        } catch (err) {
+            console.warn('Cache clear failed:', err);
+        }
+    }
+};
+
 // ─── Form Interception (Fast Delete/Actions) ──────────────────────────────────
 document.addEventListener('submit', async (e) => {
     const form = e.target;
     const btn = e.submitter || form.querySelector('button[type="submit"]');
 
+    // CRITICAL: Skip Blazor-managed forms or forms without a real action
+    // Blazor forms often have no action or action="" and are handled via WebSockets
+    if (!form.action || form.action === window.location.href || form.action === window.location.href + '#') return;
+    
     // Only intercept internal POST forms that aren't logout or external
     if (form.method.toLowerCase() !== 'post' || form.action.includes('/Account/Logout') || form.getAttribute('data-turbo') === 'false') return;
+
+    // Skip if it looks like a Blazor form (contains builder helper or is in a blazor-managed area)
+    if (form.querySelector('[name^="__"]')) return; 
 
     e.preventDefault();
     if (btn) btn.classList.add('processing');
@@ -246,14 +273,17 @@ document.addEventListener('submit', async (e) => {
     
     try {
         const formData = new FormData(form);
-        const response = await fetch(form.action || window.location.href, {
+        const response = await fetch(form.action, {
             method: 'POST',
             body: formData,
             headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '' }
         });
 
         if (response.ok) {
-            // Success! Refresh the current page content
+            // Success! Clear cache so subsequent navigations (like to Dashboard) show fresh data
+            await window.clearNavCache();
+            
+            // Refresh the current page content
             await fastNavigate(window.location.pathname + window.location.search, false);
             showToast('Success', 'Action completed successfully.', 'success');
         } else {
@@ -270,25 +300,40 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// ─── Toast Notifications ───────────────────────────────────────────────────────
+// ─── Toast Notifications (Premium Glassmorphism) ──────────────────────────────
 function showToast(title, message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
-    const icons = { info: 'ph-info', success: 'ph-check-circle', error: 'ph-warning-circle' };
-    const colors = { info: 'var(--primary)', success: '#10b981', error: '#ef4444' };
+    
+    const icons = { info: 'ph-info', success: 'ph-check-circle', error: 'ph-warning-circle', warning: 'ph-warning' };
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast toast-${type}`;
+    
     toast.innerHTML = `
-        <div class="toast-icon"><i class="${icons[type] || icons.info}" style="color:${colors[type] || colors.info};"></i></div>
+        <div class="toast-icon"><i class="${icons[type] || icons.info}"></i></div>
         <div class="toast-content">
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.remove()"><i class="ph-x"></i></button>
+        <button class="toast-close" onclick="this.parentElement.classList.remove('show'); setTimeout(() => this.parentElement.remove(), 500);">
+            <i class="ph-x"></i>
+        </button>
     `;
+    
     container.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+        setTimeout(() => toast.classList.add('show'), 10);
+    });
+    
+    // Auto-remove
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, 4500);
 }
 
 // ─── Online / Offline ─────────────────────────────────────────────────────────
@@ -345,8 +390,61 @@ function setupNavLinks() {
     });
 }
 
+// ─── Theme Manager (Dark Mode) ────────────────────────────────────────────────
+const ThemeManager = (() => {
+    const THEME_KEY = 'sata-invoice-theme';
+    const THEME_DARK = 'dark';
+    const THEME_LIGHT = 'light';
+
+    function init() {
+        const savedTheme = localStorage.getItem(THEME_KEY) || THEME_LIGHT;
+        applyTheme(savedTheme);
+        
+        // Listen for toggle clicks
+        document.addEventListener('click', (e) => {
+            const toggle = e.target.closest('#theme-toggle-btn');
+            if (toggle) {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
+                applyTheme(next);
+            }
+        });
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(THEME_KEY, theme);
+        updateToggleIcon(theme);
+        
+        // Dispatch global event for other components (like charts)
+        window.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
+        
+        console.log(`Theme applied: ${theme}`);
+    }
+
+    function updateToggleIcon(theme) {
+        const btn = document.querySelector('#theme-toggle-btn');
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        const text = btn.querySelector('span');
+        
+        if (theme === THEME_DARK) {
+            if (icon) icon.className = 'ph-sun';
+            if (text) text.innerText = 'Switch to Light';
+            btn.title = 'Switch to Light Mode';
+        } else {
+            if (icon) icon.className = 'ph-moon';
+            if (text) text.innerText = 'Switch to Dark';
+            btn.title = 'Switch to Dark Mode';
+        }
+    }
+
+    return { init };
+})();
+
 // ─── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+    ThemeManager.init();
     NavProgress.finish();
     updateActiveNav(window.location.pathname);
     setupNavLinks();
@@ -363,5 +461,104 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Expose globally for _Layout.cshtml inline script
+// ─── Report Utilities ──────────────────────────────────────────────────────────
+function exportTableToCSV(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    let csv = [];
+    const rows = table.querySelectorAll("tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (let j = 0; j < cols.length; j++) {
+            // Clean text and handle commas/quotes
+            let data = cols[j].innerText.replace(/"/g, '""');
+            row.push('"' + data + '"');
+        }
+        csv.push(row.join(","));
+    }
+
+    const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+    const downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function printElement(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const printWindow = window.open('', '_blank', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Report Print</title>');
+    
+    // Copy styles
+    const styles = document.querySelectorAll('link[rel="stylesheet"], style');
+    styles.forEach(style => {
+        printWindow.document.write(style.outerHTML);
+    });
+    
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<div class="report-print-container">');
+    printWindow.document.write(element.innerHTML);
+    printWindow.document.write('</div>');
+    printWindow.document.write('</body></html>');
+    
+    printWindow.document.close();
+    
+    // Wait for styles to load
+    setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+
+function renderReportChart(canvasId, data) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    // Cleanup existing chart
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) existingChart.destroy();
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: data.label,
+                data: data.values,
+                borderColor: '#BC1823',
+                backgroundColor: 'rgba(188, 24, 35, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+// Expose globally for Blazor JS Interop
 window.showToast = showToast;
+window.exportTableToCSV = exportTableToCSV;
+window.printElement = printElement;
+window.renderReportChart = renderReportChart;

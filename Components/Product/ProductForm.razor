@@ -4,6 +4,7 @@
 @using System.IO
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
+@inject IJSRuntime JSRuntime
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
@@ -17,6 +18,26 @@
                 <i class="ph-plus-circle"></i> Add New Item
             </button>
         </div>
+
+        <!-- Modern Flasher Notification -->
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@successMessage</span>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="ph-warning" style="font-size: 1.25rem;"></i>
+                </div>
+                <span style="flex: 1;">@errorMessage</span>
+            </div>
+        }
 
         <div class="table-container">
             <div class="table-responsive">
@@ -205,12 +226,12 @@
 
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Manufacture Date</label>
-                    <input type="date" @bind="productModel.manufacture_date" class="form-control" />
+                    <input type="date" value="@FormatDateForInput(productModel.manufacture_date)" @onchange="@(e => productModel.manufacture_date = FormatDateFromInput(e.Value?.ToString()))" class="form-control" />
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Expiry Date</label>
-                    <input type="date" @bind="productModel.expiry_date" class="form-control" />
+                    <input type="date" value="@FormatDateForInput(productModel.expiry_date)" @onchange="@(e => productModel.expiry_date = FormatDateFromInput(e.Value?.ToString()))" class="form-control" />
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
@@ -229,7 +250,7 @@
                 <hr style="margin: 0.5rem 0; border: none; border-top: 2px dashed #e2e8f0;" />
 
                 <div class="form-panel-title" style="margin-bottom: 0.5rem;">
-                    <i class="ph-stack form-icon-primary"></i> Stock & Pricing Details
+                    <i class="ph-stack form-icon-primary"></i> Pricing Details
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
@@ -247,15 +268,7 @@
                     <input type="number" step="0.01" @bind="stockModel.whole_sale_price" class="form-control" placeholder="0.00" />
                 </div>
 
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">Stock Manufacture Date</label>
-                    <input type="date" @bind="stockModel.date_of_manafacture" class="form-control" />
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">Stock Expiry Date</label>
-                    <input type="date" @bind="stockModel.date_of_expiry" class="form-control" />
-                </div>
+                @* Removed redundant stock date fields as requested - synced from product dates *@
 
                 <hr style="margin: 0.5rem 0; border: none; border-top: 2px dashed #e2e8f0;" />
 
@@ -384,6 +397,7 @@
     private ProductService? editingProduct = null;
     private bool isSubmitting = false;
     private string? errorMessage;
+    private string? successMessage;
     private IBrowserFile? selectedFile;
     private string? imgUrl;
 
@@ -583,6 +597,8 @@
 
             // Final sync before save
             stockModel.quantity = productModel.size ?? 0;
+            stockModel.date_of_manafacture = productModel.manufacture_date;
+            stockModel.date_of_expiry = productModel.expiry_date;
             CalculateTotalPurPrice();
 
             using var context = DbFactory.CreateDbContext();
@@ -618,12 +634,17 @@
             }
             await context.SaveChangesAsync();
 
+            await JSRuntime.InvokeVoidAsync("clearNavCache");
             await LoadProducts();
             HideForm();
+            successMessage = editingProduct == null ? "Product created successfully!" : "Product updated successfully!";
+            errorMessage = null;
+            _ = Task.Delay(3000).ContinueWith(_ => InvokeAsync(() => { successMessage = null; StateHasChanged(); }));
         }
         catch (Exception ex)
         {
             errorMessage = "Error saving product: " + ex.Message;
+            successMessage = null;
         }
         finally
         {
@@ -745,5 +766,18 @@
     {
         stockModel.total_pur_price = stockModel.quantity * stockModel.pur_price;
         StateHasChanged();
+    }
+    private string? FormatDateForInput(string? dateStr)
+    {
+        if (string.IsNullOrEmpty(dateStr)) return null;
+        if (DateTime.TryParse(dateStr, out var dt)) return dt.ToString("yyyy-MM-dd");
+        return null;
+    }
+
+    private string? FormatDateFromInput(string? dateStr)
+    {
+        if (string.IsNullOrEmpty(dateStr)) return null;
+        if (DateTime.TryParse(dateStr, out var dt)) return dt.ToString("yyyy-MM-dd");
+        return dateStr;
     }
 }

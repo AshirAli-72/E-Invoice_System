@@ -80,7 +80,7 @@ namespace E_Invoice_system.Pages.Sale
                     {
                         id = s.id,
                         BillNo = s.billNo,
-                        Date = s.date.ToString("yyyy-MM-dd"),
+                        Date = s.date,
                         no_of_items = s.no_of_items,
                         qty = s.qty,
                         total_qty = s.total_qty,
@@ -104,7 +104,7 @@ namespace E_Invoice_system.Pages.Sale
                 if (ReturnTotalPages > 0 && ReturnPageNumber > ReturnTotalPages) ReturnPageNumber = ReturnTotalPages;
 
                 Returns = await returnsQuery
-                    .OrderByDescending(r => r.Date)
+                    .OrderByDescending(r => r.date)
                     .Skip((ReturnPageNumber - 1) * ReturnPageSize)
                     .Take(ReturnPageSize)
                     .ToListAsync();

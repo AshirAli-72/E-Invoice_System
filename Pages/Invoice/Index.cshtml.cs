@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
+using E_Invoice_system.Services;
 using System.Text.Json;
 
 namespace E_Invoice_system.Pages.Invoice
@@ -10,10 +11,12 @@ namespace E_Invoice_system.Pages.Invoice
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly CurrencyService _currencyService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, CurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -31,7 +34,7 @@ namespace E_Invoice_system.Pages.Invoice
             public int id { get; set; }
             public string? InvoiceNo { get; set; }
             public string? CustomerName { get; set; }
-            public DateTime Date { get; set; }
+            public string? Date { get; set; }
             public string DisplayName { get; set; } = "";
             public string DisplayQty { get; set; } = "";
             public string DisplayExpiry { get; set; } = "";
@@ -45,6 +48,8 @@ namespace E_Invoice_system.Pages.Invoice
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
+
+            await _currencyService.GetSymbolAsync();
 
             try
             {
@@ -91,7 +96,7 @@ namespace E_Invoice_system.Pages.Invoice
 
                                 var dates = items.Select(i => i.ContainsKey("expiryDate") ? i["expiryDate"]?.ToString() : null)
                                                  .Where(d => !string.IsNullOrEmpty(d))
-                                                 .Select(d => DateTime.TryParse(d, out var dt) ? dt.ToString("MMM dd, yyyy") : d);
+                                                 .Select(d => d);
                                 display.DisplayExpiry = string.Join(", ", dates);
 
                                 // Truncate if too long

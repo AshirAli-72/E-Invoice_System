@@ -1,9 +1,11 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace E_Invoice_system.Data.Migrations
 {
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20260416175800_create_stock_details_table")]
     public partial class create_stock_details_table : Migration
     {

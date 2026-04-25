@@ -25,11 +25,11 @@ namespace E_Invoice_system.Models
         [Column("whole_sale_price")]
         public decimal whole_sale_price { get; set; }
 
-        [Column("date_of_manafacture", TypeName = "date")]
-        public DateTime? date_of_manafacture { get; set; }
+        [Column("date_of_manafacture")]
+        public string? date_of_manafacture { get; set; }
 
-        [Column("date_of_expiry", TypeName = "date")]
-        public DateTime? date_of_expiry { get; set; }
+        [Column("date_of_expiry")]
+        public string? date_of_expiry { get; set; }
 
         [Column("total_pur_price")]
         public decimal total_pur_price { get; set; }

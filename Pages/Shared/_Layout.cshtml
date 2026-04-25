@@ -20,7 +20,16 @@
 </head>
 
 <body>
+    @{
+        var userRole = Context.Session.GetString("UserRole") ?? "";
+        var userName = Context.Session.GetString("UserName") ?? "User";
+        var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+    }
     <div class="app-container">
+        <!-- Global Offline Banner -->
+        <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#ef4444; color:white; text-align:center; font-size:11px; font-weight:800; letter-spacing:1px; z-index:100000; padding:4px 0; box-shadow:0 2px 8px rgba(239, 68, 68, 0.4); text-transform:uppercase;">
+            <i class="ph-warning-circle"></i> Working Offline - Changes will sync when online
+        </div>
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -42,7 +51,7 @@
                 </button>
             </div>
 
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" style="margin-top: 1rem;">
                 @using Microsoft.EntityFrameworkCore
                 @using E_Invoice_system.Data
                 @using E_Invoice_system.Models
@@ -50,13 +59,13 @@
                 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 
                 @{
-                    var userRole = Context.Session.GetString("UserRole") ?? "";
-                    RolePermission? perms = null;
                     bool isAdmin = userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+                    using var context2 = DbFactory.CreateDbContext();
+                    RolePermission? perms = null;
 
                     if (!string.IsNullOrEmpty(userRole) && !isAdmin)
                     {
-                        perms = context.roles_permissions.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
+                        perms = context2.roles_permissions.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
                     }
                 }
 
@@ -76,10 +85,6 @@
                     </a>
                 }
 
-                <a href="/employee" class="nav-item">
-                    <i class="ph-users-three nav-icon"></i>
-                    <span>Employees</span>
-                </a>
 
                 @if (isAdmin || (perms?.Products ?? false))
                 {
@@ -107,9 +112,25 @@
 
                 @if (isAdmin || (perms?.Invoices ?? false))
                 {
-                    <a href="/invoice" class="nav-item">
+                    <a href="/Invoice" class="nav-item">
                         <i class="ph-file-text nav-icon"></i>
                         <span>Invoices</span>
+                    </a>
+                }
+
+                @if (isAdmin || (perms?.Employees ?? false))
+                {
+                    <a href="/employee" class="nav-item">
+                        <i class="ph-users-three nav-icon"></i>
+                        <span>Employees</span>
+                    </a>
+                }
+
+                @if (isAdmin || (perms?.Reports ?? false))
+                {
+                    <a href="/reports" class="nav-item">
+                        <i class="ph-chart-bar nav-icon"></i>
+                        <span>Reports</span>
                     </a>
                 }
 
@@ -122,6 +143,7 @@
                 }
 
             </nav>
+            
         </aside>
 
         <!-- Main Content -->
@@ -134,30 +156,44 @@
                     </button>
                 </div>
 
-                <div class="user-profile">
-                    @{
-                        var userName = Context.Session.GetString("UserName") ?? "User";
-                        var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
-                    }
+                <div class="top-bar-right">
 
-                    <div class="user-avatar-initial" id="profileDropdownToggle">
-                        @initial
-                    </div>
+                        <div class="user-profile-wrapper" style="position: relative;">
+                            <div class="user-avatar-initial" id="profileDropdownToggle" style="cursor: pointer;">
+                                @initial
+                            </div>
 
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="dropdown-header">
-                            <p class="user-email">@userName</p>
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <div style="padding: 12px; border-bottom: 1px solid var(--border);">
+                                    <div class="user-name" style="font-size: 1rem; font-weight: 800;">@userName</div>
+                                    <div class="user-role" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">@userRole</div>
+                                    @{
+                                        var displayEmail = Context.Session.GetString("UserEmail");
+                                        if (string.IsNullOrEmpty(displayEmail)) {
+                                            displayEmail = userName.Contains("@") ? userName : userName + "@system.com";
+                                        }
+                                    }
+                                    @if (displayEmail != userName)
+                                    {
+                                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; word-break: break-all;">@displayEmail</div>
+                                    }
+                                </div>
+                            
+                            <a href="javascript:void(0)" id="theme-toggle-btn" class="dropdown-item">
+                                <i class="ph-moon"></i>
+                                <span>Switch Theme</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            
+                            <form asp-page="/Account/Logout" asp-area="" method="post" style="padding: 0; margin: 0;">
+                                <button type="submit" class="dropdown-item" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; color: #ef4444;">
+                                    <i class="ph-sign-out"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
                         </div>
-
-                        <div class="dropdown-divider"></div>
-
-                        <a asp-page="/Account/Logout" class="dropdown-item">
-                            <i class="ph-sign-out"></i>
-                            Logout
-                        </a>
                     </div>
-                </div>
-            </header>
+                </header>
 
             @RenderBody()
 

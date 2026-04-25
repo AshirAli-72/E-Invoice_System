@@ -4,6 +4,16 @@
 @inject NavigationManager NavigationManager
 
 <div class="form-panel-body">
+    <!-- Modern Flasher Notification -->
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+            </div>
+            <span style="flex: 1;">@successMessage</span>
+        </div>
+    }
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div style="padding: 1rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
@@ -14,7 +24,7 @@
     <!-- Invoice Header Details -->
     <div class="form-group">
         <label class="form-label">Invoice Date</label>
-        <input class="form-control" type="date" @bind="invoiceDate" />
+        <input class="form-control" type="date" value="@invoiceDate" @onchange="@(e => invoiceDate = e.Value?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
     </div>
 
     <div class="form-group">
@@ -51,7 +61,7 @@
     </div>
 
     <!-- Add Item Form -->
-    <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
+    <div style="background: var(--bg-light); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1.25rem;">
         <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label">Add Product / Service</label>
             <div style="display: flex; gap: 0.75rem;">
@@ -70,7 +80,7 @@
     </div>
 
     <!-- Items Table -->
-    <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 12px; max-height: 300px; overflow-y: auto; margin-bottom: 1.25rem;">
+    <div class="table-responsive" style="border: 1px solid var(--border); border-radius: 12px; max-height: 300px; overflow-y: auto; margin-bottom: 1.25rem;">
         <table class="styled-table" style="margin: 0; box-shadow: none;">
             <thead>
                 <tr>
@@ -98,7 +108,7 @@
                         <tr>
                             <td style="padding-left: 1.5rem;">
                                 <div class="font-medium">@item.Name</div>
-                                <div class="font-sm text-muted">Exp: @(item.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</div>
+                                <div class="font-sm text-muted">Exp: @(item.ExpiryDate ?? "N/A")</div>
                             </td>
                             <td>
                                 <input type="number" @bind="item.Qty" @bind:after="() => CalculateItemTotal(item)" class="form-control" style="width: 80px; height: 36px; padding: 0.35rem 0.6rem;" />
@@ -122,7 +132,7 @@
     </div>
 
     <!-- Summary Section -->
-    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+    <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
         <div class="form-group">
             <label class="form-label">Invoice Status</label>
             <select class="form-control" @bind="status">
@@ -142,7 +152,7 @@
             </select>
         </div>
 
-        <div style="padding-top: 1rem; border-top: 1px solid #e2e8f0; margin-top: 0.5rem;">
+        <div style="padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 0.5rem;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
                 <span class="text-muted font-medium">Subtotal:</span>
                 <span class="font-bold">@CurrencyService.GetSymbol()@subtotal.ToString("F2")</span>
@@ -151,9 +161,9 @@
                 <span class="text-muted font-medium">Discount:</span>
                 <input type="number" step="0.01" @bind="discount" class="form-control" style="width: 120px; text-align: right; height: 38px;" />
             </div>
-            <hr style="margin: 1rem 0; border: none; border-top: 2px solid #e2e8f0;" />
+            <hr style="margin: 1rem 0; border: none; border-top: 2px solid var(--border);" />
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="font-bold" style="font-size: 1.15rem; color: #1e293b;">Total Amount:</span>
+                <span class="font-bold" style="font-size: 1.15rem; color: var(--text);">Total Amount:</span>
                 <span class="font-bold" style="font-size: 1.35rem; color: var(--primary);">@CurrencyService.GetSymbol()@total.ToString("F2")</span>
             </div>
         </div>
@@ -181,7 +191,7 @@
 
     private customers? selectedCustomer;
     private string? invoiceNo;
-    private DateTime invoiceDate = DateTime.Now.Date;
+    private string invoiceDate = DateTime.Now.ToString("yyyy-MM-dd");
     private string status = "Paid";
     private string paymentMethod = "Cash";
     private decimal discount = 0;
@@ -190,6 +200,7 @@
     private string? companyPhone;
     private bool isSubmitting = false;
     private string? errorMessage;
+    private string? successMessage;
 
 
     protected override async Task OnInitializedAsync()
@@ -293,8 +304,8 @@
 
             var invoice = new invoices
             {
-                invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.ToString("yyMMddHHmm")}" : (invoiceNo.Length > 50 ? invoiceNo.Substring(0, 50) : invoiceNo),
-                date = invoiceDate,
+                invoice_no = string.IsNullOrWhiteSpace(invoiceNo) ? $"INV-{DateTime.Now.ToString("ddMMyyHHmm")}" : (invoiceNo.Length > 50 ? invoiceNo.Substring(0, 50) : invoiceNo),
+                date = DateTime.TryParse(invoiceDate, out var dt) ? dt.ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd"),
                 seller_name = companyName?.Length > 100 ? companyName.Substring(0, 100) : companyName,
                 seller_contact = companyPhone?.Length > 50 ? companyPhone.Substring(0, 50) : companyPhone,
                 seller_address = storeConfig?.Address?.Length > 255 ? storeConfig.Address.Substring(0, 255) : storeConfig?.Address,
@@ -314,6 +325,8 @@
             context.invoices.Add(invoice);
             await context.SaveChangesAsync();
 
+            successMessage = "Invoice created successfully!";
+            await Task.Delay(500);
             // Standard Blazor Navigation
             NavigationManager.NavigateTo("/Invoice/Index", true);
         }
@@ -322,6 +335,7 @@
             string err = ex.Message;
             if (ex.InnerException != null) err += " | " + ex.InnerException.Message;
             errorMessage = "Error saving invoice: " + err;
+            successMessage = null;
             isSubmitting = false;
         }
     }
@@ -332,7 +346,7 @@
         public string? Name { get; set; }
         public decimal Qty { get; set; }
         public decimal Price { get; set; }
-        public DateTime? ExpiryDate { get; set; }
+        public string? ExpiryDate { get; set; }
         public decimal Total { get; set; }
     }
 }

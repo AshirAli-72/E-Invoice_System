@@ -220,8 +220,11 @@
                     
                     @if (!string.IsNullOrEmpty(stockAlert))
                     {
-                        <div class="alert-v2" style="display:block;">
-                            <i class="ph-warning"></i> <span>@stockAlert</span>
+                        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
+                            </div>
+                            <span style="flex: 1;">@stockAlert</span>
                         </div>
                     }
 
@@ -302,7 +305,8 @@
                     <div style="display:flex;gap:16px;">
                         <button type="button" class="btn-confirm-web cancel" style="flex:1;" @onclick="() => showPaymentModal = false">Cancel</button>
                         <button type="button" class="btn-confirm-web confirm @(isSubmitting ? "processing" : "")" style="flex:1;" @onclick="SubmitSale" disabled="@isSubmitting">
-                            @if (!isSubmitting) { <span>Complete Order</span> <i class="ph-check-circle"></i> }
+                            @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> <span>Processing...</span> }
+                            else { <span>Complete Order</span> <i class="ph-check-circle"></i> }
                         </button>
                     </div>
                 </div>
@@ -426,7 +430,7 @@
 
     <div class="rcpt-bottom">
         <div class="rcpt-bottom-left">
-            <div class="rcpt-date">Generated on @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
+            <div class="rcpt-date">Generated on @DateTime.Now.ToString("dd-MM-yyyy h:mm:ss tt")</div>
         </div>
         @if (transMode != "return")
         {
@@ -744,7 +748,7 @@
                     var returnRec = new Models.ReturnDetail {
                         billNo = orderBillNo,
                         SaleId = item.OriginalSaleId,
-                        Date = DateTime.Now.Date,
+                        date = DateTime.Now.ToString("yyyy-MM-dd"),
                         no_of_items = saleItems.Count,
                         qty = Math.Abs(item.qty),
                         total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
@@ -756,7 +760,7 @@
                 } else {
                     var sale = new Models.Sale {
                         billNo = orderBillNo, 
-                        date = DateTime.Now.Date, 
+                        date = DateTime.Now.ToString("yyyy-MM-dd"), 
                         no_of_items = saleItems.Count,
                         qty = item.qty,
                         total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
@@ -767,7 +771,7 @@
                         status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
                         is_returned = false, 
                         description = saleDescription,
-                        expiry_date = item.expiry_date ?? DateTime.Now.Date 
+                        expiry_date = item.expiry_date ?? DateTime.Now.ToString("yyyy-MM-dd") 
                     };
                     context.sales.Add(sale);
                 }
@@ -790,22 +794,26 @@
 
             await context.SaveChangesAsync();
 
-            StateHasChanged();
-            await Task.Delay(100); // Allow DOM to render the orderBillNo
+            await JSRuntime.InvokeVoidAsync("clearNavCache");
+            ShowAlert("Transaction successfully completed!");
             
-            if (shouldPrintReceipt) {
+            // Fast UI: Reset before printing so the user sees the success state immediately
+            var shouldPrint = shouldPrintReceipt;
+            var billNo = orderBillNo;
+            var mode = transMode;
+            
+            ResetComponent();
+
+            if (shouldPrint) {
                 try {
-                    if (transMode != "return") {
-                        await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", orderBillNo);
+                    if (mode != "return") {
+                        await JSRuntime.InvokeVoidAsync("renderBarcode", "rcptBarcodeSvg", billNo);
                     }
                     await JSRuntime.InvokeVoidAsync("window.print");
                 } catch (Exception jsEx) {
                     Console.WriteLine("Print Error: " + jsEx.Message);
                 }
             }
-            
-            ShowAlert("Transaction successfully completed!");
-            ResetComponent();
         } catch (Exception ex) { 
             string errMessage = ex.Message;
             if (ex.InnerException != null) errMessage += " | " + ex.InnerException.Message;
@@ -840,7 +848,7 @@
         public string Name { get; set; }
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
-        public DateTime? Expiry { get; set; }
+        public string? Expiry { get; set; }
         public decimal Stock { get; set; }
         public bool IsService { get; set; }
         public string? Image { get; set; }
@@ -853,7 +861,7 @@
         public decimal qty { get; set; }
         public decimal price { get; set; }
         public decimal discount { get; set; }
-        public DateTime? expiry_date { get; set; }
+        public string? expiry_date { get; set; }
         public decimal maxStock { get; set; }
         public string? image { get; set; }
         public decimal total_price { get; set; }

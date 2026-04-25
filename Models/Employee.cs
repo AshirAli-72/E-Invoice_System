@@ -10,8 +10,8 @@ namespace E_Invoice_system.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("date", TypeName = "date")]
-        public DateTime date { get; set; }
+        [Column("date")]
+        public string date { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
 
         [Required(ErrorMessage = "Full Name is required")]
         [Column("full_name")]

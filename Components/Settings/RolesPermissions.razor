@@ -25,11 +25,11 @@
         <div style="padding: 1.5rem;">
 
     <!-- Top Role Selector Bar -->
-    <div class="rp-topbar">
+    <div class="rp-topbar card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
         <div class="rp-role-group">
             <label class="rp-role-label">Select Role:</label>
             <div class="rp-role-select-wrapper">
-                <select class="rp-role-select" @onchange="OnRoleChangedInternal">
+                <select class="rp-role-select force-primary-border" @onchange="OnRoleChangedInternal">
                     @foreach (var role in rolesList)
                     {
                         <option value="@role.RoleTitle" selected="@(role.RoleTitle == selectedRole)">@role.RoleTitle</option>
@@ -65,7 +65,7 @@
     }
 
     <!-- SECTION 1: SYSTEM AUTHORITIES -->
-    <div class="rp-section">
+    <div class="rp-section card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
         <div class="rp-section-header">
             <span class="rp-section-title">SYSTEM AUTHORITIES:</span>
             <input type="checkbox" class="rp-check-all" title="Select/Deselect All"
@@ -122,11 +122,25 @@
                 </span>
                 <span class="rp-check-label">Inventory</span>
             </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Employees" />
+                <span class="rp-check-box @(currentPermissions.Employees ? "checked" : "")">
+                    @if (currentPermissions.Employees) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Employees</span>
+            </label>
+            <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.Reports" />
+                <span class="rp-check-box @(currentPermissions.Reports ? "checked" : "")">
+                    @if (currentPermissions.Reports) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Reports</span>
+            </label>
         </div>
     </div>
 
     <!-- SECTION 2: REPORTS SHOW/HIDDEN -->
-    <div class="rp-section">
+    <div class="rp-section card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
         <div class="rp-section-header">
             <span class="rp-section-title">REPORTS SHOW/HIDDEN:</span>
             <input type="checkbox" class="rp-check-all" title="Select/Deselect All"
@@ -163,6 +177,13 @@
                 <span class="rp-check-label">Invoice Report</span>
             </label>
             <label class="rp-check-item">
+                <input type="checkbox" @bind="currentPermissions.EmployeeReport" />
+                <span class="rp-check-box @(currentPermissions.EmployeeReport ? "checked" : "")">
+                    @if (currentPermissions.EmployeeReport) { <i class="ph-check-bold"></i> }
+                </span>
+                <span class="rp-check-label">Employee Report</span>
+            </label>
+            <label class="rp-check-item">
                 <input type="checkbox" @bind="currentPermissions.ReturnsReport" />
                 <span class="rp-check-box @(currentPermissions.ReturnsReport ? "checked" : "")">
                     @if (currentPermissions.ReturnsReport) { <i class="ph-check-bold"></i> }
@@ -179,7 +200,7 @@
         </div>
     </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0;">
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 2px solid var(--primary);">
             <button class="rp-btn-primary" @onclick="SavePermissions" disabled="@isSaving" style="padding: 0.625rem 1.4rem;">
                 @if (isSaving)
                 {
@@ -229,7 +250,7 @@
                 <div class="rp-modal-row">
                     <label class="rp-modal-label">Role Name:</label>
                     <div class="rp-combo-container">
-                        <input type="text" class="rp-combo-input" @bind="roleManagementInput" @bind:event="oninput" placeholder="e.g. Manager (Type or Select)" autocomplete="off" />
+                        <input type="text" class="rp-combo-input force-primary-border" @bind="roleManagementInput" @bind:event="oninput" placeholder="e.g. Manager (Type or Select)" autocomplete="off" />
                         <div class="rp-combo-btn" @onclick="() => showComboDropdown = !showComboDropdown">
                             <i class="ph-caret-down" style="font-size: 1.2rem;"></i>
                         </div>
@@ -322,8 +343,8 @@
     // Permission model
     private RolePermission currentPermissions = new();
 
-    private bool AllSystemChecked => currentPermissions.Dashboard && currentPermissions.Customers && currentPermissions.Products && currentPermissions.Sales && currentPermissions.Invoices && currentPermissions.Settings && currentPermissions.Inventory;
-    private bool AllReportsChecked => currentPermissions.CustomerReport && currentPermissions.SaleReport && currentPermissions.ProductReport && currentPermissions.InvoiceReport && currentPermissions.ReturnsReport && currentPermissions.DailySummary;
+    private bool AllSystemChecked => currentPermissions.Dashboard && currentPermissions.Customers && currentPermissions.Products && currentPermissions.Sales && currentPermissions.Invoices && currentPermissions.Employees && currentPermissions.Reports && currentPermissions.Settings && currentPermissions.Inventory;
+    private bool AllReportsChecked => currentPermissions.CustomerReport && currentPermissions.SaleReport && currentPermissions.ProductReport && currentPermissions.InvoiceReport && currentPermissions.EmployeeReport && currentPermissions.ReturnsReport && currentPermissions.DailySummary;
 
     protected override async Task OnInitializedAsync()
     {
@@ -381,12 +402,15 @@
                     currentPermissions.Products = true;
                     currentPermissions.Sales = true;
                     currentPermissions.Invoices = true;
+                    currentPermissions.Employees = true;
+                    currentPermissions.Reports = true;
                     currentPermissions.Settings = true;
                     currentPermissions.Inventory = true;
                     currentPermissions.CustomerReport = true;
                     currentPermissions.SaleReport = true;
                     currentPermissions.ProductReport = true;
                     currentPermissions.InvoiceReport = true;
+                    currentPermissions.EmployeeReport = true;
                     currentPermissions.ReturnsReport = true;
                     currentPermissions.DailySummary = true;
                 }
@@ -441,6 +465,8 @@
             perms.Products = currentPermissions.Products;
             perms.Sales = currentPermissions.Sales;
             perms.Invoices = currentPermissions.Invoices;
+            perms.Employees = currentPermissions.Employees;
+            perms.Reports = currentPermissions.Reports;
             perms.Settings = currentPermissions.Settings;
             perms.Inventory = currentPermissions.Inventory;
 
@@ -448,6 +474,7 @@
             perms.SaleReport = currentPermissions.SaleReport;
             perms.ProductReport = currentPermissions.ProductReport;
             perms.InvoiceReport = currentPermissions.InvoiceReport;
+            perms.EmployeeReport = currentPermissions.EmployeeReport;
             perms.ReturnsReport = currentPermissions.ReturnsReport;
             perms.DailySummary = currentPermissions.DailySummary;
 
@@ -485,6 +512,8 @@
         currentPermissions.Products = val;
         currentPermissions.Sales = val;
         currentPermissions.Invoices = val;
+        currentPermissions.Employees = val;
+        currentPermissions.Reports = val;
         currentPermissions.Settings = val;
         currentPermissions.Inventory = val;
     }
@@ -496,6 +525,7 @@
         currentPermissions.SaleReport = val;
         currentPermissions.ProductReport = val;
         currentPermissions.InvoiceReport = val;
+        currentPermissions.EmployeeReport = val;
         currentPermissions.ReturnsReport = val;
         currentPermissions.DailySummary = val;
     }

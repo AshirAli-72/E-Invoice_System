@@ -57,7 +57,7 @@
                         <tr>
                             <td class="font-bold" style="padding-left: 1.5rem; white-space: nowrap;">@(item.InvoiceNo ?? item.id.ToString())</td>
                             <td class="font-medium" style="white-space: nowrap;">@item.CustomerName</td>
-                            <td style="white-space: nowrap;">@item.Date.ToString("MMM dd, yyyy")</td>
+                            <td style="white-space: nowrap;">@item.Date</td>
                             <td class="font-sm">@item.DisplayName</td>
                             <td class="font-sm">@item.DisplayQty</td>
                             <td class="font-sm text-muted">@item.DisplayExpiry</td>
@@ -157,7 +157,6 @@
             <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)" render-mode="ServerPrerendered" />
         </div>
     </div>
-</div>
 </div>
 
 <script>
