@@ -235,7 +235,7 @@ window.clearNavCache = async () => {
     prefetched.clear();
     if ('caches' in window) {
         try {
-            const cache = await caches.open('sata-pos-v2');
+            const cache = await caches.open('sata-pos-v3');
             const keys = await cache.keys();
             // Clear all HTML pages from cache, keep assets (css, js, etc)
             for (const request of keys) {
@@ -335,22 +335,6 @@ function showToast(title, message, type = 'info') {
         }
     }, 4500);
 }
-
-// ─── Online / Offline ─────────────────────────────────────────────────────────
-function updateOnlineStatus() {
-    if (!navigator.onLine) {
-        document.body.classList.add('offline-mode');
-        showToast('Connectivity', 'You are offline. Check your connection.', 'error');
-    } else {
-        document.body.classList.remove('offline-mode');
-        if (document.body.classList.contains('was-offline')) {
-            showToast('Connectivity', 'Network connection restored.', 'success');
-            document.body.classList.remove('was-offline');
-        }
-    }
-}
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', () => { document.body.classList.add('was-offline'); updateOnlineStatus(); });
 
 // ─── Page Entry Animation ──────────────────────────────────────────────────────
 function animatePageEntry() {

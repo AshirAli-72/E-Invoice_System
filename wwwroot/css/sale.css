@@ -2,21 +2,27 @@
     --primary: #BC1823;
     --primary-hover: #9c141d;
     --primary-glow: rgba(188, 24, 35, 0.2);
-    --bg-app: var(--bg-light);
-    --surface: var(--card-bg);
-    --border: var(--border);
-    --text-main: var(--text);
+    --bg-app: #f1f5f9; /* Light grey app background */
+    --surface: #ffffff; /* Pure white sidebar/header */
+    --border: #e2e8f0;
+    --text-main: #1e293b;
     --border-separator: 1px solid var(--border);
     --shadow-luxury: 0 30px 60px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] {
-    --bg-app: #141817;
-    --surface: #1C2120;
-    --border: #1a1e1d;
+    --bg-app: #0b0e0d; /* Very dark background */
+    --surface: #141817; /* Lighter surface for sidebar/header */
+    --border: #1f2422;
     --text-main: #d1d5db;
     --border-separator: 1px solid var(--border);
     --shadow-luxury: 0 30px 90px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] label, 
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .total-label {
+    color: #ffffff;
 }
 
 .pos-container-v2 {
@@ -80,11 +86,42 @@
     justify-content: space-between;
     padding: 0 32px;
     height: 80px;
-    background: var(--card-bg);
+    background: var(--surface);
     border-bottom: var(--border-separator);
     position: relative;
     z-index: 100;
 }
+
+[data-theme="dark"] .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+}
+
+[data-theme="dark"] .top-bar .welcome-msg,
+[data-theme="dark"] .top-bar .live-clock,
+[data-theme="dark"] .top-bar .user-name {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .top-bar .user-role-label {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .top-bar .user-profile-container {
+    background: #1c2120;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .top-bar .user-profile-container:hover {
+    background: #141817;
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .top-bar #theme-toggle-btn {
+    color: #ffffff;
+}
+
 .category-tabs-v2 {
     display: flex;
     gap: 8px;
@@ -264,7 +301,7 @@
 
 .search-bar-v2:focus-within {
     border-color: var(--primary);
-    background: var(--card-bg);
+    background: var(--surface);
     box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
@@ -286,7 +323,7 @@
 
 .mode-toggle-v2 .toggle-pill,
 .search-toggle-v2 .toggle-pill {
-    background: var(--card-bg);
+    background: var(--surface);
     border: 1px solid var(--border);
     padding: 4px;
     border-radius: 12px;
@@ -381,7 +418,7 @@
 }
 
 .product-card-v2 {
-    background: var(--card-bg);
+    background: var(--surface);
     border-radius: 16px;
     border: 1px solid var(--border);
     overflow: hidden;
@@ -483,11 +520,12 @@
 .checkout-center {
     width: 100%;
     max-width: 500px;
-    background: var(--card-bg);
+    background: var(--surface);
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-left: var(--border-separator);
+    border-left: 1px solid var(--border);
+    border-radius: 0;
     position: relative;
     overflow: hidden;
     min-height: 0;
@@ -677,7 +715,7 @@
 
 .checkout-footer-v2 {
     padding: 24px 32px;
-    background: var(--card-bg);
+    background: var(--surface);
     border-top: 1px solid var(--border);
     --shadow-luxury: 0 30px 60px rgba(0, 0, 0, 0.1);
     --border-separator: 1.5px solid var(--border);
@@ -1099,7 +1137,7 @@
 }
 
 .payment-card {
-    background: var(--card-bg);
+    background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 40px;
@@ -1161,7 +1199,7 @@
 
 .method-tab {
     height: 64px;
-    background: var(--card-bg);
+    background: var(--surface);
     border: 2px solid var(--border);
     color: var(--text-muted);
     font-weight: 700;
@@ -1215,7 +1253,7 @@
 
 .web-input:focus {
     border-color: var(--primary);
-    background: var(--card-bg);
+    background: var(--surface);
     box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
@@ -1245,7 +1283,7 @@
 }
 
 .summary-box-web {
-    background: var(--card-bg);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 32px;

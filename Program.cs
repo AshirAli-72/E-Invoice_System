@@ -25,10 +25,10 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(10),
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(3),
                 errorNumbersToAdd: new List<int> { 0, -2, 4060, 40197, 40501, 40613, 49918, 49919, 49920 });
-            sqlOptions.CommandTimeout(180);
+            sqlOptions.CommandTimeout(30);
         }));
 
 // Bridge for Razor Pages and other services that inject ApplicationDbContext directly

@@ -24,13 +24,27 @@
             --primary-light: rgba(188, 24, 35, 0.1);
             --primary-dark: #9c141d;
             --primary-glow: rgba(188, 24, 35, 0.2);
-            --bg-app: var(--bg-light);
-            --sidebar-bg: var(--sidebar-bg);
-            --surface: var(--card-bg);
-            --surface-hover: var(--table-row-hover);
-            --border: var(--border);
-            --text-main: var(--text);
-            --text-muted: var(--text-muted);
+            --bg-app: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --border: #94a3b8;
+            --text-main: #000000;
+            --text-muted: #000000;
+            --nav-text: #000000;
+            --nav-icon: #64748b;
+        }
+
+        [data-theme="dark"] {
+            --bg-app: #1C2120;
+            --sidebar-bg: #141817;
+            --surface: #1c2120;
+            --surface-hover: #141817;
+            --border: #334155;
+            --text-main: #ffffff;
+            --text-muted: #ffffff;
+            --nav-text: #ffffff;
+            --nav-icon: #9ca3af;
         }
 
         * {
@@ -76,7 +90,7 @@
         }
 
         .sidebar-logo {
-            height: 48px; /* Increased size for impact as per pic */
+            height: 80px; /* Increased from 64px */
             width: auto;
         }
 
@@ -91,7 +105,7 @@
             align-items: center;
             gap: 1.25rem;
             padding: 0.85rem 1.25rem;
-            color: #475569; /* Bluish grey for inactive */
+            color: var(--nav-text);
             text-decoration: none;
             border-radius: 12px;
             margin-bottom: 0.5rem;
@@ -102,7 +116,7 @@
 
         .nav-icon {
             font-size: 1.4rem;
-            color: #64748b;
+            color: var(--nav-icon);
         }
 
         .nav-item:hover {
@@ -140,14 +154,14 @@
         }
 
         .top-bar-logo {
-            height: 32px;
+            height: 48px;
             width: auto;
             transition: height 0.2s;
         }
 
         @@media (max-width: 768px) {
             .top-bar-logo {
-                height: 24px;
+                height: 36px;
             }
         }
 

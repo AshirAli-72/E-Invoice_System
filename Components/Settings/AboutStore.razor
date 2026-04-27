@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache Cache
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container">
@@ -315,6 +316,8 @@
         }
         
         storeConfig.LogoPath = null;
+        Cache.Remove("Layout_Logo");
+        Cache.Remove("StoreLogo");
     }
 
     private string GetLogoUrl()
@@ -380,6 +383,9 @@
             
             // Reload to ensure we have the latest data
             await LoadConfiguration();
+            
+            Cache.Remove("Layout_Logo");
+            Cache.Remove("StoreLogo");
             
             // Clear success message after 3 seconds
             _ = Task.Run(async () =>

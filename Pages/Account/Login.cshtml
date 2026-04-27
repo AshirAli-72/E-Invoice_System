@@ -1,19 +1,24 @@
 @page
 @model E_Invoice_system.Pages.Account.LoginModel
-@using E_Invoice_system.Data
 @using Microsoft.EntityFrameworkCore
+@using E_Invoice_system.Data
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @{
     Layout = null;
     
-    using var context = DbFactory.CreateDbContext();
-    var store = context.store_configurations.FirstOrDefault();
+    // Load logo same as dashboard sidebar
     string logoSrc = "/images/sata-logo.png";
-    if (store != null && !string.IsNullOrEmpty(store.LogoPath))
+    try
     {
-        try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(store.LogoPath); }
-        catch { }
+        using var _ctx = DbFactory.CreateDbContext();
+        var _store = _ctx.store_configurations.AsNoTracking().FirstOrDefault();
+        if (_store != null && !string.IsNullOrEmpty(_store.LogoPath))
+        {
+            try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(_store.LogoPath); }
+            catch { }
+        }
     }
+    catch { }
 }
 
 <!DOCTYPE html>
@@ -23,66 +28,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - E-Invoice System</title>
     <link rel="stylesheet" href="~/lib/inter-font/inter.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <!-- Phosphor icons (3.8 MB) loaded async — never blocks first paint -->
+    <link rel="preload" href="~/lib/phosphor/icons.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" asp-append-version="true" />
+    <noscript><link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" /></noscript>
 </head>
 <body>
     <div class="login-wrapper">
+
+        <!-- ── Left Red Panel ──────────────────────────────────────── -->
         <div class="left-panel">
+            <!-- Rotating tagline at bottom -->
             <div class="overlay-content">
-                <h2 id="rotating-text" style="transition: all 0.5s ease-in-out; transform: translateY(0); opacity: 1;">"E-Invoice System - SATA"</h2>
+                <h2 id="rotating-text">"E-Invoice System - SATA"</h2>
             </div>
         </div>
 
+        <!-- ── Right Login Card ────────────────────────────────────── -->
         <div class="right-panel">
             <div class="login-header-actions">
                 <button type="button" id="theme-toggle-btn" class="login-theme-toggle" title="Toggle Theme">
                     <i class="ph-moon"></i>
                 </button>
             </div>
+
             <div class="login-card">
+                <!-- Logo with background -->
                 <div class="logo-section">
-                    <img src="@logoSrc" alt="SATA Technologies" class="logo" />
+                    <div class="logo-container">
+                        <img src="@logoSrc" alt="SATA Technologies" class="logo" />
+                    </div>
                 </div>
 
+                <!-- Heading -->
                 <div class="welcome-section">
                     <h1>Welcome Back !</h1>
                     <p>Sign in to continue</p>
                 </div>
 
-                <!-- Unified Premium Notification -->
+                <!-- Notification flasher -->
                 @if (TempData["Success"] != null || TempData["Error"] != null)
                 {
                     var isError = TempData["Error"] != null;
-                    var msg = TempData["Success"] ?? TempData["Error"];
-                    var bg = isError ? "rgba(239, 68, 68, 0.9)" : "rgba(16, 185, 129, 0.9)";
-                    var icon = isError ? "ph-warning-circle" : "ph-check-circle";
+                    var msg     = TempData["Success"] ?? TempData["Error"];
+                    var bg      = isError ? "rgba(239,68,68,0.92)" : "rgba(16,185,129,0.92)";
+                    var icon    = isError ? "ph-warning-circle" : "ph-check-circle";
 
-                    <div id="loginFlasher" style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 14px; background: @bg; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 1rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2); animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
-                        <div style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <i class="@icon" style="font-size: 1.25rem;"></i>
+                    <div id="loginFlasher" style="position:fixed;top:24px;right:24px;z-index:10000;
+                         min-width:300px;max-width:440px;padding:1rem 1.25rem;border-radius:14px;
+                         background:@bg;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+                         color:white;font-size:.9rem;font-weight:600;display:flex;align-items:center;
+                         gap:1rem;box-shadow:0 12px 32px rgba(0,0,0,.2);
+                         animation:slideInRight .5s cubic-bezier(.16,1,.3,1);
+                         border:1px solid rgba(255,255,255,.2);">
+                        <div style="width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;
+                                    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="@icon" style="font-size:1.25rem;"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 700; font-size: 0.95rem;">@(isError ? "Error" : "Success")</div>
-                            <div style="font-weight: 500; opacity: 0.9; font-size: 0.85rem;">@msg</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:.95rem;">@(isError ? "Error" : "Success")</div>
+                            <div style="font-weight:500;opacity:.9;font-size:.85rem;">@msg</div>
                         </div>
                     </div>
                 }
 
-                <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; text-align: center; list-style: none; padding: 0;"></div>
+                <div asp-validation-summary="ModelOnly"
+                     style="color:#ef4444;font-size:.85rem;margin-top:.75rem;margin-bottom:-.25rem;
+                            list-style:none;padding:0;"></div>
 
-                <form method="post" class="login-form">
+                <!-- Login Form -->
+                <form method="post" class="login-form" id="loginForm" autocomplete="on">
                     <div class="form-group">
                         <label asp-for="Email">Email</label>
-                        <input asp-for="Email" placeholder="Enter your email" required />
+                        <input asp-for="Email"
+                               type="email"
+                               placeholder="Enter your email"
+                               autocomplete="email"
+                               inputmode="email"
+                               required />
                     </div>
 
                     <div class="form-group">
                         <label asp-for="Password">Password</label>
-                        <input asp-for="Password" type="password" placeholder="Enter password" required />
+                        <input asp-for="Password"
+                               type="password"
+                               placeholder="Enter password"
+                               autocomplete="current-password"
+                               required />
                     </div>
 
-                    <button type="submit" class="btn-login" style="margin-top: 1rem;">Login</button>
+                    <button type="submit" class="btn-login" id="loginBtn" style="margin-top:.75rem;">
+                        Login
+                    </button>
                 </form>
             </div>
         </div>
@@ -93,7 +131,7 @@
     </div>
 
     <script>
-        // Inline Theme Logic for Login (Layout is null)
+        // ── Theme: apply immediately to avoid flash ──────────────────
         const THEME_KEY = 'sata-invoice-theme';
         const applyTheme = (theme) => {
             document.documentElement.setAttribute('data-theme', theme);
@@ -101,9 +139,8 @@
             const icon = document.querySelector('#theme-toggle-btn i');
             if (icon) icon.className = theme === 'dark' ? 'ph-sun' : 'ph-moon';
         };
-
-        const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
-        applyTheme(savedTheme);
+        // Apply saved theme synchronously before render
+        applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
 
         document.getElementById('theme-toggle-btn').addEventListener('click', () => {
             const current = document.documentElement.getAttribute('data-theme');
@@ -111,58 +148,68 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('Email').focus();
+            // Focus email for faster login
+            const emailInput = document.getElementById('Email');
+            if (emailInput && !emailInput.value) emailInput.focus();
 
-            // Auto-hide login flasher after 3 seconds
+            // Auto-hide flasher after 3s
             const flasher = document.getElementById('loginFlasher');
             if (flasher) {
                 setTimeout(() => {
-                    flasher.style.transition = 'all 0.4s ease-out';
-                    flasher.style.opacity = '0';
-                    flasher.style.transform = 'translateX(100px)';
+                    flasher.style.transition = 'all .4s ease-out';
+                    flasher.style.opacity    = '0';
+                    flasher.style.transform  = 'translateX(80px)';
                     setTimeout(() => flasher.remove(), 400);
                 }, 3000);
             }
 
-            const loginForm = document.querySelector('.login-form');
-            const loginBtn = document.querySelector('.btn-login');
+            // ── Fast submit feedback ─────────────────────────────────
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn  = document.getElementById('loginBtn');
 
             if (loginForm && loginBtn) {
-                loginForm.addEventListener('submit', function () {
-                    loginBtn.disabled = true;
-                    loginBtn.innerText = 'Logging in...';
-                    loginBtn.style.opacity = '0.7';
-                    loginBtn.style.cursor = 'not-allowed';
+                loginForm.addEventListener('submit', function (e) {
+                    // Instant visual feedback — button becomes "Logging in..."
+                    loginBtn.disabled   = true;
+                    loginBtn.innerText  = 'Logging in…';
+                    loginBtn.style.opacity = '0.8';
+                    loginBtn.style.cursor  = 'not-allowed';
+
+                    // Safety: re-enable after 10s in case of server error
+                    setTimeout(() => {
+                        loginBtn.disabled      = false;
+                        loginBtn.innerText     = 'Login';
+                        loginBtn.style.opacity = '1';
+                        loginBtn.style.cursor  = 'pointer';
+                    }, 10000);
                 });
             }
 
+            // ── Rotating tagline animation ───────────────────────────
             const texts = [
                 '"E-Invoice System - SATA"',
                 '"Fast & Secure Invoicing"',
                 '"Manage Your Sales Easily"'
             ];
-            let currentIndex = 0;
-            const textElement = document.getElementById('rotating-text');   
-
-            setInterval(() => {
-                textElement.style.transition = 'all 0.6s ease-in';
-                textElement.style.opacity = '0';
-                textElement.style.transform = 'translateX(50px)';
-
-                setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % texts.length;
-                    textElement.innerText = texts[currentIndex];
-                    textElement.style.transition = 'none';
-                    textElement.style.transform = 'translateX(-50px)';
-                    
-                    void textElement.offsetWidth;
-
-                    textElement.style.transition = 'all 0.6s ease-out';
-                    textElement.style.opacity = '1';
-                    textElement.style.transform = 'translateX(0)';
-                }, 600);
-
-            }, 3000); 
+            let idx = 0;
+            const textEl = document.getElementById('rotating-text');
+            if (textEl) {
+                setInterval(() => {
+                    textEl.style.transition = 'all .5s ease-in';
+                    textEl.style.opacity    = '0';
+                    textEl.style.transform  = 'translateX(40px)';
+                    setTimeout(() => {
+                        idx = (idx + 1) % texts.length;
+                        textEl.innerText          = texts[idx];
+                        textEl.style.transition   = 'none';
+                        textEl.style.transform    = 'translateX(-40px)';
+                        void textEl.offsetWidth;  // force reflow
+                        textEl.style.transition   = 'all .5s ease-out';
+                        textEl.style.opacity      = '1';
+                        textEl.style.transform    = 'translateX(0)';
+                    }, 500);
+                }, 3500);
+            }
         });
     </script>
 </body>

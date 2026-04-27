@@ -9,7 +9,10 @@
 
     <link rel="stylesheet" href="~/lib/inter-font/inter.css" asp-append-version="true" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" />
+    <!-- Phosphor icons (3.8 MB) loaded async — never blocks first paint -->
+    <link rel="preload" href="~/lib/phosphor/icons.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" asp-append-version="true" />
+    <noscript><link rel="stylesheet" href="~/lib/phosphor/icons.css" asp-append-version="true" /></noscript>
     <script src="~/lib/chartjs/chart.js" defer></script>
 
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
@@ -26,24 +29,32 @@
         var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
     }
     <div class="app-container">
-        <!-- Global Offline Banner -->
-        <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#ef4444; color:white; text-align:center; font-size:11px; font-weight:800; letter-spacing:1px; z-index:100000; padding:4px 0; box-shadow:0 2px 8px rgba(239, 68, 68, 0.4); text-transform:uppercase;">
-            <i class="ph-warning-circle"></i> Working Offline - Changes will sync when online
-        </div>
 
+        @using Microsoft.EntityFrameworkCore
+        @using E_Invoice_system.Data
+        @using E_Invoice_system.Models
+        @using Microsoft.AspNetCore.Http
+        @using Microsoft.Extensions.Caching.Memory
+        @inject IDbContextFactory<ApplicationDbContext> DbFactory
+        @inject IMemoryCache LayoutCache
+        @{
+            // ── Logo ────────────────────────────────────────────────────────
+            string logoSrc = "/images/sata-logo.png";
+            try
+            {
+                using var _ctx = DbFactory.CreateDbContext();
+                var _store = _ctx.store_configurations.AsNoTracking().FirstOrDefault();
+                if (_store != null && !string.IsNullOrEmpty(_store.LogoPath))
+                {
+                    try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(_store.LogoPath); }
+                    catch { }
+                }
+            }
+            catch { }
+        }
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header sidebar-logo-container">
-                @{
-                    using var context = DbFactory.CreateDbContext();
-                    var store = context.store_configurations.FirstOrDefault();
-                    string logoSrc = "/images/sata-logo.png";
-                    if (store != null && !string.IsNullOrEmpty(store.LogoPath))
-                    {
-                        try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(store.LogoPath); }
-                        catch { }
-                    }
-                }
                 <img src="@logoSrc" alt="Logo" class="sidebar-logo" />
 
                 <button id="sidebarClose" class="mobile-only mobile-close-btn">
@@ -52,20 +63,24 @@
             </div>
 
             <nav class="sidebar-nav" style="margin-top: 1rem;">
-                @using Microsoft.EntityFrameworkCore
-                @using E_Invoice_system.Data
-                @using E_Invoice_system.Models
-                @using Microsoft.AspNetCore.Http
-                @inject IDbContextFactory<ApplicationDbContext> DbFactory
-
                 @{
+                    // ── Permissions (cached 30 min per role) ───────────────
                     bool isAdmin = userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
-                    using var context2 = DbFactory.CreateDbContext();
                     RolePermission? perms = null;
 
                     if (!string.IsNullOrEmpty(userRole) && !isAdmin)
                     {
-                        perms = context2.roles_permissions.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role.RoleTitle == userRole);
+                        string cacheKey = "Perms_" + userRole;
+                        if (!LayoutCache.TryGetValue(cacheKey, out perms))
+                        {
+                            try
+                            {
+                                using var context2 = DbFactory.CreateDbContext();
+                                perms = context2.roles_permissions.Include(p => p.Role).AsNoTracking().FirstOrDefault(p => p.Role != null && p.Role.RoleTitle == userRole);
+                                if (perms != null) LayoutCache.Set(cacheKey, perms, TimeSpan.FromMinutes(30));
+                            }
+                            catch { }
+                        }
                     }
                 }
 

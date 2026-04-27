@@ -3,16 +3,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using E_Invoice_system.Data;
 using E_Invoice_system.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace E_Invoice_system.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public LoginModel(ApplicationDbContext context)
+        public LoginModel(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         [BindProperty]
@@ -21,12 +24,41 @@ namespace E_Invoice_system.Pages.Account
         [BindProperty]
         public string Password { get; set; } = default!;
 
-        public IActionResult OnGet()
+        public string LogoSrc { get; set; } = "/images/sata-logo.png";
+
+        private async Task LoadLogoAsync()
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            try
+            {
+                var store = await _context.store_configurations
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cts.Token);
+
+                if (store != null && !string.IsNullOrEmpty(store.LogoPath))
+                {
+                    LogoSrc = "/store-logo/" + Path.GetFileName(store.LogoPath);
+                }
+            }
+            catch
+            {
+                // DB unavailable / timeout — silently use default logo.
+            }
+        }
+
+        public async Task<IActionResult> OnGetAsync()
         {
             if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
             {
                 return RedirectToPage("/Index");
             }
+            
+            // Set default logo first for fast initial render
+            LogoSrc = "/images/sata-logo.png";
+            
+            // Load custom logo asynchronously (non-blocking)
+            await LoadLogoAsync();
+            
             return Page();
         }
 
@@ -35,6 +67,7 @@ namespace E_Invoice_system.Pages.Account
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
             {
                 ModelState.AddModelError(string.Empty, "Email and password are required.");
+                await LoadLogoAsync();
                 return Page();
             }
 
@@ -79,6 +112,7 @@ namespace E_Invoice_system.Pages.Account
                 ModelState.AddModelError(string.Empty, "Unable to connect. Please check your internet connection and try again.");
             }
             
+            await LoadLogoAsync();
             return Page();
         }
     }
