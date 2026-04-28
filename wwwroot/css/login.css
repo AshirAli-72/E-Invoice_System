@@ -17,9 +17,9 @@ body {
     width: 100%;
     overflow: hidden;
 
-    /* Dark theme background — full cover */
-    background-color: #050605;
-    background-image: linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.72)),
+    /* Light theme background — full cover */
+    background-color: #f0f4f8;
+    background-image: linear-gradient(rgba(248,250,252,0.68), rgba(248,250,252,0.68)),
                       url('/images/login-bg.jpg');
     background-position: center center;
     background-size: cover;
@@ -34,37 +34,20 @@ body {
     transition: background-color 0.4s ease;
 }
 
-/* Light theme — fix: must repeat ALL background sub-properties */
-[data-theme="light"] body {
-    background-color: #f0f4f8;
-    background-image: linear-gradient(rgba(248,250,252,0.68), rgba(248,250,252,0.68)),
-                      url('/images/login-bg.jpg');
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-
 /* ── Login Wrapper ───────────────────────────────────────────────────── */
 .login-wrapper {
     display: flex;
     width: 100%;
     max-width: 1100px;
     min-height: 540px;
-    background: rgba(11, 14, 13, 0.96);
+    background: rgba(255,255,255,0.97);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-radius: 20px;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55);
-    transition: box-shadow 0.3s ease;
-}
-
-[data-theme="light"] .login-wrapper {
-    background: rgba(255,255,255,0.97);
-    border-color: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
     box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    transition: box-shadow 0.3s ease;
 }
 
 /* ── Left Red Panel ──────────────────────────────────────────────────── */
@@ -83,13 +66,7 @@ body {
     overflow: hidden;
 }
 
-/* Light theme — same image */
-[data-theme="light"] .left-panel {
-    background-image: url('/images/invoice-illustration.png');
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
+
 
 /* Subtle noise/texture overlay */
 .left-panel::before {
@@ -133,16 +110,12 @@ body {
     text-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
-/* Light theme — white text still looks great on red */
-[data-theme="light"] .overlay-content h2 {
-    color: rgba(255,255,255,0.95);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
-}
+
 
 /* ── Right Panel ─────────────────────────────────────────────────────── */
 .right-panel {
     flex: 1;
-    background: #ffffff; /* Light theme background */
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -152,48 +125,27 @@ body {
     transition: background 0.4s ease;
 }
 
-[data-theme="dark"] .right-panel {
-    background: #141817; /* Dark theme background */
+/* ── Login Title Section ─────────────────────────────────────────────── */
+.login-title-section {
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-/* ── Theme Toggle Button ─────────────────────────────────────────────── */
-.login-header-actions {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 10;
+.login-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    transition: color 0.3s ease;
+    color: #1e293b;
 }
 
-.login-theme-toggle {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #e2e8f0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
-    outline: none;
-}
-
-/* Light theme button — always visible */
-[data-theme="light"] .login-theme-toggle {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #334155;
-}
-
-/* Hover — hardcoded red so it NEVER disappears in any theme */
-.login-theme-toggle:hover {
-    background: #BC1823 !important;
-    border-color: #BC1823 !important;
-    color: #ffffff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(188,24,35,0.35);
+.login-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+    color: #64748b;
 }
 
 /* ── Logo ────────────────────────────────────────────────────────────── */
@@ -203,19 +155,14 @@ body {
 }
 
 .logo-container {
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
     padding: 16px;
     border-radius: 12px;
     background: transparent;
     transition: background 0.3s ease;
-}
-
-[data-theme="dark"] .logo-container {
-    background: transparent;
-}
-
-[data-theme="light"] .logo-container {
-    background: transparent;
 }
 
 .logo {
@@ -223,14 +170,17 @@ body {
     width: auto;
     display: block;
     transition: filter 0.3s ease;
-}
-
-[data-theme="dark"] .logo {
     filter: none;
 }
 
-[data-theme="light"] .logo {
-    filter: none;
+/* ── Logo Label ───────────────────────────────────────────────────────── */
+.logo-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    color: #1e293b;
 }
 
 /* ── Login Card ──────────────────────────────────────────────────────── */
@@ -248,44 +198,8 @@ body {
 .welcome-section h1 {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #f8fafc;
+    color: #1e293b;
     margin-bottom: 0.3rem;
-}
-
-[data-theme="light"] .welcome-section h1 {
-    color: #1e293b;
-}
-
-/* Use white text on the dark right-panel in dark mode */
-[data-theme="dark"] .welcome-section h1 {
-    color: #ffffff;
-}
-[data-theme="dark"] .welcome-section p,
-[data-theme="dark"] .form-group label {
-    color: #ffffff;
-}
-[data-theme="dark"] .login-footer-external p {
-    color: #ffffff;
-}
-[data-theme="dark"] .form-group input {
-    background: #f8fafc;
-    border-color: rgba(188,24,35,0.4);
-    color: #1e293b;
-}
-[data-theme="dark"] .form-group input:focus {
-    background: #ffffff;
-    border-color: #BC1823;
-    box-shadow: 0 0 0 3px rgba(188,24,35,0.1);
-}
-[data-theme="dark"] .login-theme-toggle {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #334155;
-}
-[data-theme="dark"] .login-theme-toggle:hover {
-    background: #BC1823 !important;
-    border-color: #BC1823 !important;
-    color: #ffffff !important;
 }
 
 .welcome-section p {
@@ -313,20 +227,12 @@ body {
     letter-spacing: 0.5px;
 }
 
-[data-theme="light"] .form-group label {
-    color: #000000;
-}
-
-[data-theme="dark"] .form-group label {
-    color: #ffffff;
-}
-
 .form-group input {
     width: 100%;
     padding: 0.85rem 1rem;
     border: 1.5px solid rgba(188,24,35,0.5);
-    background: #141817;
-    color: #f1f5f9;
+    background: #f8fafc;
+    color: #1e293b;
     border-radius: 10px;
     font-size: 0.95rem;
     transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
@@ -334,29 +240,13 @@ body {
     font-family: inherit;
 }
 
-[data-theme="light"] .form-group input {
-    background: #f8fafc;
-    border-color: rgba(188,24,35,0.4);
-    color: #1e293b;
-}
-
 .form-group input:focus {
     border-color: #BC1823;
-    background: #181c1b;
-    box-shadow: 0 0 0 3px rgba(188,24,35,0.15);
-}
-
-[data-theme="light"] .form-group input:focus {
     background: #ffffff;
-    border-color: #BC1823;
     box-shadow: 0 0 0 3px rgba(188,24,35,0.1);
 }
 
 .form-group input::placeholder {
-    color: #4b5563;
-}
-
-[data-theme="light"] .form-group input::placeholder {
     color: #94a3b8;
 }
 

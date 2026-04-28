@@ -1,14 +1,13 @@
 wwwroot\css\customer.css
-wwwroot\css\sale.css
-wwwroot\css\invoice.css
 wwwroot\css\dashboard.css
-wwwroot\css\product.css
+wwwroot\css\invoice.css
 wwwroot\css\login.css
+wwwroot\css\product.css
+wwwroot\css\sale.css
 wwwroot\css\settings.css
 wwwroot\favicon.ico
 wwwroot\images\invoice-illustration.png
 wwwroot\images\login-bg.jpg
-wwwroot\images\sata-logo.png
 wwwroot\js\app-main.js
 wwwroot\js\site.js
 wwwroot\js\sw.js
@@ -87,15 +86,15 @@ C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.ass
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\build\..\_framework\blazor.server.js
 D:\netcore\E-Invoice_system\wwwroot\manifest.json
 D:\netcore\E-Invoice_system\wwwroot\css\product.css
-D:\netcore\E-Invoice_system\wwwroot\css\login.css
+D:\netcore\E-Invoice_system\wwwroot\css\dashboard.css
 D:\netcore\E-Invoice_system\wwwroot\css\invoice.css
 D:\netcore\E-Invoice_system\wwwroot\lib\phosphor\icons.css
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jsbarcode\JsBarcode.all.min.js
-D:\netcore\E-Invoice_system\wwwroot\css\dashboard.css
+D:\netcore\E-Invoice_system\wwwroot\js\app-main.js
 D:\netcore\E-Invoice_system\wwwroot\css\settings.css
 D:\netcore\E-Invoice_system\wwwroot\favicon.ico
-D:\netcore\E-Invoice_system\wwwroot\js\app-main.js
+D:\netcore\E-Invoice_system\wwwroot\css\sale.css
 D:\netcore\E-Invoice_system\wwwroot\js\site.js
 D:\netcore\E-Invoice_system\wwwroot\js\sw.js
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -155,7 +154,7 @@ D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.min.js
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\SATA Technologies\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\_framework\blazor.web.js
-D:\netcore\E-Invoice_system\wwwroot\css\sale.css
+D:\netcore\E-Invoice_system\wwwroot\css\login.css
 D:\netcore\E-Invoice_system\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
 D:\netcore\E-Invoice_system\wwwroot\css\customer.css
 D:\netcore\E-Invoice_system\wwwroot\lib\jquery\dist\jquery.slim.min.map

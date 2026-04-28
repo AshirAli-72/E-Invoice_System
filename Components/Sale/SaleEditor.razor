@@ -183,7 +183,7 @@
                             <div class="price-input-container">
                                 <span>@CurrencyService.GetSymbol()</span>
                                 <input type="number" step="0.01" class="manual-price-input" 
-                                       @bind="item.price" @onbind:after="() => CalculateSaleItemTotal(item)" />
+                                       @bind="item.price" @bind:after="() => CalculateSaleItemTotal(item)" />
                             </div>
                         </div>
                         <div class="item-v2-controls">

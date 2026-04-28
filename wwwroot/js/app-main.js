@@ -300,7 +300,7 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// ─── Toast Notifications (Premium Glassmorphism) ──────────────────────────────
+// ─── Toast Notifications (Premium Glassmorphism with Progress Bar) ──────────────────────────────
 function showToast(title, message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -309,15 +309,18 @@ function showToast(title, message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     
+    const progressColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#BC1823';
+    
     toast.innerHTML = `
         <div class="toast-icon"><i class="${icons[type] || icons.info}"></i></div>
         <div class="toast-content">
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.classList.remove('show'); setTimeout(() => this.parentElement.remove(), 500);">
+        <button class="toast-close" onclick="this.parentElement.classList.remove('show'); setTimeout(() => this.parentElement.remove(), 400);">
             <i class="ph-x"></i>
         </button>
+        <div class="toast-progress" style="background: ${progressColor};"></div>
     `;
     
     container.appendChild(toast);
@@ -327,13 +330,13 @@ function showToast(title, message, type = 'info') {
         setTimeout(() => toast.classList.add('show'), 10);
     });
     
-    // Auto-remove
+    // Auto-remove after 3 seconds
     setTimeout(() => {
         if (toast.parentNode) {
             toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 500);
+            setTimeout(() => toast.remove(), 400);
         }
-    }, 4500);
+    }, 3000);
 }
 
 // ─── Page Entry Animation ──────────────────────────────────────────────────────
@@ -374,61 +377,8 @@ function setupNavLinks() {
     });
 }
 
-// ─── Theme Manager (Dark Mode) ────────────────────────────────────────────────
-const ThemeManager = (() => {
-    const THEME_KEY = 'sata-invoice-theme';
-    const THEME_DARK = 'dark';
-    const THEME_LIGHT = 'light';
-
-    function init() {
-        const savedTheme = localStorage.getItem(THEME_KEY) || THEME_LIGHT;
-        applyTheme(savedTheme);
-        
-        // Listen for toggle clicks
-        document.addEventListener('click', (e) => {
-            const toggle = e.target.closest('#theme-toggle-btn');
-            if (toggle) {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
-                applyTheme(next);
-            }
-        });
-    }
-
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem(THEME_KEY, theme);
-        updateToggleIcon(theme);
-        
-        // Dispatch global event for other components (like charts)
-        window.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
-        
-        console.log(`Theme applied: ${theme}`);
-    }
-
-    function updateToggleIcon(theme) {
-        const btn = document.querySelector('#theme-toggle-btn');
-        if (!btn) return;
-        const icon = btn.querySelector('i');
-        const text = btn.querySelector('span');
-        
-        if (theme === THEME_DARK) {
-            if (icon) icon.className = 'ph-sun';
-            if (text) text.innerText = 'Switch to Light';
-            btn.title = 'Switch to Light Mode';
-        } else {
-            if (icon) icon.className = 'ph-moon';
-            if (text) text.innerText = 'Switch to Dark';
-            btn.title = 'Switch to Dark Mode';
-        }
-    }
-
-    return { init };
-})();
-
 // ─── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-    ThemeManager.init();
     NavProgress.finish();
     updateActiveNav(window.location.pathname);
     setupNavLinks();

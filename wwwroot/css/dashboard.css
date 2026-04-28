@@ -3,12 +3,12 @@
     --primary-hover: #9c141d;
     --primary-glow: rgba(188, 24, 35, 0.1);
     --secondary: #1C2120;
-    --bg-light: #f8fafc;
+    --bg-light: #f1f5f9;
     --sidebar-bg: #ffffff;
     --card-bg: #ffffff;
     --text: #000000;
-    --text-muted: #000000;
-    --border: #94a3b8;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
     --white: #ffffff;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -18,66 +18,7 @@
     --warning: #f59e0b;
 }
 
-[data-theme="dark"] {
-    --bg-light: #1C2120;
-    --sidebar-bg: #141817;
-    --card-bg: #1c2120;
-    --text: #ffffff;
-    --text-muted: #ffffff;
-    --border: #334155;
-    --white: #0b0e0d;
-    --shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-    --primary-glow: rgba(188, 24, 35, 0.2);
-    --table-header-bg: #050605;
-    --table-row-hover: #141817;
-}
 
-[data-theme="dark"] .sidebar .nav-item {
-    color: #9ca3af;
-}
-
-[data-theme="dark"] .sidebar .nav-item:hover {
-    background-color: #141817;
-    color: var(--primary);
-}
-
-[data-theme="dark"] .sidebar .nav-item.active {
-    background-color: var(--primary);
-    color: #ffffff;
-}
-
-[data-theme="dark"] .sidebar .nav-icon {
-    color: #9ca3af;
-}
-
-[data-theme="dark"] .sidebar .user-name {
-    color: #1e293b;
-}
-
-[data-theme="dark"] .sidebar .user-profile-container {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-}
-
-[data-theme="dark"] .sidebar .user-profile-container:hover {
-    background: #ffffff;
-    border-color: var(--primary);
-}
-
-/* Dark Mode Scrollbars */
-[data-theme="dark"] ::-webkit-scrollbar {
-    width: 10px;
-}
-[data-theme="dark"] ::-webkit-scrollbar-track {
-    background: #0f1110;
-}
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #2d3433;
-    border-radius: 5px;
-}
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: #3d4544;
-}
 
 /* Reset & Base */
 * {
@@ -119,6 +60,53 @@ body {
     align-items: center;
     gap: 0.75rem;
 }
+
+/* ── Sidebar Logo + Label ─────────────────────────────────────────── */
+.sidebar-logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.sidebar-logo {
+    height: 64px;
+    width: auto;
+    display: block;
+}
+
+.sidebar-logo-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #1e293b;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+
+
+/* ── Sale Terminal Top-Bar Logo + Label ──────────────────────────── */
+.top-bar-logo-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.top-bar-logo-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #1e293b;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+
 
 .sidebar-nav {
     flex: 1;
@@ -239,9 +227,7 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="dark"] .card {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
+
 
 .card:hover {
     border-color: var(--primary);
@@ -2682,14 +2668,6 @@ body.offline-mode #offline-banner {
     outline: none !important;
 }
 
-[data-theme="dark"] .force-primary-border,
-[data-theme="dark"] .rp-role-select,
-[data-theme="dark"] .rp-combo-input,
-[data-theme="dark"] .report-select,
-[data-theme="dark"] .report-input {
-    border-color: var(--primary) !important;
-}
-
 .product-image-premium {
     border: 2px solid var(--primary);
     box-shadow: 0 0 15px var(--primary-glow);
@@ -2700,4 +2678,169 @@ body.offline-mode #offline-banner {
 .product-image-premium:hover {
     transform: scale(1.05);
     box-shadow: 0 0 20px var(--primary-glow);
+}
+
+/* ============================================================
+   GLASS-EFFECT TOAST NOTIFICATIONS WITH PROGRESS BARS
+   ============================================================ */
+
+#toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    position: relative;
+    min-width: 320px;
+    max-width: 450px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    pointer-events: auto;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-success {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.toast-error {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.toast-warning {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.toast-info {
+    background: rgba(188, 24, 35, 0.08);
+    border-color: rgba(188, 24, 35, 0.2);
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.toast-success .toast-icon {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.toast-error .toast-icon {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.toast-warning .toast-icon {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.toast-info .toast-icon {
+    background: rgba(188, 24, 35, 0.15);
+    color: #BC1823;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    color: var(--text-main);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    border-radius: 0 0 16px 16px;
+    animation: progressShrink 3s linear forwards;
+}
+
+.toast-success .toast-progress {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.toast-error .toast-progress {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.toast-warning .toast-progress {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.toast-info .toast-progress {
+    background: linear-gradient(90deg, #BC1823, #9c141d);
+}
+
+@keyframes progressShrink {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }

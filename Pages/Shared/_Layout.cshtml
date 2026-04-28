@@ -55,7 +55,10 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header sidebar-logo-container">
-                <img src="@logoSrc" alt="Logo" class="sidebar-logo" />
+                <div class="sidebar-logo-wrap">
+                    <img src="@logoSrc" alt="Logo" class="sidebar-logo" />
+                    <span class="sidebar-logo-label">E-Invoice System</span>
+                </div>
 
                 <button id="sidebarClose" class="mobile-only mobile-close-btn">
                     <i class="ph-x"></i>
@@ -194,10 +197,6 @@
                                     }
                                 </div>
                             
-                            <a href="javascript:void(0)" id="theme-toggle-btn" class="dropdown-item">
-                                <i class="ph-moon"></i>
-                                <span>Switch Theme</span>
-                            </a>
                             <div class="dropdown-divider"></div>
                             
                             <form asp-page="/Account/Logout" asp-area="" method="post" style="padding: 0; margin: 0;">

@@ -35,18 +35,6 @@
             --nav-icon: #64748b;
         }
 
-        [data-theme="dark"] {
-            --bg-app: #1C2120;
-            --sidebar-bg: #141817;
-            --surface: #1c2120;
-            --surface-hover: #141817;
-            --border: #334155;
-            --text-main: #ffffff;
-            --text-muted: #ffffff;
-            --nav-text: #ffffff;
-            --nav-icon: #9ca3af;
-        }
-
         * {
             box-sizing: border-box;
         }
@@ -441,7 +429,10 @@
                             catch { }
                         }
                     }
-                    <img src="@logoSrc" alt="Logo" class="top-bar-logo" />
+                    <div class="top-bar-logo-wrap">
+                        <img src="@logoSrc" alt="Logo" class="top-bar-logo" />
+                        <span class="top-bar-logo-label">E-Invoice System</span>
+                    </div>
                 </div>
 
                 <div class="top-bar-center">
@@ -476,11 +467,6 @@
                                 }
                             </div>
 
-                            <a href="javascript:void(0)" id="theme-toggle-btn" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 12px; color: var(--text-main); text-decoration: none; font-size: 0.85rem; font-weight: 600;">
-                                <i class="ph-moon"></i>
-                                <span>Switch Theme</span>
-                            </a>
-
                             <div class="dropdown-divider"></div>
                             
                             <form asp-page="/Account/Logout" asp-area="" method="post" style="padding: 0; margin: 0;">
@@ -502,46 +488,6 @@
     <div id="toast-container"></div>
 
     <script>
-        // Theme Sync (Inline to prevent flash)
-        const THEME_KEY = 'sata-invoice-theme';
-        const THEME_DARK = 'dark';
-        const THEME_LIGHT = 'light';
-        
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem(THEME_KEY, theme);
-            updateToggleIcon(theme);
-            window.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
-        }
-
-        function updateToggleIcon(theme) {
-            const btn = document.querySelector('#theme-toggle-btn');
-            if (!btn) return;
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            
-            if (theme === THEME_DARK) {
-                if (icon) icon.className = 'ph-sun';
-                if (text) text.innerText = 'Switch to Light';
-            } else {
-                if (icon) icon.className = 'ph-moon';
-                if (text) text.innerText = 'Switch to Dark';
-            }
-        }
-
-        const savedTheme = localStorage.getItem(THEME_KEY) || THEME_LIGHT;
-        applyTheme(savedTheme);
-
-        // Listen for toggle clicks
-        document.addEventListener('click', (e) => {
-            const toggle = e.target.closest('#theme-toggle-btn');
-            if (toggle) {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
-                applyTheme(next);
-            }
-        });
-
         function updateClock() {
             const now = new Date();
             const isSmall = window.innerWidth < 480;
@@ -610,22 +556,6 @@
 
             profileDropdown.addEventListener('click', (e) => {
                 e.stopPropagation();
-            });
-        }
-
-        // Theme Toggle Support
-        const themeBtn = document.getElementById('theme-toggle-btn');
-        if (themeBtn) {
-            themeBtn.addEventListener('click', () => {
-                if (typeof window.ThemeManager !== 'undefined') {
-                    window.ThemeManager.toggle();
-                } else {
-                    // Fallback if ThemeManager isn't loaded (e.g. initial load)
-                    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-                    const next = current === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('sata-invoice-theme', next);
-                }
             });
         }
     </script>

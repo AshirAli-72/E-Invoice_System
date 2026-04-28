@@ -1,24 +1,7 @@
 @page
 @model E_Invoice_system.Pages.Account.LoginModel
-@using Microsoft.EntityFrameworkCore
-@using E_Invoice_system.Data
-@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @{
     Layout = null;
-    
-    // Load logo same as dashboard sidebar
-    string logoSrc = "/images/sata-logo.png";
-    try
-    {
-        using var _ctx = DbFactory.CreateDbContext();
-        var _store = _ctx.store_configurations.AsNoTracking().FirstOrDefault();
-        if (_store != null && !string.IsNullOrEmpty(_store.LogoPath))
-        {
-            try { logoSrc = "/store-logo/" + System.IO.Path.GetFileName(_store.LogoPath); }
-            catch { }
-        }
-    }
-    catch { }
 }
 
 <!DOCTYPE html>
@@ -47,24 +30,11 @@
 
         <!-- ── Right Login Card ────────────────────────────────────── -->
         <div class="right-panel">
-            <div class="login-header-actions">
-                <button type="button" id="theme-toggle-btn" class="login-theme-toggle" title="Toggle Theme">
-                    <i class="ph-moon"></i>
-                </button>
-            </div>
-
             <div class="login-card">
-                <!-- Logo with background -->
-                <div class="logo-section">
-                    <div class="logo-container">
-                        <img src="@logoSrc" alt="SATA Technologies" class="logo" />
-                    </div>
-                </div>
-
-                <!-- Heading -->
-                <div class="welcome-section">
-                    <h1>Welcome Back !</h1>
-                    <p>Sign in to continue</p>
+                <!-- Login Title -->
+                <div class="login-title-section">
+                    <h1 class="login-title">Login</h1>
+                    <p class="login-subtitle">E-Invoice System</p>
                 </div>
 
                 <!-- Notification flasher -->
@@ -72,24 +42,30 @@
                 {
                     var isError = TempData["Error"] != null;
                     var msg     = TempData["Success"] ?? TempData["Error"];
-                    var bg      = isError ? "rgba(239,68,68,0.92)" : "rgba(16,185,129,0.92)";
+                    var bg      = isError ? "rgba(220,38,38,0.92)" : "rgba(5,150,105,0.92)";
+                    var borderColor = isError ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.3)";
                     var icon    = isError ? "ph-warning-circle" : "ph-check-circle";
+                    var progressColor = isError ? "#fca5a5" : "#6ee7b7";
+                    var textColor = "#ffffff";
 
                     <div id="loginFlasher" style="position:fixed;top:24px;right:24px;z-index:10000;
-                         min-width:300px;max-width:440px;padding:1rem 1.25rem;border-radius:14px;
-                         background:@bg;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
-                         color:white;font-size:.9rem;font-weight:600;display:flex;align-items:center;
-                         gap:1rem;box-shadow:0 12px 32px rgba(0,0,0,.2);
+                         min-width:320px;max-width:450px;padding:16px 20px;border-radius:16px;
+                         background:@bg;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+                         border:1px solid @borderColor;font-size:.9rem;font-weight:600;
+                         display:flex;align-items:flex-start;gap:12px;
+                         box-shadow:0 12px 32px @(isError ? "rgba(220,38,38,0.4)" : "rgba(5,150,105,0.4)"), 0 4px 12px rgba(0,0,0,.15);
                          animation:slideInRight .5s cubic-bezier(.16,1,.3,1);
-                         border:1px solid rgba(255,255,255,.2);">
-                        <div style="width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;
-                                    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="@icon" style="font-size:1.25rem;"></i>
+                         overflow:hidden;">
+                        <div style="width:40px;height:40px;background:rgba(255,255,255,0.25);
+                                    border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="@icon" style="font-size:1.25rem;color:@textColor;"></i>
                         </div>
                         <div style="flex:1;">
-                            <div style="font-weight:700;font-size:.95rem;">@(isError ? "Error" : "Success")</div>
-                            <div style="font-weight:500;opacity:.9;font-size:.85rem;">@msg</div>
+                            <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;color:@textColor;">@(isError ? "Error" : "Success")</div>
+                            <div style="font-weight:500;opacity:1;font-size:.85rem;color:@textColor;">@msg</div>
                         </div>
+                        <div style="position:absolute;bottom:0;left:0;height:4px;background:@progressColor;
+                                    border-radius:0 0 16px 16px;animation:progressShrink 3s linear forwards;"></div>
                     </div>
                 }
 
@@ -131,22 +107,6 @@
     </div>
 
     <script>
-        // ── Theme: apply immediately to avoid flash ──────────────────
-        const THEME_KEY = 'sata-invoice-theme';
-        const applyTheme = (theme) => {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem(THEME_KEY, theme);
-            const icon = document.querySelector('#theme-toggle-btn i');
-            if (icon) icon.className = theme === 'dark' ? 'ph-sun' : 'ph-moon';
-        };
-        // Apply saved theme synchronously before render
-        applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-
-        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme');
-            applyTheme(current === 'dark' ? 'light' : 'dark');
-        });
-
         document.addEventListener('DOMContentLoaded', function () {
             // Focus email for faster login
             const emailInput = document.getElementById('Email');
