@@ -202,6 +202,9 @@
     private string? errorMessage;
     private string? successMessage;
 
+    [Parameter] public string? UserName { get; set; }
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -298,9 +301,14 @@
         isSubmitting = true;
         try
         {
+            using var context = DbFactory.CreateDbContext();
+
+            // Get Current User ID
+            var user = await context.users.AsNoTracking().FirstOrDefaultAsync(u => u.username == UserName);
+            int? currentUserId = user?.id;
+
             // Get store configuration for seller info
-            using var configContext = DbFactory.CreateDbContext();
-            var storeConfig = await configContext.store_configurations.FirstOrDefaultAsync();
+            var storeConfig = await context.store_configurations.FirstOrDefaultAsync();
 
             var invoice = new invoices
             {
@@ -318,10 +326,10 @@
                 discount = discount,
                 total_price = total,
                 payment = paymentMethod,
-                status = status
+                status = status,
+                user_id = currentUserId
             };
 
-            using var context = DbFactory.CreateDbContext();
             context.invoices.Add(invoice);
             await context.SaveChangesAsync();
 

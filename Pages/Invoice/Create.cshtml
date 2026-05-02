@@ -16,7 +16,9 @@
     </div>
 
     <!-- Blazor Component for Invoice Editing -->
-    <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)" render-mode="Server" />
+    <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)" render-mode="Server" 
+               param-UserName='@HttpContext.Session.GetString("UserName")' />
+
 </div>
 
 @section Scripts {

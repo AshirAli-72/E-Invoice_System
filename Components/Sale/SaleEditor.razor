@@ -83,7 +83,8 @@
                             @if (p.Stock <= 0)
                             {
                                 <div class="out-of-stock-overlay">Out of Stock</div>
-                            }
+                            }  
+
                             @if (!string.IsNullOrEmpty(p.Image))
                             {
                                 <img src="/product-images/@System.IO.Path.GetFileName(p.Image)" alt="Product" />
@@ -851,8 +852,10 @@
                         status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
                         is_returned = false, 
                         description = saleDescription,
-                        expiry_date = item.expiry_date ?? DateTime.Now.ToString("yyyy-MM-dd") 
+                        expiry_date = item.expiry_date ?? DateTime.Now.ToString("yyyy-MM-dd"),
+                        user_id = currentUserId 
                     };
+
                     context.sales.Add(sale);
                 }
                 

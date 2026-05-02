@@ -28,7 +28,7 @@
         </div>
 
         <div class="receipt-meta-v4">
-            <div class="meta-row-v4">Cashier: @(Model.Invoice.user_id?.ToString() ?? "nill")</div>
+            <div class="meta-row-v4">Cashier: @Model.CashierName</div>
             <div class="meta-row-v4">Customer: @Model.Invoice.customer_name</div>
         </div>
 
