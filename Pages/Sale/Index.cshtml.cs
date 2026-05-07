@@ -92,7 +92,7 @@ namespace E_Invoice_system.Pages.Sale
                     })
                     .ToListAsync();
 
-                Sales = salesList.Where(s => s.qty > 0).ToList();
+                Sales = salesList.Where(s => s.qty > 0 && !s.IsReturned).ToList();
 
                 // ── Returns Pagination ────────────────────────────────────────────
                 IQueryable<ReturnDetail> returnsQuery = _context.returns.AsNoTracking();
