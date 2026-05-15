@@ -58,31 +58,40 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseResponseCompression(); 
-app.UseStaticFiles();
 
-string imagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\images";
-if (!System.IO.Directory.Exists(imagesDir)) System.IO.Directory.CreateDirectory(imagesDir);
+// Serve images from the specific debug folder as requested by the user
+string contentRoot = app.Environment.ContentRootPath;
+string imagesDir = Path.Combine(contentRoot, "bin", "Debug", "images");
+Console.WriteLine($"[DEBUG] Serving product images from: {imagesDir}");
+string logoDir = Path.Combine(contentRoot, "bin", "Debug", "Logo");
+string empImagesDir = Path.Combine(contentRoot, "bin", "Debug", "emp_image");
+
+if (!Directory.Exists(imagesDir)) Directory.CreateDirectory(imagesDir);
+if (!Directory.Exists(logoDir)) Directory.CreateDirectory(logoDir);
+if (!Directory.Exists(empImagesDir)) Directory.CreateDirectory(empImagesDir);
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imagesDir),
     RequestPath = "/product-images"
 });
 
-string logoDir = @"D:\netcore\E-Invoice_system\bin\Debug\Logo";
-if (!System.IO.Directory.Exists(logoDir)) System.IO.Directory.CreateDirectory(logoDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(logoDir),
     RequestPath = "/store-logo"
 });
 
-string empImagesDir = @"D:\netcore\E-Invoice_system\bin\Debug\emp_image";
-if (!System.IO.Directory.Exists(empImagesDir)) System.IO.Directory.CreateDirectory(empImagesDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(empImagesDir),
     RequestPath = "/emp-image"
 });
+
+app.UseStaticFiles(); // Default for wwwroot
+
+
+
 app.UseRouting();
 
 

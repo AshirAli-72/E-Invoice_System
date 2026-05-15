@@ -415,33 +415,152 @@ function exportTableToCSV(tableId, filename) {
     document.body.removeChild(downloadLink);
 }
 
-function printElement(elementId) {
+function printElement(elementId, reportTitle, storeInfo) {
     const element = document.getElementById(elementId);
     if (!element) return;
 
-    const printWindow = window.open('', '_blank', 'height=600,width=800');
-    printWindow.document.write('<html><head><title>Report Print</title>');
-    
-    // Copy styles
-    const styles = document.querySelectorAll('link[rel="stylesheet"], style');
-    styles.forEach(style => {
-        printWindow.document.write(style.outerHTML);
+    // Create Modal Overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'print-preview-overlay';
+    Object.assign(overlay.style, {
+        position: 'fixed', top: '0', left: '0', width: '100vw', height: '100vh',
+        background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(8px)',
+        zIndex: '100000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        opacity: '0', transition: 'opacity 0.4s ease'
     });
-    
-    printWindow.document.write('</head><body>');
-    printWindow.document.write('<div class="report-print-container">');
-    printWindow.document.write(element.innerHTML);
-    printWindow.document.write('</div>');
-    printWindow.document.write('</body></html>');
-    
-    printWindow.document.close();
-    
-    // Wait for styles to load
-    setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
-    }, 500);
+
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    let logoHtml = storeInfo?.logoUrl ? `<img src="${storeInfo.logoUrl}" style="height: 60px; object-fit: contain;" />` : '';
+
+    overlay.innerHTML = `
+        <div class="print-preview-modal" style="width: 90%; max-width: 1000px; height: 90vh; background: white; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; transform: translateY(20px); transition: transform 0.4s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <!-- Modal Header -->
+            <div style="padding: 1.25rem 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 40px; height: 40px; background: #BC1823; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="ph-printer" style="font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #1e293b;">Print Preview</h3>
+                        <p style="margin: 0; font-size: 0.75rem; color: #64748b; font-weight: 600;">${reportTitle}</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button id="close-preview" style="padding: 0.6rem 1.25rem; background: white; border: 1px solid #e2e8f0; border-radius: 10px; color: #64748b; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                        <i class="ph-x"></i> Cancel
+                    </button>
+                    <button id="confirm-print" style="padding: 0.6rem 2rem; background: #BC1823; border: none; border-radius: 10px; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(188, 24, 35, 0.2); transition: all 0.2s;">
+                        <i class="ph-printer"></i> Print Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content (Scrollable Paper) -->
+            <div id="print-preview-content" style="flex: 1; overflow-y: auto; background: #cbd5e1; padding: 40px 20px; display: flex; justify-content: center;">
+                <div class="paper-page" style="width: 100%; max-width: 800px; background: white; min-height: 1100px; padding: 60px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-radius: 2px; opacity: 0; transform: translateY(10px); transition: all 0.6s ease 0.2s;">
+                    <!-- Report Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #BC1823; padding-bottom: 20px;">
+                        <div style="display: flex; gap: 20px; align-items: center;">
+                            ${logoHtml}
+                            <div>
+                                <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #BC1823; text-transform: uppercase;">${storeInfo?.shopName || 'E-Invoice System'}</h1>
+                                <p style="margin: 4px 0; font-size: 13px; color: #64748b; font-weight: 500;">${storeInfo?.address || ''}</p>
+                                <p style="margin: 4px 0; font-size: 13px; color: #64748b; font-weight: 500;">${storeInfo?.phone || ''}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #1e293b;">${reportTitle}</h2>
+                            <p style="margin: 4px 0; font-size: 12px; color: #94a3b8; font-weight: 600;">Date: ${today}</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Data -->
+                    <div class="printable-data-wrapper">
+                        ${element.innerHTML}
+                    </div>
+
+                    <div style="margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 11px; color: #94a3b8; text-align: center; font-style: italic;">
+                        This document is generated by the E-Invoice Hub. Standard terms and conditions apply.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @media print {
+                /* Hide everything except the print overlay */
+                body > *:not(#print-preview-overlay) { display: none !important; }
+                #print-preview-overlay { 
+                    position: static !important; 
+                    display: block !important; 
+                    background: white !important; 
+                    padding: 0 !important; 
+                    margin: 0 !important; 
+                    width: 100% !important; 
+                    height: auto !important;
+                }
+                .print-preview-modal { 
+                    position: static !important;
+                    width: 100% !important; 
+                    max-width: none !important; 
+                    height: auto !important; 
+                    transform: none !important; 
+                    box-shadow: none !important; 
+                    background: white !important;
+                    display: block !important;
+                }
+                #print-preview-content { 
+                    background: white !important; 
+                    padding: 0 !important; 
+                    overflow: visible !important; 
+                    display: block !important;
+                }
+                .paper-page { 
+                    box-shadow: none !important; 
+                    padding: 40px !important; 
+                    width: 100% !important; 
+                    max-width: none !important; 
+                    opacity: 1 !important; 
+                    transform: none !important; 
+                    display: block !important;
+                }
+                /* Hide UI controls during print */
+                #close-preview, #confirm-print, .print-preview-modal > div:first-child, .no-print { 
+                    display: none !important; 
+                }
+                
+                table { width: 100% !important; border-collapse: collapse !important; margin-top: 20px; }
+                th { background: #f8fafc !important; color: #1e293b !important; border-bottom: 2px solid #BC1823 !important; padding: 10px !important; text-align: left !important; }
+                td { border-bottom: 1px solid #f1f5f9 !important; padding: 10px !important; }
+            }
+        </style>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Trigger Fade-In
+    requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.querySelector('.print-preview-modal').style.transform = 'translateY(0)';
+        setTimeout(() => {
+            overlay.querySelector('.paper-page').style.opacity = '1';
+            overlay.querySelector('.paper-page').style.transform = 'translateY(0)';
+        }, 400);
+    });
+
+    // Close logic
+    const closeBtn = overlay.querySelector('#close-preview');
+    closeBtn.onclick = () => {
+        overlay.style.opacity = '0';
+        overlay.querySelector('.print-preview-modal').style.transform = 'translateY(20px)';
+        setTimeout(() => overlay.remove(), 400);
+    };
+
+    // Print logic
+    const printBtn = overlay.querySelector('#confirm-print');
+    printBtn.onclick = () => {
+        window.print();
+    };
 }
 
 function renderReportChart(canvasId, data) {
@@ -452,17 +571,22 @@ function renderReportChart(canvasId, data) {
     const existingChart = Chart.getChart(ctx);
     if (existingChart) existingChart.destroy();
 
+    const chartType = data.type || 'line';
+    const isPie = chartType === 'pie' || chartType === 'doughnut';
+
     new Chart(ctx, {
-        type: 'line',
+        type: chartType,
         data: {
             labels: data.labels,
             datasets: [{
                 label: data.label,
                 data: data.values,
-                borderColor: '#BC1823',
-                backgroundColor: 'rgba(188, 24, 35, 0.1)',
-                borderWidth: 3,
-                fill: true,
+                borderColor: isPie ? '#fff' : '#BC1823',
+                backgroundColor: isPie ? 
+                    ['#BC1823', '#1e293b', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'] : 
+                    (chartType === 'bar' ? '#BC1823' : 'rgba(188, 24, 35, 0.1)'),
+                borderWidth: isPie ? 2 : 3,
+                fill: !isPie && chartType !== 'bar',
                 tension: 0.4,
                 pointRadius: 4,
                 pointHoverRadius: 6
@@ -472,9 +596,9 @@ function renderReportChart(canvasId, data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: isPie }
             },
-            scales: {
+            scales: isPie ? {} : {
                 y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             }

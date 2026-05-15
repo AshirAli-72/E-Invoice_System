@@ -1,0 +1,544 @@
+@using E_Invoice_system.Models
+@using E_Invoice_system.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject IJSRuntime JSRuntime
+
+<div class="product-hub-container">
+    <!-- Breadcrumbs -->
+    <div class="hub-breadcrumbs no-print">
+        <div class="breadcrumb-item">
+            <i class="ph-house-line"></i>
+            <span>Dashboard</span>
+        </div>
+        <i class="ph-caret-right separator"></i>
+        <div class="breadcrumb-item clickable" @onclick="OnBack">
+            <span>Reports Center</span>
+        </div>
+        <i class="ph-caret-right separator"></i>
+        <div class="breadcrumb-item active">
+            <span>Product Catalog</span>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="hub-header no-print">
+        <div class="header-content">
+            <h1 class="hub-title">Product Analytics</h1>
+            <p class="hub-subtitle">Analyze your inventory composition and product intelligence</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-outline" @onclick='() => ExportToCSV("productTable")'>
+                <i class="ph-file-csv"></i> Export CSV
+            </button>
+            <button class="btn-primary-gradient" @onclick="PrintReport">
+                <i class="ph-printer"></i> Print Catalog
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Glass -->
+    <div class="filters-glass no-print">
+        <div class="filters-inner">
+            <div class="filter-group">
+                <label><i class="ph-calendar"></i> Date Range</label>
+                <div class="date-input-group">
+                    <input type="date" @bind="fromDate" />
+                    <span class="to-label">to</span>
+                    <input type="date" @bind="toDate" />
+                </div>
+            </div>
+            <div class="filter-group">
+                <label><i class="ph-package"></i> Select Product</label>
+                <select @bind="selectedProductId">
+                    <option value="All">All Products</option>
+                    @foreach (var p in allProductsList)
+                    {
+                        <option value="@p.id">@p.prod_name</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="ph-tag"></i> Category</label>
+                <select @bind="selectedCategory">
+                    <option value="All">All Categories</option>
+                    @foreach (var cat in categoriesList)
+                    {
+                        <option value="@cat.id">@cat.category_title</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="ph-check-circle"></i> Status</label>
+                <select @bind="selectedStatus">
+                    <option value="All">All Statuses</option>
+                    <option value="Active">Active Only</option>
+                    <option value="Inactive">Inactive Only</option>
+                </select>
+            </div>
+            <div class="filter-actions-row">
+                <button class="btn-reset-text" @onclick="ResetFilters">Reset Filters</button>
+                <button class="btn-generate-glow" @onclick="LoadData">
+                    <i class="ph-lightning"></i> Generate Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="fullReportContainer">
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card-premium border-purple">
+                    <div class="stat-info">
+                        <span class="label">Active Products</span>
+                        <h2 class="value">@(isGenerated ? allProductsList.Count(p => p.status == "Active").ToString() : "---")</h2>
+                    </div>
+                    <div class="stat-icon purple-glow"><i class="ph-package"></i></div>
+                    <div class="stat-progress"><div class="bar" style="width: @(isGenerated ? "100%" : "0%"); background: #8b5cf6;"></div></div>
+                </div>
+
+                <div class="stat-card-premium border-red">
+                    <div class="stat-info">
+                        <span class="label">Inactive Items</span>
+                        <h2 class="value">@(isGenerated ? allProductsList.Count(p => p.status == "Inactive").ToString() : "---")</h2>
+                    </div>
+                    <div class="stat-icon red-glow"><i class="ph-prohibit"></i></div>
+                    <div class="stat-progress"><div class="bar" style="width: @(isGenerated ? "100%" : "0%"); background: #BC1823;"></div></div>
+                </div>
+
+                <div class="stat-card-premium border-blue">
+                    <div class="stat-info">
+                        <span class="label">Total SKUs</span>
+                        <h2 class="value">@(isGenerated ? allProductsList.Count.ToString() : "---")</h2>
+                    </div>
+                    <div class="stat-icon blue-glow"><i class="ph-tag"></i></div>
+                    <div class="stat-progress"><div class="bar" style="width: @(isGenerated ? "100%" : "0%"); background: #3b82f6;"></div></div>
+                </div>
+
+                <div class="stat-card-premium border-orange">
+                    <div class="stat-info">
+                        <span class="label">Product Categories</span>
+                        <h2 class="value">@(isGenerated ? categoriesList.Count.ToString() : "---")</h2>
+                    </div>
+                    <div class="stat-icon orange-glow"><i class="ph-folders"></i></div>
+                    <div class="stat-progress"><div class="bar" style="width: @(isGenerated ? "100%" : "0%"); background: #f59e0b;"></div></div>
+                </div>
+            </div>
+
+            <!-- Chart & Insight Row -->
+            <div class="insight-row">
+                <div class="glass-card chart-container">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="ph-chart-pie"></i> Category Distribution</h3>
+                        <div class="card-badge">Product Mix</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        @if (isGenerated)
+                        {
+                            <canvas id="productHubChart"></canvas>
+                        }
+                        else
+                        {
+                            <div class="chart-skeleton">
+                                <i class="ph-package"></i>
+                                <p>Generate report to see category distribution</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="glass-card side-insights">
+                    <div class="insights-tabs">
+                        <div class="tab-item active"><i class="ph-magnifying-glass"></i> Top Categories</div>
+                    </div>
+                    <div class="insights-content">
+                        @if (isGenerated && categoryInsights.Any())
+                        {
+                            @foreach (var cat in categoryInsights.Take(5))
+                            {
+                                <div class="product-mini-item">
+                                    <div class="prod-details">
+                                        <span class="prod-name">@cat.Name</span>
+                                        <span class="prod-meta">@cat.Count Products</span>
+                                    </div>
+                                    <div class="prod-value" style="color: #3b82f6;">@cat.Percentage.ToString("N0")%</div>
+                                </div>
+                            }
+                        }
+                        else if (!isGenerated)
+                        {
+                            <div class="empty-mini">Awaiting analysis...</div>
+                        }
+                        else
+                        {
+                            <div class="empty-mini">No data available</div>
+                        }
+
+                        <div class="mix-header">
+                            <h4 class="mix-title">Product Type Mix</h4>
+                        </div>
+                        <div class="mix-content">
+                            @if (isGenerated)
+                            {
+                                @foreach (var type in typeStats)
+                                {
+                                    <div class="mix-item">
+                                        <div class="mix-labels">
+                                            <span>@type.Label</span>
+                                            <span>@type.Percent.ToString("N0")%</span>
+                                        </div>
+                                        <div class="mix-bar-wrap">
+                                            <div class="mix-bar" style="width: @(type.Percent)%; background: @(type.Color);"></div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="mix-skeleton"></div>
+                                <div class="mix-skeleton"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="glass-card table-section">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="ph-package"></i> Master Product List</h3>
+                    <div class="card-actions no-print">
+                         <span class="count-badge">@(isGenerated ? products.Count : 0) Records</span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    @if (isLoading)
+                    {
+                        <div class="premium-loader">
+                            <i class="ph-spinner ph-spin"></i>
+                            <span>Processing Intelligence...</span>
+                        </div>
+                    }
+                    else if (isGenerated && products.Any())
+                    {
+                        <table class="premium-table" id="productTable">
+                            <thead>
+                                <tr>
+                                    <th>Barcode</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Unit</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in products)
+                                {
+                                    <tr>
+                                        <td><span class="badge-bill">@p.barcode</span></td>
+                                        <td class="font-bold">@p.prod_name</td>
+                                        <td>@p.CategoryName</td>
+                                        <td>@p.unit</td>
+                                        <td>@p.item_type</td>
+                                        <td>
+                                            <span class="badge-status @(p.status?.ToLower() == "active" ? "sale" : "return")">@p.status</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else if (!isGenerated)
+                    {
+                        <div class="empty-hero">
+                            <i class="ph-package"></i>
+                            <h3>Catalog Analytics Ready</h3>
+                            <p>Set your filters and click <strong>Generate Analysis</strong> to view the product master list.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-hero">
+                            <i class="ph-package"></i>
+                            <h3>Catalog Empty</h3>
+                            <p>No products found matching your current parameters.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #BC1823 0%, #8b121a 100%);
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: rgba(226, 232, 240, 0.8);
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .product-hub-container { padding: 1.5rem; background: #f8fafc; min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Breadcrumbs */
+    .hub-breadcrumbs { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; color: var(--text-muted); font-size: 0.85rem; }
+    .breadcrumb-item { display: flex; align-items: center; gap: 0.4rem; font-weight: 500; }
+    .breadcrumb-item.clickable { cursor: pointer; transition: color 0.2s; }
+    .breadcrumb-item.clickable:hover { color: #BC1823; }
+    .breadcrumb-item.active { color: var(--text-main); font-weight: 700; }
+    .separator { font-size: 0.7rem; opacity: 0.5; }
+
+    /* Header */
+    .hub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .hub-title { font-size: 2rem; font-weight: 900; color: var(--text-main); margin: 0; letter-spacing: -0.5px; }
+    .hub-subtitle { margin: 4px 0 0; color: var(--text-muted); font-size: 0.95rem; }
+
+    .header-actions { display: flex; gap: 1rem; }
+    .btn-outline { padding: 0.75rem 1.25rem; border: 1.5px solid #e2e8f0; border-radius: 12px; background: white; color: var(--text-main); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; transition: all 0.2s; }
+    .btn-outline:hover { border-color: #BC1823; color: #BC1823; transform: translateY(-1px); }
+
+    .btn-primary-gradient { padding: 0.75rem 1.5rem; background: var(--primary-gradient); border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; box-shadow: 0 4px 12px rgba(188, 24, 35, 0.25); transition: all 0.2s; }
+    .btn-primary-gradient:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(188, 24, 35, 0.35); }
+
+    /* Filters Glass */
+    .filters-glass { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); }
+    .filters-inner { display: flex; flex-direction: row; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+    .filter-group { flex: 1 1 200px; min-width: 180px; max-width: 260px; display: flex; flex-direction: column; gap: 0.5rem; }
+    .filter-group label { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+    .filter-group select, .filter-group input { width: 100%; padding: 0 0.8rem; border-radius: 10px; border: 1px solid #e2e8f0; background: #fdfdfd; font-size: 0.85rem; color: var(--text-main); font-weight: 600; transition: all 0.2s; height: 44px; }
+    .filter-group select:focus, .filter-group input:focus { border-color: #BC1823; outline: none; box-shadow: 0 0 0 3px rgba(188, 24, 35, 0.1); }
+    .date-input-group { display: flex; align-items: center; gap: 0.4rem; width: 100%; }
+    .date-input-group input { flex: 1; min-width: 0; padding: 0 0.5rem; font-size: 0.8rem; }
+    .to-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+    
+    .filter-actions-row { flex: 0 0 auto; display: flex; justify-content: flex-end; align-items: flex-end; gap: 1rem; margin-left: auto; padding-top: 1.35rem; }
+    .btn-reset-text { background: none; border: none; color: var(--text-muted); font-weight: 700; cursor: pointer; font-size: 0.85rem; white-space: nowrap; }
+    .btn-reset-text:hover { color: #ef4444; }
+    .btn-generate-glow { padding: 0 1.75rem; height: 44px; background: #1e293b; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; transition: all 0.3s; white-space: nowrap; font-size: 0.85rem; }
+    .btn-generate-glow:hover { background: #0f172a; transform: scale(1.02); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.5); }
+
+    /* Dashboard Grid */
+    .dashboard-grid { display: flex; flex-direction: column; gap: 2rem; }
+
+    /* Stats Row */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+    .stat-card-premium { background: white; padding: 1.5rem; border-radius: 20px; position: relative; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.3s; }
+    .stat-card-premium:hover { transform: translateY(-5px); box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1); }
+    .stat-card-premium.border-purple { border-bottom: 4px solid #8b5cf6; }
+    .stat-card-premium.border-red { border-bottom: 4px solid #BC1823; }
+    .stat-card-premium.border-blue { border-bottom: 4px solid #3b82f6; }
+    .stat-card-premium.border-orange { border-bottom: 4px solid #f59e0b; }
+
+    .stat-info .label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .stat-info .value { font-size: 1.85rem; font-weight: 900; color: var(--text-main); margin: 0.5rem 0; }
+    
+    .stat-icon { position: absolute; top: 1.5rem; right: 1.5rem; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .red-glow { background: #fef2f2; color: #BC1823; }
+    .purple-glow { background: #f5f3ff; color: #8b5cf6; }
+    .blue-glow { background: #eff6ff; color: #3b82f6; }
+    .orange-glow { background: #fffbeb; color: #f59e0b; }
+
+    .stat-progress { height: 4px; background: #f1f5f9; border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+    .stat-progress .bar { height: 100%; transition: width 1s ease-out; }
+
+    /* Insight Row */
+    .insight-row { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; }
+    .glass-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+    
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .card-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.6rem; margin: 0; }
+    .card-badge { font-size: 0.7rem; font-weight: 700; color: #BC1823; background: #fef2f2; padding: 0.3rem 0.75rem; border-radius: 99px; }
+
+    .chart-wrapper { height: 320px; width: 100%; }
+
+    /* Side Insights */
+    .insights-tabs { display: flex; border-bottom: 2px solid #f1f5f9; margin-bottom: 1.5rem; }
+    .tab-item { padding: 0.75rem 0; font-weight: 800; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab-item.active { color: #BC1823; border-color: #BC1823; }
+
+    .product-mini-item { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid #f8fafc; }
+    .prod-name { font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: block; }
+    .prod-meta { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    .prod-value { font-size: 0.95rem; font-weight: 800; color: #10b981; }
+
+    .mix-header { margin-top: 2rem; margin-bottom: 1rem; }
+    .mix-title { font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin: 0; }
+    .mix-item { margin-bottom: 1rem; }
+    .mix-labels { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-muted); }
+    .mix-bar-wrap { height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+    .mix-bar { height: 100%; border-radius: 99px; }
+
+    /* Table */
+    .table-container { overflow-x: auto; min-height: 200px; position: relative; }
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .premium-table th { text-align: left; padding: 1.25rem 1rem; background: #f8fafc; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #f1f5f9; }
+    .premium-table td { padding: 1.25rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; color: #334155; }
+    .premium-table tr:hover td { background: #fdfdfd; }
+
+    .badge-bill { padding: 0.3rem 0.6rem; background: #f1f5f9; color: #475569; border-radius: 8px; font-weight: 800; font-size: 0.75rem; font-family: monospace; }
+    .badge-status { padding: 0.25rem 0.75rem; border-radius: 99px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; }
+    .badge-status.sale { background: #ecfdf5; color: #059669; }
+    .badge-status.return { background: #fef2f2; color: #dc2626; }
+    
+    .font-bold { font-weight: 700; color: var(--text-main); }
+    .count-badge { padding: 0.3rem 0.75rem; background: #1e293b; color: white; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
+
+    .premium-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 0; gap: 1rem; }
+    .premium-loader i { font-size: 2.5rem; color: #BC1823; }
+
+    .empty-hero { text-align: center; padding: 5rem 2rem; color: var(--text-muted); }
+    .empty-hero i { font-size: 4rem; opacity: 0.2; margin-bottom: 1.5rem; color: #BC1823; }
+
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .dashboard-grid > * { animation: fadeIn 0.5s ease-out both; }
+
+    .chart-skeleton { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border-radius: 15px; border: 2px dashed #e2e8f0; color: var(--text-muted); gap: 1rem; }
+    .chart-skeleton i { font-size: 3rem; opacity: 0.3; }
+    .mix-skeleton { height: 8px; background: #f1f5f9; border-radius: 99px; margin-bottom: 1.5rem; width: 100%; }
+
+    @@media (max-width: 1200px) {
+        .insight-row { grid-template-columns: 1fr; }
+    }
+</style>
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private DateTime fromDate = DateTime.Now.AddDays(-30);
+    private DateTime toDate = DateTime.Now;
+    private string selectedProductId = "All";
+
+    private class ProductVM : ProductService { public string CategoryName { get; set; } = ""; }
+    private List<ProductVM> products = new();
+    private List<Category> categoriesList = new();
+    private List<ProductService> allProductsList = new();
+    private bool isLoading = false;
+    private bool isGenerated = false;
+    private string selectedCategory = "All";
+    private string selectedStatus = "All";
+    private string currencySymbol = "Rs";
+    private StoreConfiguration storeInfo = new();
+
+    private class CatInsight { public string Name { get; set; } = ""; public int Count { get; set; } public decimal Percentage { get; set; } }
+    private List<CatInsight> categoryInsights = new();
+
+    private class TypeStat { public string Label { get; set; } = ""; public decimal Percent { get; set; } public string Color { get; set; } = ""; }
+    private List<TypeStat> typeStats = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMetadata();
+    }
+
+    private async Task LoadMetadata()
+    {
+        using var context = DbFactory.CreateDbContext();
+        categoriesList = await context.categories.AsNoTracking().ToListAsync();
+        allProductsList = await context.products_services.AsNoTracking().OrderBy(x => x.prod_name).ToListAsync();
+        var currency = await context.currencies.FirstOrDefaultAsync(c => c.is_active);
+        if (currency != null) currencySymbol = currency.symbol ?? "Rs";
+
+        var config = await context.store_configurations.AsNoTracking().FirstOrDefaultAsync();
+        if (config != null) storeInfo = config;
+    }
+
+    private async Task ResetFilters()
+    {
+        selectedCategory = "All";
+        selectedStatus = "All";
+        selectedProductId = "All";
+        fromDate = DateTime.Now.AddDays(-30);
+        toDate = DateTime.Now;
+        isGenerated = false;
+        products.Clear();
+        StateHasChanged();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        isGenerated = true;
+        StateHasChanged();
+
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var query = context.products_services.AsNoTracking();
+
+            if (selectedStatus != "All") query = query.Where(x => x.status == selectedStatus);
+            if (selectedProductId != "All") 
+            {
+                int pId = int.Parse(selectedProductId);
+                query = query.Where(x => x.id == pId);
+            }
+            if (selectedCategory != "All") 
+            {
+                int catId = int.Parse(selectedCategory);
+                query = query.Where(x => x.category_id == catId);
+            }
+            
+            var data = await query.ToListAsync();
+            var cats = categoriesList.ToDictionary(c => c.id, c => c.category_title);
+
+            products = data.Select(p => new ProductVM
+            {
+                id = p.id,
+                prod_name = p.prod_name,
+                barcode = p.barcode,
+                unit = p.unit,
+                category_id = p.category_id,
+                status = p.status,
+                item_type = p.item_type,
+                CategoryName = p.category_id.HasValue && cats.ContainsKey(p.category_id.Value) ? cats[p.category_id.Value] : "N/A"
+            }).OrderBy(x => x.prod_name).ToList();
+
+            // Category Insights
+            int total = allProductsList.Count;
+            categoryInsights = allProductsList.GroupBy(p => p.category_id)
+                .Select(g => new CatInsight {
+                    Name = g.Key.HasValue && cats.ContainsKey(g.Key.Value) ? cats[g.Key.Value] : "Uncategorized",
+                    Count = g.Count(),
+                    Percentage = total > 0 ? (g.Count() * 100m / total) : 0
+                }).OrderByDescending(x => x.Count).ToList();
+
+            // Chart Data
+            var chartLabels = categoryInsights.Select(c => c.Name).ToArray();
+            var chartValues = categoryInsights.Select(c => (decimal)c.Count).ToArray();
+            await JSRuntime.InvokeVoidAsync("renderReportChart", "productHubChart", new { labels = chartLabels, values = chartValues, label = "Product Count", type = "doughnut" });
+
+            // Type Mix
+            var types = allProductsList.GroupBy(p => p.item_type ?? "General")
+                .Select(g => new { Label = g.Key, Count = g.Count() })
+                .ToList();
+            
+            typeStats = types.Select((t, index) => new TypeStat {
+                Label = t.Label,
+                Percent = total > 0 ? (t.Count * 100m / total) : 0,
+                Color = index % 2 == 0 ? "#8b5cf6" : "#3b82f6"
+            }).ToList();
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
+        finally { isLoading = false; StateHasChanged(); }
+    }
+
+    private async Task PrintReport() { 
+        string logoUrl = "";
+        if (!string.IsNullOrEmpty(storeInfo.LogoPath)) logoUrl = $"/store-logo/{Path.GetFileName(storeInfo.LogoPath)}";
+
+        var printData = new {
+            shopName = storeInfo.ShopName,
+            address = storeInfo.Address,
+            phone = storeInfo.Phone1,
+            email = "", 
+            logoUrl = logoUrl
+        };
+
+        await JSRuntime.InvokeVoidAsync("printElement", "fullReportContainer", "Product Catalog Report", printData); 
+    }
+    private async Task ExportToCSV(string id) { await JSRuntime.InvokeVoidAsync("exportTableToCSV", id, "Product_Report.csv"); }
+}
+

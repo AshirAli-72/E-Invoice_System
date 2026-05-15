@@ -1,6 +1,5 @@
 @page
 @model E_Invoice_system.Pages.Invoice.IndexModel
-@using System.Text.Json
 @{
     ViewData["Title"] = "Invoices";
 }
@@ -11,7 +10,10 @@
         <div class="page-header">
             <div class="page-header-left">
                 <i class="ph-file-text page-header-icon"></i>
-                <h2 class="page-header-title">Invoice Management</h2>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <h2 class="page-header-title">Invoice Management</h2>
+                    <p class="text-muted font-sm" style="margin: 0;">View and manage your generated customer invoices.</p>
+                </div>
             </div>
             <button type="button" onclick="openInvoiceModal()" class="btn-primary">
                 <i class="ph-file-plus"></i> Create New Invoice
@@ -56,8 +58,11 @@
                             </td>
                             <td class="text-right" style="padding-right: 1.5rem;">
                                 <div class="actions-container actions-right">
-                                    <a href="/Invoice/Details/@item.id" class="btn-icon-sm btn-view" title="View Invoice">
+                                    <a href="/Invoice/Details/@item.id" class="btn-icon-sm btn-view" title="View Details">
                                         <i class="ph-eye"></i>
+                                    </a>
+                                    <a href="/Invoice/Print/@item.id" target="_blank" class="btn-icon-sm btn-edit" style="background: var(--surface); color: var(--text-main);" title="Print Receipt">
+                                        <i class="ph-printer"></i>
                                     </a>
                                     <form method="post" asp-page-handler="Delete" asp-route-id="@item.id" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this invoice?')">
                                         <button type="submit" class="btn-icon-sm btn-delete">
@@ -139,7 +144,8 @@
             <button type="button" class="form-panel-close" onclick="closeInvoiceModal()"><i class="ph-x"></i></button>
         </div>
         <div class="form-panel-body" style="padding: 0;">
-            <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)" render-mode="ServerPrerendered" />
+            <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)" render-mode="ServerPrerendered" 
+                       param-UserName='@HttpContext.Session.GetString("UserName")' />
         </div>
     </div>
 </div>
@@ -152,5 +158,11 @@
     function closeInvoiceModal() {
         document.getElementById('invoiceModalOverlay').style.display = 'none';
         document.body.classList.remove('modal-open');
+        // Reload page to see new invoice
+        location.reload();
     }
 </script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

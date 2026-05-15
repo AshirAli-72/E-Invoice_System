@@ -4,6 +4,7 @@
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
 @inject Microsoft.Extensions.Caching.Memory.IMemoryCache Cache
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container">
@@ -269,7 +270,7 @@
 
         try
         {
-            var logoFolderPath = @"D:\netcore\E-Invoice_system\bin\Debug\Logo";
+            var logoFolderPath = Path.Combine(Environment.ContentRootPath, "bin", "Debug", "Logo");
             if (!Directory.Exists(logoFolderPath)) Directory.CreateDirectory(logoFolderPath);
 
             var fileName = $"logo_{Guid.NewGuid().ToString().Substring(0, 8)}{Path.GetExtension(file.Name)}";

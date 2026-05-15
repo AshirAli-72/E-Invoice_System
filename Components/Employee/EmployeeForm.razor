@@ -5,6 +5,7 @@
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
 @inject IJSRuntime JSRuntime
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
@@ -424,7 +425,7 @@
         isSubmitting = true;
         try
         {
-            string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\emp_image";
+            string storagePath = Path.Combine(Environment.ContentRootPath, "bin", "Debug", "emp_image");
             if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
 
             if (selectedFile != null)

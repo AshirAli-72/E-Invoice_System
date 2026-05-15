@@ -5,6 +5,7 @@
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager Nav
 @inject IJSRuntime JSRuntime
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @rendermode RenderMode.InteractiveServer
 
 <div class="management-container @(showForm ? "modal-active" : "")">
@@ -66,7 +67,8 @@
                             <td>
                                 @if (!string.IsNullOrEmpty(item.pic))
                                 {
-                                    <img src="/product-images/@System.IO.Path.GetFileName(item.pic)" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZjFmNWY5Ii8+PC9zdmc+';" />
+                                    var fileName = System.IO.Path.GetFileName(item.pic);
+                                    <img src="/product-images/@fileName" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZjFmNWY5Ii8+PC9zdmc+';" />
                                 }
                                 else
                                 {
@@ -596,8 +598,8 @@
         if (!string.IsNullOrEmpty(imgUrl)) return imgUrl;
         if (!string.IsNullOrEmpty(productModel.pic))
         {
-            try { return "/product-images/" + Path.GetFileName(productModel.pic); }
-            catch { return "/product-images/" + productModel.pic; }
+            var fileName = Path.GetFileName(productModel.pic);
+            return "/product-images/" + fileName;
         }
         return "";
     }
@@ -611,7 +613,7 @@
         {
             if (selectedFile != null)
             {
-                string storagePath = @"D:\netcore\E-Invoice_system\bin\Debug\images";
+                string storagePath = Path.Combine(Environment.ContentRootPath, "bin", "Debug", "images");
                 if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(selectedFile.Name);
                 string path = Path.Combine(storagePath, fileName);
@@ -655,7 +657,23 @@
                 context.products_services.Add(productModel);
                 await context.SaveChangesAsync();
             }
-            // Note: Per user request, we do NOT update products_services during Edit anymore
+            else
+            {
+                // Update product details
+                var existingProd = await context.products_services.FirstOrDefaultAsync(p => p.id == productModel.id);
+                if (existingProd != null)
+                {
+                    existingProd.prod_name = productModel.prod_name;
+                    existingProd.category_id = productModel.category_id;
+                    existingProd.brand_id = productModel.brand_id;
+                    existingProd.unit = productModel.unit;
+                    existingProd.item_type = productModel.item_type;
+                    existingProd.prod_state = productModel.prod_state;
+                    existingProd.pic = productModel.pic; // This ensures the image path is updated!
+                    existingProd.status = productModel.status;
+                    context.products_services.Update(existingProd);
+                }
+            }
             
             // Save/Update stock details
             stockModel.item_barcode = productModel.barcode;

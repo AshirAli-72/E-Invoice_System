@@ -17,7 +17,7 @@
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div style="padding: 1rem; border-radius: 8px; background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
-            <i class="ph-warning" style="font-size: 1.1rem;"></i> @errorMessage
+            <i class="ph-warning" style="font-size: 1.1rem;"></i> @errorMessage.
         </div>
     }
 
@@ -52,6 +52,48 @@
         <label class="form-label">Invoice Number</label>
         <input class="form-control" @bind="invoiceNo" placeholder="Auto-generated if blank" />
     </div>
+
+    @if (showPreviousItems)
+    {
+        <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
+            <div class="form-panel-title" style="margin-bottom: 0.75rem; font-size: 0.95rem;">
+                <i class="ph-clock-counter-clockwise form-icon-primary"></i>
+                Select Customer's Previous Items
+            </div>
+            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 1rem; border: 1px solid #cbd5e1; border-radius: 8px; background: white;">
+                <table class="styled-table" style="margin: 0; font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 0.5rem 1rem;">Select</th>
+                            <th>Bill #</th>
+                            <th>Date</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sale in customerPreviousSales)
+                        {
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;">
+                                    <input type="checkbox" checked="@selectedSaleIds.Contains(sale.id)" @onclick="() => ToggleSaleSelection(sale.id)" style="width: 18px; height: 18px;" />
+                                </td>
+                                <td>@sale.billNo</td>
+                                <td>@sale.date</td>
+                                <td>@sale.qty</td>
+                                <td>@sale.price.ToString("F2")</td>
+                                <td class="font-bold">@sale.total_price.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn-primary" style="width: 100%; height: 38px; font-size: 0.85rem;" @onclick="AddSelectedSalesToInvoice" disabled="@(!selectedSaleIds.Any())">
+                <i class="ph-plus-circle"></i> Add Selected to Invoice
+            </button>
+        </div>
+    }
 
     <hr style="margin: 0.5rem 0; border: none; border-top: 2px dashed #e2e8f0;" />
 
@@ -203,6 +245,11 @@
     private string? successMessage;
 
     [Parameter] public string? UserName { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private List<Sale> customerPreviousSales = new();
+    private HashSet<int> selectedSaleIds = new();
+    private bool showPreviousItems = false;
 
 
 
@@ -225,16 +272,73 @@
         }
     }
 
-    private void OnCustomerChanged(ChangeEventArgs e)
+    private async Task OnCustomerChanged(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int id))
         {
             selectedCustomer = customersList.FirstOrDefault(c => c.id == id);
+            if (selectedCustomer != null)
+            {
+                await LoadCustomerPreviousItems();
+            }
         }
         else
         {
             selectedCustomer = null;
+            customerPreviousSales.Clear();
+            selectedSaleIds.Clear();
+            showPreviousItems = false;
         }
+        StateHasChanged();
+    }
+
+    private async Task LoadCustomerPreviousItems()
+    {
+        if (selectedCustomer == null) return;
+        
+        using var context = DbFactory.CreateDbContext();
+        // Look for sales where description contains [Customer: Name]
+        string searchTag = $"[Customer: {selectedCustomer.name}]";
+        customerPreviousSales = await context.sales
+            .Where(s => s.description != null && s.description.Contains(searchTag))
+            .OrderByDescending(s => s.id)
+            .ToListAsync();
+        
+        showPreviousItems = customerPreviousSales.Any();
+    }
+
+    private void ToggleSaleSelection(int saleId)
+    {
+        if (selectedSaleIds.Contains(saleId))
+            selectedSaleIds.Remove(saleId);
+        else
+            selectedSaleIds.Add(saleId);
+    }
+
+    private void AddSelectedSalesToInvoice()
+    {
+        var selectedSales = customerPreviousSales.Where(s => selectedSaleIds.Contains(s.id)).ToList();
+        foreach (var sale in selectedSales)
+        {
+            // Try to extract name from description if possible, otherwise use a generic name
+            // In SaleEditor, each item is a row, but description is the same for all items in a bill.
+            // Actually, we don't have the product name in the Sale table easily, 
+            // but we can try to find it from products table or just use 'Purchased Item'
+            
+            // Wait, let's look at Sale model again. It doesn't have product name.
+            // But it has a description.
+            
+            invoiceItems.Add(new InvoiceItem
+            {
+                Name = "Purchased Item (Bill: " + sale.billNo + ")",
+                Qty = sale.qty,
+                Price = sale.price,
+                ExpiryDate = sale.expiry_date,
+                Total = sale.total_price
+            });
+        }
+        selectedSaleIds.Clear();
+        errorMessage = null;
         StateHasChanged();
     }
 
@@ -334,8 +438,15 @@
 
             successMessage = "Invoice created successfully!";
             await Task.Delay(500);
-            // Standard Blazor Navigation
-            NavigationManager.NavigateTo("/Invoice/Index", true);
+            
+            if (OnClose.HasDelegate)
+            {
+                await OnClose.InvokeAsync();
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/Invoice/Index", true);
+            }
         }
         catch (Exception ex)
         {

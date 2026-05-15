@@ -53,42 +53,21 @@ body {
 /* ── Left Red Panel ──────────────────────────────────────────────────── */
 .left-panel {
     flex: 1;
-    /* Show only the illustration image as requested */
     background-image: url('/images/invoice-illustration.png');
-    background-position: center center;
+    background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end; /* Push text to bottom since image covers background */
+    justify-content: center;
     overflow: hidden;
 }
 
 
 
-/* Subtle noise/texture overlay */
-.left-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.12);
-    z-index: 1;
-}
-
-/* Decorative circle blobs */
-.left-panel::after {
-    content: '';
-    position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 260px;
-    height: 260px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 50%;
-    z-index: 1;
-}
+/* Clean professional illustration panel */
 
 
 
@@ -97,17 +76,20 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
-    padding: 1.5rem 2rem 2.5rem;
+    padding: 1.5rem;
     width: 100%;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px);
 }
 
 .overlay-content h2 {
-    color: rgba(255,255,255,0.95);
-    font-size: 1.05rem;
-    font-weight: 600;
-    line-height: 1.6;
-    letter-spacing: 0.4px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 
@@ -209,33 +191,34 @@ body {
 
 /* ── Form ────────────────────────────────────────────────────────────── */
 .login-form {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     width: 100%;
 }
 
 .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
     font-size: 0.82rem;
-    font-weight: 600;
-    color: #000000;
-    margin-bottom: 0.45rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.6rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 0.85rem 1rem;
-    border: 1.5px solid rgba(188,24,35,0.5);
+    padding: 1rem 1.2rem;
+    border: 1.5px solid #fca5a5; /* Subtle Red Border */
     background: #f8fafc;
     color: #1e293b;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 0.95rem;
-    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    font-weight: 500;
+    transition: all 0.2s ease;
     outline: none;
     font-family: inherit;
 }
@@ -243,11 +226,7 @@ body {
 .form-group input:focus {
     border-color: #BC1823;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(188,24,35,0.1);
-}
-
-.form-group input::placeholder {
-    color: #94a3b8;
+    box-shadow: 0 0 0 4px rgba(188,24,35,0.08);
 }
 
 /* ── Login Button ────────────────────────────────────────────────────── */

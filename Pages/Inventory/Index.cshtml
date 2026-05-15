@@ -43,7 +43,8 @@
                             <td>
                                 @if (!string.IsNullOrEmpty(item.pic))
                                 {
-                                    <img src="/product-images/@System.IO.Path.GetFileName(item.pic)" alt="Product" style="width: 44px; height: 44px; object-fit: cover; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 10px var(--primary-glow);" />
+                                    var fileName = System.IO.Path.GetFileName(item.pic);
+                                    <img src="/product-images/@fileName" alt="Product" style="width: 44px; height: 44px; object-fit: cover; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 10px var(--primary-glow);" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiBmaWxsPSIjZjFmNWY5Ii8+PC9zdmc+';" />
                                 }
                                 else
                                 {
