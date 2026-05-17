@@ -25,7 +25,7 @@
     <div class="sale-layout-container">
         <!-- Main Content Area (Now Full Width) -->
         <div class="sale-main-wrapper">
-            <header class="top-bar">
+            <header class="top-bar" style="background: white; border-bottom: 1px solid #f1f5f9; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between;">
 
                 <div class="top-bar-left">
                     @using Microsoft.EntityFrameworkCore
@@ -41,14 +41,14 @@
                             catch { }
                         }
                     }
-                    <div class="top-bar-logo-wrap">
-                        <img src="@logoSrc" alt="Logo" class="top-bar-logo" />
-                        <span class="top-bar-logo-label">E-Invoice System</span>
+                    <div style="display:flex; align-items:center; gap: 1.5rem;">
+                        <img src="@logoSrc" alt="SATA Logo" style="height: 32px; object-fit: contain;" />
+                        <span style="font-weight: 800; font-size: 1.15rem; color: #0f172a;">Welcome back!</span>
                     </div>
                 </div>
 
                 <div class="top-bar-center">
-                    <span id="liveClock" class="live-clock">Wednesday, July 2, 2025 - 15:55:16</span>
+                    <span id="liveClock" class="live-clock" style="font-weight: 700; font-size: 0.95rem; color: #0f172a;"></span>
                 </div>
 
                 <div class="top-bar-right">
@@ -59,7 +59,7 @@
                         var initial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
                     }
                     <div class="user-profile-wrapper" style="position: relative;">
-                        <div class="user-avatar-initial" id="profileDropdownToggle" style="cursor: pointer;">
+                        <div class="user-avatar-initial" id="profileDropdownToggle" style="cursor: pointer; background: #BC1823; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
                             @initial
                         </div>
 

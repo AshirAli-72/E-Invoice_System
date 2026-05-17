@@ -121,7 +121,7 @@
         <div class="add-row">
             <div>
                 <label class="inv-label">Select Product / Service</label>
-                <select class="inv-input inv-select" @onchange="OnProductSelected">
+                <select class="inv-input inv-select" value="@selectedProductId" @onchange="OnProductSelected">
                     <option value="0">-- Choose a product --</option>
                     @foreach (var p in productsList)
                     {
@@ -133,15 +133,6 @@
                 <i class="ph-plus-bold"></i> Add Item
             </button>
         </div>
-
-        @if (!string.IsNullOrEmpty(successMessage))
-        {
-            <div class="toast-success"><i class="ph-check-circle"></i> @successMessage</div>
-        }
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="toast-error"><i class="ph-warning-circle"></i> @errorMessage</div>
-        }
 
         <!-- Items Table -->
         @if (invoiceItems.Any())
@@ -268,8 +259,6 @@
     private string status = "Paid";
 
     // ── UI ────────────────────────────────────────
-    private string? errorMessage;
-    private string? successMessage;
     private bool isSubmitting = false;
 
     // ── Init ──────────────────────────────────────
@@ -321,12 +310,9 @@
     // FIX: If same product exists, just increment qty instead of adding new row
     private async Task AddItem()
     {
-        errorMessage = null;
-        successMessage = null;
-
         if (selectedProductId == 0)
         {
-            errorMessage = "Please select a product first.";
+            _ = JS.InvokeVoidAsync("showToast", "Error", "Please select a product first.", "error");
             return;
         }
 
@@ -339,15 +325,14 @@
             existingItem.Qty++;
             existingItem.Total = existingItem.Qty * existingItem.Price;
             CalculateTotals();
-            successMessage = $"Qty updated for \"{existingItem.Name}\".";
+            // _ = JS.InvokeVoidAsync("showToast", "Success", $"Qty updated for \"{existingItem.Name}\".", "success");
             selectedProductId = 0;
-            _ = Task.Run(async () => { await Task.Delay(2000); successMessage = null; await InvokeAsync(StateHasChanged); });
             return;
         }
 
         using var ctx = DbFactory.CreateDbContext();
         var prod = await ctx.products_services.FirstOrDefaultAsync(p => p.id == pid);
-        if (prod == null) { errorMessage = "Product not found."; return; }
+        if (prod == null) { _ = JS.InvokeVoidAsync("showToast", "Error", "Product not found.", "error"); return; }
 
         var stock = await ctx.stock_details
             .Where(s => s.item_barcode == prod.barcode)
@@ -367,10 +352,8 @@
         });
 
         CalculateTotals();
-        successMessage = $"\"{prod.prod_name}\" added!";
+        // _ = JS.InvokeVoidAsync("showToast", "Success", $"\"{prod.prod_name}\" added!", "success");
         selectedProductId = 0;
-
-        _ = Task.Run(async () => { await Task.Delay(2000); successMessage = null; await InvokeAsync(StateHasChanged); });
     }
 
     // ── Qty ───────────────────────────────────────
@@ -386,11 +369,9 @@
 
     private void RemoveItem(InvoiceItem item) { invoiceItems.Remove(item); CalculateTotals(); }
 
-    // ── Submit ────────────────────────────────────
     private async Task SubmitInvoice()
     {
-        errorMessage = null;
-        if (!invoiceItems.Any()) { errorMessage = "Please add at least one item."; return; }
+        if (!invoiceItems.Any()) { _ = JS.InvokeVoidAsync("showToast", "Error", "Please add at least one item.", "error"); return; }
 
         isSubmitting = true;
         try
@@ -416,14 +397,14 @@
             ctx.invoices.Add(inv);
             await ctx.SaveChangesAsync();
 
-            // Show success flash via JS then navigate
-            await JS.InvokeVoidAsync("showInvoiceSuccessFlash");
-            await Task.Delay(1800);
-            NavigationManager.NavigateTo("/Invoice/Index");
+            await JS.InvokeVoidAsync("showToast", "Success", "Invoice has been saved successfully.", "success");
+            await JS.InvokeVoidAsync("eval", "document.getElementById('createInvModal').style.display='none'");
+            await Task.Delay(500);
+            NavigationManager.NavigateTo("/Invoice", true);
         }
         catch (Exception ex)
         {
-            errorMessage = "Save failed: " + ex.Message;
+            _ = JS.InvokeVoidAsync("showToast", "Error", "Save failed: " + ex.Message, "error");
             isSubmitting = false;
         }
     }

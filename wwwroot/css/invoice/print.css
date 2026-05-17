@@ -155,7 +155,8 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     width: 140px;
-    border-bottom-right-radius: 20px;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+    border-top-left-radius: 20px;
 }
 
 .billing-body { padding: 25px; }
@@ -188,6 +189,7 @@ body {
     background: var(--primary-red);
     text-align: center;
     font-size: 24px;
+    clip-path: polygon(0 0, 100% 0, 75% 100%, 0% 100%);
 }
 
 .invoice-table tbody td {
@@ -318,7 +320,18 @@ body {
 .footer-logo { position: absolute; bottom: 30px; right: 40px; z-index: 10; color: var(--primary-red); font-size: 32px; }
 
 @media print {
-    body { background: white; padding: 0; }
-    .print-controls { display: none; }
-    .invoice-a4 { box-shadow: none; border: none; width: 210mm; min-height: 297mm; }
+    @page { size: A4; margin: 0; }
+    body { background: white; padding: 0; margin: 0; }
+    .print-controls, .actions-bar, .no-print { display: none !important; }
+    .invoice-page-wrapper { padding: 0 !important; }
+    .invoice-a4 { 
+        box-shadow: none; 
+        border: none; 
+        width: 210mm; 
+        height: auto; 
+        max-height: 296mm; 
+        overflow: hidden; 
+        page-break-inside: avoid; 
+        page-break-after: avoid;
+    }
 }

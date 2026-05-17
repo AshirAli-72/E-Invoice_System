@@ -234,7 +234,6 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\t3uvnv7ary-{0}-pcpvip1t
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\ke3h83mlbt-{0}-kek7qrqps5-kek7qrqps5.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\io11njlr67-{0}-opq015kjiv-opq015kjiv.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\nsm7m6xegr-{0}-iru6s76ywe-iru6s76ywe.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\ruln6usrnd-{0}-kcwk8qlw07-kcwk8qlw07.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\y2hcoyodtn-{0}-0lilfriqja-0lilfriqja.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\8udpp7yicj-{0}-e6qf2v6ae5-e6qf2v6ae5.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\c71hkegjhu-{0}-a5gdiy5c0v-a5gdiy5c0v.gz
@@ -250,5 +249,7 @@ D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\ejpw7b9vf9-{0}-pshs8e7l
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\5b0x952ws8-{0}-1wntvyrc5r-1wntvyrc5r.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\wvauteo3ck-{0}-zes8x4k133-zes8x4k133.gz
 D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\q06yc68to6-{0}-5vshovn9r0-5vshovn9r0.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\zbgkhzose7-{0}-qx8ho7l2nw-qx8ho7l2nw.gz
-D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\q0d5wq4o0r-{0}-fhkj595668-fhkj595668.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\zbgkhzose7-{0}-53dq15cws9-53dq15cws9.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\q0d5wq4o0r-{0}-f6xdy3ik62-f6xdy3ik62.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\compressed\ruln6usrnd-{0}-fxpd5gwvr4-fxpd5gwvr4.gz
+D:\netcore\E-Invoice_system\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

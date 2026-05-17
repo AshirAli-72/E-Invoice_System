@@ -434,7 +434,7 @@
     </div>
 </div>
 
-<link href="css/sale/create.css" rel="stylesheet" />
+<link href="/css/sale/create.css" rel="stylesheet" />
 
 
 
@@ -733,7 +733,7 @@
 
     private void SetPaymentMethod(string m) { paymentMethod = m; }
 
-    private void ShowAlert(string msg) { stockAlert = msg; StateHasChanged(); Task.Delay(3000).ContinueWith(_ => { stockAlert = null; InvokeAsync(StateHasChanged); }); }
+    private void ShowAlert(string msg) { _ = JSRuntime.InvokeVoidAsync("showToast", "Notice", msg, "warning"); }
 
     private async Task SaveNewCustomer() {
         if (string.IsNullOrEmpty(newCustomer.name)) return;

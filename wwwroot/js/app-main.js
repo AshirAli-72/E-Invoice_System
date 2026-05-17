@@ -56,6 +56,7 @@ const EXCLUDED_PATHS = [
     '/Account/Logout', 
     '/Account/Login', 
     '/sale', 
+    '/invoice',
     '/reports', 
     '/customer', 
     '/product', 
