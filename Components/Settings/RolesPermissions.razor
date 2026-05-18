@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Text.Json
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject IJSRuntime JS
 @rendermode RenderMode.InteractiveServer
 
 <link href="/css/settings/user.css" rel="stylesheet" />
@@ -48,24 +49,7 @@
         </div>
     </div>
 
-    @if (!string.IsNullOrEmpty(successMessage))
-    {
-        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(5, 150, 105, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
-            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
-            </div>
-            <span style="flex: 1;">@successMessage</span>
-        </div>
-    }
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div style="position: fixed; top: 24px; right: 24px; z-index: 10000; min-width: 320px; max-width: 450px; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: white; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1); animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid rgba(255, 255, 255, 0.2);">
-            <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <i class="ph-warning" style="font-size: 1.25rem;"></i>
-            </div>
-            <span style="flex: 1;">@errorMessage</span>
-        </div>
-    }
+
 
     <!-- SECTION 1: SYSTEM AUTHORITIES -->
     <div class="rp-section">
@@ -141,69 +125,7 @@
             </label>
         </div>
     </div>
-
-    <!-- SECTION 2: REPORTS SHOW/HIDDEN -->
-    <div class="rp-section">
-        <div class="rp-section-header">
-            <span class="rp-section-title">REPORTS SHOW/HIDDEN:</span>
-            <input type="checkbox" class="rp-check-all" title="Select/Deselect All"
-                   checked="@AllReportsChecked"
-                   @onchange="ToggleAllReports" />
-        </div>
-        <div class="rp-check-grid">
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.CustomerReport" />
-                <span class="rp-check-box @(currentPermissions.CustomerReport ? "checked" : "")">
-                    @if (currentPermissions.CustomerReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Customer Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.SaleReport" />
-                <span class="rp-check-box @(currentPermissions.SaleReport ? "checked" : "")">
-                    @if (currentPermissions.SaleReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Sales Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.ProductReport" />
-                <span class="rp-check-box @(currentPermissions.ProductReport ? "checked" : "")">
-                    @if (currentPermissions.ProductReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Product Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.InvoiceReport" />
-                <span class="rp-check-box @(currentPermissions.InvoiceReport ? "checked" : "")">
-                    @if (currentPermissions.InvoiceReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Invoice Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.EmployeeReport" />
-                <span class="rp-check-box @(currentPermissions.EmployeeReport ? "checked" : "")">
-                    @if (currentPermissions.EmployeeReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Employee Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.ReturnsReport" />
-                <span class="rp-check-box @(currentPermissions.ReturnsReport ? "checked" : "")">
-                    @if (currentPermissions.ReturnsReport) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Returns Report</span>
-            </label>
-            <label class="rp-check-item">
-                <input type="checkbox" @bind="currentPermissions.DailySummary" />
-                <span class="rp-check-box @(currentPermissions.DailySummary ? "checked" : "")">
-                    @if (currentPermissions.DailySummary) { <i class="ph-check-bold"></i> }
-                </span>
-                <span class="rp-check-label">Daily Summary</span>
-            </label>
-        </div>
-    </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 2px solid var(--primary);">
+    <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 2px solid var(--primary);">
             <button class="rp-btn-primary" @onclick="SavePermissions" disabled="@isSaving" style="padding: 0.625rem 1.4rem;">
                 @if (isSaving)
                 {
@@ -448,13 +370,13 @@
             perms.Settings = currentPermissions.Settings;
             perms.Inventory = currentPermissions.Inventory;
 
-            perms.CustomerReport = currentPermissions.CustomerReport;
-            perms.SaleReport = currentPermissions.SaleReport;
-            perms.ProductReport = currentPermissions.ProductReport;
-            perms.InvoiceReport = currentPermissions.InvoiceReport;
-            perms.EmployeeReport = currentPermissions.EmployeeReport;
-            perms.ReturnsReport = currentPermissions.ReturnsReport;
-            perms.DailySummary = currentPermissions.DailySummary;
+            perms.CustomerReport = currentPermissions.Reports;
+            perms.SaleReport = currentPermissions.Reports;
+            perms.ProductReport = currentPermissions.Reports;
+            perms.InvoiceReport = currentPermissions.Reports;
+            perms.EmployeeReport = currentPermissions.Reports;
+            perms.ReturnsReport = currentPermissions.Reports;
+            perms.DailySummary = currentPermissions.Reports;
 
             if (isNew)
             {
@@ -466,18 +388,16 @@
             }
 
             await context.SaveChangesAsync();
-            successMessage = $"Permissions for '{selectedRole}' saved successfully!";
+            await JS.InvokeVoidAsync("showToast", "Success", $"Permissions for '{selectedRole}' saved successfully!", "success");
         }
         catch (Exception ex)
         {
             errorMessage = "Error saving: " + ex.InnerException?.Message ?? ex.Message;
+            await JS.InvokeVoidAsync("showToast", "Error", errorMessage, "error");
         }
         finally
         {
             isSaving = false;
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(3000);
-            successMessage = null;
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -576,7 +496,7 @@
 
             await LoadRoles();
             CloseAddRoleModal();
-            successMessage = $"Role '{roleManagementInput}' created successfully!";
+            await JS.InvokeVoidAsync("showToast", "Success", $"Role '{roleManagementInput}' created successfully!", "success");
         }
         catch (Exception ex)
         {
@@ -618,7 +538,7 @@
             // Check if another role with same name exists
             if (await context.roles.AnyAsync(r => r.Id != editingRole.Id && r.RoleTitle.ToLower() == newName.ToLower()))
             {
-                errorMessage = $"'{newName}' already exists!";
+                errorMessage = $"' {newName}' already exists!";
                 isSubmitting = false;
                 return;
             }
@@ -638,7 +558,7 @@
             await LoadRoles();
             await LoadPermissions(); // Reload perms for the new name
             CloseAddRoleModal();
-            successMessage = $"Role renamed to '{newName}' successfully!";
+            await JS.InvokeVoidAsync("showToast", "Success", $"Role renamed to '{newName}' successfully!", "success");
         }
         catch (Exception ex)
         {
@@ -683,7 +603,7 @@
             selectedRole = rolesList.FirstOrDefault()?.RoleTitle ?? "Admin";
             await LoadPermissions();
             CloseAddRoleModal();
-            successMessage = "Role deleted successfully!";
+            await JS.InvokeVoidAsync("showToast", "Success", "Role deleted successfully!", "success");
         }
         catch (Exception ex)
         {

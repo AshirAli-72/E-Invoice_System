@@ -22,25 +22,7 @@
             </button>
         </div>
 
-        <!-- Modern Flasher Notification -->
-        @if (!string.IsNullOrEmpty(successMessage))
-        {
-            <div class="notification-toast notification-success">
-                <div class="notification-icon">
-                    <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
-                </div>
-                <span style="flex: 1;">@successMessage</span>
-            </div>
-        }
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="notification-toast notification-error">
-                <div class="notification-icon">
-                    <i class="ph-warning" style="font-size: 1.25rem;"></i>
-                </div>
-                <span style="flex: 1;">@errorMessage</span>
-            </div>
-        }
+
 
         <div class="table-container">
             <div class="table-responsive">
@@ -716,9 +698,9 @@
             await JSRuntime.InvokeVoidAsync("clearNavCache");
             await LoadProducts();
             HideForm();
-            successMessage = editingProduct == null ? "Product created successfully!" : "Product updated successfully!";
+            var msg = editingProduct == null ? "Product created successfully!" : "Product updated successfully!";
+            await JSRuntime.InvokeVoidAsync("showToast", "Success", msg, "success");
             errorMessage = null;
-            _ = Task.Delay(3000).ContinueWith(_ => InvokeAsync(() => { successMessage = null; StateHasChanged(); }));
         }
         catch (Exception ex)
         {
@@ -757,6 +739,7 @@
 
             context.products_services.Remove(prod);
             await context.SaveChangesAsync();
+            await JSRuntime.InvokeVoidAsync("showToast", "Success", "Product deleted successfully!", "success");
             await LoadProducts();
         }
     }

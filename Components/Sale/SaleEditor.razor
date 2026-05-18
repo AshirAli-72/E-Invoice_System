@@ -374,7 +374,6 @@
             {
                 <img src="/store-logo/@System.IO.Path.GetFileName(currentStore.LogoPath)" alt="Logo" class="rcpt-logo" />
             }
-            <h2 class="rcpt-store-name">@(currentStore?.ShopName ?? "SATA TECHNOLOGIES")</h2>
             <p class="rcpt-store-info">@(currentStore?.Address ?? "Gilgit, Pakistan")</p>
             <p class="rcpt-store-info">Phone: @(currentStore?.Phone1 ?? "+92 345 6781267")</p>
             <div class="rcpt-divider"></div>
@@ -518,7 +517,7 @@
             currentStore = await context.store_configurations.AsNoTracking().FirstOrDefaultAsync();
 
             allProducts = prodsData.Select(p => {
-                decimal stock = Math.Max(0, p.stock_qty);
+                int stock = Math.Max(0, p.stock_qty);
                 bool isSvc = p.item_type == "Service";
                 return new ProductDisplay { 
                     Id = p.id, Name = p.prod_name ?? "", Price = p.sale_price, Discount = 0, 
@@ -628,13 +627,22 @@
         if (sales.Any()) {
             transMode = "return";
             saleItems = sales.Select(s => {
+                string prodName = "Item #" + s.id;
+                if (!string.IsNullOrEmpty(s.description))
+                {
+                    var parts = s.description.Split(new[] { " | " }, StringSplitOptions.None);
+                    if (parts.Length > 0 && !string.IsNullOrWhiteSpace(parts[0]))
+                    {
+                        prodName = parts[0];
+                    }
+                }
                 return new SaleItem {
-                    prod_name_service = "Item #" + s.id,
+                    prod_name_service = prodName,
                     qty = -s.qty,
                     price = s.price,
                     discount = s.qty != 0 ? s.discount / s.qty : 0,
                     expiry_date = s.expiry_date,
-                    maxStock = (decimal)s.qty,
+                    maxStock = s.qty,
                     total_price = Math.Abs(s.total_price),
                     OriginalSaleId = s.id
                 };
@@ -645,7 +653,7 @@
 
     private void AddToSale(ProductDisplay p)
     {
-        decimal qty = transMode == "return" ? -1 : 1;
+        int qty = transMode == "return" ? -1 : 1;
         var existing = saleItems.FirstOrDefault(i => i.prod_name_service == p.Name);
         if (existing != null) {
             if (transMode == "sale" && (existing.qty + 1) > p.Stock) { ShowAlert("Insufficient stock."); return; }
@@ -676,7 +684,7 @@
     private void SetTransMode(string mode) {
         transMode = mode;
         foreach (var item in saleItems) {
-            decimal abs = Math.Abs(item.qty);
+            int abs = Math.Abs(item.qty);
             item.qty = mode == "return" ? -abs : abs;
             item.total_price = (item.price * item.qty) - (item.discount * item.qty);
         }
@@ -708,7 +716,7 @@
     private void SelectCustomer(customers c) { selectedCustomer = c; customerSearchQuery = c.name; showCustomerDropdown = false; }
 
     private void UpdateItemQty(SaleItem item, string? val) {
-        if (decimal.TryParse(val, out decimal q)) {
+        if (int.TryParse(val, out int q)) {
             q = Math.Abs(q);
             if (transMode == "return") q = -q;
             if (q == 0) { saleItems.Remove(item); return; }
@@ -740,6 +748,7 @@
         using var context = DbFactory.CreateDbContext();
         context.customers.Add(newCustomer);
         await context.SaveChangesAsync();
+        await JSRuntime.InvokeVoidAsync("showToast", "Success", "Customer created successfully!", "success");
         allCustomersList.Add(newCustomer);
         SelectCustomer(newCustomer);
         newCustomer = new customers { status = "Active" };
@@ -830,10 +839,13 @@
                         total_qty = saleItems.Sum(i => Math.Abs(i.qty)),
                         Amount = Math.Abs(item.total_price),
                         Method = paymentMethod,
-                        Status = "RETURN"
+                        Status = item.prod_name_service
                     };
                     context.returns.Add(returnRec);
                 } else {
+                    string itemDescription = $"{item.prod_name_service} | Customer: {selectedCustomer?.name ?? "Walk-In"} | Contact: {selectedCustomer?.contact ?? ""} | Notes: {notes ?? ""}";
+                    if (itemDescription.Length > 200) itemDescription = itemDescription.Substring(0, 200);
+
                     var sale = new Models.Sale {
                         billNo = orderBillNo, 
                         date = DateTime.Now.ToString("yyyy-MM-dd"), 
@@ -846,7 +858,7 @@
                         payment_method = paymentMethod, 
                         status = (paymentMethod == "Credit" || paymentMethod == "Pending") ? "Pending" : "Paid",
                         is_returned = false, 
-                        description = saleDescription,
+                        description = itemDescription,
                         expiry_date = item.expiry_date ?? DateTime.Now.ToString("yyyy-MM-dd")
                     };
 
@@ -946,7 +958,7 @@
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
         public string? Expiry { get; set; }
-        public decimal Stock { get; set; }
+        public int Stock { get; set; }
         public bool IsService { get; set; }
         public string? Image { get; set; }
         public string Category { get; set; }
@@ -955,11 +967,11 @@
 
     public class SaleItem {
         public string prod_name_service { get; set; } = "";
-        public decimal qty { get; set; }
+        public int qty { get; set; }
         public decimal price { get; set; }
         public decimal discount { get; set; }
         public string? expiry_date { get; set; }
-        public decimal maxStock { get; set; }
+        public int maxStock { get; set; }
         public string? image { get; set; }
         public decimal total_price { get; set; }
         public int OriginalSaleId { get; set; }

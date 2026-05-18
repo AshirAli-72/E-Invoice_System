@@ -376,6 +376,7 @@
                 }
                 
                 await LoadCurrencies();
+                await JS.InvokeVoidAsync("showToast", "Success", $"Added & activated {match.name} as base currency!", "success");
                 searchQuery = "";
             }
         }
@@ -407,6 +408,7 @@
                 curr.status = "Active";
                 context.currencies.Update(curr);
                 await context.SaveChangesAsync();
+                await JS.InvokeVoidAsync("showToast", "Success", $"Activated {curr.name} as base currency!", "success");
             }
             await LoadCurrencies();
             await CurrencyService.GetSymbolAsync(); // Refresh global symbol cache
@@ -456,6 +458,8 @@
                 context.currencies.Update(currencyModel);
             }
             await context.SaveChangesAsync();
+            var msg = editingCurrency == null ? "Currency created successfully!" : "Currency updated successfully!";
+            await JS.InvokeVoidAsync("showToast", "Success", msg, "success");
             await LoadCurrencies();
             HideForm();
         }
@@ -483,6 +487,7 @@
             {
                 context.currencies.Remove(curr);
                 await context.SaveChangesAsync();
+                await JS.InvokeVoidAsync("showToast", "Success", "Currency deleted successfully!", "success");
                 await LoadCurrencies();
                 if (showForm) HideForm();
             }

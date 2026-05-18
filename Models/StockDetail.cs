@@ -14,7 +14,7 @@ namespace E_Invoice_system.Models
         public string? item_barcode { get; set; }
 
         [Column("quantity")]
-        public decimal quantity { get; set; }
+        public int quantity { get; set; }
 
         [Column("pur_price")]
         public decimal pur_price { get; set; }
@@ -26,7 +26,7 @@ namespace E_Invoice_system.Models
         public decimal whole_sale_price { get; set; }
 
         [Column("stock_alert")]
-        public decimal stock_alert { get; set; }
+        public int stock_alert { get; set; }
 
         [Column("date_of_manafacture")]
         public string? date_of_manafacture { get; set; }

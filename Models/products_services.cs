@@ -50,6 +50,6 @@ namespace E_Invoice_system.Models
         public int? brand_id { get; set; }
 
         [NotMapped]
-        public decimal StockQty { get; set; }
+        public int StockQty { get; set; }
     }
 }

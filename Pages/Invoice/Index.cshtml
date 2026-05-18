@@ -57,21 +57,11 @@
                                 </td>
                                 <td class="text-right" style="padding-right:1.5rem;">
                                     <div class="actions-container actions-right">
-                                        <button type="button" class="btn-icon-sm inv-view-btn"
-                                                style="background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;"
-                                                title="View Invoice"
-                                                data-invno="@Html.Encode(item.InvoiceNo ?? $"INV-{item.id}")"
-                                                data-customer="@Html.Encode(item.CustomerName)"
-                                                data-date="@item.Date"
-                                                data-seller="@Html.Encode(item.SellerName)"
-                                                data-payment="@item.Payment"
-                                                data-status="@(item.Status ?? "Draft")"
-                                                data-discount="@item.Discount.ToString("N2")"
-                                                data-total="@item.TotalPrice.ToString("N2")"
-                                                data-currency="@CurrencyService.GetSymbol()"
-                                                data-items="@Html.Encode(item.RawItems)">
+                                        <a href="/Invoice/Details/@item.id" class="btn-icon-sm"
+                                           style="background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;"
+                                           title="View Invoice">
                                             <i class="ph-eye"></i>
-                                        </button>
+                                        </a>
                                         <form method="post" asp-page-handler="Delete" asp-route-id="@item.id"
                                               style="display:inline;" onsubmit="return confirm('Delete this invoice?')">
                                             <button type="submit" class="btn-icon-sm btn-delete">
@@ -150,147 +140,119 @@
         <!-- Invoice Paper -->
         <div id="invPrint" style="overflow-y:auto; flex:1; background:#cbd5e1; padding:2rem; display:flex; justify-content:center;">
             
-            <div class="invoice-a4" style="transform-origin: top center; transform: scale(0.9);">
-                <!-- Header Design -->
-                <div class="header-waves">
-                    <div class="wave-bg"></div>
-                    <div class="wave-red"></div>
-                </div>
+            <div class="invoice" style="text-align: left;">
+              <!-- BACKGROUND DESIGN -->
+              <div class="bg-circle-1"></div>
+              <div class="bg-circle-2"></div>
 
-                <div class="invoice-title-wrap">
-                    <h1>Invoice</h1>
-                    <div class="line"></div>
-                </div>
-
-                <!-- Top Content -->
-                <div class="top-content">
-                    <div class="logo-box">
-                        <h2 style="color:var(--secondary-black); font-size:2rem; font-weight:900; margin:0; letter-spacing:-1px;">SATA<br/><span style="font-size:0.9rem; font-weight:700; letter-spacing:4px; color:var(--text-main);">TECHNOLOGIES</span></h2>
-                        <div class="slogan" style="margin-top:5px;">Innovating the Future</div>
-                        
-                        <div class="invoice-meta">
-                            <div class="meta-item">
-                                <div class="meta-label">
-                                    <i class="ph-file-text-bold"></i> Invoice No.
-                                </div>
-                                <div class="meta-value">: <span id="m-invno"></span></div>
-                            </div>
-                            <div class="meta-item">
-                                <div class="meta-label">
-                                    <i class="ph-calendar-blank-bold"></i> Invoice Date
-                                </div>
-                                <div class="meta-value">: <span id="m-date"></span></div>
-                            </div>
-                        </div>
+              <!-- HEADER -->
+              <div class="header">
+                <div class="header-content">
+                  <div class="logo">
+                    <div class="logo-icon">
+                      <span></span>
+                      <span></span>
+                      <span></span>
                     </div>
+                    <div class="brand">
+                      <h1>SATA</h1>
+                      <p>TECHNOLOGIES</p>
+                    </div>
+                  </div>
+                  <div class="invoice-info">
+                    <h2>INVOICE</h2>
+                    <div class="mini-box">
+                      <div class="mini-row">
+                        <span>Invoice No:</span>
+                        <span id="m-invno"></span>
+                      </div>
+                      <div class="mini-row">
+                        <span>Date:</span>
+                        <span id="m-date"></span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                <!-- Billing Info -->
-                <div class="billing-grid">
-                    <div class="billing-card">
-                        <div class="billing-header">Bill From</div>
-                        <div class="billing-body">
-                            <div class="bill-row">
-                                <i class="ph-buildings-bold"></i>
-                                <div class="bill-content" id="m-seller"></div>
-                            </div>
-                            <div class="bill-row">
-                                <i class="ph-credit-card-bold"></i>
-                                <div class="bill-content" id="m-payment"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="billing-card">
-                        <div class="billing-header">Bill To</div>
-                        <div class="billing-body">
-                            <div class="bill-row">
-                                <i class="ph-user-bold"></i>
-                                <div class="bill-content" id="m-customer"></div>
-                            </div>
-                            <div class="bill-row">
-                                <i class="ph-tag-bold"></i>
-                                <div class="bill-content"><span id="m-status-badge"></span></div>
-                            </div>
-                        </div>
-                    </div>
+              <!-- CLIENT SECTION -->
+              <div class="clients">
+                <div class="client-card">
+                  <span class="tag"><i class="ph-buildings"></i> Company</span>
+                  <div class="info">
+                    <label>Seller:</label>
+                    <h3 id="m-seller">SATA Technologies</h3>
+                  </div>
+                  <div class="info">
+                    <label>Payment Method:</label>
+                    <h3 id="m-payment">Credit Card</h3>
+                  </div>
                 </div>
-
-                <!-- Items Table -->
-                <div class="table-section">
-                    <div class="invoice-table-wrap">
-                        <table class="invoice-table">
-                            <thead>
-                                <tr>
-                                    <th><i class="ph-cube-bold"></i></th>
-                                    <th>Product</th>
-                                    <th style="text-align: right;">Price</th>
-                                    <th style="text-align: center;">Qty</th>
-                                    <th style="text-align: right;">Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="m-items"></tbody>
-                        </table>
-                    </div>
+                <div class="client-card">
+                  <span class="tag"><i class="ph-user"></i> Client</span>
+                  <div class="info">
+                    <label>Billed To:</label>
+                    <h3 id="m-customer">John Doe</h3>
+                  </div>
+                  <div class="info">
+                    <label>Status:</label>
+                    <h3><span id="m-status-badge">Paid</span></h3>
+                  </div>
                 </div>
+              </div>
 
-                <!-- Bottom Section -->
-                <div class="bottom-section">
-                    <div class="notes-box">
-                        <h4>Notes</h4>
-                        <div class="notes-content">
-                            Thank you for your business. Please keep this invoice for your records. For any queries, contact our support team.
-                        </div>
-                    </div>
-
-                    <div class="summary-box">
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span id="m-subtotal"></span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Tax (0%)</span>
-                            <span>0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Discount</span>
-                            <span id="m-discount" style="color: var(--primary-red);"></span>
-                        </div>
-                        
-                        <div class="total-row-premium">
-                            <div class="total-label">Total Price</div>
-                            <div class="total-value">
-                                <span id="m-total"></span>
-                                <i class="ph-caret-right-bold"></i>
-                            </div>
-                        </div>
-                    </div>
+              <!-- TABLE -->
+              <div class="table-wrapper">
+                <div class="table-card">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width: 80px;">No</th>
+                        <th>Item / Description</th>
+                        <th style="text-align: right; width: 180px;">Unit Price</th>
+                        <th style="text-align: center; width: 120px;">Qty</th>
+                        <th style="text-align: right; width: 180px;">Total Price</th>
+                      </tr>
+                    </thead>
+                    <tbody id="m-items"></tbody>
+                  </table>
                 </div>
+              </div>
 
-                <!-- Footer Design -->
-                <div class="footer-waves">
-                    <div class="footer-bg"></div>
-                    <div class="footer-red"></div>
+              <!-- BOTTOM -->
+              <div class="bottom">
+                <div class="message">
+                  <h3>Thank You!</h3>
+                  <p>We appreciate your business. If you have any questions about this invoice, please feel free to reach out to us. Keep this document for your warranty records.</p>
                 </div>
+                <div class="summary">
+                  <div class="sum-row">
+                    <span>Subtotal</span>
+                    <span id="m-subtotal"></span>
+                  </div>
+                  <div class="sum-row">
+                    <span>Discount</span>
+                    <span id="m-discount"></span>
+                  </div>
+                  <div class="grand sum-row">
+                    <span>Grand Total</span>
+                    <span id="m-total"></span>
+                  </div>
+                </div>
+              </div>
 
-                <div class="footer-content">
-                    <div class="foot-item">
-                        <i class="ph-phone-bold"></i>
-                        <span>Contact Store</span>
-                    </div>
-                    <div class="foot-item">
-                        <i class="ph-envelope-simple-bold"></i>
-                        <span>info@sata.tech</span>
-                    </div>
-                    <div class="foot-item">
-                        <i class="ph-globe-bold"></i>
-                        <span>www.sata-tech.com</span>
-                    </div>
+              <!-- FOOTER -->
+              <div class="footer">
+                <div class="footer-left">
+                  <p>&copy; 2026 SATA Technologies. All rights reserved.</p>
                 </div>
+                <div class="footer-right">
+                  <div class="social"><i class="ph-facebook-logo"></i></div>
+                  <div class="social"><i class="ph-twitter-logo"></i></div>
+                  <div class="social"><i class="ph-instagram-logo"></i></div>
+                </div>
+              </div>
 
-                <div class="footer-logo">
-                    <i class="ph-flame-bold"></i>
-                </div>
             </div>
 
         </div>
@@ -300,89 +262,12 @@
 <style>
     @@keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(-10px); } to { opacity:1; transform:scale(1) translateY(0); } }
     #invModalBox { animation: modalIn 0.22s ease; }
-    
-    /* PIC 3 INVOICE DESIGN */
-    :root {
-        --primary-red: #BC1823;
-        --secondary-black: #1C2120;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-        --border-light: #f1f5f9;
-    }
-    
-    .invoice-a4 {
-        width: 210mm;
-        min-height: 297mm;
-        background: white;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        position: relative;
-        overflow: hidden;
-        padding: 0;
-        font-family: 'Inter', sans-serif;
-        color: var(--text-main);
-    }
-    
-    .header-waves { position: absolute; top: 0; right: 0; width: 400px; height: 120px; z-index: 1; }
-    .wave-bg { position: absolute; top: -20px; right: -20px; width: 120%; height: 120%; background: var(--secondary-black); clip-path: ellipse(80% 50% at 80% 0%); }
-    .wave-red { position: absolute; top: -10px; right: -10px; width: 100%; height: 100%; background: var(--primary-red); clip-path: ellipse(70% 45% at 85% 0%); z-index: 2; }
-    
-    .invoice-title-wrap { position: absolute; top: 40px; right: 60px; z-index: 10; text-align: right; }
-    .invoice-title-wrap h1 { color: white; font-size: 42px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
-    .invoice-title-wrap .line { height: 3px; background: var(--primary-red); width: 60px; margin-left: auto; margin-top: 5px; }
-    
-    .top-content { padding: 60px 60px 40px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .logo-box { max-width: 280px; }
-    .logo-box .slogan { font-size: 14px; font-weight: 700; color: #1e293b; letter-spacing: 1px; }
-    
-    .invoice-meta { margin-top: 20px; }
-    .meta-item { display: flex; align-items: center; gap: 30px; margin-bottom: 20px; }
-    .meta-label { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 13px; color: var(--text-main); text-transform: uppercase; min-width: 140px; }
-    .meta-label i { font-size: 24px; color: var(--primary-red); background: #fef2f2; padding: 8px; border-radius: 10px; }
-    .meta-value { border-bottom: 1px solid #e2e8f0; flex: 1; padding-bottom: 5px; font-weight: 600; color: var(--text-muted); font-size: 14px; }
-    
-    .billing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 0 60px; margin-top: 20px; }
-    .billing-card { background: #fbfbfc; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9; }
-    .billing-header { background: var(--primary-red); color: white; padding: 12px 25px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; width: 140px; border-bottom-right-radius: 20px; }
-    .billing-body { padding: 25px; }
-    .bill-row { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
-    .bill-row i { color: var(--primary-red); font-size: 20px; margin-top: 3px; }
-    .bill-content { flex: 1; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; font-size: 13px; font-weight: 600; min-height: 25px; color: var(--text-main); }
-    
-    .table-section { padding: 40px 60px; }
-    .invoice-table-wrap { border-radius: 20px; overflow: hidden; border: 1px solid var(--secondary-black); }
-    .invoice-table { width: 100%; border-collapse: collapse; }
-    .invoice-table thead th { background: var(--secondary-black); color: white; padding: 18px 20px; text-align: left; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-    .invoice-table thead th:first-child { width: 60px; background: var(--primary-red); text-align: center; font-size: 24px; }
-    .invoice-table tbody td { padding: 20px; border-bottom: 1px dashed #e2e8f0; border-right: 1px solid #f1f5f9; font-size: 14px; font-weight: 600; color: var(--text-main); }
-    .invoice-table tbody tr:last-child td { border-bottom: none; }
-    .invoice-table tbody td:last-child { border-right: none; }
-    
-    .bottom-section { display: grid; grid-template-columns: 1fr 340px; gap: 40px; padding: 0 60px 60px; align-items: flex-start; }
-    .notes-box h4 { font-size: 14px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: inline-block; border-bottom: 3px solid var(--primary-red); padding-bottom: 5px; }
-    .notes-content { background: #f8fafc; padding: 25px; border-radius: 20px; min-height: 120px; font-size: 13px; color: var(--text-muted); line-height: 1.6; background-image: radial-gradient(circle at top right, #e2e8f0 1px, transparent 100px); }
-    .summary-box { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; }
-    .summary-row { display: flex; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-main); }
-    .summary-row span:last-child { color: var(--text-muted); border-left: 1px solid #e2e8f0; padding-left: 20px; min-width: 120px; text-align: right; }
-    .total-row-premium { background: var(--secondary-black); color: white; display: flex; justify-content: space-between; align-items: center; }
-    .total-label { background: var(--primary-red); padding: 20px 25px; font-weight: 800; font-size: 15px; text-transform: uppercase; flex: 1; }
-    .total-value { padding: 20px 25px; font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 15px; }
-    .total-value i { font-size: 16px; color: rgba(255,255,255,0.5); }
-    
-    .footer-waves { position: absolute; bottom: 0; left: 0; width: 100%; height: 100px; }
-    .footer-bg { position: absolute; bottom: -20px; left: -20px; width: 120%; height: 120%; background: var(--secondary-black); clip-path: ellipse(80% 50% at 20% 100%); }
-    .footer-red { position: absolute; bottom: -10px; left: -10px; width: 100%; height: 100%; background: var(--primary-red); clip-path: ellipse(70% 45% at 15% 100%); z-index: 2; }
-    
-    .footer-content { position: absolute; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; gap: 60px; z-index: 10; color: white; }
-    .foot-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; }
-    .foot-item i { background: var(--primary-red); padding: 8px; border-radius: 50%; font-size: 14px; }
-    .foot-item span { border-left: 1px solid rgba(255,255,255,0.3); padding-left: 15px; }
-    .footer-logo { position: absolute; bottom: 30px; right: 40px; z-index: 10; color: var(--primary-red); font-size: 32px; }
 
     @@media print {
-        body { visibility: hidden !important; }
+        body * { visibility: hidden !important; }
         #invPrint, #invPrint * { visibility: visible !important; }
         #invPrint { position: absolute !important; left: 0; top: 0; width: 100%; height: auto; margin: 0; padding: 0 !important; overflow: visible !important; }
-        .invoice-a4 { transform: none !important; box-shadow: none !important; border-radius: 0 !important; width: 100%; min-height: 100vh; }
+        .invoice { transform: none !important; box-shadow: none !important; border-radius: 0 !important; width: 100% !important; margin: 0 !important; }
         #invModalBox { overflow: visible !important; }
     }
 </style>
@@ -430,11 +315,11 @@
                         var odd = (i % 2 === 0);
                         tr.style.background = odd ? '#fafafa' : 'white';
                         tr.innerHTML =
-                            '<td style="padding:.6rem .5rem .6rem 0;color:#94a3b8;font-weight:600;font-size:0.82rem;">' + (i+1) + '</td>' +
-                            '<td style="padding:.6rem 0;font-weight:600;color:#1e293b;font-size:0.9rem;">' + name + '</td>' +
-                            '<td style="padding:.6rem 0;text-align:right;color:#475569;">' + cur + price.toFixed(2) + '</td>' +
-                            '<td style="padding:.6rem 0;text-align:center;color:#475569;font-weight:600;">' + qty + '</td>' +
-                            '<td style="padding:.6rem 0;text-align:right;font-weight:700;color:#1e293b;">' + cur + tot.toFixed(2) + '</td>';
+                            '<td style="padding:24px; border-bottom:1px solid #edf0f5; font-size:15px; color:#6b7280; font-weight:600;">' + (i+1) + '</td>' +
+                            '<td style="padding:24px; border-bottom:1px solid #edf0f5; font-size:15px; color:#111827; font-weight:600;">' + name + '</td>' +
+                            '<td style="padding:24px; border-bottom:1px solid #edf0f5; font-size:15px; color:#374151; text-align:right;">' + cur + price.toFixed(2) + '</td>' +
+                            '<td style="padding:24px; border-bottom:1px solid #edf0f5; font-size:15px; color:#374151; text-align:center; font-weight:600;">' + qty + '</td>' +
+                            '<td style="padding:24px; border-bottom:1px solid #edf0f5; font-size:15px; color:#dc2626; text-align:right; font-weight:700;">' + cur + tot.toFixed(2) + '</td>';
                         tbody.appendChild(tr);
                     });
                     subtotalEl.textContent = cur + subtotal.toFixed(2);
@@ -461,8 +346,7 @@
 
 <!-- ════════════ CREATE INVOICE MODAL ════════════ -->
 <div id="createInvModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(6px);">
-    <div style="background:transparent; width:850px; max-width:96vw; max-height:94vh; overflow-y:auto; position:relative;">
-        <button onclick="document.getElementById('createInvModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; z-index:10;"><i class="ph-x"></i></button>
+    <div style="background:transparent; width:100%; max-width:800px; max-height:94vh; overflow-y:auto; position:relative; border-radius:16px;">
         <component type="typeof(E_Invoice_system.Components.Invoice.InvoiceEditor)"
                    render-mode="ServerPrerendered"
                    param-UserName='@HttpContext.Session.GetString("UserName")' />

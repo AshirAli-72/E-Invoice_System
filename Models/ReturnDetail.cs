@@ -23,10 +23,10 @@ namespace E_Invoice_system.Models
         public int no_of_items { get; set; }
 
         [Column("qty")]
-        public decimal qty { get; set; }
+        public int qty { get; set; }
 
         [Column("total_qty")]
-        public decimal total_qty { get; set; }
+        public int total_qty { get; set; }
 
         [Column("amount")]
         public decimal Amount { get; set; }

@@ -1,18 +1,10 @@
+// ── E-Invoice System Service Worker v4 ─────────────────────────────────────
+// Changes: Network-First for HTML/Navigation, Cache-First for static assets.
 
-// ── E-Invoice System Service Worker v3 ─────────────────────────────────────
-// Changes: login page cached, stale-while-revalidate for HTML,
-//          smarter offline fallback, bumped cache name.
-
-const CACHE_NAME = 'sata-pos-v4';
+const CACHE_NAME = 'sata-pos-v5';
 
 const STATIC_ASSETS = [
-    '/',
     '/Account/Login',
-    '/customer',
-    '/product',
-    '/sale',
-    '/Invoice',
-    '/settings',
     '/css/dashboard.css',
     '/css/customer.css',
     '/css/invoice.css',
@@ -54,9 +46,6 @@ self.addEventListener('activate', event => {
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-const isStaticAsset = url =>
-    /\.(css|js|woff2?|ttf|eot|png|jpg|jpeg|gif|svg|ico|webp)$/i.test(new URL(url).pathname);
-
 const isSkipped = url => {
     const p = new URL(url).pathname;
     return p.startsWith('/_blazor') ||
@@ -75,7 +64,26 @@ self.addEventListener('fetch', event => {
         new URL(url).origin !== self.location.origin ||
         isSkipped(url)) return;
 
-    // ── Offline-First (Stale-While-Revalidate) for both assets and HTML pages ──
+    // ── Navigation Requests: Network-First ──
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    if (response && response.status === 200) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Offline fallback: try to serve from cache, otherwise serve Login page
+                    return caches.match(request).then(cached => cached || caches.match('/Account/Login'));
+                })
+        );
+        return;
+    }
+
+    // ── Static Assets: Cache-First with Stale-While-Revalidate ──
     event.respondWith(
         caches.open(CACHE_NAME).then(cache =>
             cache.match(request).then(cached => {
@@ -88,14 +96,8 @@ self.addEventListener('fetch', event => {
                     })
                     .catch(() => null);
 
-                // Return cached version immediately if available, otherwise wait for network
                 return cached || networkFetch;
             })
-        ).catch(() => {
-            // Ultimate fallback for HTML pages
-            if (request.mode === 'navigate') {
-                return caches.match('/Account/Login');
-            }
-        })
+        )
     );
 });

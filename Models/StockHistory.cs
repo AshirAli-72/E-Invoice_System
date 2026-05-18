@@ -14,10 +14,10 @@ namespace E_Invoice_system.Models
         public string? date { get; set; }
 
         [Column("new_quantity")]
-        public decimal new_quantity { get; set; }
+        public int new_quantity { get; set; }
 
         [Column("old_quantity")]
-        public decimal old_quantity { get; set; }
+        public int old_quantity { get; set; }
 
         [Column("new_purchase_price")]
         public decimal new_purchase_price { get; set; }

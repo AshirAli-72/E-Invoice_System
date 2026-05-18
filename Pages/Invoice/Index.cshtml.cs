@@ -46,10 +46,15 @@ namespace E_Invoice_system.Pages.Invoice
             public string? RawItems { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync([FromQuery] string? success)
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
                 return RedirectToPage("/Account/Login");
+
+            if (success == "true" || success == "1")
+            {
+                TempData["Success"] = "Invoice has been saved successfully.";
+            }
 
             await _currencyService.GetSymbolAsync();
 

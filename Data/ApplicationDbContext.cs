@@ -74,7 +74,6 @@ namespace E_Invoice_system.Data
 
             modelBuilder.Entity<StockDetail>(entity =>
             {
-                entity.Property(e => e.quantity).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.pur_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.sale_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.whole_sale_price).HasColumnType("decimal(18,2)");
@@ -83,8 +82,6 @@ namespace E_Invoice_system.Data
 
             modelBuilder.Entity<stock_history>(entity =>
             {
-                entity.Property(e => e.new_quantity).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.old_quantity).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.new_purchase_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.old_purchase_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.new_sale_price).HasColumnType("decimal(18,2)");

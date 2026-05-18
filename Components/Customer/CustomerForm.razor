@@ -20,25 +20,7 @@
             </button>
         </div>
 
-        <!-- Modern Flasher Notification -->
-        @if (!string.IsNullOrEmpty(successMessage))
-        {
-            <div class="notification-toast notification-success">
-                <div class="notification-icon">
-                    <i class="ph-check-circle" style="font-size: 1.25rem;"></i>
-                </div>
-                <span style="flex: 1;">@successMessage</span>
-            </div>
-        }
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="notification-toast notification-error">
-                <div class="notification-icon">
-                    <i class="ph-warning" style="font-size: 1.25rem;"></i>
-                </div>
-                <span style="flex: 1;">@errorMessage</span>
-            </div>
-        }
+
 
         <div class="table-container">
             <div class="table-responsive">
@@ -320,14 +302,13 @@
             await JSRuntime.InvokeVoidAsync("clearNavCache");
             await LoadCustomers();
             HideForm();
-            successMessage = editingCustomer == null ? "Customer created successfully!" : "Customer updated successfully!";
+            var msg = editingCustomer == null ? "Customer created successfully!" : "Customer updated successfully!";
+            await JSRuntime.InvokeVoidAsync("showToast", "Success", msg, "success");
             errorMessage = null;
-            _ = Task.Delay(3000).ContinueWith(_ => InvokeAsync(() => { successMessage = null; StateHasChanged(); }));
         }
         catch (Exception ex)
         {
             errorMessage = "Error saving customer: " + ex.Message;
-            successMessage = null;
         }
         finally
         {
@@ -347,6 +328,7 @@
         {
             context.customers.Remove(customer);
             await context.SaveChangesAsync();
+            await JSRuntime.InvokeVoidAsync("showToast", "Success", "Customer deleted successfully!", "success");
             await JSRuntime.InvokeVoidAsync("clearNavCache");
             await LoadCustomers();
         }

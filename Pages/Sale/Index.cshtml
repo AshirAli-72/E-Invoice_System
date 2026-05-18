@@ -159,6 +159,7 @@
             <thead>
                 <tr>
                     <th style="padding-left: 1.5rem;">Bill No</th>
+                    <th>Item Name</th>
                     <th>Date</th>
                     <th>No. of Items</th>
                     <th>Total Qty</th>
@@ -178,6 +179,9 @@
                                 <div class="font-bold font-sm font-monospace">@ret.billNo</div>
                             </td>
                             <td>
+                                <div class="font-bold text-danger font-sm">@ret.Status</div>
+                            </td>
+                            <td>
                                 <div class="font-bold font-sm">@ret.date</div>
                             </td>
                             <td>
@@ -191,7 +195,7 @@
                                 <span class="font-medium font-sm">@ret.Method</span>
                             </td>
                             <td class="text-center">
-                                <span class="status-badge status-inactive">@ret.Status</span>
+                                <span class="status-badge status-inactive">Returned</span>
                             </td>
                             <td class="text-right" style="padding-right: 1.5rem;">
                                 <div class="actions-container actions-right">
@@ -208,7 +212,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="8" class="empty-state"><p>No return records found.</p></td></tr>
+                    <tr><td colspan="9" class="empty-state"><p>No return records found.</p></td></tr>
                 }
             </tbody>
         </table>

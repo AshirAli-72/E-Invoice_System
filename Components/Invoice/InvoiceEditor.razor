@@ -49,12 +49,20 @@
 </style>
 
 <div class="inv-panel">
-    <div class="inv-panel-header">
-        <i class="ph-file-plus" style="font-size:2rem; color:white;"></i>
-        <div>
-            <h3>Create New Invoice</h3>
-            <p>Fill in the details and add products below</p>
+    <div class="inv-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <i class="ph-file-plus" style="font-size:2rem; color:white;"></i>
+            <div>
+                <h3>Create New Invoice</h3>
+                <p>Fill in the details and add products below</p>
+            </div>
         </div>
+        <button type="button" onclick="document.getElementById('createInvModal').style.display='none'"
+                style="background:rgba(255,255,255,0.15); border:none; color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; transition: background 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+            <i class="ph-x"></i>
+        </button>
     </div>
     <div class="inv-body">
 
@@ -91,6 +99,64 @@
                 }
             </select>
         </div>
+
+        <!-- Customer Purchase History -->
+        @if (selectedCustomer != null)
+        {
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem; margin-bottom:1.2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                    <span style="font-size:0.75rem; font-weight:700; color:#BC1823; text-transform:uppercase; letter-spacing:0.6px; display:flex; align-items:center; gap:0.4rem;">
+                        <i class="ph-clock-counter-clockwise" style="font-size:1rem;"></i> Customer Purchase History
+                    </span>
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:600;">
+                        @customerPreviousItems.Count item(s) found
+                    </span>
+                </div>
+                
+                @if (customerPreviousItems.Any())
+                {
+                    <div style="max-height:180px; overflow-y:auto; border:1px solid #edf2f7; border-radius:8px; background:white;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                            <thead>
+                                <tr style="background:#f1f5f9; border-bottom:1px solid #e2e8f0; text-align:left;">
+                                    <th style="padding:0.6rem 0.8rem; font-weight:600; color:#475569;">Item Name</th>
+                                    <th style="padding:0.6rem 0.8rem; font-weight:600; color:#475569; text-align:right;">Last Price</th>
+                                    <th style="padding:0.6rem 0.8rem; font-weight:600; color:#475569; text-align:center; width:70px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var prevItem in customerPreviousItems)
+                                {
+                                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                                        <td style="padding:0.6rem 0.8rem; color:#1e293b; font-weight:500;">
+                                            <div style="font-weight:600;">@prevItem.Name</div>
+                                            <div style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">Inv: #@prevItem.InvoiceNo | @prevItem.Date</div>
+                                        </td>
+                                        <td style="padding:0.6rem 0.8rem; color:#475569; font-weight:700; text-align:right;">
+                                            @CurrencyService.GetSymbol()@prevItem.Price.ToString("N2")
+                                        </td>
+                                        <td style="padding:0.6rem 0.8rem; text-align:center;">
+                                            <button type="button" @onclick="() => AddPreviousItem(prevItem)"
+                                                    style="background:#fef2f2; color:#BC1823; border:1px solid #fecaca; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.78rem; font-weight:700; display:inline-flex; align-items:center; gap:3px; transition:all 0.15s;"
+                                                    onmouseover="this.style.background='#BC1823'; this.style.color='white'; this.style.borderColor='#BC1823';"
+                                                    onmouseout="this.style.background='#fef2f2'; this.style.color='#BC1823'; this.style.borderColor='#fecaca';">
+                                                <i class="ph-plus-bold"></i> Add
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div style="font-size:0.8rem; color:#94a3b8; text-align:center; padding:1.25rem 0;">
+                        No previous purchases found for this customer.
+                    </div>
+                }
+            </div>
+        }
         <!-- Payment -->
         <div class="inv-field">
             <label class="inv-label">Payment Method</label>
@@ -123,7 +189,7 @@
                 <label class="inv-label">Select Product / Service</label>
                 <select class="inv-input inv-select" value="@selectedProductId" @onchange="OnProductSelected">
                     <option value="0">-- Choose a product --</option>
-                    @foreach (var p in productsList)
+                    @foreach (var p in GetFilteredProducts())
                     {
                         <option value="@p.id">@p.prod_name (@(p.item_type ?? "General"))</option>
                     }
@@ -289,12 +355,116 @@
     }
 
     // ── Customer ──────────────────────────────────
-    private void OnCustomerChanged(ChangeEventArgs e)
+    private List<PreviousCustomerItem> customerPreviousItems = new();
+
+    private async Task OnCustomerChanged(ChangeEventArgs e)
     {
+        customerPreviousItems.Clear();
         if (int.TryParse(e.Value?.ToString(), out int id) && id > 0)
+        {
             selectedCustomer = customersList.FirstOrDefault(c => c.id == id);
+            if (selectedCustomer != null)
+            {
+                await LoadCustomerPreviousItems(selectedCustomer);
+            }
+        }
         else
+        {
             selectedCustomer = null;
+        }
+    }
+
+    private async Task LoadCustomerPreviousItems(customers customer)
+    {
+        try
+        {
+            using var ctx = DbFactory.CreateDbContext();
+            var name = customer.name;
+            var contact = customer.contact;
+
+            var itemsList = new List<PreviousCustomerItem>();
+
+            // Fetch only from POS Sales table (parsing structured description field) as requested
+            var posSales = await ctx.sales
+                .Where(s => s.description != null && 
+                            (s.description.Contains("Contact: " + contact) || 
+                             (s.description.Contains("Customer: " + name) && name != "Walk-In Customer")))
+                .OrderByDescending(s => s.id)
+                .Take(20)
+                .ToListAsync();
+
+            foreach (var sale in posSales)
+            {
+                if (!string.IsNullOrEmpty(sale.description))
+                {
+                    var parts = sale.description.Split(new[] { " | " }, StringSplitOptions.None);
+                    if (parts.Length >= 3)
+                    {
+                        var prodName = parts[0];
+                        var prod = productsList.FirstOrDefault(p => p.prod_name == prodName);
+                        itemsList.Add(new PreviousCustomerItem
+                        {
+                            InvoiceNo = sale.billNo ?? sale.id.ToString(),
+                            Date = sale.date,
+                            ProductId = prod?.id ?? 0,
+                            Name = prodName,
+                            Price = sale.price,
+                            Qty = (int)sale.qty,
+                            ExpiryDate = sale.expiry_date ?? prod?.expiry_date
+                        });
+                    }
+                }
+            }
+
+            // Sort chronologically and take top 10 items
+            customerPreviousItems = itemsList
+                .OrderByDescending(x => x.Date)
+                .ThenByDescending(x => x.InvoiceNo)
+                .Take(10)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading customer previous items: {ex.Message}");
+        }
+    }
+
+    private void AddPreviousItem(PreviousCustomerItem prevItem)
+    {
+        var existingItem = invoiceItems.FirstOrDefault(i => 
+            (prevItem.ProductId > 0 && i.ProductId == prevItem.ProductId) || 
+            (prevItem.ProductId == 0 && i.Name == prevItem.Name));
+
+        if (existingItem != null)
+        {
+            existingItem.Qty++;
+            existingItem.Total = existingItem.Qty * existingItem.Price;
+        }
+        else
+        {
+            invoiceItems.Add(new InvoiceItem
+            {
+                ProductId = prevItem.ProductId,
+                Name = prevItem.Name,
+                Qty = 1,
+                Price = prevItem.Price,
+                ExpiryDate = prevItem.ExpiryDate,
+                Total = prevItem.Price
+            });
+        }
+        CalculateTotals();
+        // Flasher notification removed as requested
+    }
+
+    public class PreviousCustomerItem
+    {
+        public string InvoiceNo { get; set; } = "";
+        public string Date { get; set; } = "";
+        public int ProductId { get; set; }
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+        public int Qty { get; set; }
+        public string? ExpiryDate { get; set; }
     }
 
     // ── Product Select ────────────────────────────
@@ -304,6 +474,28 @@
             selectedProductId = id;
         else
             selectedProductId = 0;
+    }
+
+    private List<ProductService> GetFilteredProducts()
+    {
+        if (selectedCustomer == null || !customerPreviousItems.Any())
+        {
+            return productsList;
+        }
+
+        var purchasedNames = customerPreviousItems
+            .Select(item => item.Name.Trim().ToLower())
+            .ToHashSet();
+
+        var filtered = productsList
+            .Where(p => p.prod_name != null && purchasedNames.Contains(p.prod_name.Trim().ToLower()))
+            .ToList();
+
+        if (!filtered.Any())
+        {
+            return productsList;
+        }
+        return filtered;
     }
 
     // ── Add Item ──────────────────────────────────
@@ -386,9 +578,9 @@
                 customer_name    = selectedCustomer?.name ?? "Walk-In Customer",
                 customer_contact = selectedCustomer?.contact,
                 customer_address = selectedCustomer?.address,
-                prod_name_service = System.Text.Json.JsonSerializer.Serialize(invoiceItems),
-                qty_unit_type    = $"{invoiceItems.Count} item(s)",
-                price            = subtotal,
+                prod_name_service = invoiceItems.Count == 1 ? invoiceItems[0].Name : string.Join(", ", invoiceItems.Select(i => i.Name)),
+                qty_unit_type    = invoiceItems.Count == 1 ? invoiceItems[0].Qty.ToString() : $"{invoiceItems.Sum(i => i.Qty)}",
+                price            = invoiceItems.Count == 1 ? invoiceItems[0].Price : subtotal,
                 discount         = discount,
                 total_price      = total,
                 payment          = paymentMethod,
@@ -400,7 +592,7 @@
             await JS.InvokeVoidAsync("showToast", "Success", "Invoice has been saved successfully.", "success");
             await JS.InvokeVoidAsync("eval", "document.getElementById('createInvModal').style.display='none'");
             await Task.Delay(500);
-            NavigationManager.NavigateTo("/Invoice", true);
+            NavigationManager.NavigateTo("/Invoice?success=true", true);
         }
         catch (Exception ex)
         {
