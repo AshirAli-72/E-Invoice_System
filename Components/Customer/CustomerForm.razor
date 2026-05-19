@@ -184,7 +184,6 @@
     private customers? editingCustomer = null;
     private bool isSubmitting = false;
     private string? errorMessage;
-    private string? successMessage;
     private string? originalName;
 
     // Pagination state
@@ -241,7 +240,7 @@
         customerModel = new customers { status = "Active" };
         editingCustomer = null;
         errorMessage = null;
-        successMessage = null;
+        errorMessage = null;
         showForm = true;
     }
 
@@ -259,7 +258,7 @@
             status = customer.status
         };
         errorMessage = null;
-        successMessage = null;
+        errorMessage = null;
         showForm = true;
     }
 

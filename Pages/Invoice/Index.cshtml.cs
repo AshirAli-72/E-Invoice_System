@@ -112,7 +112,15 @@ namespace E_Invoice_system.Pages.Invoice
                                 }).Where(n => !string.IsNullOrEmpty(n));
 
                                 display.DisplayName = string.Join(", ", nameParts);
-                                display.DisplayQty  = $"{items.Count} item(s)";
+
+                                // Sum actual quantities across items
+                                int totalQty = 0;
+                                foreach (var i in items)
+                                {
+                                    var qStr = GetVal(i, "Qty", "qty");
+                                    if (int.TryParse(qStr, out int q)) totalQty += q;
+                                }
+                                display.DisplayQty = totalQty > 0 ? totalQty.ToString() : items.Count.ToString();
 
                                 var dates = items
                                     .Select(i => GetVal(i, "ExpiryDate", "expiryDate"))

@@ -388,7 +388,6 @@
     private ProductService? editingProduct = null;
     private bool isSubmitting = false;
     private string? errorMessage;
-    private string? successMessage;
     private IBrowserFile? selectedFile;
     private string? imgUrl;
     
@@ -705,7 +704,7 @@
         catch (Exception ex)
         {
             errorMessage = "Error saving product: " + ex.Message;
-            successMessage = null;
+            errorMessage = null;
         }
         finally
         {

@@ -258,7 +258,6 @@
     private bool isSubmitting = false;
     private bool isLoadingCode = false;
     private string? errorMessage;
-    private string? successMessage;
     private IBrowserFile? selectedFile;
     private string? imgUrl;
 
@@ -448,7 +447,7 @@
         catch (Exception ex)
         {
             errorMessage = "Error saving employee: " + ex.Message;
-            successMessage = null;
+            errorMessage = null;
         }
         finally
         {

@@ -301,6 +301,7 @@
     // ── Form ──────────────────────────────────────
     private string companyName = "";
     private string companyPhone = "";
+    private string companyAddress = "";
     private string invoiceNo = "";
     private DateTime invoiceDate = DateTime.Now;
 
@@ -338,6 +339,7 @@
             var cfg = await ctx.store_configurations.FirstOrDefaultAsync();
             companyName = cfg?.ShopName ?? "";
             companyPhone = cfg?.Phone1 ?? "";
+            companyAddress = cfg?.Address ?? "";
 
             customersList = await ctx.customers.OrderBy(c => c.name).ToListAsync();
 
@@ -575,11 +577,14 @@
                 date             = invoiceDate.ToString("yyyy-MM-dd"),
                 seller_name      = companyName,
                 seller_contact   = companyPhone,
+                seller_address   = companyAddress,
                 customer_name    = selectedCustomer?.name ?? "Walk-In Customer",
                 customer_contact = selectedCustomer?.contact,
                 customer_address = selectedCustomer?.address,
-                prod_name_service = invoiceItems.Count == 1 ? invoiceItems[0].Name : string.Join(", ", invoiceItems.Select(i => i.Name)),
-                qty_unit_type    = invoiceItems.Count == 1 ? invoiceItems[0].Qty.ToString() : $"{invoiceItems.Sum(i => i.Qty)}",
+                prod_name_service = string.Join(", ", invoiceItems.Select(i => i.Name)),
+                qty_unit_type    = invoiceItems.Count == 1
+                    ? invoiceItems[0].Qty.ToString()
+                    : string.Join(", ", invoiceItems.Select(i => i.Qty.ToString())),
                 price            = invoiceItems.Count == 1 ? invoiceItems[0].Price : subtotal,
                 discount         = discount,
                 total_price      = total,

@@ -4,14 +4,35 @@
 @{
     Layout = null;
     var billRef = Model.Invoice.invoice_no ?? Model.Invoice.id.ToString();
-    var symbol = CurrencyService.GetSymbol() ?? "$";
-    
-    // Dynamic Logo Logic
-    string logoUrl = "/favicon.png"; // Fallback
+    var symbol  = CurrencyService.GetSymbol() ?? "$";
+    var status  = Model.Invoice.status ?? "Paid";
+    var payment = Model.Invoice.payment ?? "Cash";
+
+    // Dynamic Logo
+    string logoUrl = "/favicon.png";
     if (Model.Store != null && !string.IsNullOrEmpty(Model.Store.LogoPath))
-    {
         logoUrl = $"/store-logo/{System.IO.Path.GetFileName(Model.Store.LogoPath)}";
-    }
+
+    // Status badge colour
+    var statusColor = status.ToLower() switch {
+        "paid"    => "#16a34a",
+        "pending" => "#d97706",
+        "overdue" => "#dc2626",
+        _         => "#6b7280"
+    };
+
+    var invoiceDate = Model.Invoice.date ?? DateTime.Now.ToString("yyyy-MM-dd");
+    if (DateTime.TryParse(invoiceDate, out var dt))
+        invoiceDate = dt.ToString("dd MMM yyyy");
+
+    var sellerName    = Model.Store?.ShopName    ?? Model.Invoice.seller_name    ?? "Company";
+    var sellerCity    = Model.Store?.City        ?? "";
+    var sellerPhone   = Model.Store?.Phone1      ?? Model.Invoice.seller_contact ?? "";
+    var sellerAddress = Model.Store?.Address     ?? Model.Invoice.seller_address ?? "";
+
+    var custName    = string.IsNullOrEmpty(Model.Invoice.customer_name)    ? "Walk-In Customer" : Model.Invoice.customer_name;
+    var custAddress = Model.Invoice.customer_address ?? "";
+    var custPhone   = Model.Invoice.customer_contact ?? "";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -20,195 +41,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - @billRef</title>
     <link rel="icon" type="image/png" href="~/favicon.png" />
-    <script src="https://unpkg.com/@@phosphor-icons/web"></script>
     <link rel="stylesheet" href="~/css/invoice/print.css" asp-append-version="true" />
 </head>
 <body>
 
-    <div class="print-controls">
-        <button onclick="window.print()" class="btn btn-print">
-            <i class="ph-printer-bold"></i> PRINT INVOICE
-        </button>
-        <button onclick="window.close()" class="btn btn-close">CLOSE</button>
+    <div class="print-controls no-print">
+        <button onclick="window.print()" class="btn-print">&#128438; PRINT INVOICE</button>
+        <button onclick="window.close()" class="btn-close-inv">CLOSE</button>
     </div>
 
     <div class="invoice-a4">
-        <!-- Header Design -->
-        <div class="header-waves">
-            <div class="wave-bg"></div>
-            <div class="wave-red"></div>
-        </div>
 
-        <div class="invoice-title-wrap">
-            <h1>Invoice</h1>
-            <div class="line"></div>
-        </div>
+        <!-- ══ TOP HEADER ══ -->
+        <div class="inv-header">
+            <!-- Red diagonal shape + logo (top-left) -->
+            <div class="inv-logo-corner">
+                <img src="@logoUrl" alt="Logo" class="inv-logo-img" />
+            </div>
 
-        <!-- Top Content -->
-        <div class="top-content">
-            <div class="logo-box">
-                <img src="@logoUrl" alt="Logo" />
-                <div class="slogan">Innovating the Future</div>
-                
-                <div class="invoice-meta">
-                    <div class="meta-item">
-                        <div class="meta-label">
-                            <i class="ph-file-text-bold"></i> Invoice No.
-                        </div>
-                        <div class="meta-value">: @billRef</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">
-                            <i class="ph-calendar-blank-bold"></i> Invoice Date
-                        </div>
-                        <div class="meta-value">: @Model.Invoice.date</div>
-                    </div>
-                </div>
+            <!-- Invoice title (top-right) -->
+            <div class="inv-title-block">
+                <div class="inv-title-text">INVOICE</div>
+                <div class="inv-ref-text">#@billRef</div>
             </div>
         </div>
 
-        <!-- Billing Info -->
-        <div class="billing-grid">
-            <div class="billing-card">
-                <div class="billing-header">Bill From</div>
-                <div class="billing-body">
-                    <div class="bill-row">
-                        <i class="ph-buildings-bold"></i>
-                        <div class="bill-content">@(Model.Store?.ShopName ?? "Company Name")</div>
-                    </div>
-                    <div class="bill-row">
-                        <i class="ph-phone-bold"></i>
-                        <div class="bill-content">@(Model.Store?.Phone1 ?? "Contact")</div>
-                    </div>
-                    <div class="bill-row">
-                        <i class="ph-map-pin-bold"></i>
-                        <div class="bill-content">@(Model.Store?.Address ?? "Address")</div>
-                    </div>
-                </div>
+        <!-- ══ INVOICE FROM BADGE ══ -->
+        <div class="inv-from-badge-wrap">
+            <span class="inv-from-badge">INVOICE FROM:</span>
+        </div>
+
+        <!-- ══ BILLING INFO ══ -->
+        <div class="billing-row">
+            <!-- Left: customer -->
+            <div class="bill-left">
+                <div class="bill-name">@custName</div>
+                @if (!string.IsNullOrEmpty(custAddress))
+                {
+                    <div class="bill-detail">@custAddress</div>
+                }
+                @if (!string.IsNullOrEmpty(custPhone))
+                {
+                    <div class="bill-detail">Phone: @custPhone</div>
+                }
             </div>
 
-            <div class="billing-card">
-                <div class="billing-header">Bill To</div>
-                <div class="billing-body">
-                    <div class="bill-row">
-                        <i class="ph-user-bold"></i>
-                        <div class="bill-content">@(string.IsNullOrEmpty(Model.Invoice.customer_name) ? "Walk-In Customer" : Model.Invoice.customer_name)</div>
-                    </div>
-                    <div class="bill-row">
-                        <i class="ph-phone-bold"></i>
-                        <div class="bill-content">@(Model.Invoice.customer_contact ?? "Contact")</div>
-                    </div>
-                    <div class="bill-row">
-                        <i class="ph-map-pin-bold"></i>
-                        <div class="bill-content">@(Model.Invoice.customer_address ?? "Address")</div>
-                    </div>
-                </div>
+            <!-- Right: seller -->
+            <div class="bill-right">
+                <div class="bill-name">@sellerName</div>
+                @if (!string.IsNullOrEmpty(sellerCity))
+                {
+                    <div class="bill-detail">@sellerCity</div>
+                }
+                @if (!string.IsNullOrEmpty(sellerPhone))
+                {
+                    <div class="bill-detail">Phone: @sellerPhone</div>
+                }
+                <div class="bill-detail"><strong>Date: @invoiceDate</strong></div>
             </div>
         </div>
 
-        <!-- Items Table -->
-        <div class="table-section">
-            <div class="invoice-table-wrap">
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th><i class="ph-cube-bold"></i></th>
-                            <th>Product</th>
-                            <th style="text-align: right;">Price</th>
-                            <th style="text-align: center;">Qty</th>
-                            <th style="text-align: right;">Total Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.IsMultiItem)
+        <!-- ══ STATUS ROW ══ -->
+        <div class="status-row">
+            <div class="status-item">
+                <span class="status-label">STATUS</span>
+                <span class="status-badge" style="background:@statusColor;">@status.ToUpper()</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">PAYMENT METHOD</span>
+                <span class="status-value">@payment</span>
+            </div>
+        </div>
+
+        <!-- ══ ITEMS TABLE ══ -->
+        <div class="table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th class="th-product">PRODUCTS/SERVICES</th>
+                        <th class="th-price">PRICE</th>
+                        <th class="th-qty">QTY/UNIT TYPE</th>
+                        <th class="th-total">TOTAL PRICE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.IsMultiItem)
+                    {
+                        foreach (var item in Model.Items)
                         {
-                            foreach (var item in Model.Items)
-                            {
-                                <tr>
-                                    <td></td>
-                                    <td>@item["name"]</td>
-                                    <td style="text-align: right;">@(((decimal)item["price"]).ToString("N2"))</td>
-                                    <td style="text-align: center;">@item["qty"]</td>
-                                    <td style="text-align: right;">@(((decimal)item["total"]).ToString("N2"))</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
+                            var iName   = item.ContainsKey("Name")       ? item["Name"].ToString()        : (item.ContainsKey("name") ? item["name"].ToString() : "");
+                            var iPrice  = item.ContainsKey("Price")      ? (decimal)item["Price"]         : (item.ContainsKey("price") ? (decimal)item["price"] : 0m);
+                            var iQty    = item.ContainsKey("Qty")        ? item["Qty"].ToString()         : (item.ContainsKey("qty") ? item["qty"].ToString() : "1");
+                            var iTotal  = item.ContainsKey("Total")      ? (decimal)item["Total"]         : (item.ContainsKey("total") ? (decimal)item["total"] : 0m);
+                            var iExpiry = item.ContainsKey("ExpiryDate") ? item["ExpiryDate"].ToString()  : (item.ContainsKey("expiryDate") ? item["expiryDate"].ToString() : "");
                             <tr>
-                                <td></td>
-                                <td>@Model.Invoice.prod_name_service</td>
-                                <td style="text-align: right;">@Model.Invoice.price.ToString("N2")</td>
-                                <td style="text-align: center;">@Model.Invoice.qty_unit_type</td>
-                                <td style="text-align: right;">@((Model.Invoice.price - Model.Invoice.discount).ToString("N2"))</td>
+                                <td>
+                                    <div class="td-name">@iName</div>
+                                    @if (!string.IsNullOrEmpty(iExpiry) && iExpiry != "N/A")
+                                    {
+                                        <div class="td-expiry">Expiry: @iExpiry</div>
+                                    }
+                                </td>
+                                <td class="td-right">@symbol@iPrice.ToString("N2")</td>
+                                <td class="td-center">@iQty</td>
+                                <td class="td-right">@symbol@iTotal.ToString("N2")</td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <div class="td-name">@Model.Invoice.prod_name_service</div>
+                                @if (Model.SingleItemExpiry != "N/A" && !string.IsNullOrEmpty(Model.SingleItemExpiry))
+                                {
+                                    <div class="td-expiry">Expiry: @Model.SingleItemExpiry</div>
+                                }
+                            </td>
+                            <td class="td-right">@symbol@Model.Invoice.price.ToString("N2")</td>
+                            <td class="td-center">@Model.Invoice.qty_unit_type</td>
+                            <td class="td-right">@symbol@Model.Subtotal.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
-        <!-- Bottom Section -->
+        <!-- ══ BOTTOM SECTION ══ -->
         <div class="bottom-section">
-            <div class="notes-box">
-                <h4>Notes</h4>
-                <div class="notes-content">
-                    Thank you for your business. Please keep this invoice for your records. For any queries, contact our support team.
+            <!-- Left: Terms & Signature -->
+            <div class="terms-col">
+                <div class="terms-title">Terms &amp; Conditions</div>
+                <div class="terms-text">
+                    Please make payment within 15 days of receiving this invoice.<br />
+                    Thank you for choosing @sellerName for your business needs.
                 </div>
+                <div class="signature-line"></div>
+                <div class="signature-label">AUTHORIZED SIGNATURE</div>
             </div>
 
-            <div class="summary-box">
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>@symbol@Model.Subtotal.ToString("N2")</span>
+            <!-- Right: Totals -->
+            <div class="totals-col">
+                <div class="totals-row">
+                    <span class="tot-label">Sub Total</span>
+                    <span class="tot-val">@symbol@Model.Subtotal.ToString("N2")</span>
                 </div>
-                <div class="summary-row">
-                    <span>Tax (0%)</span>
-                    <span>@symbol 0.00</span>
+                <div class="totals-row">
+                    <span class="tot-label discount-label">Discount</span>
+                    <span class="tot-val discount-val">- @symbol@Model.Invoice.discount.ToString("N2")</span>
                 </div>
-                @if (Model.Invoice.discount > 0)
-                {
-                    <div class="summary-row">
-                        <span>Discount</span>
-                        <span style="color: var(--primary-red);">-@symbol@Model.Invoice.discount.ToString("N2")</span>
-                    </div>
-                }
-                
-                <div class="total-row-premium">
-                    <div class="total-label">Total Price</div>
-                    <div class="total-value">
-                        @symbol@Model.Invoice.total_price.ToString("N2")
-                        <i class="ph-caret-right-bold"></i>
-                    </div>
+                <div class="grand-total-row">
+                    <span class="grand-label">GRAND<br/>TOTAL</span>
+                    <span class="grand-val">@symbol@Model.Invoice.total_price.ToString("N2")</span>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Design -->
-        <div class="footer-waves">
-            <div class="footer-bg"></div>
-            <div class="footer-red"></div>
+        <!-- ══ BOTTOM CORNER DECORATION ══ -->
+        <div class="bottom-left-corner"></div>
+
+        <!-- ══ FOOTER BAR ══ -->
+        <div class="footer-bar">
+            @sellerName.ToUpper() E-INVOICE SYSTEM &nbsp;&nbsp;|&nbsp;&nbsp; INNOVATING THE FUTURE
         </div>
 
-        <div class="footer-content">
-            <div class="foot-item">
-                <i class="ph-phone-bold"></i>
-                <span>@(Model.Store?.Phone1 ?? "Phone")</span>
-            </div>
-            <div class="foot-item">
-                <i class="ph-envelope-simple-bold"></i>
-                <span>@(Model.Store?.ShopName?.Replace(" ", "").ToLower() ?? "info")@@sata.tech</span>
-            </div>
-            <div class="foot-item">
-                <i class="ph-globe-bold"></i>
-                <span>www.sata-tech.com</span>
-            </div>
-        </div>
-
-        <div class="footer-logo">
-            <i class="ph-flame-bold"></i>
-        </div>
     </div>
+
+    <script>
+        // Auto-print on load if ?autoprint=1
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('autoprint') === '1') window.print();
+    </script>
 
 </body>
 </html>

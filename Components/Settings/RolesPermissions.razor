@@ -212,10 +212,8 @@
 
 @code {
     private string selectedRole = "";
-    private bool showComboDropdown = false;
     private bool isSaving = false;
     private bool isSubmitting = false;
-    private string? successMessage;
     private string? errorMessage;
 
     // Roles list from database
@@ -279,7 +277,7 @@
 
     private async Task LoadPermissions()
     {
-        successMessage = null;
+        errorMessage = null;
         errorMessage = null;
         currentPermissions = new RolePermission(); // Reset to empty defaults
 
@@ -327,7 +325,7 @@
     private async Task SavePermissions()
     {
         isSaving = true;
-        successMessage = null;
+        errorMessage = null;
         errorMessage = null;
         await InvokeAsync(StateHasChanged);
 

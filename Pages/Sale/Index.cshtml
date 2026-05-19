@@ -73,7 +73,7 @@
                             <td>
                                 <div class="font-bold">@sale.no_of_items</div>
                             </td>
-                            <td>@sale.total_qty.ToString("N2")</td>
+                            <td>@sale.total_qty.ToString("N0")</td>
                             <td class="text-muted">@CurrencyService.GetSymbol()@sale.Price.ToString("N2")</td>
                             <td>
                                 <div class="font-bold text-primary">@CurrencyService.GetSymbol()@sale.TotalPrice.ToString("N2")</div>
@@ -187,7 +187,7 @@
                             <td>
                                 <div class="font-bold">@ret.no_of_items</div>
                             </td>
-                            <td>@ret.total_qty.ToString("N2")</td>
+                            <td>@ret.total_qty.ToString("N0")</td>
                             <td>
                                 <div class="font-bold text-danger">@CurrencyService.GetSymbol()@Math.Abs(ret.Amount).ToString("N2")</div>
                             </td>
