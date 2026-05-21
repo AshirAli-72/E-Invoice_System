@@ -27,6 +27,7 @@ namespace E_Invoice_system.Data
         public DbSet<StockDetail> stock_details { get; set; }
         public DbSet<stock_history> stock_history { get; set; }
         public DbSet<Employee> employees { get; set; }
+        public DbSet<Credit> credits { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,6 +74,14 @@ namespace E_Invoice_system.Data
                 entity.Property(e => e.old_purchase_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.new_sale_price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.old_sale_price).HasColumnType("decimal(18,2)");
+            });
+
+            modelBuilder.Entity<Credit>(entity =>
+            {
+                entity.Property(e => e.grand_total).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.paid_amount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.discount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.remaining_amount).HasColumnType("decimal(18,2)");
             });
 
             modelBuilder.Entity<Employee>(entity =>

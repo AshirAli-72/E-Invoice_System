@@ -247,71 +247,247 @@
 <!-- PAYMENT MODAL -->
 @if (showPaymentModal)
 {
-    <div class="modal-overlay show" style="display: flex;">
-        <div class="payment-card">
-            <div class="payment-left">
-                <h1 class="payment-title">Checkout</h1>
-                <p class="payment-subtitle">Complete your transaction by selecting a payment method.</p>
-                <div class="method-tabs">
-                    <div class="method-tab @(paymentMethod == "Cash" ? "active" : "")" @onclick='() => SetPaymentMethod("Cash")'><i class="ph-money"></i> <span>Cash</span></div>
-                    <div class="method-tab @(paymentMethod == "Card" ? "active" : "")" @onclick='() => SetPaymentMethod("Card")'><i class="ph-credit-card"></i> <span>Card</span></div>
-                    <div class="method-tab @(paymentMethod == "Transfer" ? "active" : "")" @onclick='() => SetPaymentMethod("Transfer")'><i class="ph-bank"></i> <span>Bank</span></div>
-                    <div class="method-tab @(paymentMethod == "Credit" ? "active" : "")" @onclick='() => SetPaymentMethod("Credit")'><i class="ph-user-focus"></i> <span>Credit</span></div>
+    <div class="modal-overlay show" style="display:flex;">
+
+        <div class="payment-card-v4">
+
+            <!-- LEFT -->
+            <div class="payment-left-v4">
+
+                <!-- HEADER -->
+                <div class="payment-header-v4">
+
+                    <div class="payment-brand-v4">
+
+                        <div class="payment-icon-v4">
+                            <i class="ph-shopping-cart-bold"></i>
+                        </div>
+
+                        <div>
+                            <h1>Checkout</h1>
+                            <p>Complete your transaction securely</p>
+                        </div>
+
+                    </div>
+
                 </div>
-                <div class="web-input-group">
+
+                <!-- METHODS -->
+                <div class="payment-methods-v4">
+
+                    <div class="payment-method-card @(paymentMethod == "Cash" ? "active" : "")"
+                         @onclick='() => SetPaymentMethod("Cash")'>
+
+                        <i class="ph-money-bold"></i>
+
+                        <div>
+                            <span>Cash</span>
+                          
+                        </div>
+
+                    </div>
+
+                    <div class="payment-method-card @(paymentMethod == "Card" ? "active" : "")"
+                         @onclick='() => SetPaymentMethod("Card")'>
+
+                        <i class="ph-credit-card-bold"></i>
+
+                        <div>
+                            <span>Card</span>
+                           
+                        </div>
+
+                    </div>
+
+                    <div class="payment-method-card @(paymentMethod == "Transfer" ? "active" : "")"
+                         @onclick='() => SetPaymentMethod("Transfer")'>
+
+                        <i class="ph-bank-bold"></i>
+
+                        <div>
+                            <span>Bank</span>
+                           
+                        </div>
+
+                    </div>
+
+                    <div class="payment-method-card @(paymentMethod == "Credit" ? "active" : "")"
+                         @onclick='() => SetPaymentMethod("Credit")'>
+
+                        <i class="ph-user-focus-bold"></i>
+
+                        <div>
+                            <span>Credit</span>
+                           
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- AMOUNT -->
+                <div class="payment-input-group-v4">
+
                     <label>Amount Tendered</label>
-                    <input type="number" class="web-input" step="0.01" @bind="tenderedAmount" @bind:event="oninput" placeholder="0.00" />
-                    <div class="quick-pills">
-                        @foreach (var amt in new[] { 10, 20, 50, 100, 500, 1000, 5000 })
+
+                    <div class="payment-input-wrap-v4">
+
+                        <i class="ph-currency-circle-dollar-bold"></i>
+
+                        <input type="number"
+                               class="payment-input-v4"
+                               step="0.01"
+                               @bind="tenderedAmount"
+                               @bind:event="oninput"
+                               placeholder="0.00" />
+
+                    </div>
+
+                    <!-- QUICK -->
+                    <div class="payment-quick-v4">
+
+                        @foreach (var amt in new[] {1000,3000,5000 })
                         {
-                            <div class="quick-pill" @onclick="() => tenderedAmount = (tenderedAmount ?? 0) + amt">+ @CurrencyService.GetSymbol()@amt</div>
+                            <div class="payment-pill-v4"
+                                 @onclick="() => tenderedAmount = (tenderedAmount ?? 0) + amt">
+                                + @CurrencyService.GetSymbol()@amt
+                            </div>
                         }
-                        <div class="quick-pill" @onclick="() => tenderedAmount = Math.Abs(currentTotal)">Match Total</div>
+                        <div class="payment-pill-v4 special"
+                             @onclick="() => tenderedAmount = Math.Abs(currentTotal)">
+                            Match Total
+                        </div>
+
                     </div>
+
                 </div>
-                <div class="web-input-group">
+
+                <!-- NOTE -->
+                <div class="payment-input-group-v4">
+
                     <label>Reference / Note</label>
-                    <input type="text" class="web-input" @bind="notes" placeholder="Transaction notes (optional)" />
+
+                    <div class="payment-input-wrap-v4">
+
+                        <i class="ph-note-pencil-bold"></i>
+
+                        <input type="text"
+                               class="payment-input-v4"
+                               @bind="notes"
+                               placeholder="Transaction notes (optional)" />
+
+                    </div>
+
                 </div>
+
             </div>
-            <div class="payment-right">
-                <div class="summary-box-web">
-                    <div class="summary-web-line">
-                        <span style="color:var(--text-muted);font-weight:600;">Total Amount Due</span>
-                        <span style="font-weight:800; color: var(--text-main);">@FormatCurrency(currentTotal)</span>
+
+            <!-- RIGHT -->
+            <div class="payment-right-v4">
+
+                <!-- SUMMARY -->
+                <div class="payment-summary-v4">
+
+                    <div class="summary-top-v4">
+                        <h3>Payment Summary</h3>
+                        <p>Transaction overview</p>
                     </div>
-                    <div class="summary-web-line" style="margin-top:8px;">
-                        <span style="color:var(--text-muted);font-weight:600;">Total Tendered</span>
-                        <span style="font-weight:800; color: var(--text-main);">@FormatCurrency(tenderedAmount ?? 0)</span>
+
+                    <div class="summary-line-v4">
+                        <span>Total Amount</span>
+                        <strong>@FormatCurrency(currentTotal)</strong>
                     </div>
+
+                    <div class="summary-line-v4">
+                        <span>Tendered</span>
+                        <strong>@FormatCurrency(tenderedAmount ?? 0)</strong>
+                    </div>
+
                     @{
                         var change = (tenderedAmount ?? 0) - Math.Abs(currentTotal);
-                        <div class="summary-web-line grand">
+
+                        <div class="summary-line-v4 total">
                             <span>Change Due</span>
-                            <span style="color: @(change >= 0 ? "var(--success)" : "var(--danger)")">@FormatCurrency(Math.Abs(change))</span>
+
+                            <strong style="color:@(change >= 0 ? "var(--success)" : "var(--danger)")">
+
+                                @FormatCurrency(Math.Abs(change))
+
+                            </strong>
                         </div>
                     }
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding:12px 16px;background:var(--surface);border-radius:14px;box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                        <label style="font-weight:800;color:var(--text-main);cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.9rem;">
-                            <i class="ph-printer" style="font-size:1.25rem;color:var(--primary);"></i> Print Receipt
-                        </label>
-                        <input type="checkbox" style="width:20px;height:20px;cursor:pointer;accent-color:var(--primary);" @bind="shouldPrintReceipt" />
-                    </div>
+
                 </div>
-                <div style="margin-top:auto;">
-                    <p style="font-size:.8rem;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.5;font-weight:600;">
-                        By completing this order, you agree to generate an official invoice and update stock levels.
+
+                <!-- RECEIPT -->
+                <div class="receipt-box-v4">
+
+                    <div class="receipt-left-v4">
+
+                        <div class="receipt-icon-v4">
+                            <i class="ph-printer-bold"></i>
+                        </div>
+
+                        <div>
+                            <span>Print Receipt</span>
+                            <small>Generate invoice after checkout</small>
+                        </div>
+
+                    </div>
+
+                    <!-- Toggle Switch -->
+                    <label class="receipt-toggle-v4">
+
+                        <input type="checkbox"
+                               @bind="shouldPrintReceipt" />
+
+                        <span class="receipt-slider-v4"></span>
+
+                    </label>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="payment-footer-v4">
+
+                    <p class="payment-info-v4">
+                        By completing this order, stock levels and invoice records will automatically update.
                     </p>
-                    <div style="display:flex;gap:12px;">
-                        <button type="button" class="btn-confirm-web cancel" style="flex:1;" @onclick="() => showPaymentModal = false">Cancel</button>
-                        <button type="button" class="btn-confirm-web confirm @(isSubmitting ? "processing" : "")" style="flex:1;" @onclick="SubmitSale" disabled="@isSubmitting">
-                            @if (isSubmitting) { <i class="ph-spinner ph-spin"></i> }
-                            else { <span>Complete Order</span> }
+
+                    <div class="payment-actions-v4">
+
+                        <button type="button"
+                                class="payment-btn-v4 cancel"
+                                @onclick="() => showPaymentModal = false">
+
+                            Cancel
+
                         </button>
+
+                        <button type="button"
+                                class="payment-btn-v4 confirm @(isSubmitting ? "processing" : "")"
+                                @onclick="SubmitSale"
+                                disabled="@isSubmitting">
+
+                            @if (isSubmitting)
+                            {
+                                <i class="ph-spinner ph-spin"></i>
+                            }
+                            else
+                            {
+                                <span>Complete Order</span>
+                            }
+
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 }
 

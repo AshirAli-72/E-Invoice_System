@@ -33,6 +33,7 @@ namespace E_Invoice_system.Pages
             public int SaleCount { get; set; }
             public int ReturnCount { get; set; }
             public int LowStockCount { get; set; }
+            public int TotalEmployees { get; set; }
         }
 
         public int TotalCustomers { get; set; }
@@ -43,6 +44,7 @@ namespace E_Invoice_system.Pages
         public int SaleCount { get; set; }
         public int ReturnCount { get; set; }
         public int LowStockCount { get; set; }
+        public int TotalEmployees { get; set; }
         public string? ErrorMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -145,6 +147,13 @@ namespace E_Invoice_system.Pages
             }
             catch (Exception ex) { _logger.LogError(ex, "Dashboard: Error fetching LowStockCount"); }
 
+            // 10. Total Employees
+            try
+            {
+                stats.TotalEmployees = await context.employees.AsNoTracking().CountAsync();
+            }
+            catch (Exception ex) { _logger.LogError(ex, "Dashboard: Error fetching TotalEmployees"); }
+
             // Cache only if we have some data to avoid caching transient failures
             if (stats.TotalCustomers > 0 || stats.TotalProducts > 0)
             {
@@ -167,6 +176,7 @@ namespace E_Invoice_system.Pages
             SaleCount = stats.SaleCount;
             ReturnCount = stats.ReturnCount;
             LowStockCount = stats.LowStockCount;
+            TotalEmployees = stats.TotalEmployees;
         }
     }
 }

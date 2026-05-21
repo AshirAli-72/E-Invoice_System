@@ -4,103 +4,316 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<!-- Dashboard Hero / Welcome Section -->
-<div class="dashboard-hero">
-    <div class="hero-content">
-        <h1 class="hero-title">Welcome back, @(HttpContext.Session.GetString("UserName") ?? "Admin")! 👋</h1>
-        <p class="hero-subtitle">Here is what's happening with your store today.</p>
-    </div>
-    <div class="hero-actions">
-        <a href="/Sale/Create" class="btn-hero-primary"><i class="ph-shopping-cart-bold"></i> New Sale</a>
-        <a href="/Product/Index" class="btn-hero-secondary"><i class="ph-package-bold"></i> Inventory</a>
-    </div>
-</div>
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 0.5rem 0;
+    }
 
-@if (Model.LowStockCount > 0)
-{
-    <div class="alert-modern alert-warning slide-in">
-        <div class="alert-icon-wrapper">
-            <i class="ph-warning-circle-fill"></i>
-        </div>
-        <div class="alert-text">
-            <strong>Action Required:</strong> There are <span>@Model.LowStockCount</span> products running low on stock.
-        </div>
-        <a asp-page="/Product/Index" class="alert-action">View Products <i class="ph-arrow-right"></i></a>
-    </div>
-}
+    .alert-box {
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+        background: rgba(249, 115, 22, 0.1);
+        border-left: 4px solid #f97316;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
 
-<!-- Key Metrics Grid -->
-<div class="metrics-grid">
-    <div class="metric-card">
-        <div class="metric-icon-bg bg-blue">
-            <i class="ph-users-three-duotone"></i>
-        </div>
-        <div class="metric-info">
-            <p class="metric-label">Total Customers</p>
-            <h3 class="metric-value">@Model.TotalCustomers</h3>
-            <div class="metric-trend positive"><i class="ph-trend-up"></i> Active Users</div>
-        </div>
-    </div>
+    .alert-icon-box {
+        background: #f97316;
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 
-    <div class="metric-card">
-        <div class="metric-icon-bg bg-green">
-            <i class="ph-currency-circle-dollar-duotone"></i>
-        </div>
-        <div class="metric-info">
-            <p class="metric-label">Total Revenue</p>
-            <h3 class="metric-value">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</h3>
-            <div class="metric-trend positive"><i class="ph-trend-up"></i> Total Sales Volume</div>
-        </div>
-    </div>
+    .stats-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
 
-    <div class="metric-card">
-        <div class="metric-icon-bg bg-orange">
-            <i class="ph-package-duotone"></i>
-        </div>
-        <div class="metric-info">
-            <p class="metric-label">Active Products</p>
-            <h3 class="metric-value">@Model.TotalProducts</h3>
-            <div class="metric-trend neutral"><i class="ph-minus"></i> Current Inventory</div>
-        </div>
-    </div>
-</div>
+    @@media (max-width: 1200px) {
+        .stats-grid-modern {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 
-<!-- Charts Section -->
-<div class="dashboard-charts-grid">
-    <div class="chart-card span-2">
-        <div class="chart-header">
-            <div>
-                <h3 class="chart-title">Revenue Overview</h3>
-                <p class="chart-subtitle">Sales performance over the last 7 days</p>
+    @@media (max-width: 600px) {
+        .stats-grid-modern {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat-card-modern {
+        background: var(--card-bg, #fff);
+        padding: 1.15rem;
+        border-radius: 14px;
+        border: 1px solid var(--border, #e2e8f0);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--card-color);
+        opacity: 0.8;
+    }
+
+    .stat-card-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-card-modern:hover .stat-icon-modern {
+        transform: scale(1.1) rotate(8deg);
+    }
+
+    .stat-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.85rem;
+    }
+
+    .stat-icon-modern {
+        width: 40px;
+        height: 40px;
+        background: var(--card-bg-light);
+        color: var(--card-color);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-label-modern {
+        color: var(--text-muted, #64748b);
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .stat-value-modern {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text, #1e293b);
+        margin: 0.15rem 0 0 0;
+        line-height: 1.2;
+    }
+
+    .charts-grid-modern {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 1rem;
+    }
+
+    @@media (max-width: 900px) {
+        .charts-grid-modern {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .charts-grid-modern {
+        display: grid;
+        grid-template-columns: 2.2fr 0.8fr; /* Line chart wider, pie chart smaller */
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    @@media (max-width: 900px) {
+        .charts-grid-modern {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Chart Card */
+    .chart-card-modern {
+        background: var(--card-bg, #fff);
+        border-radius: 14px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--border, #e2e8f0);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* LINE CHART HEIGHT INCREASE */
+    .line-chart-container {
+        flex: 1;
+        min-height: 340px;
+        max-height: 420px;
+        position: relative;
+    }
+
+    /* PIE CHART SMALLER */
+    .pie-chart-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 180px;
+        max-height: 180px;
+        margin: 0 auto;
+    }
+    
+    .pie-legend {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        width: 100%;
+        background: var(--bg-light, #f8fafc);
+        padding: 0.65rem;
+        border-radius: 8px;
+        margin-top: 0.75rem;
+    }
+
+    .pie-legend-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .pie-legend-label {
+        font-size: 0.72rem;
+        color: var(--text-muted, #64748b);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .pie-legend-value {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .pie-legend-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+    }
+
+    .pie-legend-num {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text, #0f172a);
+    }
+</style>
+
+<div class="dashboard-container">
+    @if (Model.LowStockCount > 0)
+    {
+        <div class="alert-box">
+            <div class="alert-icon-box">
+                <i class="ph-warning-bold" style="font-size: 1.2rem;"></i>
             </div>
-            <div class="chart-action">
-                <span class="badge-soft">Weekly</span>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; color: #9a3412; font-size: 0.9rem; margin-bottom: 0.15rem;">Stock Alert</div>
+                <p style="margin: 0; color: #c2410c; font-size: 0.82rem;">There are <strong>@Model.LowStockCount</strong> products running low on stock.</p>
             </div>
+            <a asp-page="/Product/Index" class="btn-primary btn-sm" style="background: #ea580c; border: none; font-size: 0.8rem;">
+                View Inventory
+            </a>
         </div>
-        <div class="chart-body">
-            <canvas id="trendChart"></canvas>
+    }
+
+    <!-- Stats Grid -->
+    <div class="stats-grid-modern">
+
+        <div class="stat-card-modern" style="--card-color: #4f46e5; --card-bg-light: rgba(79, 70, 229, 0.1);">
+            <div class="stat-header-modern">
+                <div class="stat-icon-modern"><i class="ph-users-three"></i></div>
+                <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;">Total</span>
+            </div>
+            <div class="stat-label-modern">Employees</div>
+            <div class="stat-value-modern">@Model.TotalEmployees</div>
+        </div>
+
+        <div class="stat-card-modern" style="--card-color: #0ea5e9; --card-bg-light: rgba(14, 165, 233, 0.1);">
+            <div class="stat-header-modern">
+                <div class="stat-icon-modern"><i class="ph-users"></i></div>
+                <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;">Active</span>
+            </div>
+            <div class="stat-label-modern">Customers</div>
+            <div class="stat-value-modern">@Model.TotalCustomers</div>
+        </div>
+
+        <div class="stat-card-modern" style="--card-color: #10b981; --card-bg-light: rgba(16, 185, 129, 0.1);">
+            <div class="stat-header-modern">
+                <div class="stat-icon-modern"><i class="ph-currency-circle-dollar"></i></div>
+                <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;"><i class="ph-trend-up"></i> Growth</span>
+            </div>
+            <div class="stat-label-modern">Total Sales</div>
+            <div class="stat-value-modern">@CurrencyService.GetSymbol()@(Model.TotalSales.ToString("N2"))</div>
+        </div>
+
+        <div class="stat-card-modern" style="--card-color: #f59e0b; --card-bg-light: rgba(245, 158, 11, 0.1);">
+            <div class="stat-header-modern">
+                <div class="stat-icon-modern"><i class="ph-package"></i></div>
+                <span class="badge badge-warning" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-size: 0.7rem;">Items</span>
+            </div>
+            <div class="stat-label-modern">Products</div>
+            <div class="stat-value-modern">@Model.TotalProducts</div>
         </div>
     </div>
 
-    <div class="chart-card">
-        <div class="chart-header">
-            <div>
-                <h3 class="chart-title">Sales vs Returns</h3>
-                <p class="chart-subtitle">Transaction ratio</p>
+    <!-- Charts Grid -->
+    <div class="charts-grid-modern">
+        <!-- Trend Chart -->
+        <div class="chart-card-modern">
+            <div class="chart-header-modern">
+                <h3 class="chart-title-modern">Revenue Trend (Last 7 Days)</h3>
+            </div>
+            <div class="line-chart-container">
+                <canvas id="trendChart"></canvas>
             </div>
         </div>
-        <div class="chart-body doughnut-body">
-            <canvas id="saleReturnChart"></canvas>
-            <div class="doughnut-legend">
-                <div class="legend-item">
-                    <span class="legend-dot dot-sale"></span>
-                    <span class="legend-label">Sales</span>
-                    <span class="legend-value">@Model.SaleCount</span>
+
+        <!-- Sale vs Return Pie Chart -->
+        <div class="chart-card-modern">
+            <div class="chart-header-modern">
+                <h3 class="chart-title-modern">Sale vs Return</h3>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="pie-chart-wrapper">
+                    <canvas id="saleReturnPieChart"></canvas>
                 </div>
-                <div class="legend-item">
-                    <span class="legend-dot dot-return"></span>
-                    <span class="legend-label">Returns</span>
-                    <span class="legend-value">@Model.ReturnCount</span>
+                <div class="pie-legend">
+                    <div class="pie-legend-item">
+                        <span class="pie-legend-label">Sales</span>
+                        <div class="pie-legend-value">
+                            <span class="pie-legend-dot" style="background: #10b981;"></span>
+                            <span class="pie-legend-num">@Model.SaleCount</span>
+                        </div>
+                    </div>
+                    <div style="width: 1px; background: var(--border, #e2e8f0);"></div>
+                    <div class="pie-legend-item">
+                        <span class="pie-legend-label">Returns</span>
+                        <div class="pie-legend-value">
+                            <span class="pie-legend-dot" style="background: #ef4444;"></span>
+                            <span class="pie-legend-num">@Model.ReturnCount</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,37 +328,32 @@
                 return;
             }
 
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const labelColor = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
-            const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
-            const fontFam = "'Inter', sans-serif";
+            const labelColor = '#475569';
+            const gridColor = '#f1f5f9';
 
-            Chart.defaults.font.family = fontFam;
-            Chart.defaults.color = labelColor;
-
-            // Trend Chart
+            // Trend Line Chart
             const trendChartEl = document.getElementById('trendChart');
             if (trendChartEl) {
                 const existingTrend = Chart.getChart(trendChartEl);
                 if (existingTrend) existingTrend.destroy();
 
                 const trendCtx = trendChartEl.getContext('2d');
-                var gradient = trendCtx.createLinearGradient(0, 0, 0, 350);
-                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
-                gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+                var gradient = trendCtx.createLinearGradient(0, 0, 0, 250);
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
                 new Chart(trendCtx, {
                     type: 'line',
                     data: {
                         labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
                         datasets: [{
-                            label: 'Sales Trend',
+                            label: 'Sales Count',
                             data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendData)),
                             backgroundColor: gradient,
-                            borderColor: '#4f46e5',
-                            borderWidth: 3,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
                             pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#4f46e5',
+                            pointBorderColor: '#10b981',
                             pointBorderWidth: 2,
                             pointRadius: 4,
                             pointHoverRadius: 6,
@@ -160,25 +368,21 @@
                             legend: { display: false },
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleFont: { size: 13, family: fontFam },
-                                bodyFont: { size: 14, weight: 'bold', family: fontFam },
-                                padding: 12,
-                                cornerRadius: 8,
-                                displayColors: false
+                                padding: 10,
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                cornerRadius: 6
                             }
                         },
                         scales: {
-                            y: { 
-                                beginAtZero: true, 
-                                grid: { 
-                                    color: gridColor,
-                                    drawBorder: false 
-                                },
-                                ticks: { font: { size: 12 } }
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: { font: { size: 11 }, color: labelColor }
                             },
-                            x: { 
+                            x: {
                                 grid: { display: false },
-                                ticks: { font: { size: 12 } }
+                                ticks: { font: { size: 11 }, color: labelColor }
                             }
                         },
                         interaction: { intersect: false, mode: 'index' }
@@ -186,46 +390,46 @@
                 });
             }
 
-            // Doughnut Chart
-            const saleReturnChartEl = document.getElementById('saleReturnChart');
-            if (saleReturnChartEl) {
-                const existingSaleReturn = Chart.getChart(saleReturnChartEl);
-                if (existingSaleReturn) existingSaleReturn.destroy();
+            // Sale vs Return PIE Chart
+            const pieChartEl = document.getElementById('saleReturnPieChart');
+            if (pieChartEl) {
+                const existingPie = Chart.getChart(pieChartEl);
+                if (existingPie) existingPie.destroy();
 
-                new Chart(saleReturnChartEl.getContext('2d'), {
-                    type: 'doughnut',
+                new Chart(pieChartEl.getContext('2d'), {
+                    type: 'pie',
                     data: {
                         labels: ['Sales', 'Returns'],
                         datasets: [{
                             data: [@Model.SaleCount, @Model.ReturnCount],
                             backgroundColor: ['#10b981', '#ef4444'],
-                            hoverOffset: 10,
-                            borderWidth: 0,
-                            borderRadius: 8,
-                            spacing: 4
+                            hoverOffset: 8,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '75%',
+                        maintainAspectRatio: true,
                         plugins: {
                             legend: { display: false },
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleFont: { size: 13 },
-                                bodyFont: { size: 14, weight: 'bold' },
-                                padding: 12,
-                                cornerRadius: 8
+                                padding: 10,
+                                bodyFont: { size: 12, weight: 'bold' },
+                                cornerRadius: 6
                             }
                         },
-                        animation: { animateScale: true, animateRotate: true }
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true,
+                            duration: 800
+                        }
                     }
                 });
             }
         };
 
         initCharts();
-        window.addEventListener('theme:changed', () => { setTimeout(initCharts, 50); });
     })();
 </script>
